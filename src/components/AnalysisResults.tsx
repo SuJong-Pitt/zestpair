@@ -23,6 +23,7 @@ import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBasketStore } from "@/store/basketStore";
 import type { CoupangProduct, AnalysisResult, InteractionResult } from "@/types/database";
+import SynergyCard from "./SynergyCard";
 
 interface AnalysisResultsProps {
     result: AnalysisResult;
@@ -363,14 +364,22 @@ function ProductCard({ product, index }: { product: CoupangProduct; index: numbe
 export default function AnalysisResults({ result, coupangProducts = [] }: AnalysisResultsProps) {
     const { clearBasket, setHasResult } = useBasketStore();
 
+    if (!result || !result.ingredients) {
+        return <div className="p-20 text-center text-slate-400">분석 결과를 불러오는 중입니다...</div>;
+    }
+    
     const allInteractions = [
         ...result.synergies,
         ...result.cautions,
         ...result.conflicts,
-    ].filter((r) => r.interaction !== null);
+    ].filter((r) => r && r.interaction);
 
     return (
-        <div className="space-y-12 pb-32 animate-fade-in-up max-w-4xl mx-auto">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-16 pb-32 max-w-5xl mx-auto px-4"
+        >
             {/* 종합 점수 카드 - Centered Impact & Premium Report */}
             <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-emerald-500 to-cyan-500 rounded-[3rem] blur opacity-15 group-hover:opacity-30 transition duration-1000"></div>
@@ -464,11 +473,11 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 </div>
 
                 {allInteractions.length > 0 ? (
-                    <div className="grid gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-x-16 md:gap-y-20 py-10 place-items-center">
                         {[...result.synergies, ...result.cautions, ...result.conflicts].map(
                             (r, idx) =>
                                 r.interaction && (
-                                    <InteractionCard key={r.interaction.id ?? idx} result={r} />
+                                    <SynergyCard key={r.interaction.id ?? idx} result={r} index={idx} />
                                 )
                         )}
                     </div>
@@ -563,6 +572,6 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                     개인의 체질에 따라 상호작용은 다르게 나타날 수 있으므로, 반드시 전문의와 상담하시기 바랍니다.
                 </p>
             </div>
-        </div>
+        </motion.div>
     );
 }
