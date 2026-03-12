@@ -11,6 +11,9 @@ import { useBasketStore } from "@/store/basketStore";
 import { supabase } from "@/lib/supabase";
 import type { AnalysisResult, Ingredient, InteractionResult } from "@/types/database";
 import { cn } from "@/lib/utils";
+import FloatingAssistant from "@/components/FloatingAssistant";
+import VisualDecorations from "@/components/VisualDecorations";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CATEGORIES = [
   { key: "all", label: "전체", emoji: "✨" },
@@ -201,20 +204,20 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-3xl md:text-6xl font-black text-emerald-950 mb-6 leading-[1.15] px-2 tracking-tight">
-            내 영양제들,
+            복잡한 영양제 조합,
             <br />
             <span className="relative inline-block mt-2">
               <span className="relative z-10 text-white px-6 py-2 block">
-                같이 먹어도 괜찮을까?
+                믹시가 딱 정해줄게요!
               </span>
               <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl shadow-xl shadow-emerald-200/50 -rotate-1 scale-x-105"></span>
             </span>
           </h1>
 
           <p className="text-emerald-900/60 text-base md:text-xl mb-10 leading-relaxed font-medium max-w-lg mx-auto">
-            매일 먹는 영양제, AI가 성분 간의 충돌과
+            매일 먹는 영양제, AI 어시스턴트 믹시가 성분 간의 충돌과
             <br />
-            <span className="text-emerald-700 font-bold">시너지를 실시간으로 분석</span>해드립니다. ✨
+            <span className="text-emerald-700 font-bold">시너지를 실시간으로 분석</span>해드릴게요! ✨
           </p>
 
           {/* 검색창 */}
@@ -229,7 +232,7 @@ export default function HomePage() {
               <Input
                 ref={searchRef}
                 type="text"
-                placeholder="영양제 이름을 입력하세요 (예: 비타민D, 루테인...)"
+                placeholder="궁금한 영양제를 입력해봐요! (예: 비타민D, 마그네슘...)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="bg-transparent border-none text-emerald-950 placeholder:text-emerald-200 focus-visible:ring-0 focus-visible:ring-offset-0 text-base md:text-xl h-14 flex-1 font-bold px-4"
@@ -408,7 +411,11 @@ export default function HomePage() {
       {/* ============================================================
        * 플로팅 바구니 바 (하단 고정)
        * ============================================================ */}
+      {/* 플로팅 바구니 바 (하단 고정) */}
       <FloatingBasketBar onAnalyze={handleAnalyze} />
+
+      {/* 믹시(Mixy) 어시스턴트 */}
+      <FloatingAssistant />
     </div >
   );
 }

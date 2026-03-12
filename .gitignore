@@ -48,3 +48,4 @@ validate.js
 find_slug.js
 validate_interactions.js
 check_relations.js
+update_english_translations.sql

@@ -43,13 +43,19 @@ export interface Ingredient {
   slug: string; // URL-friendly 식별자 (e.g. 'vitamin-c')
   category: IngredientCategory;
   description: string; // 성분 상세 설명
+  description_en?: string; // 영문 상세 설명
   short_description: string; // 카드에 표시할 한 줄 설명
+  short_description_en?: string; // 영문 한 줄 설명
   dosage_time: DosageTime; // 권장 복용 시간
   dosage_note: string | null; // 복용량/방법 메모
+  dosage_note_en?: string | null; // 영문 복용 방법 메모
   icon_emoji: string; // 대표 이모지 (e.g. '🍊')
   benefits: string[]; // 주요 효능 목록
+  benefits_en?: string[]; // 영문 주요 효능 목록
   warnings: string[] | null; // 주의사항 목록
+  warnings_en?: string[] | null; // 영문 주의사항 목록
   coupang_search_keyword: string; // 쿠팡 파트너스 검색 키워드
+  amazon_search_keyword?: string; // 글로벌(영문) 사이트용 아마존 파트너스 키워드
   is_popular: boolean; // 인기 성분 여부 (홈 화면 우선 노출)
   sort_order: number; // 정렬 순서
   created_at: string; // ISO 8601
@@ -67,8 +73,11 @@ export interface Interaction {
   ingredient_b_id: string; // UUID (FK → ingredients.id)
   type: InteractionType; // 궁합 유형
   title: string; // 궁합 요약 제목 (e.g. '흡수율 2배 상승!')
+  title_en?: string; // 영문 궁합 요약 제목
   reason: string; // 전문적인 궁합 이유 설명
+  reason_en?: string; // 영문 궁합 이유 설명
   recommendation: string | null; // 구체적인 복용 권장 방법
+  recommendation_en?: string | null; // 영문 복용 권장 방법
   scientific_reference: string | null; // 근거 논문/출처 (선택)
   created_at: string;
   updated_at: string;

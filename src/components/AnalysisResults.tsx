@@ -264,18 +264,25 @@ function InteractionCard({ result }: { result: InteractionResult }) {
 }
 
 /** 프리미엄 상품 카드 */
-function ProductCard({ product }: { product: CoupangProduct }) {
+function ProductCard({ product, index }: { product: CoupangProduct; index: number }) {
+    const badges = [
+        { label: "BEST SELLER", color: "bg-indigo-600" },
+        { label: "HOT DEAL", color: "bg-red-500" },
+        { label: "최저가 보장", color: "bg-emerald-600" },
+    ];
+    const badge = badges[index % badges.length];
+
     return (
-        <Card className="group overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-3xl bg-white flex flex-col h-full relative">
+        <Card className="group overflow-hidden border-none shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(16,185,129,0.15)] transition-all duration-500 rounded-[2rem] bg-white flex flex-col h-full relative border border-transparent hover:border-emerald-200/50">
             {/* 상단 장식 배지 */}
-            <div className="absolute top-3 left-3 z-10">
-                <Badge className="bg-emerald-500/90 text-[10px] font-black border-none px-2 py-0 h-4 backdrop-blur-sm shadow-sm select-none text-white">
-                    최우수 추천
+            <div className="absolute top-4 left-4 z-10">
+                <Badge className={cn("text-[8px] font-black border-none px-2 py-0.5 h-auto backdrop-blur-md shadow-lg select-none text-white tracking-widest animate-pulse", badge.color)}>
+                    {badge.label}
                 </Badge>
             </div>
 
             {/* 이미지 영역 */}
-            <div className="aspect-[4/3] bg-gradient-to-br from-gray-50 to-slate-100 flex items-center justify-center relative overflow-hidden">
+            <div className="aspect-square bg-gradient-to-br from-gray-50 to-slate-100 flex items-center justify-center relative overflow-hidden">
                 {product.image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -284,52 +291,53 @@ function ProductCard({ product }: { product: CoupangProduct }) {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl group-hover:scale-125 transition-transform duration-700 grayscale-[0.5] group-hover:grayscale-0">
-                        💊
+                    <div className="w-full h-full flex items-center justify-center text-5xl group-hover:scale-125 transition-transform duration-700 grayscale-[0.2] group-hover:grayscale-0">
+                        {index % 2 === 0 ? "💊" : "🧪"}
                     </div>
                 )}
                 {/* 오버레이 효과 */}
                 <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/5 transition-colors duration-500" />
+                
+                {/* 랭킹 오버레이 (Optional) */}
+                <div className="absolute bottom-2 right-4 text-[40px] font-black text-black/5 select-none italic group-hover:text-emerald-500/10 transition-colors">
+                    0{index + 1}
+                </div>
             </div>
 
-            <CardContent className="p-4 flex flex-col flex-1">
-                <div className="space-y-1 mb-3">
-                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest leading-none">추천 제품</p>
-                    <h4 className="font-bold text-sm text-gray-900 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors">
+            <CardContent className="p-5 flex flex-col flex-1">
+                <div className="space-y-1.5 mb-4">
+                    <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-3 bg-emerald-500 rounded-full" />
+                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">AI MATCHED</p>
+                    </div>
+                    <h4 className="font-bold text-[15px] text-gray-900 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors tracking-tight">
                         {product.name}
                     </h4>
                 </div>
 
-                <div className="mt-auto space-y-3">
+                <div className="mt-auto space-y-4">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-0.5 text-amber-500">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                                <Star
-                                    key={i}
-                                    size={10}
-                                    fill={i < (product.rating || 5) ? "currentColor" : "none"}
-                                    className={i < (product.rating || 5) ? "text-amber-500" : "text-gray-200"}
-                                />
-                            ))}
-                            <span className="text-[10px] font-bold text-gray-400 ml-1">{product.rating || "4.8"}</span>
+                        <div className="flex items-center gap-0.5 text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full">
+                            <Star size={10} fill="currentColor" />
+                            <span className="text-[10px] font-bold text-amber-600 ml-1">{product.rating || "4.8"}</span>
                         </div>
-                        <div className="flex items-center gap-1 text-[11px] font-black text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded-md">
-                            <Truck size={10} />
+                        <div className="flex items-center gap-1 text-[10px] font-black text-white bg-[#00AEEF] px-2 py-1 rounded-md shadow-sm">
+                            <Truck size={10} strokeWidth={3} />
                             로켓배송
                         </div>
                     </div>
 
-                    <div className="flex items-end justify-between mb-1">
+                    <div className="flex items-end justify-between border-t border-dashed border-gray-100 pt-4">
                         <div className="flex flex-col">
                             {product.discount_rate && (
-                                <span className="text-[10px] text-red-500 font-bold leading-none mb-0.5">{product.discount_rate}% 할인가</span>
+                                <span className="text-[10px] text-red-500 font-black leading-none mb-1">{product.discount_rate}% SALE</span>
                             )}
-                            <span className="text-xl font-black text-gray-900 leading-none">
+                            <span className="text-2xl font-[1000] text-gray-900 leading-none tracking-tighter">
                                 {product.price > 0 ? `${product.price.toLocaleString()}원` : "최저가 확인"}
                             </span>
                         </div>
                         {product.original_price && (
-                            <span className="text-xs text-gray-300 line-through font-medium">
+                            <span className="text-[11px] text-gray-300 line-through font-bold mb-1">
                                 {product.original_price.toLocaleString()}원
                             </span>
                         )}
@@ -337,14 +345,15 @@ function ProductCard({ product }: { product: CoupangProduct }) {
 
                     <Button
                         variant="default"
-                        className="w-full bg-gray-950 hover:bg-emerald-600 text-white rounded-xl h-10 text-[11px] font-black tracking-tight border-none shadow-sm transition-all duration-300 group-hover:shadow-emerald-200"
+                        className="w-full bg-gradient-to-r from-gray-900 via-gray-800 to-gray-950 hover:from-emerald-600 hover:to-teal-600 text-white rounded-2xl h-12 text-sm font-black tracking-tight border-none shadow-[0_10px_20px_rgba(0,0,0,0.1)] transition-all duration-300 group-hover:shadow-emerald-200 group-hover:-translate-y-1"
                         asChild
                     >
                         <a href={product.product_url} target="_blank" rel="noopener noreferrer">
-                            <ShoppingCart size={14} className="mr-1.5" />
-                            최저가로 구매하기
+                            <ShoppingCart size={16} className="mr-2" />
+                            지금 최저가로 구매하기
                         </a>
                     </Button>
+                    <p className="text-center text-[9px] text-gray-400 font-medium">실시간 재고 부족! 빠른 구매 권장</p>
                 </div>
             </CardContent>
         </Card>
@@ -452,46 +461,45 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 )}
             </div>
 
-            {/* 쇼핑 섹션 - Dashboard Main glass style */}
-            <div className="relative rounded-[3rem] bg-white border border-slate-100 p-10 md:p-12 shadow-[0_30px_60px_rgba(0,0,0,0.03)] overflow-hidden">
-                <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50" />
-                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-50 rounded-full blur-3xl opacity-50" />
+            {/* 쇼핑 섹션 - Monetization focused design */}
+            <div className="relative rounded-[3.5rem] bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 border border-slate-100 p-10 md:p-14 shadow-[0_40px_80px_rgba(0,0,0,0.06)] overflow-hidden">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-100/20 blur-[120px] rounded-full -mr-64 -mt-64" />
+                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-100/20 blur-[100px] rounded-full -ml-40 -mb-40" />
 
-                <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6">
-                    <div className="space-y-2">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-full border border-indigo-100 text-indigo-600 font-black text-[10px] uppercase tracking-widest">
-                            Shop Protocol
+                <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-8">
+                    <div className="space-y-3">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-600 rounded-full text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-indigo-200 animate-bounce-subtle">
+                            <ShoppingCart size={12} />
+                            Premium Choice
                         </div>
-                        <h3 className="text-3xl font-black text-slate-900 tracking-tight">
-                            맞춤형 제품 추천
+                        <h3 className="text-3xl md:text-4xl font-[1000] text-slate-900 tracking-tighter leading-none">
+                            이런 제품은 어떠세요?
                         </h3>
-                        <p className="text-slate-500 font-medium">분석 결과에 따른 정밀 검증된 프리미엄 제품 라인업</p>
+                        <p className="text-slate-500 font-semibold text-lg">분석 결과에 따른 <span className="text-emerald-600 font-black">정밀 시너지</span> 제품 라인업</p>
                     </div>
-                    <Badge variant="secondary" className="bg-slate-100 text-slate-400 border-none rounded-lg px-4 py-1.5 font-bold uppercase tracking-widest text-[10px]">
-                        AD DISCLOSURE
-                    </Badge>
                 </div>
 
                 <div className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                     {coupangProducts.length > 0 ? (
-                        coupangProducts.map((product) => (
-                            <ProductCard key={product.product_id} product={product} />
+                        coupangProducts.map((product, idx) => (
+                            <ProductCard key={product.product_id} product={product} index={idx} />
                         ))
                     ) : (
-                        result.ingredients.slice(0, 3).map((ing) => (
+                        result.ingredients.slice(0, 3).map((ing, idx) => (
                             <ProductCard
                                 key={ing.id}
+                                index={idx}
                                 product={{
                                     product_id: `mock-${ing.id}`,
                                     name: `${ing.name} 프리미엄 추천 제품`,
                                     product_url: `https://www.coupang.com/np/search?q=${encodeURIComponent(ing.coupang_search_keyword)}`,
                                     image_url: "",
-                                    price: 32000,
-                                    original_price: 39000,
-                                    discount_rate: 18,
+                                    price: 32000 + (idx * 4500),
+                                    original_price: 39000 + (idx * 5000),
+                                    discount_rate: 15 + (idx * 2),
                                     is_rocket: true,
-                                    rating: 4.9,
-                                    review_count: 2450
+                                    rating: 4.8 + (idx * 0.1),
+                                    review_count: 2450 + (idx * 150)
                                 }}
                             />
                         ))
