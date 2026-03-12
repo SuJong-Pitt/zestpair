@@ -371,56 +371,78 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
 
     return (
         <div className="space-y-12 pb-32 animate-fade-in-up max-w-4xl mx-auto">
-            {/* 종합 점수 카드 - Anti-gravity & Frosted Glass vibes */}
+            {/* 종합 점수 카드 - Centered Impact & Premium Report */}
             <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-[3rem] blur opacity-10 group-hover:opacity-20 transition duration-1000 group-hover:duration-200"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-emerald-500 to-cyan-500 rounded-[3rem] blur opacity-15 group-hover:opacity-30 transition duration-1000"></div>
+                
                 <Card className="relative rounded-[2.5rem] overflow-hidden border-none bg-slate-900 text-white shadow-2xl texture-grain">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none -mr-32 -mt-32" />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none -ml-32 -mb-32" />
+                    {/* 하이테크 스캔라인 효과 */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px)] bg-[size:100%_4px] pointer-events-none" />
+                    
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] pointer-events-none" />
 
-                    <CardContent className="p-10 md:p-12">
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-12">
-                            <div className="flex-1 text-center md:text-left space-y-6">
-                                <div className="flex items-center justify-center md:justify-start gap-2.5">
-                                    <div className="bg-indigo-500/20 p-2 rounded-xl border border-indigo-400/20 backdrop-blur-md">
-                                        <Sparkles size={18} className="text-indigo-300" />
-                                    </div>
-                                    <span className="text-sm font-black text-indigo-200 uppercase tracking-[0.2em] drop-shadow-sm">AI 정밀 궁합 분석 리포트</span>
+                    <CardContent className="p-10 md:p-16 relative z-10 flex flex-col items-center text-center">
+                        {/* 1. 최상단 스코어 섹션 (Centered) */}
+                        <div className="relative mb-8">
+                            <div className="absolute inset-0 bg-emerald-500/20 blur-[60px] rounded-full scale-150 pointer-events-none" />
+                            <ScoreRing score={result.score} />
+                        </div>
+
+                        {/* 2. 상태 텍스트 섹션 */}
+                        <div className="space-y-6 max-w-2xl mx-auto">
+                            <div className="flex flex-col items-center gap-3">
+                                <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md">
+                                    <Sparkles size={16} className="text-indigo-300 animate-pulse" />
+                                    <span className="text-[10px] md:text-xs font-black text-indigo-200 uppercase tracking-[0.3em]">AI Precision Analysis</span>
                                 </div>
-
+                                
                                 <h2 className={cn(
-                                    "text-4xl md:text-6xl font-[1000] tracking-tighter leading-[1.1] pb-1",
-                                    "bg-clip-text text-transparent bg-gradient-to-b from-white via-white 85% to-white/90",
-                                    "drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] drop-shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
+                                    "text-5xl md:text-8xl font-[1000] tracking-tighter leading-none py-2",
+                                    "bg-clip-text text-transparent bg-gradient-to-b from-white via-white 60% to-white/40",
+                                    "drop-shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
                                 )}>
                                     {result.score >= 70
-                                        ? "최상의 조합입니다"
+                                        ? "시너지 폭발!"
                                         : result.score >= 40
-                                            ? "주의가 필요합니다"
-                                            : "함께 복용을 권하지 않습니다"}
+                                            ? "주의필요 단계"
+                                            : "조합 재고필요"}
                                 </h2>
 
-                                <p className="text-lg text-white/80 leading-relaxed max-w-lg mx-auto md:mx-0 font-medium tracking-tight">
-                                    {result.summary}
-                                </p>
-
-                                <div className="pt-4 flex flex-wrap justify-center md:justify-start gap-2.5">
-                                    {result.ingredients.map((ing) => (
-                                        <div
-                                            key={ing.id}
-                                            className="flex items-center gap-2 text-xs bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl px-4 py-2.5 font-bold transition-all hover:bg-white/10 hover:border-white/20 hover:-translate-y-0.5"
-                                        >
-                                            <span className="text-[15px]">{ing.icon_emoji}</span>
-                                            <span className="tracking-tight text-white/90">{ing.name}</span>
-                                        </div>
-                                    ))}
+                                <div className="flex items-center gap-3">
+                                    <div className="h-px w-8 bg-emerald-500/30" />
+                                    <p className="text-xl md:text-3xl font-black text-emerald-400 tracking-tight">
+                                        {result.score >= 70
+                                            ? "최상의 조화를 이룬 믹스입니다"
+                                            : result.score >= 40
+                                                ? "성분 간 상충 가능성 감지"
+                                                : "함께 드시면 건강이 위험할 수 있어요"}
+                                    </p>
+                                    <div className="h-px w-8 bg-emerald-500/30" />
                                 </div>
                             </div>
 
-                            <div className="relative">
-                                {/* 스코어 링 뒤의 네온 효과 */}
-                                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 via-emerald-500/20 to-cyan-500/20 blur-[100px] rounded-full scale-110 pointer-events-none" />
-                                <ScoreRing score={result.score} />
+                            {/* 요약 박스 (Centered & Focused) */}
+                            <div className="relative group/summary">
+                                <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 to-indigo-500/20 rounded-3xl blur opacity-0 group-hover/summary:opacity-100 transition duration-500" />
+                                <div className="relative p-6 md:p-8 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-inner text-lg md:text-xl text-white/70 leading-relaxed font-medium tracking-tight">
+                                    <div className="absolute top-0 left-0 p-3 opacity-20">❝</div>
+                                    <div className="absolute bottom-0 right-0 p-3 opacity-20 rotate-180">❝</div>
+                                    {result.summary}
+                                </div>
+                            </div>
+
+                            {/* 복용 성분 리스트 (Centered Grid) */}
+                            <div className="pt-4 flex flex-wrap justify-center gap-3">
+                                {result.ingredients.map((ing) => (
+                                    <motion.div
+                                        key={ing.id}
+                                        whileHover={{ y: -5, scale: 1.05 }}
+                                        className="flex items-center gap-3 bg-white/10 border border-white/10 rounded-2xl px-6 py-3.5 font-black shadow-lg backdrop-blur-md"
+                                    >
+                                        <span className="text-2xl">{ing.icon_emoji}</span>
+                                        <span className="text-sm tracking-tight text-white/90">{ing.name}</span>
+                                    </motion.div>
+                                ))}
                             </div>
                         </div>
                     </CardContent>

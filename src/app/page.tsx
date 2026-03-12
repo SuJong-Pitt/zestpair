@@ -214,10 +214,10 @@ export default function HomePage() {
             </span>
           </h1>
 
-          <p className="text-emerald-900/60 text-base md:text-xl mb-10 leading-relaxed font-medium max-w-lg mx-auto">
+          <p className="text-white text-lg md:text-2xl mb-10 leading-relaxed font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] max-w-lg mx-auto">
             매일 먹는 영양제, AI 어시스턴트 믹시가 성분 간의 충돌과
             <br />
-            <span className="text-emerald-700 font-bold">시너지를 실시간으로 분석</span>해드릴게요! ✨
+            <span className="text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.4)]">시너지를 실시간으로 분석</span>해드릴게요! ✨
           </p>
 
           {/* 검색창 */}
