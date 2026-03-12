@@ -2,161 +2,190 @@
 
 import { useBasketStore, MAX_BASKET_SIZE } from "@/store/basketStore";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { FlaskConical, X, Sparkles, ShoppingBasket } from "lucide-react";
+import { FlaskConical, X, Sparkles, ShoppingBasket, ChevronUp, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface FloatingBasketBarProps {
     onAnalyze: () => void;
 }
 
 export default function FloatingBasketBar({ onAnalyze }: FloatingBasketBarProps) {
-    const { selectedIngredients, removeIngredient, clearBasket, isAnalyzing, hasResult } = useBasketStore();
+    const { selectedIngredients, removeIngredient, clearBasket, isAnalyzing } = useBasketStore();
     const [isVisible, setIsVisible] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
     const count = selectedIngredients.length;
 
-    // 영양제가 선택되면 바가 올라오는 애니메이션
     useEffect(() => {
         setIsVisible(count > 0);
+        if (count === 0) setIsExpanded(false);
     }, [count]);
 
     if (!isVisible) return null;
 
     return (
-        <div
-            className={cn(
-                "fixed bottom-0 left-0 right-0 z-50",
-                "transition-all duration-500 ease-out",
-                isVisible ? "translate-y-0" : "translate-y-full"
-            )}
-        >
-            {/* 배경 블러 오버레이 (확장 시) */}
-            {isExpanded && (
-                <div
-                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[-1]"
-                    onClick={() => setIsExpanded(false)}
-                />
-            )}
-
-            {/* 메인 바 */}
-            <div className="mx-auto max-w-3xl px-4 pb-4 md:pb-6">
-                <div
-                    className={cn(
-                        "rounded-[2rem] shadow-2xl overflow-hidden text-rendering-optimizeLegibility",
-                        "bg-white/10 backdrop-blur-2xl border border-white/20",
-                        "transition-all duration-500 hover:shadow-emerald-500/20",
-                        "relative texture-grain"
-                    )}
+        <AnimatePresence>
+            {isVisible && (
+                <motion.div
+                    initial={{ y: 100, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 100, opacity: 0 }}
+                    className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none"
                 >
-                    {/* 선명한 내부 배경 */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 via-teal-600/90 to-cyan-600/90 -z-10" />
-
-                    {/* 확장된 영양제 목록 */}
-                    {isExpanded && count > 0 && (
-                        <div className="px-4 pt-4 pb-2">
-                            <div className="flex flex-wrap gap-2">
-                                {selectedIngredients.map((ingredient) => (
-                                    <div
-                                        key={ingredient.id}
-                                        className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 text-white text-sm font-medium group"
-                                    >
-                                        <span>{ingredient.icon_emoji}</span>
-                                        <span>{ingredient.name}</span>
-                                        <button
-                                            onClick={() => removeIngredient(ingredient.id)}
-                                            className="ml-1 opacity-60 hover:opacity-100 transition-opacity rounded-full hover:bg-white/20 p-0.5"
-                                        >
-                                            <X size={12} />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 컨트롤 영역 */}
-                    <div className="flex items-center gap-3 p-3 md:p-4">
-                        {/* 바구니 아이콘 + 카운트 */}
-                        <button
-                            onClick={() => setIsExpanded(!isExpanded)}
-                            className="flex items-center gap-3 flex-1 text-white min-w-0"
-                        >
-                            <div className="relative shrink-0">
-                                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                                    <ShoppingBasket size={18} className="text-white" />
-                                </div>
-                                {count > 0 && (
-                                    <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-yellow-400 text-gray-900 text-[10px] font-bold flex items-center justify-center animate-bounce-subtle border-2 border-emerald-600">
-                                        {count}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="text-left min-w-0 flex-1">
-                                <p className="text-white font-bold text-xs sm:text-sm leading-tight truncate">
-                                    {count}개 선택됨
-                                </p>
-                                <p className="text-white/70 text-[10px] sm:text-xs truncate">
-                                    {count < 2
-                                        ? "2개 이상 선택 필요"
-                                        : isExpanded
-                                            ? "탭하여 접기"
-                                            : `최대 ${MAX_BASKET_SIZE}개 · 상세 보기`}
-                                </p>
-                            </div>
-                        </button>
-
-                        {/* 초기화 버튼 */}
-                        {count > 0 && (
-                            <button
-                                onClick={clearBasket}
-                                className="text-white/40 hover:text-white/90 transition-colors p-1.5 rounded-lg hover:bg-white/10 shrink-0"
-                                title="전체 삭제"
-                            >
-                                <X size={14} />
-                            </button>
+                    {/* 배경 블러 오버레이 */}
+                    <AnimatePresence>
+                        {isExpanded && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[-1] pointer-events-auto"
+                                onClick={() => setIsExpanded(false)}
+                            />
                         )}
+                    </AnimatePresence>
 
-                        {/* 분석하기 버튼 */}
-                        <Button
-                            onClick={onAnalyze}
-                            disabled={count < 2 || isAnalyzing}
+                    <div className="mx-auto max-w-2xl px-4 pb-6 pointer-events-auto">
+                        <motion.div
+                            layout
                             className={cn(
-                                "rounded-xl font-bold text-xs sm:text-sm px-3 sm:px-5 py-2 sm:py-2.5 h-auto shrink-0",
-                                "bg-white text-emerald-700 hover:bg-yellow-50",
-                                "shadow-lg shadow-black/20",
-                                "disabled:opacity-50 disabled:cursor-not-allowed",
-                                "transition-all duration-200 active:scale-95",
-                                count >= 2 && !isAnalyzing && "animate-pulse-glow"
+                                "relative rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden border border-white/20",
+                                "bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600",
+                                "transition-all duration-500"
                             )}
                         >
-                            {isAnalyzing ? (
-                                <span className="flex items-center gap-1">
-                                    <FlaskConical size={14} className="animate-spin" />
-                                    <span className="hidden xs:inline">분석 중...</span>
-                                    <span className="xs:hidden">분석...</span>
-                                </span>
-                            ) : (
-                                <span className="flex items-center gap-1">
-                                    <Sparkles size={14} />
-                                    분석하기
-                                </span>
-                            )}
-                        </Button>
-                    </div>
+                            {/* 프리미엄 유체 배경 효과 */}
+                            <div className="absolute inset-0 opacity-30 pointer-events-none">
+                                <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2)_0%,transparent_50%)] animate-pulse-slow" />
+                            </div>
 
-                    {/* 진행 바 (선택 개수에 따라) */}
-                    <div className="h-1 bg-white/20 rounded-b-2xl overflow-hidden">
-                        <div
-                            className="h-full bg-yellow-300 transition-all duration-500 ease-out"
-                            style={{ width: `${(count / MAX_BASKET_SIZE) * 100}%` }}
-                        />
+                            {/* 확장된 영양제 목록 (목록 보기 모드) */}
+                            <AnimatePresence>
+                                {isExpanded && (
+                                    <motion.div 
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        className="px-6 pt-8 pb-4 border-b border-white/10"
+                                    >
+                                        <div className="flex items-center justify-between mb-4 px-1">
+                                            <span className="text-[10px] font-black text-white/60 tracking-widest uppercase italic">선택된 영양제 목록</span>
+                                            <button 
+                                                onClick={clearBasket}
+                                                className="flex items-center gap-1.5 text-[10px] font-black text-rose-200/80 hover:text-rose-100 transition-colors bg-rose-500/20 px-3 py-1 rounded-full border border-rose-500/30"
+                                            >
+                                                <Trash2 size={10} />
+                                                모든 선택 취소
+                                            </button>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2.5 max-h-[40vh] overflow-y-auto pr-2 scrollbar-hide">
+                                            {selectedIngredients.map((ingredient) => (
+                                                <motion.div
+                                                    layout
+                                                    initial={{ scale: 0.8, opacity: 0 }}
+                                                    animate={{ scale: 1, opacity: 1 }}
+                                                    key={ingredient.id}
+                                                    className="flex items-center gap-2 bg-white/15 backdrop-blur-xl rounded-2xl px-3 py-2 text-white text-[13px] font-black border border-white/10 shadow-lg group"
+                                                >
+                                                    <span className="text-xl drop-shadow-md">{ingredient.icon_emoji}</span>
+                                                    <span>{ingredient.name}</span>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            removeIngredient(ingredient.id);
+                                                        }}
+                                                        className="ml-1 w-5 h-5 flex items-center justify-center rounded-full bg-white/10 hover:bg-rose-500 transition-all text-white/50 hover:text-white"
+                                                    >
+                                                        <X size={10} strokeWidth={3} />
+                                                    </button>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* 메인 컨트롤 바 */}
+                            <div className="flex items-center gap-4 p-3 md:p-4">
+                                {/* 바구니 요약 정보 */}
+                                <button
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                    className="flex items-center gap-4 flex-1 text-white text-left group/btn"
+                                >
+                                    <div className="relative shrink-0">
+                                        <motion.div 
+                                            whileHover={{ rotate: 15 }}
+                                            className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner"
+                                        >
+                                            <ShoppingBasket size={22} className="text-white drop-shadow-md" />
+                                        </motion.div>
+                                        <AnimatePresence>
+                                            <motion.div 
+                                                key={count}
+                                                initial={{ scale: 1.5, rotate: 20 }}
+                                                animate={{ scale: 1, rotate: 0 }}
+                                                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-amber-400 text-slate-900 text-[11px] font-[1000] flex items-center justify-center border-2 border-emerald-600 shadow-lg"
+                                            >
+                                                {count}
+                                            </motion.div>
+                                        </AnimatePresence>
+                                    </div>
+
+                                    <div className="flex flex-col min-w-0">
+                                        <h4 className="font-extrabold text-sm md:text-base tracking-tight flex items-center gap-2 uppercase italic text-white shadow-sm">
+                                            {count}개의 영양제 선택됨
+                                            <ChevronUp size={14} className={cn("transition-transform duration-500", isExpanded ? "rotate-180" : "")} />
+                                        </h4>
+                                        <span className="text-[10px] md:text-xs font-bold text-white/70 tracking-tight">
+                                            {count < 2 ? "2개 이상 선택해 주세요" : `최대 ${MAX_BASKET_SIZE}개 · 지금 궁합 분석하기`}
+                                        </span>
+                                    </div>
+                                </button>
+
+                                {/* 분석 가동 버튼 */}
+                                <motion.div
+                                    whileHover={count >= 2 ? { scale: 1.05 } : {}}
+                                    whileTap={count >= 2 ? { scale: 0.95 } : {}}
+                                >
+                                    <Button
+                                        onClick={onAnalyze}
+                                        disabled={count < 2 || isAnalyzing}
+                                        className={cn(
+                                            "rounded-2xl font-black text-xs md:text-sm px-6 py-3 h-12 shrink-0 border-none transition-all duration-500",
+                                            "bg-white text-emerald-700 hover:text-emerald-800 shadow-[0_10px_30px_rgba(255,255,255,0.2)]",
+                                            "disabled:opacity-30 disabled:scale-95 disabled:grayscale",
+                                            count >= 2 && !isAnalyzing && "animate-pulse-glow"
+                                        )}
+                                    >
+                                        {isAnalyzing ? (
+                                            <span className="flex items-center gap-2">
+                                                <FlaskConical size={16} className="animate-spin" />
+                                                분석 진행 중...
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                <Sparkles size={16} className="animate-pulse" />
+                                                분석 시작하기
+                                            </span>
+                                        )}
+                                    </Button>
+                                </motion.div>
+                            </div>
+
+                            {/* 고급 프로그레스 바 (선택 충전도) */}
+                            <div className="h-1.5 bg-black/10 w-full overflow-hidden flex">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${(count / MAX_BASKET_SIZE) * 100}%` }}
+                                    className="h-full bg-gradient-to-r from-amber-400 to-yellow-300 shadow-[0_0_10px_rgba(251,191,36,0.5)]"
+                                />
+                            </div>
+                        </motion.div>
                     </div>
-                </div>
-            </div>
-        </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 }

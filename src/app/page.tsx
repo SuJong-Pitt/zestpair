@@ -294,24 +294,58 @@ export default function HomePage() {
        * MAIN CONTENT
        * ============================================================ */}
       <main className="mx-auto max-w-2xl px-4 py-8">
-        {/* ---- 카테고리 필터 ---- */}
-        <div className="flex gap-2 overflow-x-auto md:overflow-visible md:flex-wrap pb-4 mb-4 -mx-4 px-4 md:mx-0 md:px-0 active:cursor-grabbing scrollbar-hide">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.key}
-              onClick={() => setSelectedCategory(cat.key)}
-              className={cn(
-                "flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 flex-shrink-0",
-                "border-2",
-                selectedCategory === cat.key
-                  ? "bg-slate-900 text-white border-slate-900 shadow-xl shadow-slate-200 scale-105"
-                  : "bg-white text-slate-500 border-slate-100/80 hover:border-emerald-200 hover:text-emerald-600 hover:bg-emerald-50/30"
-              )}
-            >
-              <span className="text-base">{cat.emoji}</span>
-              <span className="tracking-tight">{cat.label}</span>
-            </button>
-          ))}
+        <div className="relative mb-12">
+          {/* 카테고리 제목 (Optional but adds structure) */}
+          <div className="flex items-center gap-2 mb-6 px-1">
+            <div className="w-1 h-4 bg-emerald-500 rounded-full" />
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">카테고리 선택</span>
+          </div>
+
+          <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide focus-within:cursor-grabbing">
+            {CATEGORIES.map((cat, idx) => (
+              <motion.button
+                key={cat.key}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.03 }}
+                whileHover={{ y: -4, scale: 1.02 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => setSelectedCategory(cat.key)}
+                className={cn(
+                  "flex items-center gap-2.5 whitespace-nowrap px-5 py-3 rounded-2xl text-[13px] font-black transition-all duration-500 flex-shrink-0 group",
+                  "border-2 relative overflow-hidden",
+                  selectedCategory === cat.key
+                    ? "bg-slate-900 text-white border-slate-900 shadow-[0_10px_20px_rgba(15,23,42,0.15)] ring-4 ring-slate-900/5"
+                    : "bg-white text-slate-500 border-slate-100 hover:border-emerald-200 hover:text-emerald-700 hover:shadow-lg"
+                )}
+              >
+                {/* 활성화 시 배경 글로우 효과 */}
+                {selectedCategory === cat.key && (
+                  <motion.div 
+                    layoutId="activeCategoryGlow"
+                    className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10"
+                  />
+                )}
+                
+                <span className={cn(
+                  "text-lg transition-transform duration-500 group-hover:scale-125 group-hover:rotate-12",
+                  selectedCategory === cat.key ? "scale-110" : ""
+                )}>
+                  {cat.emoji}
+                </span>
+                
+                <span className="tracking-tight relative z-10">{cat.label}</span>
+
+                {/* 활성화 인디케이터 도트 */}
+                {selectedCategory === cat.key && (
+                  <motion.div 
+                    layoutId="activeDot"
+                    className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" 
+                  />
+                )}
+              </motion.button>
+            ))}
+          </div>
         </div>
 
         {/* ---- 인기 영양제 (홈화면 우선 표시) ---- */}
