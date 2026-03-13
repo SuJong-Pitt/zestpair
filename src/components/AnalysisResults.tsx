@@ -567,8 +567,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             </div>
                         ))
                     ) : (
-                        Array.from({ length: Math.min(12, result.ingredients.length * 2) }).map((_, idx) => {
-                            const ing = result.ingredients[idx % result.ingredients.length];
+                        result.ingredients.map((ing, idx) => {
                             return (
                                 <div key={`${ing.id}-${idx}`} className="w-[280px] sm:w-[320px] lg:w-auto flex-shrink-0 lg:flex-shrink snap-center lg:snap-align-none">
                                     <ProductCard
