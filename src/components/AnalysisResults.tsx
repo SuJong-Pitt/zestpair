@@ -538,7 +538,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
 
                         <div className="space-y-4">
                             <h3 className="text-4xl md:text-5xl lg:text-6xl font-[1000] text-white tracking-tighter leading-tight drop-shadow-md">
-                                믹시가 제안하는<br />
+                                포리가 제안하는<br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">프리미엄 처방전</span>
                             </h3>
                             <p className="text-slate-400 font-medium text-sm md:text-lg max-w-xl mx-auto leading-relaxed">

@@ -229,14 +229,14 @@ export default function HomePage() {
             <br />
             <span className="relative inline-block mt-2">
               <span className="relative z-10 text-white px-6 py-2 block">
-                믹시가 딱 정해줄게요!
+                포리가 딱 정해줄게요!
               </span>
               <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl shadow-xl shadow-emerald-200/50 -rotate-1 scale-x-105"></span>
             </span>
           </h1>
 
           <p className="text-white text-lg md:text-2xl mb-10 leading-relaxed font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] max-w-lg mx-auto">
-            매일 먹는 영양제, AI 어시스턴트 믹시가 성분 간의 충돌과
+            매일 먹는 영양제, AI 어시스턴트 포리가 성분 간의 충돌과
             <br />
             <span className="text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.4)]">시너지를 실시간으로 분석</span>해드릴게요! ✨
           </p>
@@ -507,7 +507,7 @@ export default function HomePage() {
       {/* 플로팅 바구니 바 (하단 고정) */}
       <FloatingBasketBar onAnalyze={handleAnalyze} />
 
-      {/* 믹시(Mixy) 어시스턴트 */}
+      {/* 포리(Pori) 어시스턴트 */}
       <FloatingAssistant />
 
       {/* 맨 위로 이동 버튼 */}
