@@ -264,97 +264,119 @@ function InteractionCard({ result }: { result: InteractionResult }) {
     );
 }
 
-/** 프리미엄 상품 카드 */
-function ProductCard({ product, index }: { product: CoupangProduct; index: number }) {
-    const badges = [
-        { label: "BEST SELLER", color: "bg-indigo-600" },
-        { label: "HOT DEAL", color: "bg-red-500" },
-        { label: "최저가 보장", color: "bg-emerald-600" },
+/** 프리미엄 상품 카드 - 퍼스널 큐레이션 버전 */
+function ProductCard({ product, index, sourceIngredient }: { product: CoupangProduct; index: number; sourceIngredient?: string }) {
+    const configs = [
+        { label: "AI 최적 추천", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100", gradient: "from-blue-600 to-indigo-600", glow: "shadow-blue-500/20" },
+        { label: "시너지 극대화", color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", gradient: "from-emerald-600 to-teal-600", glow: "shadow-emerald-500/20" },
+        { label: "최고의 가성비", color: "text-amber-600", bg: "bg-amber-50", border: "border-orange-100", gradient: "from-orange-500 to-amber-600", glow: "shadow-orange-500/20" },
     ];
-    const badge = badges[index % badges.length];
+    const config = configs[index % configs.length];
 
     return (
-        <Card className="group overflow-hidden border-none shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(16,185,129,0.15)] transition-all duration-500 rounded-[2rem] bg-white flex flex-col h-full relative border border-transparent hover:border-emerald-200/50">
-            {/* 상단 장식 배지 */}
-            <div className="absolute top-4 left-4 z-10">
-                <Badge className={cn("text-[8px] font-black border-none px-2 py-0.5 h-auto backdrop-blur-md shadow-lg select-none text-white tracking-widest animate-pulse", badge.color)}>
-                    {badge.label}
-                </Badge>
-            </div>
+        <Card className="group h-full flex flex-col overflow-hidden border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-700 rounded-[2.5rem] bg-white relative">
+            {/* 배경 글로우 장식 */}
+            <div className={cn("absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[80px] opacity-0 group-hover:opacity-20 transition-opacity duration-1000", config.bg)} />
 
-            {/* 이미지 영역 */}
-            <div className="aspect-square bg-gradient-to-br from-gray-50 to-slate-100 flex items-center justify-center relative overflow-hidden">
+            {/* 상단 비주얼 영역 */}
+            <div className="relative aspect-[4/3] bg-gradient-to-b from-slate-50/50 to-white flex items-center justify-center p-8 overflow-hidden">
+                {/* 랭킹 넘버링 */}
+                <div className="absolute top-5 left-6 z-10">
+                    <span className="text-4xl font-[1000] italic text-slate-100 group-hover:text-emerald-50 transition-colors select-none">
+                        0{index + 1}
+                    </span>
+                </div>
+
+                {/* 매칭 뱃지 */}
+                <div className="absolute top-5 right-5 z-10 flex flex-col items-end gap-2">
+                    <Badge className={cn("px-2.5 py-1 border-none shadow-sm text-[10px] font-black uppercase tracking-tight text-white bg-gradient-to-r", config.gradient)}>
+                        {config.label}
+                    </Badge>
+                </div>
+
                 {product.image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={product.image_url}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000 drop-shadow-xl"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-5xl group-hover:scale-125 transition-transform duration-700 grayscale-[0.2] group-hover:grayscale-0">
-                        {index % 2 === 0 ? "💊" : "🧪"}
+                    <div className="relative">
+                        <div className="text-7xl group-hover:scale-110 transition-transform duration-700 select-none drop-shadow-2xl">
+                            {index % 4 === 0 ? "💊" : index % 4 === 1 ? "🧬" : index % 4 === 2 ? "🧪" : "🧴"}
+                        </div>
+                        <div className="absolute inset-0 bg-white/40 blur-3xl rounded-full -z-10 animate-pulse" />
                     </div>
                 )}
-                {/* 오버레이 효과 */}
-                <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/5 transition-colors duration-500" />
-                
-                {/* 랭킹 오버레이 (Optional) */}
-                <div className="absolute bottom-2 right-4 text-[40px] font-black text-black/5 select-none italic group-hover:text-emerald-500/10 transition-colors">
-                    0{index + 1}
-                </div>
+
+                {/* 하단 샴페인 데코레이션 */}
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent" />
             </div>
 
-            <CardContent className="p-5 flex flex-col flex-1">
-                <div className="space-y-1.5 mb-4">
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-1 h-3 bg-emerald-500 rounded-full" />
-                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">AI MATCHED</p>
-                    </div>
-                    <h4 className="font-bold text-[15px] text-gray-900 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors tracking-tight">
-                        {product.name}
-                    </h4>
+            <CardContent className="px-6 pb-8 pt-2 flex flex-col flex-1">
+                {/* 매칭 정보 태그 */}
+                <div className="flex items-center gap-2 mb-3">
+                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <p className="text-[10px] font-black text-emerald-600/70 uppercase tracking-widest">
+                        {sourceIngredient ? `${sourceIngredient} 관련 맞춤추천` : "AI 정밀 시너지 추천"}
+                    </p>
                 </div>
 
-                <div className="mt-auto space-y-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-0.5 text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full">
-                            <Star size={10} fill="currentColor" />
-                            <span className="text-[10px] font-bold text-amber-600 ml-1">{product.rating || "4.8"}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-[10px] font-black text-white bg-[#00AEEF] px-2 py-1 rounded-md shadow-sm">
-                            <Truck size={10} strokeWidth={3} />
-                            로켓배송
-                        </div>
-                    </div>
+                {/* 상품명 - 가독성 중심 */}
+                <h4 className="font-ex-bold text-lg text-slate-900 leading-[1.4] mb-6 line-clamp-2 min-h-[2.8em] tracking-tight group-hover:text-emerald-700 transition-colors">
+                    {product.name}
+                </h4>
 
-                    <div className="flex items-end justify-between border-t border-dashed border-gray-100 pt-4">
+                {/* 별점 & 배송 - 깔끔한 인디케이터 */}
+                <div className="flex items-center gap-4 mb-8">
+                    <div className="flex items-center gap-1.5 text-slate-500">
+                        <Star size={14} fill="#F59E0B" className="text-amber-500" />
+                        <span className="text-sm font-black text-slate-700">{typeof product.rating === 'number' ? product.rating.toFixed(1) : "4.8"}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sky-500 bg-sky-50 px-2 py-0.5 rounded-lg border border-sky-100">
+                        <Truck size={14} strokeWidth={2.5} />
+                        <span className="text-[10px] font-black uppercase italic">Rocket</span>
+                    </div>
+                </div>
+
+                {/* 가격 및 구매 인터페이스 */}
+                <div className="mt-auto flex flex-col gap-5">
+                    <div className="flex items-end justify-between border-t border-slate-50 pt-5 pr-2">
                         <div className="flex flex-col">
                             {product.discount_rate && (
-                                <span className="text-[10px] text-red-500 font-black leading-none mb-1">{product.discount_rate}% SALE</span>
+                                <span className="text-rose-500 text-[11px] font-black italic mb-0.5 animate-bounce-subtle">{product.discount_rate}% Limited Sale</span>
                             )}
-                            <span className="text-2xl font-[1000] text-gray-900 leading-none tracking-tighter">
-                                {product.price > 0 ? `${product.price.toLocaleString()}원` : "최저가 확인"}
-                            </span>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-sm font-black text-slate-400">₩</span>
+                                <span className="text-3xl font-[1000] text-slate-900 tracking-tighter">
+                                    {product.price > 0 ? Math.floor(product.price).toLocaleString() : "품절임박"}
+                                </span>
+                            </div>
                         </div>
                         {product.original_price && (
-                            <span className="text-[11px] text-gray-300 line-through font-bold mb-1">
-                                {product.original_price.toLocaleString()}원
+                            <span className="text-xs text-slate-300 line-through font-bold pb-1">
+                                ₩{Math.floor(product.original_price).toLocaleString()}
                             </span>
                         )}
                     </div>
 
                     <Button
-                        variant="default"
-                        className="w-full bg-gradient-to-r from-gray-900 via-gray-800 to-gray-950 hover:from-emerald-600 hover:to-teal-600 text-white rounded-2xl h-12 text-sm font-black tracking-tight border-none shadow-[0_10px_20px_rgba(0,0,0,0.1)] transition-all duration-300 group-hover:shadow-emerald-200 group-hover:-translate-y-1"
+                        className={cn(
+                            "w-full h-15 rounded-2xl text-white font-[900] text-[15px] transition-all duration-500 shadow-lg hover:shadow-2xl group-hover:scale-[1.02] active:scale-[0.98] hover:-translate-y-1 relative overflow-hidden bg-gradient-to-r border border-white/20",
+                            config.gradient,
+                            config.glow
+                        )}
                         asChild
                     >
-                        <a href={product.product_url} target="_blank" rel="noopener noreferrer">
-                            <ShoppingCart size={16} className="mr-2" />
-                            지금 최저가로 구매하기
+                        <a href={product.product_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2.5 w-full h-full py-4">
+                            {/* 고급스러운 빛 반사 쉬머 효과 */}
+                            <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
+
+                            <ShoppingCart size={18} className="text-white/90 drop-shadow-sm" />
+                            <span className="tracking-wide drop-shadow-md">쿠팡 최저가 구매</span>
                         </a>
                     </Button>
-                    <p className="text-center text-[9px] text-gray-400 font-medium">실시간 재고 부족! 빠른 구매 권장</p>
                 </div>
             </CardContent>
         </Card>
@@ -367,7 +389,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
     if (!result || !result.ingredients) {
         return <div className="p-20 text-center text-slate-400">분석 결과를 불러오는 중입니다...</div>;
     }
-    
+
     const allInteractions = [
         ...result.synergies,
         ...result.cautions,
@@ -375,19 +397,19 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
     ].filter((r) => r && r.interaction);
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-16 pb-32 max-w-5xl mx-auto px-4"
+            className="space-y-24 pb-48 w-full max-w-7xl mx-auto px-4 md:px-8"
         >
             {/* 종합 점수 카드 - Centered Impact & Premium Report */}
             <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-emerald-500 to-cyan-500 rounded-[3rem] blur opacity-15 group-hover:opacity-30 transition duration-1000"></div>
-                
+
                 <Card className="relative rounded-[2.5rem] overflow-hidden border-none bg-slate-900 text-white shadow-2xl texture-grain">
                     {/* 하이테크 스캔라인 효과 */}
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px)] bg-[size:100%_4px] pointer-events-none" />
-                    
+
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] pointer-events-none" />
 
                     <CardContent className="p-10 md:p-16 relative z-10 flex flex-col items-center text-center">
@@ -404,7 +426,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                     <Sparkles size={16} className="text-indigo-300 animate-pulse" />
                                     <span className="text-[10px] md:text-xs font-black text-indigo-200 uppercase tracking-[0.3em]">AI Precision Analysis</span>
                                 </div>
-                                
+
                                 <h2 className={cn(
                                     "text-5xl md:text-8xl font-[1000] tracking-tighter leading-none py-2",
                                     "bg-clip-text text-transparent bg-gradient-to-b from-white via-white 60% to-white/40",
@@ -492,48 +514,82 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 )}
             </div>
 
-            {/* 쇼핑 섹션 - Monetization focused design */}
-            <div className="relative rounded-[3.5rem] bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 border border-slate-100 p-10 md:p-14 shadow-[0_40px_80px_rgba(0,0,0,0.06)] overflow-hidden">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-100/20 blur-[120px] rounded-full -mr-64 -mt-64" />
-                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-100/20 blur-[100px] rounded-full -ml-40 -mb-40" />
+            {/* 쇼핑 섹션 - Personalized Medical Recommendation */}
+            <div className="relative rounded-[3rem] md:rounded-[4rem] bg-[#0f172a] shadow-[0_40px_100px_rgba(0,0,0,0.6)]">
+                {/* 배경 효과 영역 (터치에 방해되지 않도록 분리) */}
+                <div className="absolute inset-0 rounded-[3rem] md:rounded-[4rem] overflow-hidden pointer-events-none">
+                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/10 blur-[120px] rounded-full -mr-64 -mt-64" />
+                    <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full -ml-64 -mb-64" />
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
+                </div>
 
-                <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-8">
-                    <div className="space-y-3">
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-600 rounded-full text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-indigo-200 animate-bounce-subtle">
-                            <ShoppingCart size={12} />
-                            Premium Choice
+                {/* 중앙 정렬 럭셔리 헤더 영역 */}
+                <div className="p-8 sm:p-12 md:p-16 pb-8">
+                    <div className="flex flex-col items-center text-center relative z-10 space-y-6">
+                        <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            whileInView={{ y: 0, opacity: 1 }}
+                            className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-800/80 border border-slate-700/80 rounded-full shadow-lg backdrop-blur-md"
+                        >
+                            <ShoppingCart size={14} className="text-emerald-400 animate-pulse" />
+                            <span className="text-slate-300 font-bold text-[10px] md:text-xs uppercase tracking-[0.2em] pt-px">Personalized Pharmacy</span>
+                        </motion.div>
+
+                        <div className="space-y-4">
+                            <h3 className="text-4xl md:text-5xl lg:text-6xl font-[1000] text-white tracking-tighter leading-tight drop-shadow-md">
+                                믹시가 제안하는<br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">프리미엄 처방전</span>
+                            </h3>
+                            <p className="text-slate-400 font-medium text-sm md:text-lg max-w-xl mx-auto leading-relaxed">
+                                성분 분석 결과를 완벽하게 보완하고 시너지를 낼 수 있는 <strong className="text-emerald-400">TOP 큐레이션</strong>만을 엄선했습니다.
+                            </p>
                         </div>
-                        <h3 className="text-3xl md:text-4xl font-[1000] text-slate-900 tracking-tighter leading-none">
-                            이런 제품은 어떠세요?
-                        </h3>
-                        <p className="text-slate-500 font-semibold text-lg">분석 결과에 따른 <span className="text-emerald-600 font-black">정밀 시너지</span> 제품 라인업</p>
+
+                        <div className="pt-2">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                                <span className="text-emerald-400 font-black text-[10px] md:text-xs tracking-widest uppercase">실시간 최저가 탐색 완료</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                {/* 모바일 가로 스크롤 / 데스크톱 2열 그리드 전환 */}
+                <div className="relative z-10 flex flex-nowrap lg:grid lg:grid-cols-2 overflow-x-auto lg:overflow-visible pb-16 px-6 sm:px-10 lg:px-16 gap-4 sm:gap-6 lg:gap-8 scrollbar-hide snap-x snap-mandatory lg:snap-none max-w-5xl mx-auto">
                     {coupangProducts.length > 0 ? (
                         coupangProducts.map((product, idx) => (
-                            <ProductCard key={product.product_id} product={product} index={idx} />
+                            <div key={product.product_id} className="w-[280px] sm:w-[320px] lg:w-auto flex-shrink-0 lg:flex-shrink snap-center lg:snap-align-none">
+                                <ProductCard
+                                    product={product}
+                                    index={idx}
+                                    sourceIngredient={result.ingredients[idx % result.ingredients.length]?.name}
+                                />
+                            </div>
                         ))
                     ) : (
-                        result.ingredients.slice(0, 3).map((ing, idx) => (
-                            <ProductCard
-                                key={ing.id}
-                                index={idx}
-                                product={{
-                                    product_id: `mock-${ing.id}`,
-                                    name: `${ing.name} 프리미엄 추천 제품`,
-                                    product_url: `https://www.coupang.com/np/search?q=${encodeURIComponent(ing.coupang_search_keyword)}`,
-                                    image_url: "",
-                                    price: 32000 + (idx * 4500),
-                                    original_price: 39000 + (idx * 5000),
-                                    discount_rate: 15 + (idx * 2),
-                                    is_rocket: true,
-                                    rating: 4.8 + (idx * 0.1),
-                                    review_count: 2450 + (idx * 150)
-                                }}
-                            />
-                        ))
+                        Array.from({ length: Math.min(12, result.ingredients.length * 2) }).map((_, idx) => {
+                            const ing = result.ingredients[idx % result.ingredients.length];
+                            return (
+                                <div key={`${ing.id}-${idx}`} className="w-[280px] sm:w-[320px] lg:w-auto flex-shrink-0 lg:flex-shrink snap-center lg:snap-align-none">
+                                    <ProductCard
+                                        index={idx}
+                                        sourceIngredient={ing.name}
+                                        product={{
+                                            product_id: `mock-${ing.id}-${idx}`,
+                                            name: `${ing.name} ${idx % 2 === 0 ? "프리미엄 정량 고농축" : "고효능 시너지 포뮬러"}`,
+                                            product_url: `https://www.coupang.com/np/search?q=${encodeURIComponent(ing.coupang_search_keyword)}`,
+                                            image_url: "",
+                                            price: 28000 + (idx * 3500),
+                                            original_price: 35000 + (idx * 4000),
+                                            discount_rate: 14 + (idx % 10),
+                                            is_rocket: true,
+                                            rating: 4.7 + (idx * 0.02),
+                                            review_count: 500 + (idx * 100)
+                                        }}
+                                    />
+                                </div>
+                            );
+                        })
                     )}
                 </div>
             </div>

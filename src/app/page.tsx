@@ -221,27 +221,56 @@ export default function HomePage() {
             <span className="text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.4)]">시너지를 실시간으로 분석</span>해드릴게요! ✨
           </p>
 
-          {/* 검색창 */}
+          {/* 검색창 (프리미엄 검색 인터페이스) */}
           <div className="relative max-w-xl mx-auto group">
-            {/* Outer Glow */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-[3rem] blur opacity-20 group-focus-within:opacity-40 transition duration-500" />
+            {/* 고해상도 아웃라인 글로우 */}
+            <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 rounded-[3rem] blur-md opacity-20 group-focus-within:opacity-50 transition duration-700 animate-pulse-slow" />
 
-            <div className="relative flex items-center bg-white border-2 border-emerald-100/80 rounded-[3rem] p-2 shadow-xl transition-all duration-300 group-focus-within:border-emerald-500 group-focus-within:ring-4 group-focus-within:ring-emerald-500/10">
-              <div className="pl-5 flex items-center justify-center text-emerald-500">
-                <Search size={22} className="group-focus-within:scale-110 transition-transform" />
+            <div className="relative flex items-center bg-white/95 backdrop-blur-xl border-[3px] border-emerald-100/50 rounded-[3rem] p-1.5 md:p-2 shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-500 group-focus-within:border-emerald-500 group-focus-within:scale-[1.02] group-focus-within:shadow-[0_25px_60px_rgba(16,185,129,0.2)]">
+              
+              {/* 좌측 아이콘 데코레이션 */}
+              <div className="pl-4 md:pl-5 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center transition-colors group-focus-within:bg-emerald-500 group-focus-within:text-white text-emerald-500 shadow-inner">
+                  <Search size={20} className="group-focus-within:scale-110 transition-transform duration-500" />
+                </div>
               </div>
+
               <Input
                 ref={searchRef}
                 type="text"
-                placeholder="궁금한 영양제를 입력해봐요! (예: 비타민D, 마그네슘...)"
+                placeholder="궁금한 성분이나 효능을 입력해보세요! ✨"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-none text-emerald-950 placeholder:text-emerald-200 focus-visible:ring-0 focus-visible:ring-offset-0 text-base md:text-xl h-14 flex-1 font-bold px-4"
+                className="bg-transparent border-none text-emerald-950 placeholder:text-emerald-300 focus-visible:ring-0 focus-visible:ring-offset-0 text-base md:text-xl h-12 md:h-14 flex-1 font-extrabold px-3 md:px-4 tracking-tight"
               />
-              <button className="hidden md:flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold text-sm transition-all active:scale-95 shadow-lg shadow-emerald-200">
-                <span>검색하기</span>
+
+              {/* 입력값 초기화 버튼 */}
+              <AnimatePresence>
+                {searchQuery && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    onClick={() => setSearchQuery("")}
+                    className="p-2 mr-1 text-emerald-300 hover:text-emerald-500 transition-colors"
+                  >
+                    <RefreshCcw size={18} className="hover:rotate-180 transition-transform duration-500" />
+                  </motion.button>
+                )}
+              </AnimatePresence>
+
+              {/* 검색 작동 버튼 */}
+              <button className="hidden sm:flex items-center gap-2 px-5 md:px-8 py-3 md:py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-full font-black text-xs md:text-sm transition-all active:scale-95 shadow-[0_10px_20px_rgba(16,185,129,0.3)] hover:shadow-[0_15px_25px_rgba(16,185,129,0.4)]">
+                <span className="tracking-widest uppercase italic border-b-2 border-white/30">Go</span>
                 <ChevronDown size={14} className="-rotate-90" />
               </button>
+            </div>
+
+            {/* 하단 검색 힌트 */}
+            <div className="absolute top-full left-6 mt-3 flex gap-4 text-[11px] font-bold text-emerald-800/60 opacity-0 group-focus-within:opacity-100 transition-opacity duration-500">
+              <span>#비타민C</span>
+              <span>#마그네슘</span>
+              <span>#수면건강</span>
             </div>
           </div>
 
@@ -374,7 +403,7 @@ export default function HomePage() {
             </div>
 
             <div className={cn(
-              "flex gap-3 overflow-x-auto md:overflow-visible md:grid md:grid-cols-4 pb-4 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide",
+              "flex gap-3 overflow-x-auto md:overflow-visible md:grid md:grid-cols-4 pt-3 pb-4 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide",
               !showAllPopular && "md:max-h-none"
             )}>
               {(showAllPopular ? popularIngredients : popularIngredients.slice(0, 8)).map((ing) => (

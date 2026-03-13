@@ -106,14 +106,14 @@ export default function IngredientCard({ ingredient }: IngredientCardProps) {
 
                     {/* 정보 영역 (간격 타이닝) */}
                     <div className="relative z-10 space-y-1">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 min-w-0">
                             <h3 className={cn(
-                                "font-black text-sm md:text-base transition-colors tracking-tighter uppercase italic truncate",
+                                "font-black text-sm md:text-base transition-colors tracking-tighter uppercase italic truncate pr-1.5",
                                 selected ? "text-amber-400" : "text-slate-900"
                             )}>
                                 {ingredient.name}
                             </h3>
-                            {selected && <Sparkles size={12} className="text-amber-400 animate-pulse" />}
+                            {selected && <Sparkles size={12} className="text-amber-400 animate-pulse shrink-0" />}
                         </div>
 
                         <p className={cn(
