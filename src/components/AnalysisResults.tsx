@@ -16,6 +16,7 @@ import {
     RefreshCcw,
     Zap,
     ShieldCheck,
+    ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -552,6 +553,13 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* 모바일 가로 스크롤 스와이프 안내 */}
+                <div className="lg:hidden flex items-center justify-end px-8 mb-4 max-w-5xl mx-auto">
+                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400/80 uppercase tracking-widest animate-pulse">
+                        스와이프하여 더보기 <ArrowRight size={14} className="opacity-70" />
+                    </span>
                 </div>
 
                 {/* 모바일 가로 스크롤 / 데스크톱 2열 그리드 전환 */}

@@ -37,8 +37,28 @@ type CategoryKey = (typeof CATEGORIES)[number]["key"];
 export default function HomePage() {
   const resultRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCategoryDragging, setIsCategoryDragging] = useState(false);
+  const [categoryStartX, setCategoryStartX] = useState(0);
+  const [categoryScrollLeft, setCategoryScrollLeft] = useState(0);
+
+  const handleCategoryMouseDown = (e: React.MouseEvent) => {
+    if (!categoryScrollRef.current) return;
+    setIsCategoryDragging(true);
+    setCategoryStartX(e.pageX - categoryScrollRef.current.offsetLeft);
+    setCategoryScrollLeft(categoryScrollRef.current.scrollLeft);
+  };
+  const handleCategoryMouseLeave = () => setIsCategoryDragging(false);
+  const handleCategoryMouseUp = () => setIsCategoryDragging(false);
+  const handleCategoryMouseMove = (e: React.MouseEvent) => {
+    if (!isCategoryDragging || !categoryScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - categoryScrollRef.current.offsetLeft;
+    const walk = (x - categoryStartX) * 1.5;
+    categoryScrollRef.current.scrollLeft = categoryScrollLeft - walk;
+  };
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey>("all");
   const [showAllPopular, setShowAllPopular] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -330,8 +350,17 @@ export default function HomePage() {
             <div className="w-1 h-4 bg-emerald-500 rounded-full" />
             <span className="text-xs font-black text-slate-400 uppercase tracking-widest">카테고리 선택</span>
           </div>
-
-          <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide focus-within:cursor-grabbing">
+          <div
+            ref={categoryScrollRef}
+            className={cn(
+              "flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide focus-within:cursor-grabbing hover:cursor-grab active:cursor-grabbing",
+              isCategoryDragging ? "cursor-grabbing" : "cursor-grab"
+            )}
+            onMouseDown={handleCategoryMouseDown}
+            onMouseLeave={handleCategoryMouseLeave}
+            onMouseUp={handleCategoryMouseUp}
+            onMouseMove={handleCategoryMouseMove}
+          >
             {CATEGORIES.map((cat, idx) => (
               <motion.button
                 key={cat.key}
