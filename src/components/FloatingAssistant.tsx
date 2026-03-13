@@ -84,11 +84,16 @@ const MIXY_MESSAGES_EN = [
   "I'm your exclusive AI Nutritionist, Mixy! 👩‍🔬",
 ];
 
+import { useBasketStore } from "@/store/basketStore";
+
 export default function FloatingAssistant() {
+  const { selectedIngredients } = useBasketStore();
   const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState("");
   const [showBubble, setShowBubble] = useState(false);
   const [lang, setLang] = useState<"ko" | "en">("ko");
+
+  const hasItems = selectedIngredients.length > 0;
 
   useEffect(() => {
     // 브라우저 언어 설정 확인 (혹은 URL 쿼리 파라미터 등)
@@ -130,26 +135,32 @@ export default function FloatingAssistant() {
   const currentMessages = lang === "ko" ? MIXY_MESSAGES_KO : MIXY_MESSAGES_EN;
 
   return (
-    <div className="fixed bottom-24 right-4 z-50 flex flex-col items-end pointer-events-none" id="mixy-assistant-root">
+    <div 
+      className={cn(
+        "fixed right-3 md:right-4 z-50 flex flex-col items-end pointer-events-none transition-all duration-700 ease-in-out",
+        hasItems ? "bottom-32 md:bottom-28" : "bottom-6 md:bottom-8"
+      )} 
+      id="mixy-assistant-root"
+    >
       {/* 믹시의 말풍선 */}
       <div
         className={cn(
-          "mb-4 px-5 py-3.5 bg-white/95 backdrop-blur-lg rounded-[1.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.1)] border border-emerald-100/60 max-w-[220px] transition-all duration-700 origin-bottom-right pointer-events-auto",
+          "mb-3 px-4 py-3 bg-white/95 backdrop-blur-lg rounded-[1.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-emerald-100/60 max-w-[180px] md:max-w-[220px] transition-all duration-700 origin-bottom-right pointer-events-auto",
           showBubble ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-50 translate-y-6"
         )}
       >
-        <p className="text-xs md:text-sm font-extrabold text-[#0D4D43] leading-[1.4] tracking-tight">
+        <p className="text-[11px] md:text-sm font-black text-[#0D4D43] leading-[1.4] tracking-tight">
           {message}
         </p>
-        <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white/95 border-r border-b border-emerald-100/60 rotate-45 transform" />
+        <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white/95 border-r border-b border-emerald-100/60 rotate-45 transform" />
       </div>
 
       {/* 믹시 본체 (캡슐 로봇) */}
       <div className="relative group pointer-events-auto">
         {/* 역동적인 오라 효과 */}
-        <div className="absolute -inset-8 bg-gradient-to-tr from-emerald-500/20 via-teal-400/20 to-amber-300/10 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-1000 animate-pulse-slow" />
+        <div className="absolute -inset-4 md:-inset-8 bg-gradient-to-tr from-emerald-500/20 via-teal-400/20 to-amber-300/10 rounded-full blur-xl group-hover:blur-2xl transition-all duration-1000 animate-pulse-slow" />
         
-        <div className="relative w-24 h-24 md:w-32 md:h-32 animate-float cursor-pointer active:scale-90 transition-all duration-300 transform group-hover:scale-105"
+        <div className="relative w-16 h-16 md:w-28 md:h-28 animate-float cursor-pointer active:scale-90 transition-all duration-300 transform group-hover:scale-110"
              onClick={() => {
                 setShowBubble(false);
                 setTimeout(() => {
@@ -161,7 +172,7 @@ export default function FloatingAssistant() {
           <img
             src="/images/mixy.png"
             alt="Mixy - Synergy Analysis Master"
-            className="w-full h-full object-contain filter drop-shadow-[0_20px_30px_rgba(0,0,0,0.15)]"
+            className="w-full h-full object-contain filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.15)]"
             style={{ 
               mixBlendMode: 'multiply',
               maskImage: 'radial-gradient(circle, black 65%, transparent 98%)',
@@ -170,13 +181,14 @@ export default function FloatingAssistant() {
           />
           
           {/* 가동 상태 인디케이터 */}
-          <div className="absolute bottom-5 right-5 w-4 h-4 bg-[#10B981] border-[3px] border-white rounded-full shadow-[0_0_15px_rgba(16,185,129,0.7)] animate-pulse" />
+          <div className="absolute bottom-3 right-3 md:bottom-5 md:right-5 w-2.5 h-2.5 md:w-4 md:h-4 bg-[#10B981] border-2 md:border-[3px] border-white rounded-full shadow-[0_0_10px_rgba(16,185,129,0.7)] animate-pulse" />
           
           {/* 부유 파티클 (애니메이션 요소) */}
-          <div className="absolute -top-1 -right-1 text-xs animate-bounce" style={{ animationDuration: '4s' }}>✨</div>
-          <div className="absolute top-1/2 -left-4 text-sm animate-pulse opacity-60">💊</div>
+          <div className="absolute -top-1 -right-1 text-[10px] md:text-xs animate-bounce" style={{ animationDuration: '4s' }}>✨</div>
+          <div className="absolute top-1/2 -left-3 text-xs md:text-sm animate-pulse opacity-60">💊</div>
         </div>
       </div>
     </div>
   );
 }
+

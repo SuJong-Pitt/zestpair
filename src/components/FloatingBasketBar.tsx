@@ -108,38 +108,38 @@ export default function FloatingBasketBar({ onAnalyze }: FloatingBasketBarProps)
                             </AnimatePresence>
 
                             {/* 메인 컨트롤 바 */}
-                            <div className="flex items-center gap-4 p-3 md:p-4">
+                            <div className="flex items-center gap-2 md:gap-4 p-2.5 md:p-4">
                                 {/* 바구니 요약 정보 */}
                                 <button
                                     onClick={() => setIsExpanded(!isExpanded)}
-                                    className="flex items-center gap-4 flex-1 text-white text-left group/btn"
+                                    className="flex items-center gap-2 md:gap-4 flex-1 text-white text-left group/btn min-w-0"
                                 >
-                                    <div className="relative shrink-0">
+                                    <div className="relative shrink-0 scale-90 md:scale-100">
                                         <motion.div 
                                             whileHover={{ rotate: 15 }}
-                                            className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner"
+                                            className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner"
                                         >
-                                            <ShoppingBasket size={22} className="text-white drop-shadow-md" />
+                                            <ShoppingBasket size={20} className="text-white drop-shadow-md" />
                                         </motion.div>
                                         <AnimatePresence>
                                             <motion.div 
                                                 key={count}
                                                 initial={{ scale: 1.5, rotate: 20 }}
                                                 animate={{ scale: 1, rotate: 0 }}
-                                                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-amber-400 text-slate-900 text-[11px] font-[1000] flex items-center justify-center border-2 border-emerald-600 shadow-lg"
+                                                className="absolute -top-1.5 -right-1.5 w-5 h-5 md:w-6 md:h-6 rounded-full bg-amber-400 text-slate-900 text-[10px] md:text-[11px] font-[1000] flex items-center justify-center border-2 border-emerald-600 shadow-lg"
                                             >
                                                 {count}
                                             </motion.div>
                                         </AnimatePresence>
                                     </div>
 
-                                    <div className="flex flex-col min-w-0">
-                                        <h4 className="font-extrabold text-sm md:text-base tracking-tight flex items-center gap-2 uppercase italic text-white shadow-sm">
-                                            {count}개의 영양제 선택됨
+                                    <div className="flex flex-col min-w-0 pr-1 md:pr-0">
+                                        <h4 className="font-extrabold text-[13px] md:text-base tracking-tight flex items-center gap-1.5 uppercase italic text-white shadow-sm truncate">
+                                            {count}개 영양제
                                             <ChevronUp size={14} className={cn("transition-transform duration-500", isExpanded ? "rotate-180" : "")} />
                                         </h4>
-                                        <span className="text-[10px] md:text-xs font-bold text-white/70 tracking-tight">
-                                            {count < 2 ? "2개 이상 선택해 주세요" : `최대 ${MAX_BASKET_SIZE}개 · 지금 궁합 분석하기`}
+                                        <span className="text-[10px] md:text-xs font-bold text-white/70 tracking-tight truncate">
+                                            {count < 2 ? "2개 이상 선택" : "지금 궁합 분석!"}
                                         </span>
                                     </div>
                                 </button>
@@ -148,26 +148,28 @@ export default function FloatingBasketBar({ onAnalyze }: FloatingBasketBarProps)
                                 <motion.div
                                     whileHover={count >= 2 ? { scale: 1.05 } : {}}
                                     whileTap={count >= 2 ? { scale: 0.95 } : {}}
+                                    className="shrink-0"
                                 >
                                     <Button
                                         onClick={onAnalyze}
                                         disabled={count < 2 || isAnalyzing}
                                         className={cn(
-                                            "rounded-2xl font-black text-xs md:text-sm px-6 py-3 h-12 shrink-0 border-none transition-all duration-500",
+                                            "rounded-2xl font-black text-[11px] md:text-sm px-4 md:px-6 py-2.5 md:py-3 h-10 md:h-12 border-none transition-all duration-500",
                                             "bg-white text-emerald-700 hover:text-emerald-800 shadow-[0_10px_30px_rgba(255,255,255,0.2)]",
                                             "disabled:opacity-30 disabled:scale-95 disabled:grayscale",
                                             count >= 2 && !isAnalyzing && "animate-pulse-glow"
                                         )}
                                     >
                                         {isAnalyzing ? (
-                                            <span className="flex items-center gap-2">
-                                                <FlaskConical size={16} className="animate-spin" />
-                                                분석 진행 중...
+                                            <span className="flex items-center gap-1.5">
+                                                <FlaskConical size={14} className="animate-spin" />
+                                                <span className="hidden xs:inline">분석 중...</span>
+                                                <span className="xs:hidden">...</span>
                                             </span>
                                         ) : (
-                                            <span className="flex items-center gap-2">
-                                                <Sparkles size={16} className="animate-pulse" />
-                                                분석 시작하기
+                                            <span className="flex items-center gap-1.5">
+                                                <Sparkles size={14} className="animate-pulse" />
+                                                분석 시작
                                             </span>
                                         )}
                                     </Button>

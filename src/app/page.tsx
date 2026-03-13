@@ -13,6 +13,7 @@ import type { AnalysisResult, Ingredient, InteractionResult } from "@/types/data
 import { cn } from "@/lib/utils";
 import FloatingAssistant from "@/components/FloatingAssistant";
 import VisualDecorations from "@/components/VisualDecorations";
+import ScrollToTop from "@/components/ScrollToTop";
 import { motion, AnimatePresence } from "framer-motion";
 
 const CATEGORIES = [
@@ -450,6 +451,9 @@ export default function HomePage() {
 
       {/* 믹시(Mixy) 어시스턴트 */}
       <FloatingAssistant />
+
+      {/* 맨 위로 이동 버튼 */}
+      <ScrollToTop />
     </div >
   );
 }

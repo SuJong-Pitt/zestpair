@@ -40,7 +40,7 @@ export default function ScrollToTop() {
                     whileTap={{ scale: 0.9 }}
                     onClick={scrollToTop}
                     className={cn(
-                        "fixed bottom-24 right-6 z-40 md:bottom-32 md:right-10",
+                        "fixed bottom-32 left-6 z-40 md:left-auto md:right-10 md:bottom-32",
                         "w-12 h-12 rounded-2xl flex items-center justify-center",
                         "bg-white/80 backdrop-blur-xl border border-emerald-100",
                         "shadow-[0_10px_25px_-5px_rgba(16,185,129,0.2)]",

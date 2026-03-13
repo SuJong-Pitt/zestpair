@@ -46,8 +46,8 @@ export default function IngredientCard({ ingredient }: IngredientCardProps) {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => toggleIngredient(ingredient)}
                     className={cn(
-                        "group relative w-full text-left rounded-[1.5rem] p-5 transition-all duration-500",
-                        "font-sans border-2 perspective-1000", // overflow-hidden 제거
+                        "group relative w-full text-left rounded-[1.5rem] p-3.5 md:p-4 transition-all duration-500",
+                        "font-sans border-2 perspective-1000",
                         selected
                             ? "border-amber-400 bg-slate-900 shadow-[0_0_30px_rgba(251,191,36,0.2)]"
                             : "border-slate-100 bg-white hover:border-emerald-300 shadow-sm hover:shadow-xl"
@@ -56,44 +56,39 @@ export default function IngredientCard({ ingredient }: IngredientCardProps) {
                     {/* --- 유희왕 카드 스타일 배경 효과 --- */}
                     {selected && (
                         <>
-                            {/* 홀로그램 글린트 (모서리 곡률을 위해 내부 레이어에 배치) */}
+                            {/* 홀로그램 글린트 */}
                             <div className="absolute inset-0 rounded-[1.4rem] overflow-hidden pointer-events-none">
                                 <div className="absolute inset-0 bg-[linear-gradient(110deg,transparent_20%,rgba(255,255,255,0.1)_40%,transparent_60%)] bg-[length:200%_100%] animate-hologram" />
-                            </div>
-                            {/* 하이테크 레이저 라인 */}
-                            <div className="absolute inset-0 opacity-10 pointer-events-none rounded-[1.4rem] overflow-hidden">
-                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
                             </div>
                         </>
                     )}
 
                     {/* 속성 구슬 (Attribute Orb) */}
                     <div className={cn(
-                        "absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-300 border-white/20 z-20",
+                        "absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center border transition-all duration-300 border-white/20 z-20",
                         selected ? "bg-slate-800 shadow-inner" : "bg-slate-50"
                     )}>
                         {getAttributeIcon(ingredient.name)}
                     </div>
 
-                    {/* 인기 배지 - 카드 태그 스타일 (z-index를 높여서 위로 부상) */}
+                    {/* 인기 배지 */}
                     {ingredient.is_popular && (
-                        <div className="absolute top-0 left-6 -translate-y-2 z-30 group-hover:-translate-y-3 transition-transform">
-                            <div className="bg-gradient-to-r from-red-600 to-rose-500 text-[9px] font-[1000] px-3 py-1.5 rounded-b-lg shadow-xl text-white tracking-widest uppercase italic border-x border-b border-white/20">
+                        <div className="absolute top-0 left-5 -translate-y-2 z-30 group-hover:-translate-y-2.5 transition-transform">
+                            <div className="bg-gradient-to-r from-red-600 to-rose-500 text-[8px] font-[1000] px-2 py-1 rounded-b-md shadow-lg text-white tracking-widest uppercase italic border-x border-b border-white/10">
                                 LIMITED
                             </div>
                         </div>
                     )}
 
-                    {/* 메인 비주얼 박스 (몬스터 이미지 영역 느낌) */}
+                    {/* 메인 비주얼 박스 (높이 축소) */}
                     <div
                         className={cn(
-                            "relative w-full aspect-square rounded-xl flex items-center justify-center text-4xl mb-5 transition-all duration-500 overflow-hidden",
+                            "relative w-full h-20 md:h-28 rounded-xl flex items-center justify-center text-3xl md:text-4xl mb-3 transition-all duration-500 overflow-hidden",
                             selected 
                                 ? "bg-gradient-to-b from-slate-800 to-slate-950 border border-white/10 shadow-inner" 
                                 : "bg-slate-50 border border-slate-100 group-hover:bg-emerald-50"
                         )}
                     >
-                        {/* 선택 시 파티클 효과 */}
                         {selected && (
                             <motion.div 
                                 initial={{ opacity: 0 }}
@@ -109,62 +104,61 @@ export default function IngredientCard({ ingredient }: IngredientCardProps) {
                         </span>
                     </div>
 
-                    {/* 정보 영역 */}
-                    <div className="relative z-10 space-y-2">
-                        <div className="flex items-center gap-2">
+                    {/* 정보 영역 (간격 타이닝) */}
+                    <div className="relative z-10 space-y-1">
+                        <div className="flex items-center gap-1.5">
                             <h3 className={cn(
-                                "font-black text-lg transition-colors tracking-tighter uppercase italic",
+                                "font-black text-sm md:text-base transition-colors tracking-tighter uppercase italic truncate",
                                 selected ? "text-amber-400" : "text-slate-900"
                             )}>
                                 {ingredient.name}
                             </h3>
-                            {selected && <Sparkles size={14} className="text-amber-400 animate-pulse" />}
+                            {selected && <Sparkles size={12} className="text-amber-400 animate-pulse" />}
                         </div>
 
                         <p className={cn(
-                            "text-[10px] leading-relaxed font-bold line-clamp-2 min-h-[30px]",
+                            "text-[10px] leading-[1.3] font-bold line-clamp-2",
                             selected ? "text-slate-400" : "text-slate-500"
                         )}>
                             {ingredient.short_description}
                         </p>
                     </div>
 
-                    {/* 하단 패러미터 (ATK/DEF 느낌) */}
+                    {/* 하단 패러미터 */}
                     <div className={cn(
-                        "mt-4 flex items-center justify-between pt-3 border-t transition-colors",
+                        "mt-3 flex items-center justify-between pt-2 border-t transition-colors",
                         selected ? "border-slate-800" : "border-slate-100"
                     )}>
                         <div className="flex items-center gap-2">
                             <div className={cn(
-                                "flex items-center gap-1 px-2 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-tighter",
+                                "flex items-center gap-1 px-1.5 py-0.5 rounded-md border text-[8px] font-black uppercase tracking-tighter",
                                 selected 
                                     ? "bg-amber-400/10 border-amber-400/30 text-amber-400" 
-                                    : "bg-slate-100 border-slate-200 text-slate-500"
+                                    : "bg-slate-100 border-slate-200 text-slate-400"
                             )}>
-                                <Clock size={10} strokeWidth={3} />
+                                <Clock size={9} strokeWidth={3} />
                                 {dosageTimeLabels[ingredient.dosage_time]}
                             </div>
                         </div>
 
-                        {/* 선택됨 표시 - 레어리티 인디케이터 느낌 */}
                         <AnimatePresence>
                             {selected && (
                                 <motion.div
-                                    initial={{ opacity: 0, x: 10 }}
+                                    initial={{ opacity: 0, x: 5 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: 10 }}
-                                    className="flex items-center gap-1 text-[10px] font-black text-emerald-400"
+                                    exit={{ opacity: 0, x: 5 }}
+                                    className="flex items-center gap-1 text-[9px] font-black text-emerald-400"
                                 >
-                                    <Check size={12} strokeWidth={4} />
+                                    <Check size={10} strokeWidth={4} />
                                     선택됨
                                 </motion.div>
                             )}
                         </AnimatePresence>
                         
-                        {!selected && <HelpCircle size={14} className="text-slate-200 group-hover:text-emerald-400 transition-colors" />}
+                        {!selected && <HelpCircle size={12} className="text-slate-200 group-hover:text-emerald-400 transition-colors" />}
                     </div>
 
-                    {/* 테두리 오라 효과 (카드 희귀도 효과) */}
+                    {/* 테두리 오라 효과 */}
                     {selected && (
                         <div className="absolute inset-0 border-2 border-amber-400/50 rounded-[1.5rem] pointer-events-none animate-pulse-slow shadow-[inset_0_0_20px_rgba(251,191,36,0.1)]" />
                     )}
