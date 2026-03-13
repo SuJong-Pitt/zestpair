@@ -217,7 +217,7 @@ export default function HomePage() {
             <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
               <Pill size={22} className="text-white" />
             </div>
-            <span className="text-white font-black text-xl tracking-tight">Nutri-Mixer</span>
+            <span className="text-white font-black text-xl tracking-tight">SuppPair</span>
           </div>
 
           <div className="inline-block px-4 py-1.5 rounded-full bg-emerald-100/50 border border-emerald-200/50 mb-6 backdrop-blur-sm animate-fade-in">

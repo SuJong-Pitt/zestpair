@@ -4,8 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
   title: {
-    default: "Nutri-Mixer | 영양제 궁합 분석 서비스",
-    template: "%s | Nutri-Mixer",
+    default: "SuppPair | 영양제 궁합 분석 서비스",
+    template: "%s | SuppPair",
   },
   description:
     "내가 먹는 영양제들, 같이 먹어도 괜찮을까? AI 기반 영양제 궁합 분석으로 최적의 조합을 찾아보세요. 비타민, 미네랄, 오메가-3 등 수십 종의 영양제 상호작용을 무료로 확인하세요.",
@@ -15,20 +15,20 @@ export const metadata: Metadata = {
     "비타민 조합",
     "영양제 함께먹기",
     "영양제 상호작용",
-    "Nutri-Mixer",
-    "뉴트리믹서",
+    "SuppPair",
+    "섭페어",
   ],
-  authors: [{ name: "Nutri-Mixer" }],
+  authors: [{ name: "SuppPair" }],
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    siteName: "Nutri-Mixer",
-    title: "Nutri-Mixer | 영양제 궁합 분석 서비스",
+    siteName: "SuppPair",
+    title: "SuppPair | 영양제 궁합 분석 서비스",
     description: "내가 먹는 영양제들, 같이 먹어도 괜찮을까?",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nutri-Mixer | 영양제 궁합 분석",
+    title: "SuppPair | 영양제 궁합 분석",
     description: "AI 기반 영양제 궁합 분석 서비스",
   },
 };

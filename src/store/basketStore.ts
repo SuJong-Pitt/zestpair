@@ -73,7 +73,7 @@ export const useBasketStore = create<BasketState>()(
             },
         }),
         {
-            name: "nutrimixer-basket", // localStorage key
+            name: "supppair-basket", // localStorage key
             storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({
                 // 분석 상태는 저장하지 않고 선택된 영양제만 저장
