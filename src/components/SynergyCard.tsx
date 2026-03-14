@@ -12,11 +12,14 @@ import {
     XCircle, 
     Share2, 
     RefreshCcw,
-    Download
+    Download,
+    Loader2
 } from "lucide-react";
 import type { InteractionResult } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useRef } from "react";
+import { toPng } from "html-to-image";
 
 const cardTypeConfig = {
     SYNERGY: {
@@ -56,8 +59,65 @@ export default function SynergyCard({
     if (!result.interaction) return null;
     
     const [isFlipped, setIsFlipped] = useState(false);
+    const [isSharing, setIsSharing] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const cardRef = useRef<HTMLDivElement>(null);
+    const frontCardRef = useRef<HTMLDivElement>(null);
+    const backCardRef = useRef<HTMLDivElement>(null);
+    const combinedRef = useRef<HTMLDivElement>(null);
+    
     const config = cardTypeConfig[result.interaction.type];
     const Icon = config.icon;
+
+    const handleShare = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsSharing(true);
+        const shareData = {
+            title: `ZestPair - ${result.interaction?.title}`,
+            text: `${result.pair[0].name} & ${result.pair[1].name} 궁합 분석 결과: ${result.interaction?.title}\n${result.interaction?.reason}`,
+            url: window.location.href,
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(`${shareData.text}\n\n결과 보기: ${shareData.url}`);
+                alert("결과가 클립보드에 복사되었습니다!");
+            }
+        } catch (err) {
+            console.error("Error sharing:", err);
+        } finally {
+            setTimeout(() => setIsSharing(false), 1000);
+        }
+    };
+
+    const handleDownload = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        
+        // 통합 이미지 캡처를 위해 숨겨진 combinedRef 사용
+        const targetElement = combinedRef.current;
+        if (!targetElement) return;
+        
+        setIsDownloading(true);
+        try {
+            const dataUrl = await toPng(targetElement, {
+                cacheBust: true,
+                backgroundColor: '#0f172a', // 프리미엄 다크 배경
+                pixelRatio: 2, // 고해상도 출력
+            });
+            
+            const link = document.createElement('a');
+            link.download = `ZestPair-Full-Report-${result.interaction?.title || 'Result'}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (err) {
+            console.error("Error downloading card:", err);
+            alert("이미지 저장 중 오류가 발생했습니다.");
+        } finally {
+            setIsDownloading(false);
+        }
+    };
 
     return (
         <motion.div
@@ -73,6 +133,7 @@ export default function SynergyCard({
             onClick={() => setIsFlipped(!isFlipped)}
         >
             <motion.div
+                ref={cardRef}
                 className="w-full h-full relative"
                 animate={{ rotateY: isFlipped ? 180 : 0 }}
                 transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
@@ -80,9 +141,11 @@ export default function SynergyCard({
             >
                 {/* --- 카드 앞면 --- */}
                 <div 
+                    ref={frontCardRef}
                     className={cn(
-                        "absolute inset-0 w-full h-full rounded-[2.5rem] p-1.5 shadow-2xl overflow-hidden",
-                        "bg-gradient-to-br", config.theme
+                        "absolute inset-0 w-full h-full rounded-[2.5rem] p-1.5 shadow-2xl overflow-hidden transition-all duration-300 pointer-events-none",
+                        "bg-gradient-to-br", config.theme,
+                        isFlipped ? "opacity-0" : "opacity-100 z-10 pointer-events-auto"
                     )}
                     style={{ backfaceVisibility: "hidden" }}
                 >
@@ -111,10 +174,16 @@ export default function SynergyCard({
                                     "bg-gradient-to-tr", config.theme
                                 )} />
                                 
-                                <div className="relative flex items-center justify-center gap-4 mb-5">
-                                    <div className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">{result.pair[0].icon_emoji}</div>
-                                    <Zap className="text-yellow-400 animate-bounce" size={32} strokeWidth={3} />
-                                    <div className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">{result.pair[1].icon_emoji}</div>
+                                <div className="relative flex items-center justify-center gap-6 mb-5">
+                                    <div className="flex flex-col items-center gap-2">
+                                        <div className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">{result.pair[0].icon_emoji}</div>
+                                        <span className="text-[10px] font-black text-white/60 tracking-tighter uppercase">{result.pair[0].name}</span>
+                                    </div>
+                                    <Zap className="text-yellow-400 animate-bounce mb-6" size={28} strokeWidth={3} />
+                                    <div className="flex flex-col items-center gap-2">
+                                        <div className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">{result.pair[1].icon_emoji}</div>
+                                        <span className="text-[10px] font-black text-white/60 tracking-tighter uppercase">{result.pair[1].name}</span>
+                                    </div>
                                 </div>
 
                                 <div className="flex flex-col items-center space-y-3">
@@ -147,9 +216,11 @@ export default function SynergyCard({
 
                 {/* --- 카드 뒷면 (상세 정보) --- */}
                 <div 
+                    ref={backCardRef}
                     className={cn(
-                        "absolute inset-0 w-full h-full rounded-[2.5rem] p-1.5 shadow-2xl overflow-hidden",
-                        "bg-gradient-to-br", config.theme
+                        "absolute inset-0 w-full h-full rounded-[2.5rem] p-1.5 shadow-2xl overflow-hidden transition-all duration-300 pointer-events-none",
+                        "bg-gradient-to-br", config.theme,
+                        isFlipped ? "opacity-100 z-20 pointer-events-auto" : "opacity-0"
                     )}
                     style={{ 
                         WebkitBackfaceVisibility: "hidden",
@@ -173,10 +244,12 @@ export default function SynergyCard({
                                 </div>
                             </div>
 
-                            {/* 스크롤 영역: min-h-0가 flex-1 장치에서 스크롤을 활성화하는 핵심입니다. */}
-                            <div className="flex-1 min-h-0 overflow-hidden relative group/scroll">
+                            {/* 스크롤 영역: 클릭 이벤트 전파를 중단하여 스크롤 시 카드가 뒤집히지 않도록 함 */}
+                            <div className="flex-1 min-h-0 overflow-hidden relative group/scroll" 
+                                 onClick={(e) => e.stopPropagation()}
+                                 style={{ touchAction: "pan-y" }}>
                                 <ScrollArea className="h-full pr-3">
-                                    <div className="space-y-4 pt-1 pb-14"> {/* 하단 패딩을 대폭 늘려 페이드와 겹치지 않게 함 */}
+                                    <div className="space-y-5 pt-2 pb-10"> {/* 상하단 여백 최적화 */}
                                         <div className="space-y-2 text-left">
                                             <div className="inline-flex items-center gap-2 px-2 py-0.5 bg-slate-100 rounded-md">
                                                 <span className="text-slate-600 font-black text-[9px] uppercase">궁합 이유</span>
@@ -202,19 +275,37 @@ export default function SynergyCard({
                                 <div className="absolute bottom-0 left-0 right-2 w-full h-10 bg-gradient-to-t from-white/95 via-white/40 to-transparent pointer-events-none z-10" />
                             </div>
 
-                            <div className="mt-2 flex flex-col items-center gap-2 flex-shrink-0 border-t border-slate-100 pt-3">
-                                <div className="flex items-center gap-2 text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100/50">
+                            <div className="mt-2 flex flex-col items-center gap-2 flex-shrink-0 border-t border-slate-100 pt-3" onClick={(e) => e.stopPropagation()}>
+                                <button 
+                                    onClick={() => setIsFlipped(false)}
+                                    className="flex items-center gap-2 text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 px-3 py-1 rounded-full border border-slate-100/50 transition-colors"
+                                >
                                     <span className="text-[8px] font-black tracking-widest uppercase">클릭하여 돌아가기</span>
                                     <RefreshCcw size={10} className="rotate-180" />
-                                </div>
+                                </button>
                                 <div className="w-full flex gap-1.5">
-                                    <div className="flex-1 px-3 py-2 bg-slate-50 rounded-xl flex items-center justify-between border border-slate-100">
-                                        <span className="text-[9px] font-black text-slate-400">SHARE</span>
-                                        <Share2 size={12} className="text-slate-500" />
-                                    </div>
-                                    <div className="w-9 h-9 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg">
-                                        <Download size={12} />
-                                    </div>
+                                    <button 
+                                        onClick={handleShare}
+                                        disabled={isSharing}
+                                        className={cn(
+                                            "flex-1 px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl flex items-center justify-between border border-slate-100 cursor-pointer transition-all active:scale-95",
+                                            isSharing && "opacity-50"
+                                        )}
+                                    >
+                                        <span className="text-[9px] font-black text-slate-400">{isSharing ? "SHARING..." : "SHARE"}</span>
+                                        <Share2 size={12} className={cn("text-slate-500", isSharing && "animate-bounce")} />
+                                    </button>
+                                    <button 
+                                        onClick={handleDownload}
+                                        disabled={isDownloading}
+                                        className="w-9 h-9 bg-slate-900 hover:bg-black text-white rounded-xl flex items-center justify-center shadow-lg cursor-pointer transition-transform active:scale-95 disabled:opacity-50"
+                                    >
+                                        {isDownloading ? (
+                                            <Loader2 size={12} className="animate-spin" />
+                                        ) : (
+                                            <Download size={12} />
+                                        )}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -227,6 +318,92 @@ export default function SynergyCard({
                 <span className="text-[70px] font-black text-indigo-500/5 select-none tracking-tighter italic uppercase">
                     {config.intensity}
                 </span>
+            </div>
+
+            {/* --- 이미지 저장 전용 숨겨진 레이아웃 (앞/뒤 동시 렌더링) --- */}
+            <div className="fixed -left-[9999px] top-0">
+                <div 
+                    ref={combinedRef}
+                    className="p-10 flex gap-8 bg-[#0F172A] items-center"
+                    style={{ width: '800px' }}
+                >
+                    {/* 앞면 복제본 */}
+                    <div className="w-[340px] aspect-[2/3] shrink-0">
+                        <div className={cn("w-full h-full rounded-[2.5rem] p-1.5 bg-gradient-to-br", config.theme)}>
+                            <div className="w-full h-full rounded-[2.2rem] bg-[#0F172A] overflow-hidden relative border border-white/20">
+                                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+                                <div className="p-6 flex flex-col h-full relative z-10">
+                                    <div className="flex justify-between items-start mb-6">
+                                        <span className="text-[10px] font-black text-white/40 tracking-[0.3em] uppercase">ZestPair TRADING CARD</span>
+                                        <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
+                                            <Sparkles size={14} className="text-white" />
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 flex flex-col items-center justify-center mb-8">
+                                        <div className="flex items-center justify-center gap-6 mb-6">
+                                            <div className="flex flex-col items-center gap-2">
+                                                <div className="text-6xl">{result.pair[0].icon_emoji}</div>
+                                                <span className="text-[10px] font-black text-white/40 tracking-tighter">{result.pair[0].name}</span>
+                                            </div>
+                                            <Zap className="text-yellow-400 mb-6" size={24} />
+                                            <div className="flex flex-col items-center gap-2">
+                                                <div className="text-6xl">{result.pair[1].icon_emoji}</div>
+                                                <span className="text-[10px] font-black text-white/40 tracking-tighter">{result.pair[1].name}</span>
+                                            </div>
+                                        </div>
+                                        <h4 className="text-2xl font-[1000] text-white tracking-tighter text-center leading-tight mb-4">
+                                            {result.interaction.title}
+                                        </h4>
+                                        <div className={cn("px-4 py-1.5 rounded-full font-black text-[10px] tracking-[0.2em] text-white border border-white/20", config.theme.split(' ')[0].replace('from-', 'bg-'))}>
+                                            {config.label}
+                                        </div>
+                                    </div>
+                                    <div className="mt-auto pt-4 border-t border-white/10 flex justify-between text-[8px] font-black text-white/30 tracking-widest">
+                                        <span>{result.pair[0].name}</span>
+                                        <span>VS</span>
+                                        <span>{result.pair[1].name}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 뒷면 복제본 */}
+                    <div className="w-[340px] aspect-[2/3] shrink-0 text-left">
+                        <div className={cn("w-full h-full rounded-[2.5rem] p-1.5 bg-gradient-to-br", config.theme)}>
+                            <div className="w-full h-full rounded-[2.2rem] bg-white overflow-hidden relative border border-white/20 p-6 flex flex-col">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex flex-col">
+                                        <span className="text-[8px] font-black text-slate-400 tracking-[0.2em] uppercase">ANALYSIS REPORT</span>
+                                        <span className="text-[10px] font-black text-slate-900">PROTOCOL-X-{index + 1}</span>
+                                    </div>
+                                    <div className={cn("p-2 rounded-xl text-white", config.theme.split(' ')[0].replace('from-', 'bg-'))}>
+                                        <Icon size={14} />
+                                    </div>
+                                </div>
+                                <div className="space-y-6">
+                                    <div>
+                                        <span className="inline-block px-2 py-0.5 bg-slate-100 rounded text-[8px] font-black text-slate-500 mb-2 uppercase tracking-tighter">궁합 이유</span>
+                                        <p className="text-[13px] text-slate-800 font-bold leading-snug break-words">
+                                            {result.interaction.reason}
+                                        </p>
+                                    </div>
+                                    {result.interaction.recommendation && (
+                                        <div>
+                                            <span className="inline-block px-2 py-0.5 bg-emerald-50 rounded text-[8px] font-black text-emerald-600 mb-2 uppercase tracking-tighter">전문가 권고</span>
+                                            <p className="text-[12px] text-slate-600 font-semibold leading-relaxed break-words">
+                                                {result.interaction.recommendation}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="mt-auto pt-6 flex justify-center opacity-30">
+                                    <span className="text-[9px] font-black text-slate-400 tracking-[0.5em] uppercase">ZestPair AI SYSTEM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </motion.div>
     );
