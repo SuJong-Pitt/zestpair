@@ -4,8 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
   title: {
-    default: "SuppPair | 영양제 궁합 분석 서비스",
-    template: "%s | SuppPair",
+    default: "ZestPair | 영양제 궁합 분석 서비스",
+    template: "%s | ZestPair",
   },
   description:
     "내가 먹는 영양제들, 같이 먹어도 괜찮을까? AI 기반 영양제 궁합 분석으로 최적의 조합을 찾아보세요. 비타민, 미네랄, 오메가-3 등 수십 종의 영양제 상호작용을 무료로 확인하세요.",
@@ -15,20 +15,20 @@ export const metadata: Metadata = {
     "비타민 조합",
     "영양제 함께먹기",
     "영양제 상호작용",
-    "SuppPair",
-    "섭페어",
+    "ZestPair",
+    "제스트페어",
   ],
-  authors: [{ name: "SuppPair" }],
+  authors: [{ name: "ZestPair" }],
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    siteName: "SuppPair",
-    title: "SuppPair | 영양제 궁합 분석 서비스",
+    siteName: "ZestPair",
+    title: "ZestPair | 영양제 궁합 분석 서비스",
     description: "내가 먹는 영양제들, 같이 먹어도 괜찮을까?",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SuppPair | 영양제 궁합 분석",
+    title: "ZestPair | 영양제 궁합 분석",
     description: "AI 기반 영양제 궁합 분석 서비스",
   },
 };
