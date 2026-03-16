@@ -16,6 +16,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import VisualDecorations from "@/components/VisualDecorations";
 import { motion, AnimatePresence } from "framer-motion";
 import { UI_TRANSLATIONS, CATEGORIES_TRANSLATIONS } from "@/lib/i18n";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 // 헬퍼 컴포넌트: 가로 스크롤 컨테이너 (관성 드래그 지원)
 function HorizontalScroll({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -76,6 +77,7 @@ export default function HomePage() {
 
   const [dbIngredients, setDbIngredients] = useState<Ingredient[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(true);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -191,11 +193,11 @@ export default function HomePage() {
       <section
         className="relative overflow-hidden pb-24 pt-14 md:pt-12 md:pb-32"
         style={{
-          background: "linear-gradient(145deg, #080c14 0%, #0c1220 30%, #0d1a1a 60%, #0a0e1a 100%)"
+          background: "radial-gradient(circle at 50% 0%, #0d1a15 0%, #080c14 50%, #030712 100%)"
         }}
       >
         {/* 고도화된 배경 장식 */}
-        <VisualDecorations />
+        {!isMobile && <VisualDecorations />}
 
         <div className="absolute top-5 right-5 sm:top-8 sm:right-8 z-50">
           <button
@@ -211,30 +213,31 @@ export default function HomePage() {
 
           {/* === 로고 배지 === */}
           <motion.div
-            initial={{ opacity: 0, y: -16, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="inline-flex items-center gap-2.5 mb-6 mt-2 sm:mt-0 px-4 py-2 rounded-full"
-            style={{
-              background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              backdropFilter: "blur(20px)"
-            }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="inline-flex items-center gap-3 mb-8 px-5 py-2.5 rounded-full relative group cursor-default"
           >
-            <div className="relative w-7 h-7 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-[0_0_16px_rgba(52,211,153,0.5)]">
-              <Pill size={14} className="text-white" />
+            {/* 뒤 배경 글로우 */}
+            <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
+
+            <div className="relative flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
+              <div className="relative w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.6)]">
+                <Pill size={16} className="text-white animate-bounce-slow" />
+              </div>
+              <span className="text-white font-[1000] text-sm tracking-[0.2em] uppercase">ZestPair</span>
+              <div className="w-px h-4 bg-white/20 mx-1" />
+              <span
+                className="text-[9px] font-black uppercase tracking-widest text-[#6ee7b7] flex items-center gap-1.5"
+              >
+                <motion.span
+                  animate={{ opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"
+                />
+                AI Core v2.5
+              </span>
             </div>
-            <span className="text-white/90 font-black text-sm tracking-widest uppercase">ZestPair</span>
-            <span
-              className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
-              style={{
-                background: "linear-gradient(90deg, rgba(16,185,129,0.25), rgba(6,182,212,0.15))",
-                border: "1px solid rgba(16,185,129,0.3)",
-                color: "#6ee7b7"
-              }}
-            >
-              AI POWERED
-            </span>
           </motion.div>
 
           {/* === 메인 헤드라인 === */}
@@ -309,14 +312,14 @@ export default function HomePage() {
               ))}
               {/* 스파클 */}
               <motion.span
-                animate={{ opacity: [0,1,0], scale: [0.6,1.4,0.6], rotate: [-10,10,-10] }}
+                animate={{ opacity: [0, 1, 0], scale: [0.6, 1.4, 0.6], rotate: [-10, 10, -10] }}
                 transition={{ duration: 2.8, repeat: Infinity, delay: 1.2 }}
                 className="absolute -top-6 -right-6 hidden md:block"
               >
                 <Sparkles size={26} className="text-amber-300" />
               </motion.span>
               <motion.span
-                animate={{ opacity: [0,0.8,0], scale: [0.5,1.2,0.5] }}
+                animate={{ opacity: [0, 0.8, 0], scale: [0.5, 1.2, 0.5] }}
                 transition={{ duration: 3.5, repeat: Infinity, delay: 2.5 }}
                 className="absolute -bottom-5 -left-4 hidden md:block"
               >
@@ -643,7 +646,7 @@ export default function HomePage() {
 
         <div className="mb-8 relative pt-4">
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-emerald-500/50 to-transparent" />
-          
+
           {/* ── 전체 목록 헤더 ── */}
           <div className="flex items-center justify-between mb-6 px-1">
             <div className="flex items-center gap-3">
@@ -718,7 +721,7 @@ export default function HomePage() {
         </div>
       </main>
 
-      <FloatingBasketBar onAnalyze={handleAnalyze} />
+      <FloatingBasketBar onAnalyze={handleAnalyze} allIngredients={dbIngredients} />
       <FloatingAssistant />
       <ScrollToTop />
     </div>

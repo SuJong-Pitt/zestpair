@@ -1,8 +1,7 @@
-"use client";
-
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 /* ------------------------------------------------------------------ */
 /* 고정 시드(seed)로 랜덤값 생성 – SSR/CSR hydration mismatch 방지      */
@@ -41,37 +40,20 @@ function MolecularNetwork() {
   return (
     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
       <defs>
-        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#10b981" stopOpacity="0.15" />
-          <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.1" />
-          <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.15" />
-        </linearGradient>
-        <filter id="nodeglow">
-          <feGaussianBlur stdDeviation="0.5" result="blur" />
+        <filter id="softglow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
           <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
       </defs>
-      {connections.map(([a, b], i) => (
-        <motion.line
-          key={i}
-          x1={nodes[a].x} y1={nodes[a].y}
-          x2={nodes[b].x} y2={nodes[b].y}
-          stroke="url(#lineGrad)"
-          strokeWidth="0.3"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: [0, 0.6, 0.3] }}
-          transition={{ duration: 2 + i * 0.3, delay: i * 0.15, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-        />
-      ))}
       {nodes.map((n, i) => (
         <motion.circle
           key={i}
-          cx={n.x} cy={n.y} r="0.8"
+          cx={n.x} cy={n.y} r="0.4"
           fill={i % 3 === 0 ? "#10b981" : i % 3 === 1 ? "#06b6d4" : "#a78bfa"}
-          filter="url(#nodeglow)"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: [1, 1.8, 1], opacity: [0.4, 0.9, 0.4] }}
-          transition={{ duration: 3 + seededRand(i) * 2, delay: i * 0.2, repeat: Infinity, ease: "easeInOut" }}
+          filter="url(#softglow)"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.1, 0.3, 0.1], scale: [1, 1.5, 1] }}
+          transition={{ duration: 4 + i * 0.5, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}
     </svg>
@@ -82,6 +64,7 @@ export default function VisualDecorations() {
   const [hasMounted, setHasMounted] = useState(false);
   const [stats, setStats] = useState({ ingredients: 0, interactions: 0 });
   const [isLoading, setIsLoading] = useState(true);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     setHasMounted(true);
@@ -135,17 +118,45 @@ export default function VisualDecorations() {
         />
         {/* 골든 오브 – 가운데 하단 */}
         <motion.div
-          animate={{ scale: [1, 1.4, 1], x: ["-5%", "5%", "-5%"], y: ["5%", "-5%", "5%"] }}
-          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[5%] left-[20%] w-[60%] h-[50%]"
-          style={{ background: "radial-gradient(circle at 50% 70%, rgba(245,158,11,0.12) 0%, rgba(16,185,129,0.1) 40%, transparent 65%)", filter: "blur(100px)" }}
+          animate={{ scale: [1, 1.3, 1], opacity: [0.08, 0.15, 0.08] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-0 left-0 right-0 h-[40%]"
+          style={{ background: "radial-gradient(circle at 50% 100%, rgba(16,185,129,0.15) 0%, transparent 70%)", filter: "blur(100px)" }}
         />
       </div>
 
-      {/* === 분자 네트워크 배경 === */}
-      <div className="absolute inset-0 opacity-70">
-        <MolecularNetwork />
+      {/* === 우아한 부유 보케 효과 === */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ 
+              opacity: [0, 0.15, 0], 
+              y: [100, -100], 
+              x: [(Math.random() - 0.5) * 50, (Math.random() - 0.5) * 100],
+              scale: [0.5, 1.5, 0.8]
+            }}
+            transition={{ duration: 15 + i * 5, repeat: Infinity, ease: "linear", delay: i * 2 }}
+            className="absolute rounded-full"
+            style={{ 
+              width: 150 + i * 50, 
+              height: 150 + i * 50, 
+              left: `${(i * 15) % 100}%`, 
+              top: '80%',
+              background: `radial-gradient(circle, ${["#10b98115", "#06b6d415", "#8b5cf615"][i % 3]} 0%, transparent 70%)`,
+              filter: "blur(40px)"
+            }}
+          />
+        ))}
       </div>
+
+      {/* === 분자 네트워크 배경 === */}
+      {!isMobile && (
+        <div className="absolute inset-0 opacity-70">
+          <MolecularNetwork />
+        </div>
+      )}
 
       {/* === 노이즈 텍스처 === */}
       <div className="absolute inset-0 opacity-[0.035] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
@@ -232,24 +243,24 @@ export default function VisualDecorations() {
       ))}
 
       {/* === 리치 파티클 시스템 (다양한 색상) === */}
-      {[...Array(30)].map((_, i) => {
+      {[...Array(isMobile ? 12 : 25)].map((_, i) => {
         const colors = ["#10b981", "#06b6d4", "#a78bfa", "#f59e0b", "#f97316", "#ec4899"];
         const color = colors[i % colors.length];
-        const size = 2 + seededRand(i * 3) * 3;
+        const size = 2 + seededRand(i * 3) * 2;
         return (
           <motion.div
             key={i}
             initial={{ opacity: 0 }}
             animate={{
-              opacity: [0, 0.7, 0],
-              y: [0, -(80 + seededRand(i) * 80)],
-              x: [0, (seededRand(i * 2) - 0.5) * 50],
-              scale: [1, 0.5],
+              opacity: [0, 0.6, 0],
+              y: [0, -(60 + seededRand(i) * 100)],
+              x: [0, (seededRand(i * 2) - 0.5) * 40],
+              scale: [1, 0.4],
             }}
             transition={{
-              duration: 4 + seededRand(i * 5) * 5,
+              duration: 5 + seededRand(i * 5) * 6,
               repeat: Infinity,
-              delay: seededRand(i * 7) * 10,
+              delay: seededRand(i * 7) * 8,
               ease: "easeOut",
             }}
             className="absolute rounded-full"
@@ -258,8 +269,8 @@ export default function VisualDecorations() {
               height: size,
               background: color,
               left: `${seededRand(i * 11) * 100}%`,
-              top: `${55 + seededRand(i * 13) * 45}%`,
-              boxShadow: `0 0 ${size * 3}px ${color}`,
+              top: `${60 + seededRand(i * 13) * 40}%`,
+              boxShadow: `0 0 ${size * 2}px ${color}`,
             }}
           />
         );

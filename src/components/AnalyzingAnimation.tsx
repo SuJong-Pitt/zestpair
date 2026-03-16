@@ -69,14 +69,14 @@ export default function AnalyzingAnimation({ onComplete }: Props) {
 
   // 배경 파티클
   const bgParticles = useMemo(() =>
-    Array.from({ length: 40 }).map((_, i) => ({
+    Array.from({ length: 25 }).map((_, i) => ({
       id: i,
       x: Math.random() * 100,
       delay: Math.random() * 5,
-      duration: 4 + Math.random() * 6,
-      size: 1 + Math.random() * 3,
+      duration: 5 + Math.random() * 7,
+      size: 1 + Math.random() * 2,
       color: ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#f43f5e"][i % 5],
-      emoji: i % 5 === 0 ? PILL_EMOJIS[i % PILL_EMOJIS.length] : null
+      emoji: i % 8 === 0 ? PILL_EMOJIS[i % PILL_EMOJIS.length] : null
     }))
   , []);
 
@@ -103,12 +103,10 @@ export default function AnalyzingAnimation({ onComplete }: Props) {
     >
       {/* ── 배경 오브 ── */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(16,185,129,0.35) 0%, transparent 60%)", filter: "blur(80px)", opacity: 0.5 }} />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(139,92,246,0.5) 0%, transparent 60%)", filter: "blur(70px)", opacity: 0.35 }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(6,182,212,0.3) 0%, transparent 50%)", filter: "blur(60px)", opacity: 0.25 }} />
+        <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(16,185,129,0.35) 0%, transparent 60%)", filter: "blur(60px) md:blur(80px)", opacity: 0.5 }} />
+        <div className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] md:w-[400px] md:h-[400px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(139,92,246,0.5) 0%, transparent 60%)", filter: "blur(50px) md:blur(70px)", opacity: 0.35 }} />
       </div>
 
       {/* ── 배경 파티클 (상승) ── */}

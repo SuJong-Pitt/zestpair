@@ -45,9 +45,9 @@ export default function IngredientCard({ ingredient, isFeatured = false }: Ingre
       <div
         className="relative w-full rounded-[1.75rem] overflow-hidden transition-all duration-400"
         style={selected ? {
-          background: "linear-gradient(145deg, #071210 0%, #0a1a15 60%, #060e10 100%)",
-          border: `1.5px solid ${theme.color}55`,
-          boxShadow: `0 0 0 1px ${theme.color}22, 0 20px 60px rgba(0,0,0,0.6), 0 0 40px ${theme.glow}`,
+          background: "linear-gradient(145deg, #0a1a15 0%, #060e10 100%)",
+          border: `1.5px solid ${theme.color}`,
+          boxShadow: `0 0 30px ${theme.glow}, inset 0 0 20px ${theme.color}20`,
         } : {
           background: isFeatured
             ? "linear-gradient(145deg, #ffffff 0%, #f8fffe 100%)"
@@ -62,9 +62,9 @@ export default function IngredientCard({ ingredient, isFeatured = false }: Ingre
         {selected && (
           <motion.div
             animate={{ x: ["-110%", "210%"] }}
-            transition={{ duration: 3, repeat: Infinity, repeatDelay: 5, ease: "easeInOut" }}
-            className="absolute inset-y-0 w-1/3 pointer-events-none z-10"
-            style={{ background: `linear-gradient(90deg, transparent, ${theme.color}18, transparent)`, transform: "skewX(-12deg)" }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
+            className="absolute inset-y-0 w-1/2 pointer-events-none z-10"
+            style={{ background: `linear-gradient(90deg, transparent, ${theme.color}25, transparent)`, transform: "skewX(-20deg)" }}
           />
         )}
 

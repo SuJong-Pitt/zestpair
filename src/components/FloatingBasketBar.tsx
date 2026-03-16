@@ -2,28 +2,39 @@
 
 import { useBasketStore, MAX_BASKET_SIZE } from "@/store/basketStore";
 import { cn } from "@/lib/utils";
-import { FlaskConical, X, Sparkles, ShoppingBasket, ChevronUp, Trash2, Zap } from "lucide-react";
+import { FlaskConical, X, Sparkles, ShoppingBasket, ChevronUp, Trash2, Zap, Search as SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UI_TRANSLATIONS } from "@/lib/i18n";
 
+import type { Ingredient } from "@/types/database";
+
 interface FloatingBasketBarProps {
   onAnalyze: () => void;
+  allIngredients?: Ingredient[];
 }
 
-export default function FloatingBasketBar({ onAnalyze }: FloatingBasketBarProps) {
-  const { selectedIngredients, removeIngredient, clearBasket, isAnalyzing, language } = useBasketStore();
+export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: FloatingBasketBarProps) {
+  const { selectedIngredients, addIngredient, removeIngredient, clearBasket, isAnalyzing, language, isSelected } = useBasketStore();
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const t = UI_TRANSLATIONS[language];
   const count = selectedIngredients.length;
   const canAnalyze = count >= 2;
 
   useEffect(() => {
-    setIsVisible(count > 0);
-    if (count === 0) setIsExpanded(false);
-  }, [count]);
+    setIsVisible(count > 0 || isSearchActive);
+    if (count === 0 && !isSearchActive) setIsExpanded(false);
+  }, [count, isSearchActive]);
+
+  const filteredSearch = allIngredients.filter(ing => {
+    if (!searchQuery) return false;
+    const name = language === 'ko' ? ing.name : ing.name_en;
+    return name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   if (!isVisible) return null;
 
@@ -116,43 +127,76 @@ export default function FloatingBasketBar({ onAnalyze }: FloatingBasketBarProps)
                       </div>
 
                       <div className="flex flex-wrap gap-2 max-h-[35vh] overflow-y-auto scrollbar-hide">
-                        {selectedIngredients.map((ingredient, i) => (
-                          <motion.div
-                            layout
-                            key={ingredient.id}
-                            initial={{ scale: 0.7, opacity: 0, y: 10 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.04 }}
-                            className="group flex items-center gap-2 px-3.5 py-2 rounded-2xl text-[13px] font-bold transition-all hover:scale-[1.03]"
-                            style={{
-                              background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
-                              border: "1px solid rgba(255,255,255,0.1)",
-                              color: "rgba(255,255,255,0.9)"
-                            }}
-                          >
-                            <span className="text-lg group-hover:scale-110 transition-transform">
-                              {ingredient.icon_emoji}
-                            </span>
-                            <span className="tracking-tight">
-                              {language === 'ko' ? ingredient.name : ingredient.name_en}
-                            </span>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
-                              className="ml-1 w-5 h-5 flex items-center justify-center rounded-full transition-all"
-                              style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.3)" }}
-                              onMouseEnter={e => {
-                                (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,68,68,0.6)";
-                                (e.currentTarget as HTMLButtonElement).style.color = "white";
-                              }}
-                              onMouseLeave={e => {
-                                (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.08)";
-                                (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.3)";
+                        {isSearchActive && searchQuery ? (
+                          // 검색 결과 모드
+                          filteredSearch.length > 0 ? (
+                            filteredSearch.map((ingredient, i) => {
+                              const active = isSelected(ingredient.id);
+                              return (
+                                <motion.button
+                                  key={ingredient.id}
+                                  initial={{ scale: 0.8, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  transition={{ delay: i * 0.03 }}
+                                  onClick={() => active ? removeIngredient(ingredient.id) : addIngredient(ingredient)}
+                                  className={cn(
+                                    "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-[13px] font-black transition-all",
+                                    active 
+                                      ? "bg-emerald-500 text-white shadow-[0_8px_20px_rgba(16,185,129,0.3)]" 
+                                      : "bg-white/5 border border-white/10 text-white/70 hover:bg-white/10"
+                                  )}
+                                >
+                                  <span className="text-xl">{ingredient.icon_emoji}</span>
+                                  <span>{language === 'ko' ? ingredient.name : ingredient.name_en}</span>
+                                  {active && <Zap size={10} fill="white" />}
+                                </motion.button>
+                              );
+                            })
+                          ) : (
+                            <div className="w-full py-10 text-center text-white/30 font-bold italic">
+                              {language === 'ko' ? "검색 결과가 없습니다." : "No results found."}
+                            </div>
+                          )
+                        ) : (
+                          // 기본 선택 목록 모드
+                          selectedIngredients.map((ingredient, i) => (
+                            <motion.div
+                              layout
+                              key={ingredient.id}
+                              initial={{ scale: 0.7, opacity: 0, y: 10 }}
+                              animate={{ scale: 1, opacity: 1, y: 0 }}
+                              transition={{ delay: i * 0.04 }}
+                              className="group flex items-center gap-2 px-3.5 py-2 rounded-2xl text-[13px] font-bold transition-all hover:scale-[1.03]"
+                              style={{
+                                background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
+                                border: "1px solid rgba(255,255,255,0.1)",
+                                color: "rgba(255,255,255,0.9)"
                               }}
                             >
-                              <X size={9} strokeWidth={3} />
-                            </button>
-                          </motion.div>
-                        ))}
+                              <span className="text-lg group-hover:scale-110 transition-transform">
+                                {ingredient.icon_emoji}
+                              </span>
+                              <span className="tracking-tight">
+                                {language === 'ko' ? ingredient.name : ingredient.name_en}
+                              </span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
+                                className="ml-1 w-5 h-5 flex items-center justify-center rounded-full transition-all"
+                                style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.3)" }}
+                                onMouseEnter={e => {
+                                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,68,68,0.6)";
+                                  (e.currentTarget as HTMLButtonElement).style.color = "white";
+                                }}
+                                onMouseLeave={e => {
+                                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.08)";
+                                  (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.3)";
+                                }}
+                              >
+                                <X size={9} strokeWidth={3} />
+                              </button>
+                            </motion.div>
+                          ))
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -162,74 +206,91 @@ export default function FloatingBasketBar({ onAnalyze }: FloatingBasketBarProps)
               {/* 메인 컨트롤 바 */}
               <div className="flex items-center gap-3 p-3 md:p-4">
 
-                {/* 바구니 버튼 */}
-                <button
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className="flex items-center gap-3 flex-1 text-left group/btn min-w-0"
-                >
-                  {/* 아이콘 */}
-                  <div className="relative shrink-0">
-                    <motion.div
-                      whileHover={{ rotate: 12, scale: 1.08 }}
-                      className="w-11 h-11 md:w-13 md:h-13 rounded-2xl flex items-center justify-center"
-                      style={{
-                        background: "linear-gradient(135deg, rgba(16,185,129,0.25) 0%, rgba(6,182,212,0.15) 100%)",
-                        border: "1px solid rgba(16,185,129,0.3)",
-                        boxShadow: "0 0 20px rgba(16,185,129,0.2)"
+                  {/* 검색 & 정보 토글 가능 영역 */}
+                  <div className="flex items-center flex-1 min-w-0 gap-3">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsSearchActive(!isSearchActive);
+                        if (!isSearchActive) {
+                          setIsExpanded(true);
+                          setTimeout(() => document.getElementById('bar-search')?.focus(), 100);
+                        }
                       }}
+                      className={cn(
+                        "w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all shrink-0",
+                        isSearchActive 
+                          ? "bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]" 
+                          : "bg-white/5 border border-white/10 text-white/40 hover:text-white/80"
+                      )}
                     >
-                      <ShoppingBasket size={18} style={{ color: "#34d399" }} />
-                    </motion.div>
-                    {/* 카운트 배지 */}
-                    <AnimatePresence mode="popLayout">
-                      <motion.div
-                        key={count}
-                        initial={{ scale: 1.6, rotate: 15, opacity: 0 }}
-                        animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                        className="absolute -top-2 -right-2 w-5 h-5 rounded-full text-[10px] font-[900] flex items-center justify-center"
-                        style={{
-                          background: "linear-gradient(135deg, #10b981, #06b6d4)",
-                          color: "#022c22",
-                          boxShadow: "0 0 12px rgba(16,185,129,0.6), 0 2px 6px rgba(0,0,0,0.4)",
-                          border: "2px solid rgba(8,12,24,0.8)"
-                        }}
-                      >
-                        {count}
-                      </motion.div>
-                    </AnimatePresence>
-                  </div>
+                      {isSearchActive ? <X size={20} /> : <SearchIcon size={20} />}
+                    </button>
 
-                  {/* 텍스트 */}
-                  <div className="flex flex-col min-w-0">
-                    <span
-                      className="font-black text-sm md:text-base tracking-tight flex items-center gap-1.5 truncate"
-                      style={{ color: "rgba(255,255,255,0.95)" }}
-                    >
-                      {t.basket.itemsSelected.replace('{count}', count.toString())}
-                      <ChevronUp
-                        size={13}
-                        className="transition-transform duration-400 shrink-0"
-                        style={{
-                          transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
-                          color: "rgba(52,211,153,0.7)"
-                        }}
-                      />
-                    </span>
-                    <span
-                      className="text-[10px] md:text-xs font-semibold truncate"
-                      style={{ color: canAnalyze ? "rgba(52,211,153,0.8)" : "rgba(255,255,255,0.35)" }}
-                    >
-                      {count < 2 ? t.basket.notEnough : t.basket.ready}
-                    </span>
+                    <div className="flex-1 min-w-0">
+                      <AnimatePresence mode="wait">
+                        {isSearchActive ? (
+                          <motion.div
+                            key="search"
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            className="w-full"
+                          >
+                            <input
+                              id="bar-search"
+                              autoFocus
+                              type="text"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              placeholder={language === 'ko' ? "성분 추가..." : "Add ingredient..."}
+                              className="w-full bg-transparent border-none focus:ring-0 text-white p-0 font-bold placeholder:text-white/20"
+                            />
+                          </motion.div>
+                        ) : (
+                          <motion.button
+                            key="info"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="flex flex-col text-left w-full min-w-0"
+                          >
+                            <span
+                              className="font-black text-sm md:text-base tracking-tight flex items-center gap-1.5 truncate"
+                              style={{ color: "rgba(255,255,255,0.95)" }}
+                            >
+                              {t.basket.itemsSelected.replace('{count}', count.toString())}
+                              <ChevronUp
+                                size={13}
+                                className="transition-transform duration-400 shrink-0"
+                                style={{
+                                  transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                                  color: "rgba(52,211,153,0.7)"
+                                }}
+                              />
+                            </span>
+                            <span
+                              className="text-[10px] md:text-xs font-semibold truncate"
+                              style={{ color: canAnalyze ? "rgba(52,211,153,0.8)" : "rgba(255,255,255,0.35)" }}
+                            >
+                              {count < 2 ? t.basket.notEnough : t.basket.ready}
+                            </span>
+                          </motion.button>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
-                </button>
 
                 {/* 분석 버튼 */}
                 <motion.button
                   whileHover={canAnalyze ? { scale: 1.04 } : {}}
                   whileTap={canAnalyze ? { scale: 0.95 } : {}}
-                  onClick={onAnalyze}
+                  onClick={() => {
+                    setIsExpanded(false);
+                    setIsSearchActive(false);
+                    onAnalyze();
+                  }}
                   disabled={!canAnalyze || isAnalyzing}
                   className="relative shrink-0 overflow-hidden rounded-full font-[900] text-xs md:text-sm px-6 md:px-9 h-11 md:h-12 transition-all duration-400"
                   style={canAnalyze ? {

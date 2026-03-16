@@ -33,26 +33,35 @@ export default function ScrollToTop() {
         <AnimatePresence>
             {isVisible && (
                 <motion.button
-                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                    whileHover={{ scale: 1.1, y: -2 }}
+                    initial={{ opacity: 0, scale: 0.5, rotate: -45 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    exit={{ opacity: 0, scale: 0.5, rotate: 45 }}
+                    whileHover={{ scale: 1.15, y: -4 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={scrollToTop}
                     className={cn(
-                        "fixed bottom-32 left-6 z-40 md:left-auto md:right-10 md:bottom-32",
-                        "w-12 h-12 rounded-2xl flex items-center justify-center",
-                        "bg-white/80 backdrop-blur-xl border border-emerald-100",
-                        "shadow-[0_10px_25px_-5px_rgba(16,185,129,0.2)]",
-                        "text-emerald-600 transition-colors hover:text-emerald-700 hover:bg-white",
-                        "texture-grain"
+                        "fixed bottom-32 left-6 z-40 md:left-10 md:right-auto md:bottom-12",
+                        "w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center overflow-hidden",
+                        "bg-slate-900/40 backdrop-blur-2xl border border-white/10",
+                        "shadow-[0_15px_30px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)]",
+                        "text-emerald-400 transition-all group"
                     )}
-                    aria-label="맨 위로 이동"
+                    aria-label="Scroll to top"
                 >
-                    <ArrowUp size={24} strokeWidth={2.5} />
+                    {/* 오로라 배경 */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    
+                    {/* 스캐닝 라인 애니메이션 */}
+                    <motion.div 
+                        animate={{ y: ["-100%", "100%"] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-x-0 h-px bg-white/20 blur-[1px] opacity-20"
+                    />
 
-                    {/* 장식용 글로우 효과 */}
-                    <div className="absolute inset-0 rounded-2xl bg-emerald-500/10 blur-xl opacity-0 hover:opacity-100 transition-opacity -z-10" />
+                    <ArrowUp size={24} strokeWidth={3} className="relative z-10 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+                    
+                    {/* 하단 점 포인트 */}
+                    <div className="absolute bottom-1.5 w-1 h-1 rounded-full bg-emerald-400 group-hover:scale-150 transition-transform" />
                 </motion.button>
             )}
         </AnimatePresence>

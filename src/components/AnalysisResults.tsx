@@ -21,7 +21,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, animate } from "framer-motion";
 import { useBasketStore } from "@/store/basketStore";
 import type { CoupangProduct, AnalysisResult, InteractionResult } from "@/types/database";
 import SynergyCard from "./SynergyCard";
@@ -65,38 +65,62 @@ const interactionTypeConfig = {
     },
 } as const;
 
-/** 점수 링 컴포넌트 */
-/** 점수 링 컴포넌트 - 프리미엄 그래디언트 및 글로우 버전 */
+/** 점수 링 컴포넌트 - 시네마틱 AI 프로토콜 버전 */
 function ScoreRing({ score }: { score: number }) {
-    const radius = 70;
-    const strokeWidth = 10;
+    const radius = 72;
+    const strokeWidth = 8;
     const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (score / 100) * circumference;
+    
+    // 애니메이션을 위한 모션 벨류
+    const count = useMotionValue(0);
+    const rounded = useTransform(count, (latest) => Math.round(latest));
+    const spring = useSpring(count, { stiffness: 45, damping: 20 });
+
+    useEffect(() => {
+        const animation = animate(count, score, { duration: 2.5, ease: [0.22, 1, 0.36, 1] });
+        return animation.stop;
+    }, [score, count]);
+
+    const offset = useTransform(spring, (latest) => 
+        circumference - (latest / 100) * circumference
+    );
+
+    // 구슬(Orbital Particle)의 위치 계산
+    const orbX = useTransform(spring, (latest) => {
+        const angle = (latest / 100) * 360 - 90;
+        const rad = (angle * Math.PI) / 180;
+        return 90 + radius * Math.cos(rad);
+    });
+    const orbY = useTransform(spring, (latest) => {
+        const angle = (latest / 100) * 360 - 90;
+        const rad = (angle * Math.PI) / 180;
+        return 90 + radius * Math.sin(rad);
+    });
 
     const getColor = (s: number) => {
-        if (s >= 70) return ["#10b981", "#34d399", "rgba(16, 185, 129, 0.5)"]; // Emerald/Green
-        if (s >= 40) return ["#f59e0b", "#fbbf24", "rgba(245, 158, 11, 0.5)"]; // Amber
-        return ["#ef4444", "#f87171", "rgba(239, 68, 68, 0.5)"]; // Red
+        if (s >= 70) return { main: "#10b981", light: "#34d399", accent: "#fbbf24" };
+        if (s >= 40) return { main: "#f59e0b", light: "#fbbf24", accent: "#ffffff" };
+        return { main: "#ef4444", light: "#f87171", accent: "#ffffff" };
     };
 
-    const [mainColor, lightColor, glowColor] = getColor(score);
+    const colors = getColor(score);
 
     return (
-        <div className="relative flex items-center justify-center w-64 h-64 md:w-72 md:h-72 select-none">
-            {/* 주변 네온 오라 (Deep Glow) */}
+        <div className="relative flex items-center justify-center w-72 h-72 md:w-80 md:h-80 select-none">
+            {/* 주변 네온 오라 (Super Deep Glow) */}
             <div
                 className="absolute inset-0 rounded-full opacity-30 blur-[100px] transition-all duration-1000 scale-125"
-                style={{ backgroundColor: mainColor }}
+                style={{ background: `radial-gradient(circle, ${colors.main} 0%, transparent 70%)` }}
             />
 
-            <svg viewBox="0 0 180 180" className="w-full h-full transform -rotate-90">
+            <svg viewBox="0 0 180 180" className="w-full h-full transform transition-all duration-1000">
                 <defs>
-                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor={mainColor} />
-                        <stop offset="100%" stopColor={lightColor} />
+                    <linearGradient id="scoreProgressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={colors.main} />
+                        <stop offset="100%" stopColor={colors.light} />
                     </linearGradient>
-                    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur stdDeviation="4" result="blur" />
+                    <filter id="orbGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="3" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
                 </defs>
@@ -106,96 +130,73 @@ function ScoreRing({ score }: { score: number }) {
                     cx="90"
                     cy="90"
                     r={radius}
-                    stroke="rgba(255,255,255,0.08)"
+                    stroke="rgba(255,255,255,0.05)"
                     strokeWidth={strokeWidth}
                     fill="transparent"
                 />
 
-                {/* 메인 프로그레스 링 (Outer Glow layer) */}
-                <circle
-                    cx="90"
-                    cy="90"
-                    r={radius}
-                    stroke={mainColor}
-                    strokeWidth={strokeWidth + 2}
-                    fill="transparent"
-                    strokeDasharray={circumference}
-                    style={{
-                        strokeDashoffset: offset,
-                        transition: "stroke-dashoffset 2.5s cubic-bezier(0.2, 1, 0.3, 1)",
-                        opacity: 0.3,
-                        filter: "blur(8px)"
-                    }}
-                    strokeLinecap="round"
-                />
-
-                {/* 메인 프로그레스 링 (Inner Glow layer) */}
-                <circle
-                    cx="90"
-                    cy="90"
-                    r={radius}
-                    stroke={lightColor}
-                    strokeWidth={strokeWidth}
-                    fill="transparent"
-                    strokeDasharray={circumference}
-                    style={{
-                        strokeDashoffset: offset,
-                        transition: "stroke-dashoffset 2.5s cubic-bezier(0.2, 1, 0.3, 1)",
-                        filter: "url(#neonGlow)"
-                    }}
-                    strokeLinecap="round"
-                />
-
-                {/* 프로그레스 포인트 (End dot) */}
+                {/* 프로그레스 링 1 (Outer Blur Layer) */}
                 <motion.circle
-                    cx={90 + radius * Math.cos((score / 100) * 2 * Math.PI - Math.PI / 2)}
-                    cy={90 + radius * Math.sin((score / 100) * 2 * Math.PI - Math.PI / 2)}
+                    cx="90"
+                    cy="90"
+                    r={radius}
+                    stroke={colors.main}
+                    strokeWidth={strokeWidth + 4}
+                    fill="transparent"
+                    strokeDasharray={circumference}
+                    style={{ strokeDashoffset: offset, opacity: 0.2, filter: "blur(8px)", strokeLinecap: "round" }}
+                    className="-rotate-90 origin-center"
+                />
+
+                {/* 프로그레스 링 2 (Inner Pure Layer) */}
+                <motion.circle
+                    cx="90"
+                    cy="90"
+                    r={radius}
+                    stroke="url(#scoreProgressGrad)"
+                    strokeWidth={strokeWidth}
+                    fill="transparent"
+                    strokeDasharray={circumference}
+                    style={{ strokeDashoffset: offset, strokeLinecap: "round" }}
+                    className="-rotate-90 origin-center"
+                />
+
+                {/* 궤도 위 구슬 (Particle Orb) */}
+                <motion.circle
+                    cx={orbX}
+                    cy={orbY}
                     r="4.5"
                     fill="white"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 1, duration: 0.5 }}
-                    style={{
-                        transition: "all 2.5s cubic-bezier(0.2, 1, 0.3, 1)",
-                        filter: "drop-shadow(0 0 8px white)"
-                    }}
+                    filter="url(#orbGlow)"
+                    style={{ filter: "drop-shadow(0 0 8px rgba(255,255,255,0.8))" }}
                 />
             </svg>
 
-            {/* 내부 텍스트 레이아웃 */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
-                <div className="relative flex flex-col items-center">
-                    {/* 상단 PTS 레이블 - 강조 버전 */}
-                    <div className="absolute -top-3 -right-10 flex flex-col items-start">
-                        <span className="text-xs md:text-sm font-black text-yellow-300 tracking-widest drop-shadow-[0_0_8px_rgba(253,224,71,0.5)]">
-                            PTS
-                        </span>
-                    </div>
-
-                    {/* 중앙 메인 점수 - 크기 최적화 */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.8, duration: 1 }}
-                        className="relative"
+            {/* 텍스트 정보 레이어 */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pt-2">
+                <div className="relative">
+                    <motion.span className="text-7xl md:text-8xl font-[1000] text-white tracking-tighter drop-shadow-2xl">
+                        {rounded}
+                    </motion.span>
+                    <span 
+                        className="absolute -top-1 -right-8 text-xs font-black italic tracking-widest uppercase"
+                        style={{ color: colors.accent }}
                     >
-                        <span className={cn(
-                            "text-6xl md:text-7xl font-[1000] tracking-tight tabular-nums leading-none",
-                            "bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400",
-                            "filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
-                        )}>
-                            {score}
-                        </span>
-                    </motion.div>
-
-                    {/* 하단 구분선 및 타이틀 - 부각 버전 */}
-                    <div className="flex flex-col items-center w-full mt-4">
-                        <div className="h-[2px] w-14 bg-gradient-to-r from-transparent via-white to-transparent mb-3 shadow-[0_0_10px_white]" />
-                        <span className="text-[11px] md:text-13px font-black text-white tracking-[0.6em] pl-[0.6em] leading-none uppercase filter drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-                            AI PROTOCOL
-                        </span>
-                    </div>
+                        PTS
+                    </span>
                 </div>
+                
+                {/* 하단 장식선 */}
+                <motion.div 
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: 60, opacity: 0.5 }}
+                    transition={{ delay: 1, duration: 1 }}
+                    className="h-px bg-white/50 mb-4 mt-2"
+                />
+
+                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] text-white/60">
+                    AI Protocol
+                </span>
             </div>
         </div>
     );
@@ -278,7 +279,7 @@ function InteractionCard({ result }: { result: InteractionResult }) {
 function ProductCard({ product, index, sourceIngredient }: { product: CoupangProduct; index: number; sourceIngredient?: string }) {
     const { language } = useBasketStore();
     const t = UI_TRANSLATIONS[language];
-    
+
     const configs = [
         { label: t.products.bestAi, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100", gradient: "from-blue-600 to-indigo-600", glow: "shadow-blue-500/20" },
         { label: t.products.maxSynergy, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", gradient: "from-emerald-600 to-teal-600", glow: "shadow-emerald-500/20" },
@@ -332,7 +333,7 @@ function ProductCard({ product, index, sourceIngredient }: { product: CoupangPro
                 <div className="flex items-center gap-2 mb-3">
                     <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                     <p className="text-[10px] font-black text-emerald-600/70 uppercase tracking-widest">
-                        {sourceIngredient 
+                        {sourceIngredient
                             ? t.products.relatedTo.replace("{ingredient}", sourceIngredient)
                             : t.products.curationTitle}
                     </p>
@@ -428,73 +429,99 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                     {/* 하이테크 스캔라인 효과 */}
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px)] bg-[size:100%_4px] pointer-events-none" />
 
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] pointer-events-none" />
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] pointer-events-none opacity-50 md:opacity-100" />
 
-                    <CardContent className="p-10 md:p-16 relative z-10 flex flex-col items-center text-center">
-                        {/* 1. 최상단 스코어 섹션 (Centered) */}
-                        <div className="relative mb-8">
+                    <CardContent className="p-10 md:p-24 relative z-10 flex flex-col items-center text-center">
+                        {/* 0. 점수 링 섹션 (최상단) */}
+                        <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="relative mb-12"
+                        >
                             <div className="absolute inset-0 bg-emerald-500/20 blur-[60px] rounded-full scale-150 pointer-events-none" />
                             <ScoreRing score={result.score} />
+                        </motion.div>
+
+                        {/* 1. AI 뱃지 */}
+                        <motion.div
+                            initial={{ y: -20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="flex items-center gap-2.5 px-5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md mb-8"
+                        >
+                            <Sparkles size={14} className="text-indigo-300 animate-pulse" />
+                            <span className="text-[10px] md:text-xs font-black text-indigo-100 uppercase tracking-[0.3em] pt-0.5">AI Precision Analysis</span>
+                        </motion.div>
+
+                        {/* 2. 초대형 타이틀 */}
+                        <div className="mb-10 space-y-4">
+                            <motion.h2 
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+                                className="text-6xl md:text-8xl font-[1000] tracking-tighter leading-none text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
+                            >
+                                {result.score >= 70 ? t.results.synergy : result.score >= 40 ? t.results.caution : t.results.conflict}
+                            </motion.h2>
+                            <motion.p 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                                className="text-xl md:text-3xl font-black text-emerald-400 tracking-tight"
+                            >
+                                {result.score >= 70 
+                                    ? t.results.bestMix 
+                                    : result.score >= 40 
+                                        ? t.results.potentialConflict 
+                                        : t.results.dangerous}
+                            </motion.p>
                         </div>
 
-                        {/* 2. 상태 텍스트 섹션 */}
-                        <div className="space-y-6 max-w-2xl mx-auto">
-                            <div className="flex flex-col items-center gap-3">
-                                <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md">
-                                    <Sparkles size={16} className="text-indigo-300 animate-pulse" />
-                                    <span className="text-[10px] md:text-xs font-black text-indigo-200 uppercase tracking-[0.3em]">AI Precision Analysis</span>
+                        {/* 3. 인용문 형태의 요약 박스 */}
+                        <motion.div 
+                            initial={{ y: 20, opacity: 0 }}
+                            whileInView={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.6 }}
+                            className="relative w-full max-w-2xl mb-16 group/summary"
+                        >
+                            <div className="absolute -top-4 -left-4 text-4xl text-white/10 font-serif select-none">“</div>
+                            <div className="absolute -bottom-10 -right-4 text-4xl text-white/10 font-serif select-none rotate-180">“</div>
+                            
+                            <div className="relative px-8 py-10 rounded-[2.5rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-inner overflow-hidden">
+                                {/* 내부 체크 아이콘 배경 */}
+                                <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+                                    <ShieldCheck size={180} />
                                 </div>
-
-                                <h2 className={cn(
-                                    "text-5xl md:text-8xl font-[1000] tracking-tighter leading-none py-2",
-                                    "bg-clip-text text-transparent bg-gradient-to-b from-white via-white 60% to-white/40",
-                                    "drop-shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
-                                )}>
-                                    {result.score >= 70
-                                        ? t.results.synergy
-                                        : result.score >= 40
-                                            ? t.results.caution
-                                            : t.results.conflict}
-                                </h2>
-
-                                <div className="flex items-center gap-3 text-center justify-center">
-                                    <div className="h-px w-8 bg-emerald-500/30 hidden md:block" />
-                                    <p className="text-xl md:text-3xl font-black text-emerald-400 tracking-tight">
-                                        {result.score >= 70
-                                            ? t.results.bestMix
-                                            : result.score >= 40
-                                                ? t.results.potentialConflict
-                                                : t.results.dangerous}
+                                <div className="relative flex items-center justify-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                                        <ShieldCheck size={18} className="text-emerald-400" />
+                                    </div>
+                                    <p className="text-lg md:text-2xl font-bold text-white/90 tracking-tight">
+                                        {result.summary}
                                     </p>
-                                    <div className="h-px w-8 bg-emerald-500/30 hidden md:block" />
                                 </div>
                             </div>
+                        </motion.div>
 
-                            {/* 요약 박스 (Centered & Focused) */}
-                            <div className="relative group/summary">
-                                <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 to-indigo-500/20 rounded-3xl blur opacity-0 group-hover/summary:opacity-100 transition duration-500" />
-                                <div className="relative p-6 md:p-8 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-inner text-lg md:text-xl text-white/70 leading-relaxed font-medium tracking-tight">
-                                    <div className="absolute top-0 left-0 p-3 opacity-20">❝</div>
-                                    <div className="absolute bottom-0 right-0 p-3 opacity-20 rotate-180">❝</div>
-                                    {result.summary}
-                                </div>
-                            </div>
-
-                            {/* 복용 성분 리스트 (Centered Grid) */}
-                            <div className="pt-4 flex flex-wrap justify-center gap-3">
-                                {result.ingredients.map((ing) => (
-                                    <motion.div
-                                        key={ing.id}
-                                        whileHover={{ y: -5, scale: 1.05 }}
-                                        className="flex items-center gap-3 bg-white/10 border border-white/10 rounded-2xl px-6 py-3.5 font-black shadow-lg backdrop-blur-md"
-                                    >
-                                        <span className="text-2xl">{ing.icon_emoji}</span>
-                                        <span className="text-sm tracking-tight text-white/90">
-                                            {language === "ko" ? ing.name : ing.name_en}
-                                        </span>
-                                    </motion.div>
-                                ))}
-                            </div>
+                        {/* 4. 성분 캡슐 그리드 (2열) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl">
+                            {result.ingredients.map((ing, i) => (
+                                <motion.div
+                                    key={ing.id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.8 + i * 0.1 }}
+                                    className="flex items-center gap-4 bg-slate-800/40 border border-white/5 rounded-2xl px-6 py-4 backdrop-blur-sm group/ing hover:bg-slate-800/60 transition-colors"
+                                >
+                                    <span className="text-2xl drop-shadow-sm group-hover/ing:scale-110 transition-transform">
+                                        {ing.icon_emoji}
+                                    </span>
+                                    <span className="text-sm md:text-base font-black text-white/80 tracking-tight">
+                                        {language === "ko" ? ing.name : ing.name_en}
+                                    </span>
+                                </motion.div>
+                            ))}
                         </div>
                     </CardContent>
                 </Card>
@@ -587,7 +614,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                     <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0f172a] via-[#0f172a]/50 to-transparent z-20 pointer-events-none opacity-0 group-hover/productScroll:opacity-100 transition-opacity lg:hidden" />
                     <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0f172a] via-[#0f172a]/50 to-transparent z-20 pointer-events-none opacity-0 group-hover/productScroll:opacity-100 transition-opacity lg:hidden" />
 
-                    <motion.div 
+                    <motion.div
                         drag="x"
                         dragConstraints={{ left: -1000, right: 0 }} // 임시, 실제 너비에 맞춰 자동 계산 로직 필요 시 추가
                         dragElastic={0.05}
@@ -595,10 +622,10 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         className="flex flex-nowrap lg:grid lg:grid-cols-2 pt-4 pb-16 gap-4 sm:gap-6 lg:gap-8 cursor-grab active:cursor-grabbing lg:cursor-default lg:overflow-visible"
                     >
                         {result.ingredients.map((ing, idx) => {
-                            const searchKeyword = language === "ko" 
+                            const searchKeyword = language === "ko"
                                 ? (ing.coupang_search_keyword || ing.name)
                                 : (ing.amazon_search_keyword || ing.name_en);
-                            
+
                             const shopUrl = language === "ko"
                                 ? `https://www.coupang.com/np/search?q=${encodeURIComponent(searchKeyword)}`
                                 : `https://www.amazon.com/s?k=${encodeURIComponent(searchKeyword)}`;
@@ -610,7 +637,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                         sourceIngredient={language === "ko" ? ing.name : ing.name_en}
                                         product={{
                                             product_id: `mock-${ing.id}-${idx}`,
-                                            name: language === "ko" 
+                                            name: language === "ko"
                                                 ? `${ing.name} ${idx % 2 === 0 ? "프리미엄 정량 고농축" : "고효능 시너지 포뮬러"}`
                                                 : `${ing.name_en} ${idx % 2 === 0 ? "Premium High Conc." : "High Potency Synergy Formula"}`,
                                             product_url: shopUrl,
@@ -630,38 +657,95 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 </div>
             </div>
 
-            {/* 다시 분석하기 버튼 - 3D Lift Effect */}
-            <div className="pt-4 px-4">
-                <Button
-                    onClick={clearBasket}
-                    variant="outline"
-                    className={cn(
-                        "w-full py-10 rounded-[2.5rem] border-none",
-                        "bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)]",
-                        "hover:shadow-[0_20px_40px_rgba(79,70,229,0.1)] hover:-translate-y-1 group active:translate-y-0 active:shadow-inner",
-                        "transition-all duration-500 ease-out font-black text-lg text-slate-900 tracking-tight ring-1 ring-slate-100"
-                    )}
+            {/* 다시 분석하기 버튼 - Premium Glassmorphism & Soft Glow */}
+            <div className="pt-20 px-4 flex justify-center">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="relative w-full max-w-xl group"
                 >
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-indigo-50 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-500 shadow-sm">
-                            <RefreshCcw size={24} className="group-hover:rotate-180 transition-transform duration-1000" />
+                    {/* 뒤 배경 소프트 글로우 */}
+                    <div className="absolute -inset-8 bg-gradient-to-r from-emerald-400/10 via-teal-400/5 to-cyan-400/10 rounded-full blur-[80px] opacity-100 group-hover:opacity-100 transition duration-1000" />
+
+                    <Button
+                        onClick={clearBasket}
+                        className={cn(
+                            "w-full py-8 md:py-12 min-h-[140px] md:min-h-[180px] rounded-[2.5rem] relative overflow-hidden transition-all duration-500",
+                            "bg-white/90 border border-emerald-100/50 backdrop-blur-3xl",
+                            "shadow-[0_20px_50px_rgba(16,185,129,0.1),0_0_0_1px_rgba(255,255,255,0.5)_inset]",
+                            "hover:shadow-[0_30px_70px_rgba(16,185,129,0.15)] hover:scale-[1.01] hover:bg-white active:scale-95 group/reset"
+                        )}
+                    >
+                        <div className="relative z-10 flex flex-col items-center justify-center w-full h-full gap-4 px-6">
+                            <motion.div
+                                whileHover={{ rotate: 180 }}
+                                transition={{ duration: 0.8, ease: "anticipate" }}
+                                className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-emerald-50 text-emerald-500 flex items-center justify-center shadow-inner group-hover/reset:bg-emerald-500 group-hover/reset:text-white transition-colors duration-500"
+                            >
+                                <RefreshCcw size={28} strokeWidth={2.5} />
+                            </motion.div>
+
+                            <div className="text-center">
+                                <span className="block text-[10px] md:text-[11px] font-black text-emerald-400 uppercase tracking-[0.3em] mb-2 opacity-70">
+                                    Refresh Session
+                                </span>
+                                <h3 className="text-xl md:text-3xl font-black tracking-tight text-slate-800 leading-tight">
+                                    {t.common.reset}
+                                </h3>
+                            </div>
                         </div>
-                        {t.common.reset}
-                    </div>
-                </Button>
+
+                        {/* 우아한 쉬머 효과 */}
+                        <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12" />
+                    </Button>
+                </motion.div>
             </div>
 
-            {/* 법적 고지 - Clear Typography */}
-            <div className="text-center space-y-2 pb-12">
-                <div className="inline-block px-4 py-1.5 bg-slate-50 rounded-full border border-slate-100">
-                    <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.1em] flex items-center gap-2">
-                        <AlertTriangle size={12} className="text-amber-500" />
-                        {t.common.medicalDisclaimerTitle}
-                    </p>
-                </div>
-                <p className="text-xs text-slate-400 leading-normal max-w-2xl mx-auto font-medium">
-                    {t.common.medicalDisclaimerBody}
-                </p>
+            {/* 법적 고지 - Premium Professional Layout */}
+            <div className="mt-32 pb-32 px-4">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    className="max-w-3xl mx-auto relative"
+                >
+                    {/* 상단 장식선 */}
+                    <div className="flex items-center justify-center gap-4 mb-8">
+                        <div className="h-px w-12 bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+                        <div className="relative group/icon">
+                            <div className="absolute inset-0 bg-amber-500/10 blur-xl rounded-full scale-150 animate-pulse" />
+                            <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center relative z-10">
+                                <AlertTriangle size={18} className="text-amber-500" />
+                            </div>
+                        </div>
+                        <div className="h-px w-12 bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+                    </div>
+
+                    <div className="text-center space-y-4">
+                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4">
+                            {t.common.medicalDisclaimerTitle}
+                        </h4>
+
+                        <div className="relative p-8 md:p-10 rounded-[2.5rem] bg-slate-50/30 border border-slate-100/50 backdrop-blur-sm shadow-inner group/body">
+                            {/* 코너 데코레이션 */}
+                            <div className="absolute top-0 right-10 w-20 h-px bg-gradient-to-r from-transparent via-emerald-200/50 to-transparent" />
+                            <div className="absolute bottom-0 left-10 w-20 h-px bg-gradient-to-r from-transparent via-sky-200/50 to-transparent" />
+
+                            <p className="text-[13px] md:text-[15px] text-slate-400 font-medium leading-[1.8] tracking-tight max-w-2xl mx-auto italic opacity-80 group-hover/body:opacity-100 transition-opacity duration-700">
+                                {t.common.medicalDisclaimerBody}
+                            </p>
+                        </div>
+
+                        {/* 하단 시스템 시그니처 */}
+                        <div className="pt-6 flex flex-col items-center opacity-40">
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mb-2" />
+                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-[0.5em] pl-[0.5em]">
+                                ZestPair Security Protocol
+                            </span>
+                        </div>
+                    </div>
+                </motion.div>
             </div>
         </motion.div>
     );
