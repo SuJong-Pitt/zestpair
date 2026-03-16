@@ -13,6 +13,7 @@ interface BasketState {
     hasResult: boolean;
 
     language: "ko" | "en";
+    isBasketExpanded: boolean;
 
     // Actions
     addIngredient: (ingredient: Ingredient) => void;
@@ -23,6 +24,7 @@ interface BasketState {
     setHasResult: (value: boolean) => void;
     isSelected: (id: string) => boolean;
     setLanguage: (lang: "ko" | "en") => void;
+    setBasketExpanded: (value: boolean) => void;
 }
 
 /**
@@ -37,6 +39,7 @@ export const useBasketStore = create<BasketState>()(
             isAnalyzing: false,
             hasResult: false,
             language: "ko",
+            isBasketExpanded: false,
 
             addIngredient: (ingredient) => {
                 const { selectedIngredients } = get();
@@ -77,6 +80,8 @@ export const useBasketStore = create<BasketState>()(
             },
 
             setLanguage: (lang) => set({ language: lang }),
+
+            setBasketExpanded: (value) => set({ isBasketExpanded: value }),
         }),
         {
             name: "zestpair-basket", // localStorage key
@@ -84,6 +89,7 @@ export const useBasketStore = create<BasketState>()(
             partialize: (state) => ({
                 // 분석 상태는 저장하지 않고 선택된 영양제만 저장
                 selectedIngredients: state.selectedIngredients,
+                language: state.language,
             }),
         }
     )

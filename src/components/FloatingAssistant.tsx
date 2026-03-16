@@ -89,7 +89,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
 export default function FloatingAssistant() {
-  const { selectedIngredients, language } = useBasketStore();
+  const { selectedIngredients, language, isBasketExpanded } = useBasketStore();
   const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState("");
   const [showBubble, setShowBubble] = useState(false);
@@ -143,13 +143,19 @@ export default function FloatingAssistant() {
   if (!isVisible) return null;
 
   return (
-    <div 
-      className={cn(
-        "fixed right-3 md:right-8 z-[100] flex flex-col items-end pointer-events-none transition-all duration-1000 ease-in-out",
-        hasItems ? "bottom-32 md:bottom-32" : "bottom-10 md:bottom-12"
-      )} 
-      id="pori-assistant-root"
-    >
+    <AnimatePresence>
+      {!isBasketExpanded && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: 20 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className={cn(
+            "fixed right-3 md:right-8 z-[100] flex flex-col items-end pointer-events-none",
+            hasItems ? "bottom-32 md:bottom-32" : "bottom-10 md:bottom-12"
+          )} 
+          id="pori-assistant-root"
+        >
       <AnimatePresence>
         {showBubble && !isBubbleDismissed && (
           <motion.div
@@ -329,7 +335,9 @@ export default function FloatingAssistant() {
           </motion.div>
         </motion.div>
       </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

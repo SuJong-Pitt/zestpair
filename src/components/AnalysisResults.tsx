@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -420,7 +420,30 @@ function ProductCard({ product, index, sourceIngredient }: { product: CoupangPro
 export default function AnalysisResults({ result, coupangProducts = [] }: AnalysisResultsProps) {
     const { clearBasket, language } = useBasketStore();
     const t = UI_TRANSLATIONS[language];
+    const containerRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
 
+    useEffect(() => {
+        const updateConstraints = () => {
+            if (containerRef.current && contentRef.current) {
+                const containerWidth = containerRef.current.offsetWidth;
+                const contentWidth = contentRef.current.scrollWidth;
+                setDragConstraints({ left: Math.min(0, -(contentWidth - containerWidth + 40)), right: 0 });
+            }
+        };
+
+        updateConstraints();
+        window.addEventListener('resize', updateConstraints);
+        const timer = setTimeout(updateConstraints, 500);
+
+        return () => {
+            window.removeEventListener('resize', updateConstraints);
+            clearTimeout(timer);
+        };
+    }, [result.ingredients]);
+
+    const synergyCount = result.synergies.length;
     if (!result || !result.ingredients) {
         return <div className="p-20 text-center text-slate-400">{t.common.loading}...</div>;
     }
@@ -689,14 +712,15 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 </div>
 
                 {/* 가로 스크롤 컨테이너 (드래그 지원) */}
-                <div className="relative z-10 px-6 sm:px-10 lg:px-16 max-w-5xl mx-auto overflow-hidden group/productScroll">
+                <div ref={containerRef} className="relative z-10 px-6 sm:px-10 lg:px-16 max-w-5xl mx-auto overflow-hidden group/productScroll">
                     {/* 페이드 마스크 */}
                     <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0f172a] via-[#0f172a]/50 to-transparent z-20 pointer-events-none opacity-0 group-hover/productScroll:opacity-100 transition-opacity lg:hidden" />
                     <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0f172a] via-[#0f172a]/50 to-transparent z-20 pointer-events-none opacity-0 group-hover/productScroll:opacity-100 transition-opacity lg:hidden" />
 
                     <motion.div
+                        ref={contentRef}
                         drag="x"
-                        dragConstraints={{ left: -1000, right: 0 }} // 임시, 실제 너비에 맞춰 자동 계산 로직 필요 시 추가
+                        dragConstraints={dragConstraints}
                         dragElastic={0.05}
                         dragTransition={{ power: 0.1, timeConstant: 200 }}
                         className="flex flex-nowrap lg:grid lg:grid-cols-2 pt-4 pb-10 gap-4 sm:gap-6 lg:gap-8 cursor-grab active:cursor-grabbing lg:cursor-default lg:overflow-visible"

@@ -15,9 +15,10 @@ interface FloatingBasketBarProps {
 }
 
 export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: FloatingBasketBarProps) {
-  const { selectedIngredients, addIngredient, removeIngredient, clearBasket, isAnalyzing, language, isSelected } = useBasketStore();
+  const { selectedIngredients, addIngredient, removeIngredient, clearBasket, isAnalyzing, language, isSelected, isBasketExpanded, setBasketExpanded } = useBasketStore();
   const [isVisible, setIsVisible] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const isExpanded = isBasketExpanded;
+  const setIsExpanded = setBasketExpanded;
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
