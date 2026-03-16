@@ -551,13 +551,77 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         )}
                     </div>
                 ) : (
-                    <div className="rounded-[2rem] bg-slate-50/50 border border-slate-100 p-12 text-center shadow-inner backdrop-blur-sm">
-                        <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                            <ShieldCheck size={32} className="text-emerald-500" />
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        className="relative overflow-hidden rounded-[3rem] p-16 md:p-24 text-center group"
+                        style={{
+                            background: "linear-gradient(145deg, rgba(16,185,129,0.05) 0%, rgba(8,145,178,0.03) 100%)",
+                            border: "1px solid rgba(16,185,129,0.1)",
+                            boxShadow: "0 20px 60px -10px rgba(0,0,0,0.1), inset 0 0 30px rgba(16,185,129,0.02)"
+                        }}
+                    >
+                        {/* 배경 장식 HUD */}
+                        <div className="absolute inset-0 pointer-events-none opacity-20">
+                            <div className="absolute top-0 left-0 w-24 h-24 border-t-2 border-l-2 border-emerald-500/30 rounded-tl-[2rem]" />
+                            <div className="absolute bottom-0 right-0 w-24 h-24 border-b-2 border-r-2 border-emerald-500/30 rounded-br-[2rem]" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.1)_0%,transparent_70%)]" />
                         </div>
-                        <p className="text-slate-900 font-bold text-lg">{t.results.noInteraction}</p>
-                        <p className="text-slate-500 font-medium mt-2 max-w-sm mx-auto">{t.results.noInteractionBody}</p>
-                    </div>
+
+                        <div className="relative z-10 space-y-8 flex flex-col items-center">
+                            {/* 초대형 시큐리티 실드 애니메이션 */}
+                            <div className="relative w-28 h-28 md:w-36 md:h-36">
+                                {/* 바깥 궤도 링 */}
+                                <motion.div 
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                                    className="absolute inset-0 rounded-full border-2 border-dashed border-emerald-500/20" 
+                                />
+                                
+                                {/* 스캐너 빔 */}
+                                <motion.div 
+                                    animate={{ rotate: -360 }}
+                                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                                    className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent_0deg,rgba(16,185,129,0.4)_20deg,transparent_40deg)]" 
+                                />
+
+                                <div className="absolute inset-4 rounded-[1.8rem] bg-white shadow-xl flex items-center justify-center border border-emerald-50/50">
+                                    <motion.div
+                                        animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
+                                        transition={{ duration: 3, repeat: Infinity }}
+                                    >
+                                        <ShieldCheck size={56} className="text-emerald-500 drop-shadow-[0_0_15px_rgba(16,185,129,0.4)]" strokeWidth={1.5} />
+                                    </motion.div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[10px] font-black uppercase tracking-[0.3em]"
+                                >
+                                    Security Status: Verified
+                                </motion.div>
+                                <h4 className="text-2xl md:text-3xl lg:text-4xl font-[1000] text-slate-800 tracking-tighter">
+                                    {t.results.noInteraction}
+                                </h4>
+                                <p className="text-sm md:text-lg text-slate-400 font-bold max-w-sm mx-auto leading-relaxed">
+                                    {t.results.noInteractionBody}
+                                </p>
+                            </div>
+
+                            {/* 세이프티 배지 */}
+                            <div className="flex gap-4 pt-4">
+                                {['Zero Risk', 'Bio-Safe', '100% Synergy'].map((label, i) => (
+                                    <div key={i} className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-50 border border-slate-100 italic">
+                                        <Zap size={10} className="text-emerald-400" />
+                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
                 )}
             </div>
 
@@ -671,33 +735,58 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                     <Button
                         onClick={clearBasket}
                         className={cn(
-                            "w-full py-8 md:py-12 min-h-[140px] md:min-h-[180px] rounded-[2.5rem] relative overflow-hidden transition-all duration-500",
-                            "bg-white/90 border border-emerald-100/50 backdrop-blur-3xl",
-                            "shadow-[0_20px_50px_rgba(16,185,129,0.1),0_0_0_1px_rgba(255,255,255,0.5)_inset]",
-                            "hover:shadow-[0_30px_70px_rgba(16,185,129,0.15)] hover:scale-[1.01] hover:bg-white active:scale-95 group/reset"
+                            "w-full pt-20 pb-16 md:pt-28 md:pb-20 h-auto rounded-[2.5rem] md:rounded-[3rem] relative overflow-hidden transition-all duration-700",
+                            "bg-slate-900 border border-white/10",
+                            "shadow-[0_40px_100px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.1)]",
+                            "hover:scale-[1.02] active:scale-95 group/reset"
                         )}
                     >
-                        <div className="relative z-10 flex flex-col items-center justify-center w-full h-full gap-4 px-6">
-                            <motion.div
-                                whileHover={{ rotate: 180 }}
-                                transition={{ duration: 0.8, ease: "anticipate" }}
-                                className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-emerald-50 text-emerald-500 flex items-center justify-center shadow-inner group-hover/reset:bg-emerald-500 group-hover/reset:text-white transition-colors duration-500"
-                            >
-                                <RefreshCcw size={28} strokeWidth={2.5} />
-                            </motion.div>
+                        {/* 다이나믹 배경 장식 */}
+                        <div className="absolute inset-0 pointer-events-none">
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] opacity-0 group-hover/reset:opacity-100 transition-opacity duration-700" />
+                            <div className="absolute -inset-[100%] group-hover/reset:animate-[spin_10s_linear_infinite] opacity-20 pointer-events-none"
+                                 style={{ background: "conic-gradient(from_0deg, transparent_0deg, #10b981_20deg, transparent_40deg, transparent_180deg, #06b6d4_200deg, transparent_220deg)" }} />
+                        </div>
 
-                            <div className="text-center">
-                                <span className="block text-[10px] md:text-[11px] font-black text-emerald-400 uppercase tracking-[0.3em] mb-2 opacity-70">
-                                    Refresh Session
-                                </span>
-                                <h3 className="text-xl md:text-3xl font-black tracking-tight text-slate-800 leading-tight">
+                        <div className="relative z-10 flex flex-col items-center justify-center w-full gap-6 md:gap-8">
+                            {/* 아이콘 컨테이너 - 모바일 사이즈 최적화 */}
+                            <div className="relative">
+                                <motion.div
+                                    animate={{ rotate: [0, 360] }}
+                                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                                    className="absolute -inset-3 md:-inset-4 rounded-full border border-dashed border-emerald-500/20 opacity-50"
+                                />
+                                <motion.div
+                                    whileHover={{ rotate: 180, scale: 1.1 }}
+                                    transition={{ duration: 0.8, ease: "anticipate" }}
+                                    className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white flex items-center justify-center shadow-[0_10px_30px_rgba(16,185,129,0.3)] relative z-10"
+                                >
+                                    <RefreshCcw className="w-5 h-5 md:w-6 md:h-6 drop-shadow-lg" strokeWidth={3} />
+                                </motion.div>
+                            </div>
+
+                            <div className="text-center space-y-2 px-6">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-1">
+                                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                                    <span className="text-[8px] md:text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-80">
+                                        System Re-Initialization
+                                    </span>
+                                </div>
+                                <h3 className="text-lg md:text-3xl font-[1000] tracking-tighter text-white leading-tight drop-shadow-md break-keep">
                                     {t.common.reset}
                                 </h3>
+                                <p className="text-slate-400 font-bold text-[9px] md:text-xs uppercase tracking-widest opacity-40 group-hover/reset:opacity-80 transition-opacity">
+                                    Clear protocol & start fresh
+                                </p>
                             </div>
                         </div>
 
-                        {/* 우아한 쉬머 효과 */}
-                        <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12" />
+                        {/* 프리미엄 쉬머 스캔 */}
+                        <motion.div 
+                            animate={{ x: ["-100%", "200%"] }}
+                            transition={{ duration: 3, repeat: Infinity, repeatDelay: 5 }}
+                            className="absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 pointer-events-none" 
+                        />
                     </Button>
                 </motion.div>
             </div>
