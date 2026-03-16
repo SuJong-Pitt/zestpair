@@ -12,55 +12,61 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useHasMounted } from "@/hooks/useHasMounted";
+import { UI_TRANSLATIONS } from "@/lib/i18n";
 
 interface IngredientCardProps {
     ingredient: Ingredient;
+    isFeatured?: boolean;
 }
-
-const dosageTimeLabels: Record<Ingredient["dosage_time"], string> = {
-    before_meal: "식전",
-    after_meal: "식후",
-    any_time: "상시",
-    morning: "아침",
-    evening: "저녁",
-};
 
 // 속성 아이콘 맵핑
 const getAttributeIcon = (name: string) => {
-    if (name.includes("비타민") || name.includes("활성")) return <Zap size={10} className="text-yellow-400" />;
-    if (name.includes("오메가") || name.includes("지방")) return <Waves size={10} className="text-cyan-400" />;
-    if (name.includes("콜라겐") || name.includes("피부")) return <Heart size={10} className="text-rose-400" />;
+    const n = name.toLowerCase();
+    if (n.includes("vitamin") || n.includes("비타민") || n.includes("활성")) return <Zap size={10} className="text-yellow-400" />;
+    if (n.includes("omega") || n.includes("오메가") || n.includes("지방")) return <Waves size={10} className="text-cyan-400" />;
+    if (n.includes("collagen") || n.includes("콜라겐") || n.includes("피부")) return <Heart size={10} className="text-rose-400" />;
     return <Shield size={10} className="text-emerald-400" />;
 };
 
-export default function IngredientCard({ ingredient }: IngredientCardProps) {
+export default function IngredientCard({ ingredient, isFeatured = false }: IngredientCardProps) {
     const hasMounted = useHasMounted();
-    const { isSelected, toggleIngredient } = useBasketStore();
+    const { isSelected, toggleIngredient, language } = useBasketStore();
     const selected = hasMounted ? isSelected(ingredient.id) : false;
+
+    const t = UI_TRANSLATIONS[language];
+    const name = language === "ko" ? ingredient.name : ingredient.name_en;
+    const shortDesc = language === "ko" ? ingredient.short_description : (ingredient.short_description_en || ingredient.short_description);
+    const desc = language === "ko" ? ingredient.description : (ingredient.description_en || ingredient.description);
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>
                 <motion.button
-                    whileHover={{ scale: 1.05, rotateY: 5, rotateX: -5 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ 
+                      scale: 1.04,
+                      y: -4,
+                      transition: { duration: 0.2, ease: "easeOut" }
+                    }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => toggleIngredient(ingredient)}
                     className={cn(
-                        "group relative w-full text-left rounded-[1.5rem] p-3.5 md:p-4 transition-all duration-500",
-                        "font-sans border-2 perspective-1000",
+                        "group relative w-full text-left rounded-[2rem] p-5 transition-all duration-300",
+                        "font-sans border-0",
                         selected
-                            ? "border-amber-400 bg-slate-900 shadow-[0_0_30px_rgba(251,191,36,0.2)]"
-                            : "border-slate-100 bg-white hover:border-emerald-300 shadow-sm hover:shadow-xl"
+                            ? "bg-[#0A1A16] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)]"
+                            : isFeatured
+                                ? "bg-white border border-emerald-100 shadow-[0_20px_40px_-15px_rgba(16,185,129,0.12)]"
+                                : "bg-white border border-slate-100 shadow-[0_15px_30px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)]"
                     )}
                 >
-                    {/* --- 유희왕 카드 스타일 배경 효과 --- */}
+                    {/* --- 배경 디테일 (Silk Texture) --- */}
+                    <div className="absolute inset-0 rounded-[2rem] overflow-hidden pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/pinstripe.png')]" />
+
+                    {/* 홀로그램 글린트 (Selected) */}
                     {selected && (
-                        <>
-                            {/* 홀로그램 글린트 */}
-                            <div className="absolute inset-0 rounded-[1.4rem] overflow-hidden pointer-events-none">
-                                <div className="absolute inset-0 bg-[linear-gradient(110deg,transparent_20%,rgba(255,255,255,0.1)_40%,transparent_60%)] bg-[length:200%_100%] animate-hologram" />
-                            </div>
-                        </>
+                        <div className="absolute inset-0 rounded-[2rem] overflow-hidden pointer-events-none">
+                            <div className="absolute inset-0 bg-[linear-gradient(110deg,transparent_20%,rgba(52,211,153,0.05)_40%,transparent_60%)] bg-[length:200%_100%] animate-hologram" />
+                        </div>
                     )}
 
                     {/* 속성 구슬 (Attribute Orb) */}
@@ -71,73 +77,84 @@ export default function IngredientCard({ ingredient }: IngredientCardProps) {
                         {getAttributeIcon(ingredient.name)}
                     </div>
 
-                    {/* 인기 배지 */}
-                    {ingredient.is_popular && (
+                    {/* 인기 배지 - Featured 모드 특화 */}
+                    {(ingredient.is_popular || isFeatured) && (
                         <div className="absolute top-0 left-5 -translate-y-2 z-30 group-hover:-translate-y-2.5 transition-transform">
-                            <div className="bg-gradient-to-r from-red-600 to-rose-500 text-[8px] font-[1000] px-2 py-1 rounded-b-md shadow-lg text-white tracking-widest uppercase italic border-x border-b border-white/10">
-                                LIMITED
+                            <div className={cn(
+                                "text-[8px] font-[1000] px-2.5 py-1.5 rounded-b-xl shadow-lg text-white tracking-widest uppercase italic border-x border-b border-white/10",
+                                isFeatured 
+                                    ? "bg-gradient-to-r from-emerald-600 to-teal-500 shadow-emerald-500/20" 
+                                    : "bg-gradient-to-r from-red-600 to-rose-500 shadow-rose-500/20"
+                            )}>
+                                {isFeatured ? 'TRENDING' : 'LIMITED'}
                             </div>
                         </div>
                     )}
 
-                    {/* 메인 비주얼 박스 (높이 축소) */}
                     <div
                         className={cn(
-                            "relative w-full h-20 md:h-28 rounded-xl flex items-center justify-center text-3xl md:text-4xl mb-3 transition-all duration-500 overflow-hidden",
+                            "relative w-full h-28 md:h-36 rounded-2xl flex items-center justify-center text-4xl md:text-5xl mb-5 transition-all duration-700 overflow-hidden",
                             selected 
-                                ? "bg-gradient-to-b from-slate-800 to-slate-950 border border-white/10 shadow-inner" 
-                                : "bg-slate-50 border border-slate-100 group-hover:bg-emerald-50"
+                                ? "bg-gradient-to-b from-slate-900/50 to-black/50 border border-white/5" 
+                                : isFeatured
+                                    ? "bg-gradient-to-br from-emerald-100/20 to-teal-50/10 border border-emerald-100/30"
+                                    : "bg-slate-50/50 border border-slate-100/30 group-hover:bg-emerald-50/50"
                         )}
                     >
-                        {selected && (
-                            <motion.div 
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.15),transparent_70%)]"
-                            />
-                        )}
+                        {/* 아이콘 아우라 */}
+                        <div className={cn(
+                            "absolute inset-0 transition-opacity duration-700",
+                            selected ? "opacity-30 bg-emerald-500/10 blur-2xl" : isFeatured ? "opacity-20 bg-emerald-400/5 blur-xl" : "opacity-0"
+                        )} />
+
                         <span className={cn(
-                            "relative z-10 drop-shadow-2xl transition-transform duration-500 group-hover:scale-125",
-                            selected ? "animate-float" : ""
+                            "relative z-10 transition-all duration-1000 group-hover:scale-110 group-hover:-translate-y-1",
+                            selected ? "animate-float drop-shadow-[0_0_20px_rgba(52,211,153,0.3)]" : "drop-shadow-sm"
                         )}>
                             {ingredient.icon_emoji}
                         </span>
+                        
+                        {/* 프리미엄 광택 (Hover) */}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
+                            <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent" />
+                        </div>
                     </div>
 
-                    {/* 정보 영역 (간격 타이닝) */}
-                    <div className="relative z-10 space-y-1">
-                        <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="relative z-10 space-y-1.5 px-1">
+                        <div className="flex items-center justify-between">
                             <h3 className={cn(
-                                "font-black text-sm md:text-base transition-colors tracking-tighter uppercase italic truncate pr-1.5",
-                                selected ? "text-amber-400" : "text-slate-900"
+                                "font-black text-[15px] md:text-[17px] transition-colors tracking-tight line-clamp-1",
+                                selected ? "text-emerald-400" : isFeatured ? "text-slate-900" : "text-slate-900"
                             )}>
-                                {ingredient.name}
+                                {name}
                             </h3>
-                            {selected && <Sparkles size={12} className="text-amber-400 animate-pulse shrink-0" />}
+                            {selected && <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping" />}
                         </div>
 
                         <p className={cn(
-                            "text-[10px] leading-[1.3] font-bold line-clamp-2",
-                            selected ? "text-slate-400" : "text-slate-500"
+                            "text-[11px] leading-relaxed font-medium line-clamp-2 min-h-[3em]",
+                            selected ? "text-slate-400" : isFeatured ? "text-slate-500" : "text-slate-500"
                         )}>
-                            {ingredient.short_description}
+                            {shortDesc}
                         </p>
                     </div>
 
                     {/* 하단 패러미터 */}
                     <div className={cn(
                         "mt-3 flex items-center justify-between pt-2 border-t transition-colors",
-                        selected ? "border-slate-800" : "border-slate-100"
+                        selected ? "border-slate-800" : isFeatured ? "border-emerald-100" : "border-slate-100"
                     )}>
                         <div className="flex items-center gap-2">
                             <div className={cn(
                                 "flex items-center gap-1 px-1.5 py-0.5 rounded-md border text-[8px] font-black uppercase tracking-tighter",
                                 selected 
                                     ? "bg-amber-400/10 border-amber-400/30 text-amber-400" 
-                                    : "bg-slate-100 border-slate-200 text-slate-400"
+                                    : isFeatured
+                                        ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                                        : "bg-slate-100 border-slate-200 text-slate-400"
                             )}>
                                 <Clock size={9} strokeWidth={3} />
-                                {dosageTimeLabels[ingredient.dosage_time]}
+                                {t.dosage[ingredient.dosage_time]}
                             </div>
                         </div>
 
@@ -150,17 +167,24 @@ export default function IngredientCard({ ingredient }: IngredientCardProps) {
                                     className="flex items-center gap-1 text-[9px] font-black text-emerald-400"
                                 >
                                     <Check size={10} strokeWidth={4} />
-                                    선택됨
+                                    {t.common.selected}
                                 </motion.div>
                             )}
                         </AnimatePresence>
                         
-                        {!selected && <HelpCircle size={12} className="text-slate-200 group-hover:text-emerald-400 transition-colors" />}
+                        {!selected && (
+                          isFeatured 
+                            ? <Zap size={12} className="text-emerald-400 animate-pulse" /> 
+                            : <HelpCircle size={12} className="text-slate-200 group-hover:text-emerald-400 transition-colors" />
+                        )}
                     </div>
 
                     {/* 테두리 오라 효과 */}
                     {selected && (
                         <div className="absolute inset-0 border-2 border-amber-400/50 rounded-[1.5rem] pointer-events-none animate-pulse-slow shadow-[inset_0_0_20px_rgba(251,191,36,0.1)]" />
+                    )}
+                    {isFeatured && !selected && (
+                        <div className="absolute inset-0 border border-emerald-500/10 rounded-[1.5rem] pointer-events-none group-hover:border-emerald-500/30 transition-colors" />
                     )}
                 </motion.button>
             </TooltipTrigger>
@@ -168,9 +192,9 @@ export default function IngredientCard({ ingredient }: IngredientCardProps) {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 border-b border-white/10 pb-2 mb-2">
                         <span className="text-lg">{ingredient.icon_emoji}</span>
-                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest">분석 프로토콜</span>
+                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest">{t.common.analysisProtocol}</span>
                     </div>
-                    <p className="text-[11px] leading-relaxed font-bold text-slate-300">{ingredient.description}</p>
+                    <p className="text-[11px] leading-relaxed font-bold text-slate-300">{desc}</p>
                 </div>
             </TooltipContent>
         </Tooltip>

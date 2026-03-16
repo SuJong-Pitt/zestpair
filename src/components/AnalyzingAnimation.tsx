@@ -1,152 +1,253 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { FlaskConical, Atom, Binary, Database, Cpu, Sparkles, Search, Fingerprint } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { useEffect, useState, useMemo } from "react";
+import { Atom, Activity, Beaker, Pill, Droplets, Zap, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useBasketStore } from "@/store/basketStore";
 
-const ANALYZING_MESSAGES = [
-    "영양 성분을 분석하고 있어요... 🔬",
-    "궁합 데이터베이스를 검색 중... 📚",
-    "상호작용 패턴을 계산하고 있어요... ⚗️",
-    "전문가 권고사항을 취합 중... 🧑‍⚕️",
-    "최적의 복용 순서를 산출하고 있어요... ⏱️",
-    "분석 결과를 정리하는 중... ✨",
+const ANALYZING_MESSAGES_KO = [
+    "장바구니 성분 추출 중... 🔬",
+    "분자 구조 분석 및 매핑 중... 🧬",
+    "성분 간 충돌 테스트 프로토콜... ⚡",
+    "시너지 공식 산출 중... 🧪",
+    "영양 밸런스 최적화 로직 가동... ✨",
+    "분석 결과 패키징 완료! 🎯",
 ];
 
-export default function AnalyzingAnimation() {
+const ANALYZING_MESSAGES_EN = [
+    "Extracting basket ingredients... 🔬",
+    "Mapping molecular structures... 🧬",
+    "Executing collision protocols... ⚡",
+    "Calculating synergy formulas... 🧪",
+    "Optimizing nutrient balance... ✨",
+    "Packaging results... 🎯",
+];
+
+interface Props {
+    onComplete?: () => void;
+}
+
+export default function AnalyzingAnimation({ onComplete }: Props) {
+    const { language } = useBasketStore();
     const [messageIdx, setMessageIdx] = useState(0);
-    const [dotCount, setDotCount] = useState(0);
     const [progress, setProgress] = useState(0);
+    const [isFinished, setIsFinished] = useState(false);
+
+    const messages = language === "ko" ? ANALYZING_MESSAGES_KO : ANALYZING_MESSAGES_EN;
 
     useEffect(() => {
         const msgInterval = setInterval(() => {
-            setMessageIdx((prev) => (prev + 1) % ANALYZING_MESSAGES.length);
-        }, 1500);
-
-        const dotInterval = setInterval(() => {
-            setDotCount((prev) => (prev + 1) % 4);
-        }, 400);
+            setMessageIdx((prev) => (prev + 1) % messages.length);
+        }, 1200);
 
         const progressInterval = setInterval(() => {
             setProgress((prev) => {
-                if (prev >= 98) return prev;
-                // 초반에는 빠르고 뒤로 갈수록 느릿하게 (로그 느낌)
-                const increment = (100 - prev) * 0.05 + Math.random();
-                return prev + increment;
+                if (prev >= 100) {
+                    clearInterval(progressInterval);
+                    setIsFinished(true);
+                    // 100% 도달 후 연출을 위해 약간의 지연 후 콜백 실행
+                    setTimeout(() => onComplete?.(), 800);
+                    return 100;
+                }
+                // 자연스러운 가속/감속 로직
+                const remaining = 100 - prev;
+                const step = Math.max(0.5, remaining * 0.08); // 남은 거리의 8%씩 이동 (최소 0.5)
+                const jitter = Math.random() * 2;
+                return Math.min(100, prev + step + jitter);
             });
-        }, 300);
+        }, 150);
 
         return () => {
             clearInterval(msgInterval);
-            clearInterval(dotInterval);
             clearInterval(progressInterval);
         };
-    }, []);
+    }, [messages.length, onComplete]);
+
+    const particles = useMemo(() => 
+        Array.from({ length: 15 }).map((_, i) => ({
+            id: i,
+            delay: i * 0.1,
+            duration: 1.5 + Math.random() * 2,
+            size: 2 + Math.random() * 4
+        }))
+    , []);
 
     return (
-        <div className="flex flex-col items-center justify-center py-24 md:py-32 gap-10 overflow-hidden relative">
-            {/* 배경 장식 */}
-            <div className="absolute inset-0 pointer-events-none opacity-50">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-50 rounded-full blur-[100px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-cyan-50 rounded-full blur-[80px]" />
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#050B0A] overflow-hidden"
+        >
+            {/* 시네마틱 배경 입자 */}
+            <div className="absolute inset-0">
+                {particles.map((p) => (
+                    <motion.div
+                        key={p.id}
+                        initial={{ opacity: 0, y: 1000 }}
+                        animate={{ 
+                            opacity: [0, 0.4, 0],
+                            y: [-100, -1100],
+                            x: [Math.random() * 1000 - 500, Math.random() * 1000 - 500]
+                        }}
+                        transition={{ duration: p.duration, repeat: Infinity, delay: p.delay }}
+                        className="absolute w-1 h-1 bg-emerald-400 rounded-full blur-[1px]"
+                    />
+                ))}
             </div>
 
-            {/* 분석 로봇 애니메이션 메인 영역 */}
-            <div className="relative">
-                {/* 외부 기술적 링들 */}
-                <div className="absolute inset-[-40px] rounded-full border border-dashed border-emerald-200 animate-spin opacity-40" style={{ animationDuration: "12s" }} />
-                <div className="absolute inset-[-20px] rounded-full border border-emerald-100/50 animate-spin opacity-30" style={{ animationDuration: "8s", animationDirection: "reverse" }} />
+            <div className="relative z-10 w-full max-w-lg px-8 flex flex-col items-center">
+                
+                {/* 메인 믹싱 코어: 비커 & 아이콘 액션 */}
+                <div className="relative mb-12">
+                    <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+                        {/* 회전하는 하이테크 링 */}
+                        <motion.div 
+                            animate={{ rotate: 360, scale: [1, 1.05, 1] }}
+                            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-[-30px] border-2 border-dashed border-emerald-500/20 rounded-full" 
+                        />
+                        
+                        {/* 액티브 믹싱 비커 */}
+                        <motion.div
+                            animate={isFinished ? { 
+                                scale: [1, 1.1, 1],
+                                rotate: [0, 5, -5, 0]
+                            } : { 
+                                y: [0, -15, 0],
+                                rotate: [-2, 2, -2]
+                            }}
+                            transition={{ duration: 0.5, repeat: isFinished ? 1 : Infinity }}
+                            className="relative w-48 h-48 md:w-60 md:h-60 rounded-[3.5rem] bg-slate-900/40 backdrop-blur-3xl border-2 border-white/20 shadow-[0_0_100px_rgba(16,185,129,0.3)] flex items-center justify-center overflow-hidden group"
+                        >
+                            {/* 액체 수위 애니메이션 */}
+                            <motion.div 
+                                animate={{ height: `${progress}%` }}
+                                className="absolute bottom-0 w-full bg-gradient-to-t from-emerald-600 via-emerald-400/40 to-teal-300/10 transition-all duration-300"
+                            >
+                                {/* 파도 효과 */}
+                                <motion.div 
+                                    animate={{ x: ["-50%", "0%"] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                    className="absolute top-0 left-0 w-[200%] h-4 bg-white/20 blur-md rounded-full"
+                                />
+                            </motion.div>
+                            
+                            {/* 반응 기포 */}
+                            {Array.from({ length: 12 }).map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ y: 200, opacity: 0 }}
+                                    animate={{ 
+                                        y: [-50, -250], 
+                                        opacity: [0, 0.8, 0],
+                                        scale: [0.5, 1.2, 0.5]
+                                    }}
+                                    transition={{ duration: 1.5 + Math.random(), repeat: Infinity, delay: i * 0.2 }}
+                                    className="absolute w-2 h-2 rounded-full bg-emerald-200 blur-[1px]"
+                                />
+                            ))}
 
-                {/* 실제 스캐닝 효과 */}
-                <div className="absolute inset-0 rounded-full overflow-hidden z-20 pointer-events-none">
-                    <div className="w-full h-1/3 bg-gradient-to-b from-transparent via-emerald-400/20 to-transparent animate-scan" />
-                </div>
+                            <AnimatePresence mode="wait">
+                                {isFinished ? (
+                                    <motion.div
+                                        key="check"
+                                        initial={{ scale: 0, rotate: -90 }}
+                                        animate={{ scale: 1, rotate: 0 }}
+                                        className="z-20 text-emerald-300 shadow-[0_0_30px_rgba(16,185,129,1)]"
+                                    >
+                                        <CheckCircle2 size={100} strokeWidth={2.5} />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div key="beaker" className="z-10 text-emerald-400/80">
+                                        <Beaker size={90} strokeWidth={1.5} />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
 
-                {/* 중앙 코어 */}
-                <div className="relative w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 flex items-center justify-center shadow-2xl shadow-emerald-200/50 transform rotate-45 group h-32 w-32">
-                    <div className="transform -rotate-45 flex flex-col items-center justify-center text-white">
-                        <div className="relative">
-                            <Fingerprint size={48} className="text-white/40 absolute inset-0 blur-[1px]" />
-                            <Cpu size={48} className="text-white relative animate-pulse" />
+                        {/* 플로팅 성분 아이콘들의 "결합" 액션 */}
+                        <div className="absolute inset-0 pointer-events-none">
+                            {[Pill, Droplets, Atom, Zap].map((Icon, i) => (
+                                <motion.div
+                                    key={i}
+                                    animate={{ 
+                                        x: [
+                                            (i % 2 === 0 ? -120 : 120), 
+                                            (i % 2 === 0 ? -40 : 40), 
+                                            (i % 2 === 0 ? -120 : 120)
+                                        ],
+                                        y: [
+                                            (i < 2 ? -120 : 120), 
+                                            (i < 2 ? -40 : 40), 
+                                            (i < 2 ? -120 : 120)
+                                        ],
+                                        scale: [1, 1.4, 1],
+                                        rotate: [0, 180, 360]
+                                    }}
+                                    transition={{ duration: 4, repeat: Infinity, delay: i * 0.5 }}
+                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 rounded-full bg-slate-900/80 border border-emerald-500/50 shadow-2xl text-emerald-400 z-30"
+                                >
+                                    <Icon size={24} />
+                                </motion.div>
+                            ))}
                         </div>
                     </div>
-
-                    {/* 글로우 효과 */}
-                    <div className="absolute inset-0 rounded-[2.5rem] bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
                 </div>
 
-                {/* 위성 입자들 (궤도 회전) */}
-                <div className="absolute inset-0">
-                    {[
-                        { icon: FlaskConical, delay: "0s", color: "bg-emerald-500" },
-                        { icon: Atom, delay: "1.5s", color: "bg-cyan-500" },
-                        { icon: Binary, delay: "3s", color: "bg-teal-500" },
-                        { icon: Sparkles, delay: "4.5s", color: "bg-yellow-400" },
-                    ].map((item, i) => (
-                        <div
-                            key={i}
-                            className="absolute inset-0 animate-orbit"
-                            style={{ animationDelay: item.delay, animationDuration: "6s" }}
-                        >
-                            <div className={cn(
-                                "absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-xl shadow-lg flex items-center justify-center text-white border border-white/20",
-                                item.color
-                            )}>
-                                <item.icon size={16} />
+                {/* 하단 텍스트 및 데이터 바 */}
+                <div className="w-full text-center">
+                    <div className="h-16 mb-8 flex items-center justify-center">
+                        <AnimatePresence mode="wait">
+                            <motion.h3 
+                                key={messageIdx}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                className="text-2xl md:text-5xl font-[1000] text-emerald-50 tracking-tight italic drop-shadow-[0_0_25px_rgba(16,185,129,0.6)]"
+                            >
+                                {messages[messageIdx]}
+                            </motion.h3>
+                        </AnimatePresence>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="relative group">
+                            <div className="h-2 bg-slate-900/60 rounded-full overflow-hidden border border-white/5 p-[1px]">
+                                <motion.div 
+                                    animate={{ width: `${progress}%` }}
+                                    className="h-full bg-gradient-to-r from-emerald-600 via-emerald-400 to-teal-400 shadow-[0_0_20px_rgba(16,185,129,0.8)] rounded-full"
+                                />
                             </div>
                         </div>
-                    ))}
-                </div>
-            </div>
 
-            {/* 상태 텍스트 섹션 */}
-            <div className="relative z-10 text-center space-y-4 max-w-sm">
-                <div className="bg-emerald-50 text-emerald-700 text-[10px] font-black px-3 py-1 rounded-full border border-emerald-100 uppercase tracking-widest inline-flex items-center gap-1.5 mb-2">
-                    <Search size={10} />
-                    Processing Interaction Data
-                </div>
-
-                <div className="h-16 flex items-center justify-center overflow-hidden">
-                    <h3 className="text-2xl font-black text-gray-900 animate-fade-in-up tracking-tight leading-tight" key={messageIdx}>
-                        {ANALYZING_MESSAGES[messageIdx]}
-                    </h3>
-                </div>
-
-                {/* 프로그레스 섹션 */}
-                <div className="space-y-4 pt-4">
-                    <div className="relative h-3 w-72 bg-gray-100 rounded-full overflow-hidden shadow-inner">
-                        {/* 베이스 바 */}
-                        <div
-                            className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 transition-all duration-700 ease-out flex items-center"
-                            style={{ width: `${progress}%` }}
-                        >
-                            {/* 흐르는 광택 효과 */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-20 transform -skew-x-12 translate-x-[-100%] animate-[shimmer_2s_infinite]" />
+                        <div className="flex items-end justify-between px-2">
+                            <div className="text-left">
+                                <span className="text-[10px] font-black text-emerald-500/60 uppercase tracking-widest block mb-1">Status</span>
+                                <div className="flex items-center gap-2">
+                                    <Activity size={16} className="text-emerald-400 animate-pulse" />
+                                    <span className="font-mono text-sm text-white/50 tracking-tighter">
+                                        {isFinished ? "PROCESS_COMPLETE" : `MIXING_ACTIVE_00${Math.floor(progress)}`}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <motion.div 
+                                animate={isFinished ? { scale: [1, 1.2, 1] } : {}}
+                                className="text-right"
+                            >
+                                <span className="text-[10px] font-black text-emerald-500/60 uppercase tracking-widest block mb-1">Blend Index</span>
+                                <span className="text-5xl md:text-8xl font-[1010] text-white italic leading-none tracking-tighter drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                                    {Math.floor(progress)}<span className="text-xl md:text-3xl ml-1 text-emerald-400">%</span>
+                                </span>
+                            </motion.div>
                         </div>
-                    </div>
-
-                    <div className="flex items-center justify-between px-1">
-                        <div className="flex items-center gap-2">
-                            <Database size={12} className="text-gray-400" />
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">
-                                Database: <span className="text-emerald-600">Syncing...</span>
-                            </span>
-                        </div>
-                        <span className="text-xl font-black tracking-tighter text-gray-900">
-                            {Math.floor(progress)}<span className="text-xs text-gray-400">%</span>
-                        </span>
                     </div>
                 </div>
             </div>
 
-            {/* 배경 스타일링용 추가 (Keyframes) */}
-            <style jsx>{`
-                @keyframes shimmer {
-                    0% { transform: translateX(-150%) skewX(-12deg); }
-                    100% { transform: translateX(350%) skewX(-12deg); }
-                }
-            `}</style>
-        </div>
+            {/* 하이테크 레이더 스캔 효과 */}
+            <div className="absolute inset-0 pointer-events-none bg-[conic-gradient(from_0deg,transparent_0%,rgba(16,185,129,0.05)_50%,transparent_100%)] animate-[spin_10s_linear_infinite]" />
+        </motion.div>
     );
 }

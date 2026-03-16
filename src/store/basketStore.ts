@@ -12,6 +12,8 @@ interface BasketState {
     isAnalyzing: boolean;
     hasResult: boolean;
 
+    language: "ko" | "en";
+
     // Actions
     addIngredient: (ingredient: Ingredient) => void;
     removeIngredient: (id: string) => void;
@@ -20,6 +22,7 @@ interface BasketState {
     setAnalyzing: (value: boolean) => void;
     setHasResult: (value: boolean) => void;
     isSelected: (id: string) => boolean;
+    setLanguage: (lang: "ko" | "en") => void;
 }
 
 /**
@@ -33,6 +36,7 @@ export const useBasketStore = create<BasketState>()(
             selectedIngredients: [],
             isAnalyzing: false,
             hasResult: false,
+            language: "ko",
 
             addIngredient: (ingredient) => {
                 const { selectedIngredients } = get();
@@ -71,6 +75,8 @@ export const useBasketStore = create<BasketState>()(
             isSelected: (id) => {
                 return get().selectedIngredients.some((i) => i.id === id);
             },
+
+            setLanguage: (lang) => set({ language: lang }),
         }),
         {
             name: "zestpair-basket", // localStorage key

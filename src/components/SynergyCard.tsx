@@ -20,6 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRef } from "react";
 import { toPng } from "html-to-image";
+import { useBasketStore } from "@/store/basketStore";
+import { UI_TRANSLATIONS } from "@/lib/i18n";
 
 const cardTypeConfig = {
     SYNERGY: {
@@ -55,7 +57,9 @@ export default function SynergyCard({
     result: InteractionResult; 
     index: number;
 }) {
-    // 성분 상호작용 정보가 없으면 표시안함
+    const { language } = useBasketStore();
+    const t = UI_TRANSLATIONS[language];
+    
     if (!result.interaction) return null;
     
     const [isFlipped, setIsFlipped] = useState(false);
@@ -69,12 +73,18 @@ export default function SynergyCard({
     const config = cardTypeConfig[result.interaction.type];
     const Icon = config.icon;
 
+    const displayTitle = language === "ko" ? result.interaction.title : (result.interaction.title_en || result.interaction.title);
+    const displayReason = language === "ko" ? result.interaction.reason : (result.interaction.reason_en || result.interaction.reason);
+    const displayRec = language === "ko" ? result.interaction.recommendation : (result.interaction.recommendation_en || result.interaction.recommendation);
+    const nameA = language === "ko" ? result.pair[0].name : result.pair[0].name_en;
+    const nameB = language === "ko" ? result.pair[1].name : result.pair[1].name_en;
+
     const handleShare = async (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsSharing(true);
         const shareData = {
-            title: `ZestPair - ${result.interaction?.title}`,
-            text: `${result.pair[0].name} & ${result.pair[1].name} 궁합 분석 결과: ${result.interaction?.title}\n${result.interaction?.reason}`,
+            title: `ZestPair - ${displayTitle}`,
+            text: `${nameA} & ${nameB} ${language === 'ko' ? '궁합 분석 결과' : 'Interaction Analysis'}: ${displayTitle}\n${displayReason}`,
             url: window.location.href,
         };
 
@@ -83,7 +93,7 @@ export default function SynergyCard({
                 await navigator.share(shareData);
             } else {
                 await navigator.clipboard.writeText(`${shareData.text}\n\n결과 보기: ${shareData.url}`);
-                alert("결과가 클립보드에 복사되었습니다!");
+                alert(t.common.shareText);
             }
         } catch (err) {
             console.error("Error sharing:", err);
@@ -113,7 +123,7 @@ export default function SynergyCard({
             link.click();
         } catch (err) {
             console.error("Error downloading card:", err);
-            alert("이미지 저장 중 오류가 발생했습니다.");
+            alert(t.common.errorDownload);
         } finally {
             setIsDownloading(false);
         }
@@ -177,37 +187,37 @@ export default function SynergyCard({
                                 <div className="relative flex items-center justify-center gap-6 mb-5">
                                     <div className="flex flex-col items-center gap-2">
                                         <div className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">{result.pair[0].icon_emoji}</div>
-                                        <span className="text-[10px] font-black text-white/60 tracking-tighter uppercase">{result.pair[0].name}</span>
+                                        <span className="text-[10px] font-black text-white/60 tracking-tighter uppercase">{nameA}</span>
                                     </div>
                                     <Zap className="text-yellow-400 animate-bounce mb-6" size={28} strokeWidth={3} />
                                     <div className="flex flex-col items-center gap-2">
                                         <div className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">{result.pair[1].icon_emoji}</div>
-                                        <span className="text-[10px] font-black text-white/60 tracking-tighter uppercase">{result.pair[1].name}</span>
+                                        <span className="text-[10px] font-black text-white/60 tracking-tighter uppercase">{nameB}</span>
                                     </div>
                                 </div>
 
                                 <div className="flex flex-col items-center space-y-3">
                                     <h4 className="text-2xl md:text-3xl font-[1000] text-white tracking-tighter leading-tight drop-shadow-lg text-center px-2">
-                                        {result.interaction.title}
+                                        {displayTitle}
                                     </h4>
                                     <div className={cn(
                                         "px-4 py-1.5 rounded-full font-black text-[10px] tracking-[0.2em] text-white border border-white/20 uppercase backdrop-blur-xl shadow-lg",
                                         config.theme.split(' ')[0].replace('from-', 'bg-')
                                     )}>
-                                        {config.label}
+                                        {language === "ko" ? config.label : result.interaction.type}
                                     </div>
                                 </div>
                             </div>
 
                             <div className="mt-auto flex flex-col items-center gap-4 pt-4 border-t border-white/10">
                                 <div className="flex items-center gap-2 text-white/50 bg-white/5 px-4 py-2 rounded-full border border-white/10">
-                                    <span className="text-[9px] font-black tracking-widest uppercase">클릭하여 상세 정보 보기</span>
+                                    <span className="text-[9px] font-black tracking-widest uppercase">{language === 'ko' ? '클릭하여 상세 정보 보기' : 'Click to see details'}</span>
                                     <RefreshCcw size={12} className="animate-spin-slow" />
                                 </div>
                                 <div className="w-full flex justify-between items-center text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">
-                                    <span>{result.pair[0].name}</span>
+                                    <span>{nameA}</span>
                                     <span>VS</span>
-                                    <span>{result.pair[1].name}</span>
+                                    <span>{nameB}</span>
                                 </div>
                             </div>
                         </div>
@@ -252,20 +262,20 @@ export default function SynergyCard({
                                     <div className="space-y-5 pt-2 pb-10"> {/* 상하단 여백 최적화 */}
                                         <div className="space-y-2 text-left">
                                             <div className="inline-flex items-center gap-2 px-2 py-0.5 bg-slate-100 rounded-md">
-                                                <span className="text-slate-600 font-black text-[9px] uppercase">궁합 이유</span>
+                                                <span className="text-slate-600 font-black text-[9px] uppercase">{language === 'ko' ? '궁합 이유' : 'Interaction Logic'}</span>
                                             </div>
                                             <p className="text-[14px] md:text-[15px] text-slate-700 font-bold leading-snug tracking-tight break-words">
-                                                {result.interaction.reason}
+                                                {displayReason}
                                             </p>
                                         </div>
 
-                                        {result.interaction.recommendation && (
+                                        {displayRec && (
                                             <div className="space-y-2 pt-3 border-t border-slate-100 text-left">
                                                 <div className="inline-flex items-center gap-2 px-2 py-0.5 bg-emerald-50 rounded-md">
-                                                    <span className="text-emerald-600 font-black text-[9px] uppercase">전문가 권고</span>
+                                                    <span className="text-emerald-600 font-black text-[9px] uppercase">{t.common.expertProtocol}</span>
                                                 </div>
                                                 <p className="text-[13px] text-slate-600 font-semibold leading-normal tracking-tight break-words">
-                                                    {result.interaction.recommendation}
+                                                    {displayRec}
                                                 </p>
                                             </div>
                                         )}
@@ -280,7 +290,7 @@ export default function SynergyCard({
                                     onClick={() => setIsFlipped(false)}
                                     className="flex items-center gap-2 text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 px-3 py-1 rounded-full border border-slate-100/50 transition-colors"
                                 >
-                                    <span className="text-[8px] font-black tracking-widest uppercase">클릭하여 돌아가기</span>
+                                    <span className="text-[8px] font-black tracking-widest uppercase">{language === 'ko' ? '클릭하여 돌아가기' : 'Click to go back'}</span>
                                     <RefreshCcw size={10} className="rotate-180" />
                                 </button>
                                 <div className="w-full flex gap-1.5">
@@ -343,25 +353,25 @@ export default function SynergyCard({
                                         <div className="flex items-center justify-center gap-6 mb-6">
                                             <div className="flex flex-col items-center gap-2">
                                                 <div className="text-6xl">{result.pair[0].icon_emoji}</div>
-                                                <span className="text-[10px] font-black text-white/40 tracking-tighter">{result.pair[0].name}</span>
+                                                <span className="text-[10px] font-black text-white/40 tracking-tighter">{nameA}</span>
                                             </div>
                                             <Zap className="text-yellow-400 mb-6" size={24} />
                                             <div className="flex flex-col items-center gap-2">
                                                 <div className="text-6xl">{result.pair[1].icon_emoji}</div>
-                                                <span className="text-[10px] font-black text-white/40 tracking-tighter">{result.pair[1].name}</span>
+                                                <span className="text-[10px] font-black text-white/40 tracking-tighter">{nameB}</span>
                                             </div>
                                         </div>
                                         <h4 className="text-2xl font-[1000] text-white tracking-tighter text-center leading-tight mb-4">
-                                            {result.interaction.title}
+                                            {displayTitle}
                                         </h4>
                                         <div className={cn("px-4 py-1.5 rounded-full font-black text-[10px] tracking-[0.2em] text-white border border-white/20", config.theme.split(' ')[0].replace('from-', 'bg-'))}>
-                                            {config.label}
+                                            {language === "ko" ? config.label : result.interaction.type}
                                         </div>
                                     </div>
                                     <div className="mt-auto pt-4 border-t border-white/10 flex justify-between text-[8px] font-black text-white/30 tracking-widest">
-                                        <span>{result.pair[0].name}</span>
+                                        <span>{nameA}</span>
                                         <span>VS</span>
-                                        <span>{result.pair[1].name}</span>
+                                        <span>{nameB}</span>
                                     </div>
                                 </div>
                             </div>
@@ -383,16 +393,16 @@ export default function SynergyCard({
                                 </div>
                                 <div className="space-y-6">
                                     <div>
-                                        <span className="inline-block px-2 py-0.5 bg-slate-100 rounded text-[8px] font-black text-slate-500 mb-2 uppercase tracking-tighter">궁합 이유</span>
+                                        <span className="inline-block px-2 py-0.5 bg-slate-100 rounded text-[8px] font-black text-slate-500 mb-2 uppercase tracking-tighter">{language === 'ko' ? '궁합 이유' : 'Interaction Logic'}</span>
                                         <p className="text-[13px] text-slate-800 font-bold leading-snug break-words">
-                                            {result.interaction.reason}
+                                            {displayReason}
                                         </p>
                                     </div>
-                                    {result.interaction.recommendation && (
+                                    {displayRec && (
                                         <div>
-                                            <span className="inline-block px-2 py-0.5 bg-emerald-50 rounded text-[8px] font-black text-emerald-600 mb-2 uppercase tracking-tighter">전문가 권고</span>
+                                            <span className="inline-block px-2 py-0.5 bg-emerald-50 rounded text-[8px] font-black text-emerald-600 mb-2 uppercase tracking-tighter">{t.common.expertProtocol}</span>
                                             <p className="text-[12px] text-slate-600 font-semibold leading-relaxed break-words">
-                                                {result.interaction.recommendation}
+                                                {displayRec}
                                             </p>
                                         </div>
                                     )}

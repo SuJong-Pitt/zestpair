@@ -25,6 +25,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useBasketStore } from "@/store/basketStore";
 import type { CoupangProduct, AnalysisResult, InteractionResult } from "@/types/database";
 import SynergyCard from "./SynergyCard";
+import { UI_TRANSLATIONS } from "@/lib/i18n";
 
 interface AnalysisResultsProps {
     result: AnalysisResult;
@@ -202,10 +203,18 @@ function ScoreRing({ score }: { score: number }) {
 
 /** 상호작용 카드 컴포넌트 */
 function InteractionCard({ result }: { result: InteractionResult }) {
+    const { language } = useBasketStore();
+    const t = UI_TRANSLATIONS[language];
     if (!result.interaction) return null;
-    const { type, title, reason, recommendation } = result.interaction;
+    const { type, title, reason, recommendation, title_en, reason_en, recommendation_en } = result.interaction;
     const config = interactionTypeConfig[type];
     const Icon = config.icon;
+
+    const displayTitle = language === "ko" ? title : (title_en || title);
+    const displayReason = language === "ko" ? reason : (reason_en || reason);
+    const displayRec = language === "ko" ? recommendation : (recommendation_en || recommendation);
+    const nameA = language === "ko" ? result.pair[0].name : result.pair[0].name_en;
+    const nameB = language === "ko" ? result.pair[1].name : result.pair[1].name_en;
 
     return (
         <motion.div
@@ -234,27 +243,27 @@ function InteractionCard({ result }: { result: InteractionResult }) {
                         </div>
                         <div className="flex-1 min-w-0 font-sans tracking-tight">
                             <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                <h4 className="font-bold text-lg text-slate-900 leading-tight tracking-tight">{title}</h4>
+                                <h4 className="font-bold text-lg text-slate-900 leading-tight tracking-tight">{displayTitle}</h4>
                                 <Badge className={cn("text-[10px] px-2 py-0 h-5 border-none font-black uppercase tracking-wider", config.color)}>
-                                    {config.label}
+                                    {language === "ko" ? config.label : type}
                                 </Badge>
                             </div>
                             <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 mb-4 uppercase tracking-widest">
-                                <span className="text-slate-600 font-black">{result.pair[0].name}</span>
+                                <span className="text-slate-600 font-black">{nameA}</span>
                                 <Zap size={10} className="text-emerald-400 animate-pulse" />
-                                <span className="text-slate-600 font-black">{result.pair[1].name}</span>
+                                <span className="text-slate-600 font-black">{nameB}</span>
                             </div>
-                            <p className="text-[15px] text-slate-600 leading-relaxed mb-5 font-medium">{reason}</p>
+                            <p className="text-[15px] text-slate-600 leading-relaxed mb-5 font-medium">{displayReason}</p>
 
-                            {recommendation && (
+                            {displayRec && (
                                 <div className="p-4 rounded-2xl bg-slate-50/80 backdrop-blur-sm border border-slate-100 shadow-inner group-hover:bg-white transition-colors">
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="p-1 bg-emerald-100 rounded-lg">
                                             <ShieldCheck size={14} className="text-emerald-600" />
                                         </div>
-                                        <span className="text-[11px] text-emerald-800 font-black uppercase tracking-tighter">전문가 권고 프로토콜</span>
+                                        <span className="text-[11px] text-emerald-800 font-black uppercase tracking-tighter">{t.common.expertProtocol}</span>
                                     </div>
-                                    <p className="text-sm text-slate-700 font-semibold leading-relaxed">{recommendation}</p>
+                                    <p className="text-sm text-slate-700 font-semibold leading-relaxed">{displayRec}</p>
                                 </div>
                             )}
                         </div>
@@ -267,10 +276,13 @@ function InteractionCard({ result }: { result: InteractionResult }) {
 
 /** 프리미엄 상품 카드 - 퍼스널 큐레이션 버전 */
 function ProductCard({ product, index, sourceIngredient }: { product: CoupangProduct; index: number; sourceIngredient?: string }) {
+    const { language } = useBasketStore();
+    const t = UI_TRANSLATIONS[language];
+    
     const configs = [
-        { label: "AI 최적 추천", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100", gradient: "from-blue-600 to-indigo-600", glow: "shadow-blue-500/20" },
-        { label: "시너지 극대화", color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", gradient: "from-emerald-600 to-teal-600", glow: "shadow-emerald-500/20" },
-        { label: "최고의 가성비", color: "text-amber-600", bg: "bg-amber-50", border: "border-orange-100", gradient: "from-orange-500 to-amber-600", glow: "shadow-orange-500/20" },
+        { label: t.products.bestAi, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100", gradient: "from-blue-600 to-indigo-600", glow: "shadow-blue-500/20" },
+        { label: t.products.maxSynergy, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", gradient: "from-emerald-600 to-teal-600", glow: "shadow-emerald-500/20" },
+        { label: t.products.bestValue, color: "text-amber-600", bg: "bg-amber-50", border: "border-orange-100", gradient: "from-orange-500 to-amber-600", glow: "shadow-orange-500/20" },
     ];
     const config = configs[index % configs.length];
 
@@ -320,7 +332,9 @@ function ProductCard({ product, index, sourceIngredient }: { product: CoupangPro
                 <div className="flex items-center gap-2 mb-3">
                     <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                     <p className="text-[10px] font-black text-emerald-600/70 uppercase tracking-widest">
-                        {sourceIngredient ? `${sourceIngredient} 관련 맞춤추천` : "AI 정밀 시너지 추천"}
+                        {sourceIngredient 
+                            ? t.products.relatedTo.replace("{ingredient}", sourceIngredient)
+                            : t.products.curationTitle}
                     </p>
                 </div>
 
@@ -351,7 +365,7 @@ function ProductCard({ product, index, sourceIngredient }: { product: CoupangPro
                             <div className="flex items-baseline gap-1">
                                 <span className="text-sm font-black text-slate-400">₩</span>
                                 <span className="text-3xl font-[1000] text-slate-900 tracking-tighter">
-                                    {product.price > 0 ? Math.floor(product.price).toLocaleString() : "품절임박"}
+                                    {product.price > 0 ? Math.floor(product.price).toLocaleString() : t.products.outOfStock}
                                 </span>
                             </div>
                         </div>
@@ -375,7 +389,9 @@ function ProductCard({ product, index, sourceIngredient }: { product: CoupangPro
                             <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
 
                             <ShoppingCart size={18} className="text-white/90 drop-shadow-sm" />
-                            <span className="tracking-wide drop-shadow-md">쿠팡 최저가 구매</span>
+                            <span className="tracking-wide drop-shadow-md">
+                                {UI_TRANSLATIONS[useBasketStore.getState().language].common[useBasketStore.getState().language === "ko" ? 'shoppingCoupang' : 'shoppingAmazon']}
+                            </span>
                         </a>
                     </Button>
                 </div>
@@ -385,10 +401,11 @@ function ProductCard({ product, index, sourceIngredient }: { product: CoupangPro
 }
 
 export default function AnalysisResults({ result, coupangProducts = [] }: AnalysisResultsProps) {
-    const { clearBasket, setHasResult } = useBasketStore();
+    const { clearBasket, language } = useBasketStore();
+    const t = UI_TRANSLATIONS[language];
 
     if (!result || !result.ingredients) {
-        return <div className="p-20 text-center text-slate-400">분석 결과를 불러오는 중입니다...</div>;
+        return <div className="p-20 text-center text-slate-400">{t.common.loading}...</div>;
     }
 
     const allInteractions = [
@@ -434,22 +451,22 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                     "drop-shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
                                 )}>
                                     {result.score >= 70
-                                        ? "시너지 폭발!"
+                                        ? t.results.synergy
                                         : result.score >= 40
-                                            ? "주의필요 단계"
-                                            : "조합 재고필요"}
+                                            ? t.results.caution
+                                            : t.results.conflict}
                                 </h2>
 
-                                <div className="flex items-center gap-3">
-                                    <div className="h-px w-8 bg-emerald-500/30" />
+                                <div className="flex items-center gap-3 text-center justify-center">
+                                    <div className="h-px w-8 bg-emerald-500/30 hidden md:block" />
                                     <p className="text-xl md:text-3xl font-black text-emerald-400 tracking-tight">
                                         {result.score >= 70
-                                            ? "최상의 조화를 이룬 믹스입니다"
+                                            ? t.results.bestMix
                                             : result.score >= 40
-                                                ? "성분 간 상충 가능성 감지"
-                                                : "함께 드시면 건강이 위험할 수 있어요"}
+                                                ? t.results.potentialConflict
+                                                : t.results.dangerous}
                                     </p>
-                                    <div className="h-px w-8 bg-emerald-500/30" />
+                                    <div className="h-px w-8 bg-emerald-500/30 hidden md:block" />
                                 </div>
                             </div>
 
@@ -472,7 +489,9 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                         className="flex items-center gap-3 bg-white/10 border border-white/10 rounded-2xl px-6 py-3.5 font-black shadow-lg backdrop-blur-md"
                                     >
                                         <span className="text-2xl">{ing.icon_emoji}</span>
-                                        <span className="text-sm tracking-tight text-white/90">{ing.name}</span>
+                                        <span className="text-sm tracking-tight text-white/90">
+                                            {language === "ko" ? ing.name : ing.name_en}
+                                        </span>
                                     </motion.div>
                                 ))}
                             </div>
@@ -486,12 +505,12 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 <div className="flex items-end justify-between px-2">
                     <div className="space-y-1">
                         <h3 className="text-2xl font-black text-slate-900 tracking-tight">
-                            상호작용 매트릭스
+                            {t.results.matrixTitle}
                         </h3>
-                        <p className="text-sm text-slate-500 font-medium">영양 성분 간의 생화학적 시너지와 충돌 분석</p>
+                        <p className="text-sm text-slate-500 font-medium">{t.results.matrixSubtitle}</p>
                     </div>
                     <Badge variant="outline" className="rounded-lg px-3 py-1 border-slate-200 text-slate-400 font-bold bg-slate-50">
-                        {allInteractions.length}건의 분석결과
+                        {allInteractions.length}{language === "ko" ? "건의 분석결과" : " Results"}
                     </Badge>
                 </div>
 
@@ -509,8 +528,8 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-slate-100">
                             <ShieldCheck size={32} className="text-emerald-500" />
                         </div>
-                        <p className="text-slate-900 font-bold text-lg">상호작용 위험 없음</p>
-                        <p className="text-slate-500 font-medium mt-2 max-w-sm mx-auto">선택하신 영양 성분들은 함께 복용하셔도 안전한 것으로 분석되었습니다.</p>
+                        <p className="text-slate-900 font-bold text-lg">{t.results.noInteraction}</p>
+                        <p className="text-slate-500 font-medium mt-2 max-w-sm mx-auto">{t.results.noInteractionBody}</p>
                     </div>
                 )}
             </div>
@@ -538,18 +557,18 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
 
                         <div className="space-y-4">
                             <h3 className="text-4xl md:text-5xl lg:text-6xl font-[1000] text-white tracking-tighter leading-tight drop-shadow-md">
-                                포리가 제안하는<br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">프리미엄 처방전</span>
+                                {t.results.prescriptionTitle}<br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">{t.results.premiumPrescription}</span>
                             </h3>
                             <p className="text-slate-400 font-medium text-sm md:text-lg max-w-xl mx-auto leading-relaxed">
-                                성분 분석 결과를 완벽하게 보완하고 시너지를 낼 수 있는 <strong className="text-emerald-400">TOP 큐레이션</strong>만을 엄선했습니다.
+                                {t.results.prescriptionSubtitle}
                             </p>
                         </div>
 
                         <div className="pt-2">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                                <span className="text-emerald-400 font-black text-[10px] md:text-xs tracking-widest uppercase">실시간 최저가 탐색 완료</span>
+                                <span className="text-emerald-400 font-black text-[10px] md:text-xs tracking-widest uppercase">{t.results.lowestPriceFound}</span>
                             </div>
                         </div>
                     </div>
@@ -558,46 +577,56 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 {/* 모바일 가로 스크롤 스와이프 안내 */}
                 <div className="lg:hidden flex items-center justify-end px-8 mb-4 max-w-5xl mx-auto">
                     <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400/80 uppercase tracking-widest animate-pulse">
-                        스와이프하여 더보기 <ArrowRight size={14} className="opacity-70" />
+                        {t.common.swipeToSeeMore} <ArrowRight size={14} className="opacity-70" />
                     </span>
                 </div>
 
-                {/* 모바일 가로 스크롤 / 데스크톱 2열 그리드 전환 */}
-                <div className="relative z-10 flex flex-nowrap lg:grid lg:grid-cols-2 overflow-x-auto lg:overflow-visible pb-16 px-6 sm:px-10 lg:px-16 gap-4 sm:gap-6 lg:gap-8 scrollbar-hide snap-x snap-mandatory lg:snap-none max-w-5xl mx-auto">
-                    {coupangProducts.length > 0 ? (
-                        coupangProducts.map((product, idx) => (
-                            <div key={product.product_id} className="w-[280px] sm:w-[320px] lg:w-auto flex-shrink-0 lg:flex-shrink snap-center lg:snap-align-none">
-                                <ProductCard
-                                    product={product}
-                                    index={idx}
-                                    sourceIngredient={result.ingredients[idx % result.ingredients.length]?.name}
-                                />
-                            </div>
-                        ))
-                    ) : (
-                        result.ingredients.map((ing, idx) => {
+                {/* 가로 스크롤 컨테이너 (드래그 지원) */}
+                <div className="relative z-10 px-6 sm:px-10 lg:px-16 max-w-5xl mx-auto overflow-hidden group/productScroll">
+                    {/* 페이드 마스크 */}
+                    <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0f172a] via-[#0f172a]/50 to-transparent z-20 pointer-events-none opacity-0 group-hover/productScroll:opacity-100 transition-opacity lg:hidden" />
+                    <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0f172a] via-[#0f172a]/50 to-transparent z-20 pointer-events-none opacity-0 group-hover/productScroll:opacity-100 transition-opacity lg:hidden" />
+
+                    <motion.div 
+                        drag="x"
+                        dragConstraints={{ left: -1000, right: 0 }} // 임시, 실제 너비에 맞춰 자동 계산 로직 필요 시 추가
+                        dragElastic={0.05}
+                        dragTransition={{ power: 0.1, timeConstant: 200 }}
+                        className="flex flex-nowrap lg:grid lg:grid-cols-2 pt-4 pb-16 gap-4 sm:gap-6 lg:gap-8 cursor-grab active:cursor-grabbing lg:cursor-default lg:overflow-visible"
+                    >
+                        {result.ingredients.map((ing, idx) => {
+                            const searchKeyword = language === "ko" 
+                                ? (ing.coupang_search_keyword || ing.name)
+                                : (ing.amazon_search_keyword || ing.name_en);
+                            
+                            const shopUrl = language === "ko"
+                                ? `https://www.coupang.com/np/search?q=${encodeURIComponent(searchKeyword)}`
+                                : `https://www.amazon.com/s?k=${encodeURIComponent(searchKeyword)}`;
+
                             return (
                                 <div key={`${ing.id}-${idx}`} className="w-[280px] sm:w-[320px] lg:w-auto flex-shrink-0 lg:flex-shrink snap-center lg:snap-align-none">
                                     <ProductCard
                                         index={idx}
-                                        sourceIngredient={ing.name}
+                                        sourceIngredient={language === "ko" ? ing.name : ing.name_en}
                                         product={{
                                             product_id: `mock-${ing.id}-${idx}`,
-                                            name: `${ing.name} ${idx % 2 === 0 ? "프리미엄 정량 고농축" : "고효능 시너지 포뮬러"}`,
-                                            product_url: `https://www.coupang.com/np/search?q=${encodeURIComponent(ing.coupang_search_keyword)}`,
+                                            name: language === "ko" 
+                                                ? `${ing.name} ${idx % 2 === 0 ? "프리미엄 정량 고농축" : "고효능 시너지 포뮬러"}`
+                                                : `${ing.name_en} ${idx % 2 === 0 ? "Premium High Conc." : "High Potency Synergy Formula"}`,
+                                            product_url: shopUrl,
                                             image_url: "",
-                                            price: 28000 + (idx * 3500),
-                                            original_price: 35000 + (idx * 4000),
+                                            price: language === "ko" ? (28000 + (idx * 3500)) : (19.99 + (idx * 5.5)),
+                                            original_price: language === "ko" ? (35000 + (idx * 4000)) : (29.99 + (idx * 6.5)),
                                             discount_rate: 14 + (idx % 10),
-                                            is_rocket: true,
+                                            is_rocket: language === "ko",
                                             rating: 4.7 + (idx * 0.02),
                                             review_count: 500 + (idx * 100)
                                         }}
                                     />
                                 </div>
                             );
-                        })
-                    )}
+                        })}
+                    </motion.div>
                 </div>
             </div>
 
@@ -617,7 +646,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         <div className="p-3 bg-indigo-50 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-500 shadow-sm">
                             <RefreshCcw size={24} className="group-hover:rotate-180 transition-transform duration-1000" />
                         </div>
-                        분석 리셋 및 새로 시작하기
+                        {t.common.reset}
                     </div>
                 </Button>
             </div>
@@ -627,12 +656,11 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 <div className="inline-block px-4 py-1.5 bg-slate-50 rounded-full border border-slate-100">
                     <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.1em] flex items-center gap-2">
                         <AlertTriangle size={12} className="text-amber-500" />
-                        의학적 고지 사항
+                        {t.common.medicalDisclaimerTitle}
                     </p>
                 </div>
                 <p className="text-xs text-slate-400 leading-normal max-w-2xl mx-auto font-medium">
-                    본 리포트는 정보 제공만을 목적으로 하며 의학적 진단을 대체할 수 없습니다.
-                    개인의 체질에 따라 상호작용은 다르게 나타날 수 있으므로, 반드시 전문의와 상담하시기 바랍니다.
+                    {t.common.medicalDisclaimerBody}
                 </p>
             </div>
         </motion.div>

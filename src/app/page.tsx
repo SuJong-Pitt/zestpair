@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { Search, Pill, ChevronDown, Info, Sparkles, RefreshCcw } from "lucide-react";
+import { Search, Pill, ChevronDown, Info, Sparkles, RefreshCcw, Languages, ChevronRight, Database } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import IngredientCard from "@/components/IngredientCard";
 import FloatingBasketBar from "@/components/FloatingBasketBar";
@@ -12,54 +12,65 @@ import { supabase } from "@/lib/supabase";
 import type { AnalysisResult, Ingredient, InteractionResult } from "@/types/database";
 import { cn } from "@/lib/utils";
 import FloatingAssistant from "@/components/FloatingAssistant";
-import VisualDecorations from "@/components/VisualDecorations";
 import ScrollToTop from "@/components/ScrollToTop";
+import VisualDecorations from "@/components/VisualDecorations";
 import { motion, AnimatePresence } from "framer-motion";
+import { UI_TRANSLATIONS, CATEGORIES_TRANSLATIONS } from "@/lib/i18n";
 
-const CATEGORIES = [
-  { key: "all", label: "전체", emoji: "✨" },
-  { key: "drugs", label: "의약품", emoji: "💊" },
-  { key: "vitamins", label: "비타민", emoji: "💊" },
-  { key: "minerals", label: "미네랄", emoji: "⚗️" },
-  { key: "omega", label: "오메가", emoji: "🐟" },
-  { key: "probiotics", label: "유산균", emoji: "🦠" },
-  { key: "antioxidants", label: "항산화", emoji: "🛡️" },
-  { key: "amino_acids", label: "아미노산", emoji: "✨" },
-  { key: "lipids", label: "지질/인지질", emoji: "🍳" },
-  { key: "enzymes", label: "효소", emoji: "🍱" },
-  { key: "herbs", label: "허브/천연", emoji: "🌿" },
-  { key: "hormones", label: "호르몬", emoji: "🦋" },
-  { key: "other", label: "기타", emoji: "🧪" },
-] as const;
+// 헬퍼 컴포넌트: 가로 스크롤 컨테이너 (관성 드래그 지원)
+function HorizontalScroll({ children, className }: { children: React.ReactNode; className?: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
 
-type CategoryKey = (typeof CATEGORIES)[number]["key"];
+  useEffect(() => {
+    const updateConstraints = () => {
+      if (containerRef.current && contentRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const contentWidth = contentRef.current.scrollWidth;
+        // 드레그 여유 공간 32px 추가
+        setDragConstraints({ left: Math.min(0, -(contentWidth - containerWidth + 32)), right: 0 });
+      }
+    };
+
+    updateConstraints();
+    window.addEventListener('resize', updateConstraints);
+    // 이미지나 내용 로드가 늦어질 수 있으므로 추가 체크
+    const timer = setTimeout(updateConstraints, 500);
+
+    return () => {
+      window.removeEventListener('resize', updateConstraints);
+      clearTimeout(timer);
+    };
+  }, [children]);
+
+  return (
+    <div ref={containerRef} className="relative group/hscroll w-full overflow-hidden">
+      {/* 페이드 효과 */}
+      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none opacity-0 group-hover/hscroll:opacity-100 transition-opacity" />
+      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none opacity-0 group-hover/hscroll:opacity-100 transition-opacity" />
+
+      <motion.div
+        ref={contentRef}
+        drag="x"
+        dragConstraints={dragConstraints}
+        dragElastic={0.05}
+        dragTransition={{ power: 0.1, timeConstant: 200 }}
+        className={cn("flex cursor-grab active:cursor-grabbing", className)}
+        style={{ width: "max-content" }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
 
 export default function HomePage() {
   const resultRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const categoryScrollRef = useRef<HTMLDivElement>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCategoryDragging, setIsCategoryDragging] = useState(false);
-  const [categoryStartX, setCategoryStartX] = useState(0);
-  const [categoryScrollLeft, setCategoryScrollLeft] = useState(0);
-
-  const handleCategoryMouseDown = (e: React.MouseEvent) => {
-    if (!categoryScrollRef.current) return;
-    setIsCategoryDragging(true);
-    setCategoryStartX(e.pageX - categoryScrollRef.current.offsetLeft);
-    setCategoryScrollLeft(categoryScrollRef.current.scrollLeft);
-  };
-  const handleCategoryMouseLeave = () => setIsCategoryDragging(false);
-  const handleCategoryMouseUp = () => setIsCategoryDragging(false);
-  const handleCategoryMouseMove = (e: React.MouseEvent) => {
-    if (!isCategoryDragging || !categoryScrollRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - categoryScrollRef.current.offsetLeft;
-    const walk = (x - categoryStartX) * 1.5;
-    categoryScrollRef.current.scrollLeft = categoryScrollLeft - walk;
-  };
-  const [selectedCategory, setSelectedCategory] = useState<CategoryKey>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showAllPopular, setShowAllPopular] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
@@ -69,29 +80,30 @@ export default function HomePage() {
   useEffect(() => {
     const fetchIngredients = async () => {
       setIsLoadingList(true);
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("ingredients")
         .select("*")
         .order("sort_order", { ascending: true });
 
-      if (data) {
-        setDbIngredients(data);
-      }
+      if (data) setDbIngredients(data);
       setIsLoadingList(false);
     };
     fetchIngredients();
   }, []);
 
-  const { selectedIngredients, isAnalyzing, hasResult, setAnalyzing, setHasResult, clearBasket } =
+  const { selectedIngredients, isAnalyzing, hasResult, setAnalyzing, setHasResult, clearBasket, language, setLanguage } =
     useBasketStore();
 
-  // 필터링 로직
+  const t = UI_TRANSLATIONS[language];
+
   const filteredIngredients = dbIngredients.filter((ing) => {
+    const name = language === "ko" ? ing.name : ing.name_en;
+    const desc = language === "ko" ? ing.short_description : (ing.short_description_en || ing.short_description);
+
     const matchesSearch =
       searchQuery === "" ||
-      ing.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ing.name_en.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ing.short_description.includes(searchQuery);
+      name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      desc.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesCategory =
       selectedCategory === "all" || ing.category === selectedCategory;
@@ -101,27 +113,15 @@ export default function HomePage() {
 
   const popularIngredients = dbIngredients.filter((i) => i.is_popular);
 
-  /**
-   * 분석 실행 (목 데이터 기반)
-   * 실제 서비스 시 src/app/api/analyze/route.ts 엔드포인트로 교체
-   */
   const handleAnalyze = async () => {
     if (selectedIngredients.length < 2) return;
 
     setAnalyzing(true);
-
-    // 스크롤 프리뷰
     setTimeout(() => {
       resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
 
-    // 분석 효과를 제대로 보여주기 위한 딜레이 (4.5초 대기)
-    await new Promise((resolve) => setTimeout(resolve, 4500));
-
-    // Supabase에서 선택된 영양제들의 인터랙션 정보 가져오기
-    const ingredients = selectedIngredients;
-    const ingredientIds = ingredients.map((i) => i.id);
-
+    const ingredientIds = selectedIngredients.map((i) => i.id);
     const { data: dbInteractions } = await supabase
       .from("interactions")
       .select("*")
@@ -130,368 +130,341 @@ export default function HomePage() {
 
     const findInteraction = (idA: string, idB: string) => {
       const dbInts = (dbInteractions as any[]) || [];
-      return (
-        dbInts.find(
-          (i) =>
-            (i.ingredient_a_id === idA && i.ingredient_b_id === idB) ||
-            (i.ingredient_a_id === idB && i.ingredient_b_id === idA)
-        ) ?? null
-      );
+      return dbInts.find(i =>
+        (i.ingredient_a_id === idA && i.ingredient_b_id === idB) ||
+        (i.ingredient_a_id === idB && i.ingredient_b_id === idA)
+      ) ?? null;
     };
 
     const synergies: InteractionResult[] = [];
     const cautions: InteractionResult[] = [];
     const conflicts: InteractionResult[] = [];
 
-    for (let i = 0; i < ingredients.length; i++) {
-      for (let j = i + 1; j < ingredients.length; j++) {
-        const ing1 = ingredients[i];
-        const ing2 = ingredients[j];
+    for (let i = 0; i < selectedIngredients.length; i++) {
+      for (let j = i + 1; j < selectedIngredients.length; j++) {
+        const ing1 = selectedIngredients[i];
+        const ing2 = selectedIngredients[j];
         const interaction = findInteraction(ing1.id, ing2.id) as any;
-
-        const result: InteractionResult = {
-          pair: [ing1, ing2],
-          interaction,
-        };
-
+        const res: InteractionResult = { pair: [ing1, ing2], interaction };
         if (!interaction) continue;
-        if (interaction.type === "SYNERGY") synergies.push(result);
-        else if (interaction.type === "CAUTION") cautions.push(result);
-        else if (interaction.type === "CONFLICT") conflicts.push(result);
+        if (interaction.type === "SYNERGY") synergies.push(res);
+        else if (interaction.type === "CAUTION") cautions.push(res);
+        else if (interaction.type === "CONFLICT") conflicts.push(res);
       }
     }
 
-    // 점수 계산
-    const totalPairs = (ingredients.length * (ingredients.length - 1)) / 2;
     const synergyWeight = synergies.length * 15;
     const cautionPenalty = cautions.length * 5;
     const conflictPenalty = conflicts.length * 25;
-    const baseScore = 70;
-    const score = Math.max(
-      10,
-      Math.min(100, baseScore + synergyWeight - cautionPenalty - conflictPenalty)
-    );
+    const score = Math.max(10, Math.min(100, 70 + synergyWeight - cautionPenalty - conflictPenalty));
 
-    // 종합 요약
     let summary = "";
-    if (conflicts.length > 0) {
-      summary = `⚠️ ${conflicts.length}가지 충돌 조합이 발견되었습니다. 함께 복용 시 효과가 감소하거나 부작용이 발생할 수 있습니다.`;
-    } else if (synergies.length > 0) {
-      summary = `✅ ${synergies.length}가지 시너지 조합이 발견되었습니다! 함께 복용하면 효과가 더욱 극대화됩니다.`;
-    } else if (cautions.length > 0) {
-      summary = `🔶 ${cautions.length}가지 주의 조합이 있습니다. 복용 시간 간격을 두고 섭취하면 문제없습니다.`;
+    if (language === "ko") {
+      if (conflicts.length > 0) summary = `⚠️ ${conflicts.length}가지 충돌 조합이 발견되었습니다...`;
+      else if (synergies.length > 0) summary = `✅ ${synergies.length}가지 시너지 조합이 발견되었습니다!`;
+      else if (cautions.length > 0) summary = `🔶 ${cautions.length}가지 주의 조합이 발견되었습니다...`;
+      else summary = "중립적인 조합입니다.";
     } else {
-      summary = "선택한 영양제들은 서로 크게 영향을 주지 않는 중립적인 조합입니다. 각각의 효능을 독립적으로 누릴 수 있습니다.";
+      if (conflicts.length > 0) summary = `⚠️ ${conflicts.length} conflicts detected...`;
+      else if (synergies.length > 0) summary = `✅ ${synergies.length} synergies detected!`;
+      else if (cautions.length > 0) summary = `🔶 ${cautions.length} cautions detected...`;
+      else summary = "Neutral combination.";
     }
 
-    const result: AnalysisResult = {
-      ingredients,
-      synergies,
-      cautions,
-      conflicts,
-      score,
-      summary,
-      analyzed_at: new Date().toISOString(),
-    };
+    setAnalysisResult({
+      ingredients: selectedIngredients,
+      synergies, cautions, conflicts, score, summary,
+      analyzed_at: new Date().toISOString()
+    });
+  };
 
-    setAnalysisResult(result);
+  const handleAnimationComplete = () => {
     setAnalyzing(false);
     setHasResult(true);
-
-    // 결과로 스크롤
     setTimeout(() => {
       resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 200);
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* ============================================================
-       * HERO SECTION
-       * ============================================================ */}
-      <section className="relative overflow-hidden pb-20 pt-10 md:pt-16 md:pb-28 bg-gradient-to-b from-[#239E8A] via-[#86C2B1] to-white">
+    <div className="min-h-screen bg-slate-50/50">
+      <section className="relative overflow-hidden pb-16 pt-8 md:pt-14 md:pb-32 bg-[#0F172A]">
+        {/* 고도화된 배경 장식 */}
+        <VisualDecorations />
+
+        <div className="absolute top-8 right-8 z-50">
+          <button
+            onClick={() => setLanguage(language === "ko" ? "en" : "ko")}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white font-black text-xs transition-all hover:bg-white/30 active:scale-95 shadow-lg group"
+          >
+            <Languages size={14} className="group-hover:rotate-12 transition-transform" />
+            <span className="tracking-widest uppercase">{language === "ko" ? "ENGLISH" : "한국어"}</span>
+          </button>
+        </div>
 
         <div className="relative mx-auto max-w-2xl px-4 text-center">
-          {/* 로고 */}
-          <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="flex items-center justify-center gap-2 mb-2">
             <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
               <Pill size={22} className="text-white" />
             </div>
             <span className="text-white font-black text-xl tracking-tight">ZestPair</span>
           </div>
 
-          <div className="inline-block px-4 py-1.5 rounded-full bg-emerald-100/50 border border-emerald-200/50 mb-6 backdrop-blur-sm animate-fade-in">
-            <span className="text-emerald-800 text-xs md:text-sm font-bold tracking-wider uppercase">AI Analysis Engine v2.0</span>
-          </div>
-
-          <h1 className="text-3xl md:text-6xl font-black text-emerald-950 mb-6 leading-[1.15] px-2 tracking-tight">
-            복잡한 영양제 조합,
-            <br />
-            <span className="relative inline-block mt-2">
-              <span className="relative z-10 text-white px-6 py-2 block">
-                포리가 딱 정해줄게요!
+          <h1 className="text-[1.8rem] md:text-5xl lg:text-6xl font-[1000] text-white mb-4 leading-[1.05] tracking-tighter">
+            <span className="block opacity-90 drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)] mb-2 italic">{t.hero.title1}</span>
+            <span className="relative inline-block mt-2 md:mt-4 group">
+              <span className="relative z-10 bg-gradient-to-br from-emerald-200 via-white to-emerald-200 bg-clip-text text-transparent px-6 md:px-10 py-3 md:py-4 block">
+                {t.hero.title2}
               </span>
-              <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl shadow-xl shadow-emerald-200/50 -rotate-1 scale-x-105"></span>
+              <motion.span 
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: "100%", opacity: 1 }}
+                transition={{ duration: 1.5, ease: "circOut" }}
+                className="absolute inset-0 bg-gradient-to-r from-emerald-600/30 via-emerald-500/20 to-teal-600/30 backdrop-blur-3xl rounded-[2rem] md:rounded-[3rem] border-2 border-emerald-400/30 shadow-[0_30px_60px_rgba(16,185,129,0.4)] md:-skew-x-3"
+              ></motion.span>
+              
+              {/* 스파클 데코레이션 */}
+              <motion.div 
+                animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute -top-4 -right-4 text-emerald-300 hidden md:block"
+              >
+                <Sparkles size={32} />
+              </motion.div>
             </span>
           </h1>
 
-          <p className="text-white text-lg md:text-2xl mb-10 leading-relaxed font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] max-w-lg mx-auto">
-            매일 먹는 영양제, AI 어시스턴트 포리가 성분 간의 충돌과
-            <br />
-            <span className="text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.4)]">시너지를 실시간으로 분석</span>해드릴게요! ✨
+          <p className="text-white/90 text-sm md:text-xl mb-6 md:mb-8 leading-relaxed font-bold max-w-sm md:max-w-lg mx-auto drop-shadow-sm px-4">
+            {t.hero.subtitle1} {" "}
+            <span className="bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent font-[900]">{t.hero.subtitle2}</span>
+            {t.hero.subtitle3}
           </p>
 
-          {/* 검색창 (프리미엄 검색 인터페이스) */}
-          <div className="relative max-w-xl mx-auto group">
-            {/* 고해상도 아웃라인 글로우 */}
-            <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 rounded-[3rem] blur-md opacity-20 group-focus-within:opacity-50 transition duration-700 animate-pulse-slow" />
-
-            <div className="relative flex items-center bg-white/95 backdrop-blur-xl border-[3px] border-emerald-100/50 rounded-[3rem] p-1.5 md:p-2 shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-500 group-focus-within:border-emerald-500 group-focus-within:scale-[1.02] group-focus-within:shadow-[0_25px_60px_rgba(16,185,129,0.2)]">
+          <div className="relative max-w-2xl mx-auto group">
+            {/* 고해상도 퀀텀 글로우 */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/30 via-teal-400/20 to-emerald-600/30 rounded-[5rem] blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
+            
+            <div className="relative flex items-center bg-slate-950/40 backdrop-blur-3xl border border-white/20 rounded-[5rem] p-1.5 md:p-3 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] transition-all duration-500 group-focus-within:bg-slate-900/60 group-focus-within:border-emerald-400/60 group-focus-within:scale-[1.02]">
+              {/* 테크니컬 스캔라인 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/5 to-transparent -translate-x-full group-hover:animate-[scan-once_1.5s_ease-in-out] pointer-events-none" />
               
-              {/* 좌측 아이콘 데코레이션 */}
-              <div className="pl-4 md:pl-5 flex items-center justify-center">
-                <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center transition-colors group-focus-within:bg-emerald-500 group-focus-within:text-white text-emerald-500 shadow-inner">
-                  <Search size={20} className="group-focus-within:scale-110 transition-transform duration-500" />
-                </div>
+              <div className="pl-4 md:pl-6 flex items-center justify-center text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+                <Search size={24} className="md:size-7 group-focus-within:scale-110 transition-transform duration-500" />
               </div>
-
               <Input
                 ref={searchRef}
                 type="text"
-                placeholder="궁금한 성분이나 효능을 입력해보세요! ✨"
+                placeholder={t.hero.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-none text-emerald-950 placeholder:text-emerald-300 focus-visible:ring-0 focus-visible:ring-offset-0 text-base md:text-xl h-12 md:h-14 flex-1 font-extrabold px-3 md:px-4 tracking-tight"
+                className="bg-transparent border-none text-white placeholder:text-white/30 focus-visible:ring-0 text-xs md:text-2xl h-10 md:h-16 flex-1 font-[800] px-2 md:px-5 tracking-tighter md:tracking-tight"
               />
-
-              {/* 입력값 초기화 버튼 */}
-              <AnimatePresence>
+              <div className="flex items-center gap-2 md:gap-4 pr-1.5 md:pr-3">
                 {searchQuery && (
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    onClick={() => setSearchQuery("")}
-                    className="p-2 mr-1 text-emerald-300 hover:text-emerald-500 transition-colors"
-                  >
-                    <RefreshCcw size={18} className="hover:rotate-180 transition-transform duration-500" />
-                  </motion.button>
+                  <button onClick={() => setSearchQuery("")} className="hidden sm:block p-3 text-white/40 hover:text-white transition-colors bg-white/10 rounded-full">
+                    <RefreshCcw size={22} />
+                  </button>
                 )}
-              </AnimatePresence>
-
-              {/* 검색 작동 버튼 */}
-              <button className="hidden sm:flex items-center gap-2 px-5 md:px-8 py-3 md:py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-full font-black text-xs md:text-sm transition-all active:scale-95 shadow-[0_10px_20px_rgba(16,185,129,0.3)] hover:shadow-[0_15px_25px_rgba(16,185,129,0.4)]">
-                <span className="tracking-widest uppercase italic border-b-2 border-white/30">Go</span>
-                <ChevronDown size={14} className="-rotate-90" />
-              </button>
-            </div>
-
-            {/* 하단 검색 힌트 */}
-            <div className="absolute top-full left-6 mt-3 flex gap-4 text-[11px] font-bold text-emerald-800/60 opacity-0 group-focus-within:opacity-100 transition-opacity duration-500">
-              <span>#비타민C</span>
-              <span>#마그네슘</span>
-              <span>#수면건강</span>
-            </div>
-          </div>
-
-          {/* 분석 결과 리셋 버튼 (결과가 있을 때만 표시) */}
-          {hasResult && (
-            <div className="mt-6 animate-fade-in">
-              <button
-                onClick={() => {
-                  clearBasket();
-                  searchRef.current?.focus();
-                }}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold transition-all hover:-translate-y-0.5"
-              >
-                <RefreshCcw size={14} />
-                결과 리셋하고 처음부터 다시하기
-              </button>
-            </div>
-          )}
-
-          {/* 통계 배지 */}
-          <div className="flex items-center justify-center gap-4 mt-12 flex-wrap">
-            {[
-              { label: "분석 라이브러리", value: isLoadingList ? "..." : `${dbIngredients.length}종 +`, icon: <Pill size={14} /> },
-              { label: "무료 서비스", value: "무제한 분석", icon: <Sparkles size={14} /> },
-              { label: "처리 속도", value: "0.5초 이내", icon: <RefreshCcw size={14} /> },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-2xl px-5 py-3 border border-emerald-50 md:hover:bg-white transition-all duration-300 shadow-sm"
-              >
-                <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600">
-                  {stat.icon}
-                </div>
-                <div className="flex flex-col items-start leading-tight">
-                  <span className="text-emerald-800/40 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-0.5">{stat.label}</span>
-                  <span className="text-emerald-950 font-extrabold text-sm sm:text-base">{stat.value}</span>
-                </div>
+                <button 
+                  onClick={handleAnalyze}
+                  className="flex items-center gap-2 md:gap-3 px-6 md:px-10 py-2.5 md:py-4 bg-gradient-to-br from-emerald-400 via-teal-400 to-emerald-600 hover:brightness-110 text-emerald-950 rounded-full font-[1000] text-xs md:text-base transition-all active:scale-95 shadow-[0_15px_40px_rgba(16,185,129,0.5)] group/btn whitespace-nowrap"
+                >
+                  <span className="tracking-[0.1em] uppercase">{language === 'ko' ? '분석' : 'ANALYZE'}</span>
+                  <ChevronDown size={18} className="md:size-5 -rotate-90 group-hover/btn:translate-x-1 transition-transform" />
+                </button>
               </div>
-            ))}
-          </div>
-
-          {/* 스크롤 다운 힌트 */}
-          <div className="mt-4 animate-bounce">
-            <ChevronDown size={24} className="text-white/50 mx-auto" />
+            </div>
+            
+            {/* 검색창 하단 팁 */}
+            <div className="mt-6 flex items-center justify-center gap-4 opacity-50">
+              <span className="text-[10px] text-white font-black uppercase tracking-[0.2em]">Popular:</span>
+              <div className="flex gap-3">
+                {['Vitamin C', 'Zinc', 'Biotin'].map(tag => (
+                   <button key={tag} onClick={() => setSearchQuery(tag)} className="text-[10px] text-emerald-300 font-bold hover:text-white transition-colors">#{tag}</button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* 
+            고급 하단 스크림(Scrim): 
+            콘텐츠를 가리지 않도록 높이를 조절하고 부드러운 전이 유지
+        */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-20" 
+          style={{
+            background: 'linear-gradient(to top, ' +
+              'rgba(255,255,255,1) 0%, ' +
+              'rgba(255,255,255,0.95) 20%, ' +
+              'rgba(255,255,255,0.7) 45%, ' +
+              'rgba(255,255,255,0.3) 75%, ' +
+              'rgba(255,255,255,0) 100%)'
+          }}
+        />
       </section>
 
-
-      {/* ============================================================
-       * MAIN CONTENT
-       * ============================================================ */}
       <main className="mx-auto max-w-2xl px-4 py-8">
         <div className="relative mb-12">
-          {/* 카테고리 제목 (Optional but adds structure) */}
           <div className="flex items-center gap-2 mb-6 px-1">
             <div className="w-1 h-4 bg-emerald-500 rounded-full" />
-            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">카테고리 선택</span>
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t.common.categoryTitle}</span>
           </div>
-          <div
-            ref={categoryScrollRef}
-            className={cn(
-              "flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide focus-within:cursor-grabbing hover:cursor-grab active:cursor-grabbing",
-              isCategoryDragging ? "cursor-grabbing" : "cursor-grab"
-            )}
-            onMouseDown={handleCategoryMouseDown}
-            onMouseLeave={handleCategoryMouseLeave}
-            onMouseUp={handleCategoryMouseUp}
-            onMouseMove={handleCategoryMouseMove}
-          >
-            {CATEGORIES.map((cat, idx) => (
+
+          <HorizontalScroll className="gap-3 pt-2 pb-4">
+            {Object.entries(CATEGORIES_TRANSLATIONS).map(([key, data]) => (
               <motion.button
-                key={cat.key}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.03 }}
-                whileHover={{ y: -4, scale: 1.02 }}
+                key={key}
+                layout
+                whileHover={{ y: -4 }}
                 whileTap={{ scale: 0.96 }}
-                onClick={() => setSelectedCategory(cat.key)}
+                onClick={() => setSelectedCategory(key)}
                 className={cn(
-                  "flex items-center gap-2.5 whitespace-nowrap px-5 py-3 rounded-2xl text-[13px] font-black transition-all duration-500 flex-shrink-0 group",
-                  "border-2 relative overflow-hidden",
-                  selectedCategory === cat.key
-                    ? "bg-slate-900 text-white border-slate-900 shadow-[0_10px_20px_rgba(15,23,42,0.15)] ring-4 ring-slate-900/5"
-                    : "bg-white text-slate-500 border-slate-100 hover:border-emerald-200 hover:text-emerald-700 hover:shadow-lg"
+                  "relative flex items-center gap-2.5 whitespace-nowrap px-6 py-3.5 rounded-2xl text-[13px] font-black transition-all duration-500",
+                  selectedCategory === key 
+                    ? "text-white shadow-[0_20px_40px_-10px_rgba(15,23,42,0.3)]" 
+                    : "bg-white text-slate-500 hover:text-slate-900 border border-slate-100 shadow-sm"
                 )}
               >
-                {/* 활성화 시 배경 글로우 효과 */}
-                {selectedCategory === cat.key && (
-                  <motion.div 
-                    layoutId="activeCategoryGlow"
-                    className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10"
+                {selectedCategory === key && (
+                  <motion.div
+                    layoutId="activeCategory"
+                    className="absolute inset-0 bg-slate-900 rounded-2xl z-0"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
+                <span className="relative z-10 text-lg">{data.emoji}</span>
+                <span className="relative z-10 tracking-tight">{data[language]}</span>
                 
-                <span className={cn(
-                  "text-lg transition-transform duration-500 group-hover:scale-125 group-hover:rotate-12",
-                  selectedCategory === cat.key ? "scale-110" : ""
-                )}>
-                  {cat.emoji}
-                </span>
-                
-                <span className="tracking-tight relative z-10">{cat.label}</span>
-
-                {/* 활성화 인디케이터 도트 */}
-                {selectedCategory === cat.key && (
+                {selectedCategory === key && (
                   <motion.div 
-                    layoutId="activeDot"
-                    className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_10px_#34d399]"
                   />
                 )}
               </motion.button>
             ))}
-          </div>
+          </HorizontalScroll>
         </div>
 
-        {/* ---- 인기 영양제 (홈화면 우선 표시) ---- */}
         {searchQuery === "" && selectedCategory === "all" && (
-          <div className="mb-8 animate-fade-in-up">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Sparkles size={18} className="text-amber-500" />
-                <h2 className="text-base font-bold text-gray-700">
-                  많이 찾는 영양제
-                </h2>
+          <div className="mb-16 -mx-4 px-4 py-10 bg-gradient-to-b from-slate-50/50 via-white to-transparent rounded-[3rem] border-b border-slate-100">
+            <div className="flex items-center justify-between mb-8 px-2">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-amber-100 rounded-lg">
+                    <Sparkles size={16} className="text-amber-600 animate-pulse" />
+                  </div>
+                  <h2 className="text-xl font-[1000] text-slate-900 tracking-tighter italic uppercase">{t.common.popular}</h2>
+                </div>
+                <p className="text-[10px] text-emerald-600 font-black uppercase tracking-[0.2em] ml-9 opacity-70">Curated trending picks</p>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="hidden md:block text-[10px] text-gray-400 font-bold uppercase tracking-widest">Selected Popular Picks</span>
-                <span className="md:hidden text-[10px] text-gray-400 font-bold uppercase tracking-widest">Swipe Left</span>
+              
+              <div className="flex items-center gap-4">
+                <div className="hidden md:flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-slate-100 shadow-sm">
+                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
+                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{t.common.popularPicks}</span>
+                </div>
                 {popularIngredients.length > 8 && (
-                  <button
-                    onClick={() => setShowAllPopular(!showAllPopular)}
-                    className="hidden md:block text-xs text-emerald-600 font-bold hover:underline"
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowAllPopular(!showAllPopular)} 
+                    className={cn(
+                      "group flex items-center gap-2.5 px-5 py-2.5 rounded-2xl font-black transition-all duration-300 shadow-lg",
+                      "text-[11px] uppercase tracking-widest italic",
+                      showAllPopular 
+                        ? "bg-emerald-500 text-white shadow-emerald-500/20" 
+                        : "bg-slate-900 text-white shadow-slate-900/40 hover:bg-slate-800"
+                    )}
                   >
-                    {showAllPopular ? "접기" : "전체보기"}
-                  </button>
+                    <span>{showAllPopular ? t.common.hide : t.common.showAll}</span>
+                    <motion.div
+                      animate={{ rotate: showAllPopular ? 180 : 0 }}
+                      className="flex items-center justify-center"
+                    >
+                      <ChevronDown size={14} strokeWidth={3} />
+                    </motion.div>
+                  </motion.button>
                 )}
               </div>
             </div>
 
-            <div className={cn(
-              "flex gap-3 overflow-x-auto md:overflow-visible md:grid md:grid-cols-4 pt-3 pb-4 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide",
-              !showAllPopular && "md:max-h-none"
-            )}>
-              {(showAllPopular ? popularIngredients : popularIngredients.slice(0, 8)).map((ing) => (
-                <div key={ing.id} className="w-[160px] md:w-full flex-shrink-0">
-                  <IngredientCard ingredient={ing} />
-                </div>
-              ))}
-            </div>
+            <AnimatePresence mode="wait">
+              {showAllPopular ? (
+                <motion.div 
+                  key="grid"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-6 px-1"
+                >
+                  {popularIngredients.map((ing) => (
+                    <IngredientCard key={ing.id} ingredient={ing} isFeatured={true} />
+                  ))}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="scroll"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <HorizontalScroll className="gap-4 pt-2 pb-6 px-1">
+                    {popularIngredients.slice(0, 8).map((ing) => (
+                      <div key={ing.id} className="w-[170px] md:w-[220px] flex-shrink-0">
+                        <IngredientCard ingredient={ing} isFeatured={true} />
+                      </div>
+                    ))}
+                  </HorizontalScroll>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-gray-500">
-              {searchQuery
-                ? `"${searchQuery}" 검색 결과 (${filteredIngredients.length}개)`
-                : selectedCategory === "all"
-                  ? `전체 영양제 (${filteredIngredients.length}종)`
-                  : `${CATEGORIES.find((c) => c.key === selectedCategory)?.label} (${filteredIngredients.length}종)`}
-            </h2>
-            <div className="flex items-center gap-1.5 text-xs text-gray-400">
-              <Info size={12} />
-              <span>2개 이상 선택 후 분석</span>
+        <div className="mb-8 relative pt-4">
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-emerald-500/50 to-transparent" />
+          
+          <div className="flex items-center justify-between mb-6 text-xs text-gray-400 px-1">
+            <div className="flex items-center gap-3">
+              <h2 className="font-[1000] text-slate-900 uppercase tracking-widest italic flex items-center gap-2">
+                <Database size={14} className="text-slate-400" />
+                {t.common.all} 
+                <span className="text-emerald-500 ml-1">[{filteredIngredients.length}]</span>
+              </h2>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+              <Info size={12} className="text-emerald-500" />
+              <span className="font-black text-[9px] uppercase tracking-tighter text-slate-500">
+                {language === 'ko' ? '2개 이상 선택 시 분석 시스템 활성화' : 'Select 2+ for Analysis'}
+              </span>
             </div>
           </div>
 
           {isLoadingList ? (
-            <div className="text-center py-16 text-gray-400">
-              <div className="animate-spin w-8 h-8 rounded-full border-4 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
-              <p className="font-medium animate-pulse">영양제 목록을 불러오는 중입니다...</p>
-            </div>
+            <div className="text-center py-16 text-gray-400 animate-pulse">{t.common.loading}</div>
           ) : filteredIngredients.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {filteredIngredients.map((ing) => (
                 <IngredientCard key={ing.id} ingredient={ing} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 text-gray-400">
-              <div className="text-4xl mb-3">🔍</div>
-              <p className="font-medium">검색 결과가 없어요</p>
-              <p className="text-sm mt-1">다른 키워드로 검색해보세요</p>
-            </div>
+            <div className="text-center py-16 text-gray-400">{t.common.noResult}</div>
           )}
         </div>
 
-        {/* ============================================================
-         * 결과 섹션 (분석하기 클릭 후 표시)
-         * ============================================================ */}
         <div ref={resultRef} className="mt-8">
-          {isAnalyzing && <AnalyzingAnimation />}
-
+          {isAnalyzing && <AnalyzingAnimation onComplete={handleAnimationComplete} />}
           {!isAnalyzing && hasResult && analysisResult && (
             <>
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center gap-2 mb-8">
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent" />
-                <h2 className="text-base font-bold text-gray-600 flex items-center gap-2 px-3">
+                <h2 className="text-base font-bold text-gray-600 px-3 flex items-center gap-2 uppercase tracking-widest">
                   <Sparkles size={16} className="text-emerald-500" />
-                  분석 결과
+                  {t.common.resultTitle}
                 </h2>
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent" />
               </div>
@@ -501,17 +474,9 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* ============================================================
-       * 플로팅 바구니 바 (하단 고정)
-       * ============================================================ */}
-      {/* 플로팅 바구니 바 (하단 고정) */}
       <FloatingBasketBar onAnalyze={handleAnalyze} />
-
-      {/* 포리(Pori) 어시스턴트 */}
       <FloatingAssistant />
-
-      {/* 맨 위로 이동 버튼 */}
       <ScrollToTop />
-    </div >
+    </div>
   );
 }

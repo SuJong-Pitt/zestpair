@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useBasketStore } from "@/store/basketStore";
 
 // 포리의 풍부한 메시지 라이브러리 (상황별/성격별)
 const MIXY_MESSAGES_KO = [
@@ -84,109 +85,186 @@ const MIXY_MESSAGES_EN = [
   "I'm your exclusive AI Nutritionist, Pori! 👩‍🔬",
 ];
 
-import { useBasketStore } from "@/store/basketStore";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function FloatingAssistant() {
-  const { selectedIngredients } = useBasketStore();
+  const { selectedIngredients, language } = useBasketStore();
   const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState("");
   const [showBubble, setShowBubble] = useState(false);
-  const [lang, setLang] = useState<"ko" | "en">("ko");
+  const [poriStatus, setPoriStatus] = useState<'idle' | 'thinking' | 'happy'>('idle');
 
   const hasItems = selectedIngredients.length > 0;
+  const messages = language === "ko" ? MIXY_MESSAGES_KO : MIXY_MESSAGES_EN;
 
   useEffect(() => {
-    // 브라우저 언어 설정 확인 (혹은 URL 쿼리 파라미터 등)
-    const browserLang = navigator.language.startsWith("ko") ? "ko" : "en";
-    setLang(browserLang);
-
-    const messages = browserLang === "ko" ? MIXY_MESSAGES_KO : MIXY_MESSAGES_EN;
-
-    // 1.5초 뒤에 포리 등장!
     const timer = setTimeout(() => {
       setIsVisible(true);
       setMessage(messages[0]);
       setTimeout(() => setShowBubble(true), 500);
     }, 1500);
-
     return () => clearTimeout(timer);
   }, []);
 
-  // 주기적으로 포리의 상태 브리핑
   useEffect(() => {
     if (!isVisible) return;
-    
-    const messages = lang === "ko" ? MIXY_MESSAGES_KO : MIXY_MESSAGES_EN;
+    setShowBubble(false);
+    setTimeout(() => {
+      setMessage(messages[0]);
+      setShowBubble(true);
+    }, 500);
+  }, [language, isVisible]);
 
+  useEffect(() => {
+    if (!isVisible) return;
     const interval = setInterval(() => {
       setShowBubble(false);
+      setPoriStatus('thinking');
       setTimeout(() => {
         const nextMsg = messages[Math.floor(Math.random() * messages.length)];
         setMessage(nextMsg);
+        setPoriStatus('idle');
         setShowBubble(true);
-      }, 600);
-    }, 10000); // 10초마다 소통
-
+      }, 1200);
+    }, 15000);
     return () => clearInterval(interval);
-  }, [isVisible, lang]);
+  }, [isVisible, messages]);
 
   if (!isVisible) return null;
-
-  const currentMessages = lang === "ko" ? MIXY_MESSAGES_KO : MIXY_MESSAGES_EN;
 
   return (
     <div 
       className={cn(
-        "fixed right-3 md:right-4 z-50 flex flex-col items-end pointer-events-none transition-all duration-700 ease-in-out",
-        hasItems ? "bottom-32 md:bottom-28" : "bottom-6 md:bottom-8"
+        "fixed right-4 md:right-8 z-[100] flex flex-col items-end pointer-events-none transition-all duration-1000 ease-in-out",
+        hasItems ? "bottom-36 md:bottom-32" : "bottom-10 md:bottom-12"
       )} 
       id="pori-assistant-root"
     >
-      {/* 포리의 말풍선 */}
-      <div
-        className={cn(
-          "mb-3 px-4 py-3 bg-white/95 backdrop-blur-lg rounded-[1.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-emerald-100/60 max-w-[180px] md:max-w-[220px] transition-all duration-700 origin-bottom-right pointer-events-auto",
-          showBubble ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-50 translate-y-6"
-        )}
-      >
-        <p className="text-[11px] md:text-sm font-black text-[#0D4D43] leading-[1.4] tracking-tight">
-          {message}
-        </p>
-        <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white/95 border-r border-b border-emerald-100/60 rotate-45 transform" />
-      </div>
+      <AnimatePresence>
+        {showBubble && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, scale: 0.8, y: 20, filter: 'blur(10px)' }}
+            className="mb-4 relative"
+          >
+            <div className="relative px-5 py-4 bg-white/80 backdrop-blur-2xl rounded-[2rem] shadow-[0_20px_50px_rgba(16,185,129,0.15)] border border-emerald-100/80 max-w-[200px] md:max-w-[260px] pointer-events-auto group">
+              {/* 내부 에너지 펄스 */}
+              <div className="absolute top-2 left-6 w-1 h-1 bg-emerald-400 rounded-full animate-ping" />
+              
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-widest">Pori AI</span>
+                  {poriStatus === 'thinking' && (
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3].map(i => (
+                        <motion.div
+                          key={i}
+                          animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
+                          transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
+                          className="w-1 h-1 bg-emerald-400 rounded-full"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <p className="text-[12px] md:text-[14px] font-bold text-slate-800 leading-relaxed tracking-tight break-keep">
+                  {message}
+                </p>
+              </div>
 
-      {/* 포리 본체 (캡슐 로봇) */}
+              {/* 말풍선 꼬리 - 프리미엄 버전 */}
+              <div className="absolute -bottom-2 right-10 w-4 h-4 bg-white/80 backdrop-blur-2xl border-r border-b border-emerald-100/80 rotate-45" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="relative group pointer-events-auto">
-        {/* 역동적인 오라 효과 */}
-        <div className="absolute -inset-4 md:-inset-8 bg-gradient-to-tr from-emerald-500/20 via-teal-400/20 to-amber-300/10 rounded-full blur-xl group-hover:blur-2xl transition-all duration-1000 animate-pulse-slow" />
-        
-        <div className="relative w-16 h-16 md:w-28 md:h-28 animate-float cursor-pointer active:scale-90 transition-all duration-300 transform group-hover:scale-110"
-             onClick={() => {
-                setShowBubble(false);
-                setTimeout(() => {
-                    const nextMsg = currentMessages[Math.floor(Math.random() * currentMessages.length)];
-                    setMessage(nextMsg);
-                    setShowBubble(true);
-                }, 300);
-             }}>
+        <motion.div
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => {
+            setShowBubble(false);
+            setPoriStatus('happy');
+            setTimeout(() => {
+              const nextMsg = messages[Math.floor(Math.random() * messages.length)];
+              setMessage(nextMsg);
+              setShowBubble(true);
+              setPoriStatus('idle');
+            }, 400);
+          }}
+          className="relative w-20 h-20 md:w-32 md:h-32 cursor-pointer"
+        >
+          {/* 하이퍼 코어 오라 */}
+          <div className="absolute -inset-6 bg-gradient-to-tr from-emerald-500/30 via-teal-400/20 to-amber-300/20 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-1000 animate-pulse-slow" />
+          
+          {/* 회전하는 액션 서클 (Hover 시 노출) */}
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-x-0 inset-y-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          >
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center border border-white/20 shadow-xl">
+              <span className="text-xs">🧬</span>
+            </div>
+            <div className="absolute top-1/2 -right-4 -translate-y-1/2 w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center border border-white/20 shadow-xl">
+              <span className="text-xs">⚡</span>
+            </div>
+            <div className="absolute bottom-1/2 -left-4 translate-y-1/2 w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center border border-white/20 shadow-xl">
+              <span className="text-xs">🔬</span>
+            </div>
+          </motion.div>
+
           <img
             src="/images/mixy.png"
-            alt="Pori - Synergy Analysis Master"
-            className="w-full h-full object-contain filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.15)]"
+            alt="Pori"
+            className={cn(
+              "w-full h-full object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.25)] transition-all duration-500",
+              poriStatus === 'thinking' ? "brightness-110 saturate-150" : ""
+            )}
             style={{ 
               mixBlendMode: 'multiply',
-              maskImage: 'radial-gradient(circle, black 65%, transparent 98%)',
-              WebkitMaskImage: 'radial-gradient(circle, black 65%, transparent 98%)'
+              maskImage: 'radial-gradient(circle, black 65%, transparent 95%)',
+              WebkitMaskImage: 'radial-gradient(circle, black 65%, transparent 95%)'
             }}
           />
           
-          {/* 가동 상태 인디케이터 */}
-          <div className="absolute bottom-3 right-3 md:bottom-5 md:right-5 w-2.5 h-2.5 md:w-4 md:h-4 bg-[#10B981] border-2 md:border-[3px] border-white rounded-full shadow-[0_0_10px_rgba(16,185,129,0.7)] animate-pulse" />
+          {/* 다중 레이어 가동 상태 인디케이터 */}
+          <div className="absolute bottom-4 right-4 md:bottom-7 md:right-7 flex items-center justify-center">
+            <div className="absolute w-6 h-6 md:w-8 md:h-8 bg-emerald-400/30 rounded-full animate-ping" />
+            <div className="relative w-3 h-3 md:w-5 md:h-5 bg-emerald-500 border-[3px] border-white rounded-full shadow-[0_0_15px_rgba(16,185,129,0.8)]" />
+          </div>
           
-          {/* 부유 파티클 (애니메이션 요소) */}
-          <div className="absolute -top-1 -right-1 text-[10px] md:text-xs animate-bounce" style={{ animationDuration: '4s' }}>✨</div>
-          <div className="absolute top-1/2 -left-3 text-xs md:text-sm animate-pulse opacity-60">💊</div>
-        </div>
+          {/* 톡톡 튀는 마법 효과 파티클 */}
+          <motion.div 
+            animate={{ 
+              y: [0, -20, 0],
+              opacity: [1, 0, 1]
+            }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="absolute -top-2 -right-2 text-sm md:text-xl"
+          >
+            ✨
+          </motion.div>
+          <motion.div 
+            animate={{ 
+              x: [0, 15, 0],
+              rotate: [0, 360, 0]
+            }}
+            transition={{ duration: 5, repeat: Infinity }}
+            className="absolute top-1/2 -left-6 text-sm md:text-lg opacity-80"
+          >
+            💊
+          </motion.div>
+          <motion.div 
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute -bottom-2 -left-2 text-sm md:text-lg"
+          >
+            💎
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );
