@@ -188,14 +188,14 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50/50">
-      <section className="relative overflow-hidden pb-16 pt-8 md:pt-14 md:pb-32 bg-[#0F172A]">
+      <section className="relative overflow-hidden pb-24 pt-16 md:pt-14 md:pb-32 bg-[#0F172A]">
         {/* 고도화된 배경 장식 */}
         <VisualDecorations />
 
-        <div className="absolute top-8 right-8 z-50">
+        <div className="absolute top-5 right-5 sm:top-8 sm:right-8 z-50">
           <button
             onClick={() => setLanguage(language === "ko" ? "en" : "ko")}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white font-black text-xs transition-all hover:bg-white/30 active:scale-95 shadow-lg group"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white font-[1000] text-[10px] sm:text-xs transition-all hover:bg-white/30 active:scale-95 shadow-lg group"
           >
             <Languages size={14} className="group-hover:rotate-12 transition-transform" />
             <span className="tracking-widest uppercase">{language === "ko" ? "ENGLISH" : "한국어"}</span>
@@ -203,7 +203,7 @@ export default function HomePage() {
         </div>
 
         <div className="relative mx-auto max-w-2xl px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
+          <div className="flex items-center justify-center gap-2 mb-2 mt-2 sm:mt-0">
             <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
               <Pill size={22} className="text-white" />
             </div>
@@ -292,7 +292,7 @@ export default function HomePage() {
             콘텐츠를 가리지 않도록 높이를 조절하고 부드러운 전이 유지
         */}
         <div 
-          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-20" 
+          className="absolute bottom-0 left-0 right-0 h-44 pointer-events-none z-20" 
           style={{
             background: 'linear-gradient(to top, ' +
               'rgba(255,255,255,1) 0%, ' +
