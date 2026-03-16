@@ -107,14 +107,14 @@ export default function VisualDecorations() {
           animate={{ scale: [1, 1.35, 1], x: ["-5%", "8%", "-5%"], y: ["-5%", "5%", "-5%"] }}
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -top-[15%] -left-[10%] w-[65%] h-[70%]"
-          style={{ background: "radial-gradient(circle at 40% 40%, rgba(16,185,129,0.28) 0%, transparent 65%)", filter: "blur(80px)" }}
+          style={{ background: "radial-gradient(circle at 40% 40%, rgba(16,185,129,0.28) 0%, transparent 65%)", filter: isMobile ? "blur(40px)" : "blur(80px)" }}
         />
         {/* 시안/퍼플 오브 – 우상단 */}
         <motion.div
           animate={{ scale: [1.2, 0.9, 1.2], x: ["5%", "-8%", "5%"], y: ["5%", "-5%", "5%"] }}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -top-[10%] -right-[15%] w-[70%] h-[75%]"
-          style={{ background: "radial-gradient(circle at 60% 35%, rgba(139,92,246,0.25) 0%, rgba(6,182,212,0.15) 40%, transparent 65%)", filter: "blur(90px)" }}
+          style={{ background: "radial-gradient(circle at 60% 35%, rgba(139,92,246,0.25) 0%, rgba(6,182,212,0.15) 40%, transparent 65%)", filter: isMobile ? "blur(50px)" : "blur(90px)" }}
         />
         {/* 골든 오브 – 가운데 하단 */}
         <motion.div
@@ -127,7 +127,7 @@ export default function VisualDecorations() {
 
       {/* === 우아한 부유 보케 효과 === */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(8)].map((_, i) => (
+        {[...Array(isMobile ? 3 : 8)].map((_, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, scale: 0.5 }}
@@ -243,7 +243,7 @@ export default function VisualDecorations() {
       ))}
 
       {/* === 리치 파티클 시스템 (다양한 색상) === */}
-      {[...Array(isMobile ? 12 : 25)].map((_, i) => {
+      {[...Array(isMobile ? 8 : 25)].map((_, i) => {
         const colors = ["#10b981", "#06b6d4", "#a78bfa", "#f59e0b", "#f97316", "#ec4899"];
         const color = colors[i % colors.length];
         const size = 2 + seededRand(i * 3) * 2;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
@@ -50,7 +50,7 @@ const cardTypeConfig = {
     }
 } as const;
 
-export default function SynergyCard({ 
+const SynergyCard = memo(function SynergyCard({ 
     result, 
     index 
 }: { 
@@ -204,7 +204,7 @@ export default function SynergyCard({
                                         "px-4 py-1.5 rounded-full font-black text-[10px] tracking-[0.2em] text-white border border-white/20 uppercase backdrop-blur-xl shadow-lg",
                                         config.theme.split(' ')[0].replace('from-', 'bg-')
                                     )}>
-                                        {language === "ko" ? config.label : result.interaction.type}
+                                        {result.interaction.type === 'SYNERGY' ? t.results.typeSynergy : result.interaction.type === 'CAUTION' ? t.results.typeCaution : t.results.typeConflict}
                                     </div>
                                 </div>
                             </div>
@@ -365,7 +365,7 @@ export default function SynergyCard({
                                             {displayTitle}
                                         </h4>
                                         <div className={cn("px-4 py-1.5 rounded-full font-black text-[10px] tracking-[0.2em] text-white border border-white/20", config.theme.split(' ')[0].replace('from-', 'bg-'))}>
-                                            {language === "ko" ? config.label : result.interaction.type}
+                                            {result.interaction.type === 'SYNERGY' ? t.results.typeSynergy : result.interaction.type === 'CAUTION' ? t.results.typeCaution : t.results.typeConflict}
                                         </div>
                                     </div>
                                     <div className="mt-auto pt-4 border-t border-white/10 flex justify-between text-[8px] font-black text-white/30 tracking-widest">
@@ -417,4 +417,6 @@ export default function SynergyCard({
             </div>
         </motion.div>
     );
-}
+});
+
+export default SynergyCard;

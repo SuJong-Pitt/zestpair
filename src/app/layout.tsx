@@ -65,7 +65,6 @@ export default function RootLayout({
             {children}
           </main>
 
-          <ScrollToTop />
         </TooltipProvider>
       </body>
     </html>

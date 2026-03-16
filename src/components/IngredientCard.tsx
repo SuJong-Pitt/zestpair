@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Ingredient } from "@/types/database";
 import { useBasketStore } from "@/store/basketStore";
@@ -22,7 +23,7 @@ function getCategoryTheme(name: string) {
   return { color: "#10b981", glow: "rgba(16,185,129,0.35)", icon: <ShieldCheck size={11} /> };
 }
 
-export default function IngredientCard({ ingredient, isFeatured = false }: IngredientCardProps) {
+const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = false }: IngredientCardProps) {
   const hasMounted = useHasMounted();
   const { isSelected, toggleIngredient, language } = useBasketStore();
   const selected = hasMounted ? isSelected(ingredient.id) : false;
@@ -291,7 +292,7 @@ export default function IngredientCard({ ingredient, isFeatured = false }: Ingre
           style={{
             background: "linear-gradient(145deg, rgba(8,12,24,0.97) 0%, rgba(10,20,18,0.97) 100%)",
             border: `1px solid ${theme.color}35`,
-            backdropFilter: "blur(30px)",
+            backdropFilter: "blur(20px)",
             boxShadow: `0 0 30px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)`
           }}
         >
@@ -318,4 +319,6 @@ export default function IngredientCard({ ingredient, isFeatured = false }: Ingre
       </div>
     </motion.button>
   );
-}
+});
+
+export default IngredientCard;

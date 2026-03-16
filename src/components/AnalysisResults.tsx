@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, memo } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,6 @@ interface AnalysisResultsProps {
 
 const interactionTypeConfig = {
     SYNERGY: {
-        label: "시너지",
         color: "bg-emerald-500 text-white",
         headerColor: "from-white to-slate-50",
         shadowColor: "shadow-emerald-500/10",
@@ -44,7 +43,6 @@ const interactionTypeConfig = {
         borderColor: "border-emerald-100/50",
     },
     CAUTION: {
-        label: "주의",
         color: "bg-amber-500 text-white",
         headerColor: "from-white to-slate-50",
         shadowColor: "shadow-amber-500/10",
@@ -54,7 +52,6 @@ const interactionTypeConfig = {
         borderColor: "border-amber-100/50",
     },
     CONFLICT: {
-        label: "충돌",
         color: "bg-red-500 text-white",
         headerColor: "from-white to-slate-50",
         shadowColor: "shadow-red-500/10",
@@ -109,8 +106,8 @@ function ScoreRing({ score }: { score: number }) {
         <div className="relative flex items-center justify-center w-72 h-72 md:w-80 md:h-80 select-none">
             {/* 주변 네온 오라 (Super Deep Glow) */}
             <div
-                className="absolute inset-0 rounded-full opacity-30 blur-[100px] transition-all duration-1000 scale-125"
-                style={{ background: `radial-gradient(circle, ${colors.main} 0%, transparent 70%)` }}
+                className="absolute inset-0 rounded-full opacity-30 transition-all duration-1000 scale-125"
+                style={{ background: `radial-gradient(circle, ${colors.main} 0%, transparent 70%)`, filter: "blur(60px)" }}
             />
 
             <svg viewBox="0 0 180 180" className="w-full h-full transform transition-all duration-1000">
@@ -246,7 +243,7 @@ function InteractionCard({ result }: { result: InteractionResult }) {
                             <div className="flex items-center gap-2 mb-2 flex-wrap">
                                 <h4 className="font-bold text-lg text-slate-900 leading-tight tracking-tight">{displayTitle}</h4>
                                 <Badge className={cn("text-[10px] px-2 py-0 h-5 border-none font-black uppercase tracking-wider", config.color)}>
-                                    {language === "ko" ? config.label : type}
+                                    {type === 'SYNERGY' ? t.results.typeSynergy : type === 'CAUTION' ? t.results.typeCaution : t.results.typeConflict}
                                 </Badge>
                             </div>
                             <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 mb-4 uppercase tracking-widest">
@@ -276,7 +273,7 @@ function InteractionCard({ result }: { result: InteractionResult }) {
 }
 
 /** 프리미엄 상품 카드 - 퍼스널 큐레이션 버전 */
-function ProductCard({ product, index, sourceIngredient }: { product: CoupangProduct; index: number; sourceIngredient?: string }) {
+const ProductCard = memo(function ProductCard({ product, index, sourceIngredient }: { product: CoupangProduct; index: number; sourceIngredient?: string }) {
     const { language } = useBasketStore();
     const t = UI_TRANSLATIONS[language];
 
@@ -415,7 +412,7 @@ function ProductCard({ product, index, sourceIngredient }: { product: CoupangPro
             </div>
         </Card>
     );
-}
+});
 
 export default function AnalysisResults({ result, coupangProducts = [] }: AnalysisResultsProps) {
     const { clearBasket, language } = useBasketStore();
@@ -477,7 +474,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             animate={{ scale: 1, opacity: 1 }}
                             className="relative mb-12"
                         >
-                            <div className="absolute inset-0 bg-emerald-500/20 blur-[60px] rounded-full scale-150 pointer-events-none" />
+                            <div className="absolute inset-0 bg-emerald-500/20 blur-[40px] rounded-full scale-150 pointer-events-none" />
                             <ScoreRing score={result.score} />
                         </motion.div>
 
@@ -535,8 +532,13 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                     <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
                                         <ShieldCheck size={18} className="text-emerald-400" />
                                     </div>
-                                    <p className="text-lg md:text-2xl font-bold text-white/90 tracking-tight">
-                                        {result.summary}
+                                    <p className="text-lg md:text-2xl font-bold text-white/90 tracking-tight text-center">
+                                        {(() => {
+                                            if (result.conflicts.length > 0) return t.results.summaryConflict.replace("{count}", result.conflicts.length.toString());
+                                            if (result.synergies.length > 0) return t.results.summarySynergy.replace("{count}", result.synergies.length.toString());
+                                            if (result.cautions.length > 0) return t.results.summaryCaution.replace("{count}", result.cautions.length.toString());
+                                            return t.results.summaryNeutral;
+                                        })()}
                                     </p>
                                 </div>
                             </div>

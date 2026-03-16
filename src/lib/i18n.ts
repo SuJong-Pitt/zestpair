@@ -57,7 +57,14 @@ export const UI_TRANSLATIONS = {
             prescriptionTitle: "포리가 제안하는",
             premiumPrescription: "프리미엄 처방전",
             prescriptionSubtitle: "성분 분석 결과를 완벽하게 보완하고 시너지를 낼 수 있는 TOP 큐레이션만을 엄선했습니다.",
-            lowestPriceFound: "실시간 최저가 탐색 완료"
+            lowestPriceFound: "실시간 최저가 탐색 완료",
+            summaryConflict: "⚠️ {count}가지 충돌 조합이 발견되었습니다...",
+            summarySynergy: "✅ {count}가지 시너지 조합이 발견되었습니다!",
+            summaryCaution: "🔶 {count}가지 주의 조합이 발견되었습니다...",
+            summaryNeutral: "중립적인 조합입니다.",
+            typeSynergy: "시너지",
+            typeCaution: "주의",
+            typeConflict: "충돌"
         },
         dosage: {
             before_meal: "식전",
@@ -141,7 +148,14 @@ export const UI_TRANSLATIONS = {
             prescriptionTitle: "Pori's Suggested",
             premiumPrescription: "Premium Prescription",
             prescriptionSubtitle: "Carefully selected TOP curation to complement and synergize with your results.",
-            lowestPriceFound: "Real-time lookup complete"
+            lowestPriceFound: "Real-time lookup complete",
+            summaryConflict: "⚠️ {count} conflict(s) detected...",
+            summarySynergy: "✅ {count} synergy(ies) detected!",
+            summaryCaution: "🔶 {count} caution(s) detected...",
+            summaryNeutral: "Neutral combination.",
+            typeSynergy: "SYNERGY",
+            typeCaution: "CAUTION",
+            typeConflict: "CONFLICT"
         },
         dosage: {
             before_meal: "Pre-meal",

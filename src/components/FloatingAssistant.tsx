@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useBasketStore } from "@/store/basketStore";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 // 포리의 풍부한 메시지 라이브러리 (상황별/성격별)
 const MIXY_MESSAGES_KO = [
@@ -99,8 +100,10 @@ export default function FloatingAssistant() {
   const hasItems = selectedIngredients.length > 0;
   const messages = language === "ko" ? MIXY_MESSAGES_KO : MIXY_MESSAGES_EN;
 
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   useEffect(() => {
-    const isMobile = window.innerWidth <= 768;
+    // 모바일에서는 말풍선을 기본으로 닫아둠
     if (isMobile) {
       setIsBubbleDismissed(true);
     }
@@ -108,22 +111,30 @@ export default function FloatingAssistant() {
     const timer = setTimeout(() => {
       setIsVisible(true);
       setMessage(messages[0]);
+      // PC에서만 처음에 말풍선을 자동으로 띄움
       if (!isMobile) {
         setTimeout(() => setShowBubble(true), 500);
       }
     }, 1500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isMobile, messages]);
 
   useEffect(() => {
     if (!isVisible) return;
     setShowBubble(false);
-    setIsBubbleDismissed(false);
-    setTimeout(() => {
-      setMessage(messages[0]);
-      setShowBubble(true);
-    }, 500);
-  }, [language, isVisible]);
+    
+    // 언어 변경 시, 모바일이 아닐 때만 말풍선을 다시 띄움
+    if (!isMobile) {
+      setIsBubbleDismissed(false);
+      setTimeout(() => {
+        setMessage(messages[0]);
+        setShowBubble(true);
+      }, 500);
+    } else {
+      // 모바일인 경우엔 말풍선을 계속 닫힌 상태로 유지 (강제 업데이트 방지)
+      setIsBubbleDismissed(true);
+    }
+  }, [language, isVisible, isMobile, messages]);
 
   useEffect(() => {
     if (!isVisible || isBubbleDismissed) return;

@@ -5,9 +5,11 @@ import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, La
 import { Input } from "@/components/ui/input";
 import IngredientCard from "@/components/IngredientCard";
 import FloatingBasketBar from "@/components/FloatingBasketBar";
-import AnalyzingAnimation from "@/components/AnalyzingAnimation";
-import AnalysisResults from "@/components/AnalysisResults";
+import dynamic from "next/dynamic";
 import { useBasketStore } from "@/store/basketStore";
+
+const AnalyzingAnimation = dynamic(() => import("@/components/AnalyzingAnimation"), { ssr: false });
+const AnalysisResults = dynamic(() => import("@/components/AnalysisResults"), { ssr: false });
 import { supabase } from "@/lib/supabase";
 import type { AnalysisResult, Ingredient, InteractionResult } from "@/types/database";
 import { cn } from "@/lib/utils";
