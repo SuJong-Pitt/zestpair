@@ -261,14 +261,6 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
                               style={{ color: "rgba(255,255,255,0.95)" }}
                             >
                               {t.basket.itemsSelected.replace('{count}', count.toString())}
-                              <ChevronUp
-                                size={13}
-                                className="transition-transform duration-400 shrink-0"
-                                style={{
-                                  transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
-                                  color: "rgba(52,211,153,0.7)"
-                                }}
-                              />
                             </span>
                             <span
                               className="text-[10px] md:text-xs font-semibold truncate"

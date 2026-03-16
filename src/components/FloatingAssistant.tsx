@@ -86,12 +86,14 @@ const MIXY_MESSAGES_EN = [
 ];
 
 import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
 
 export default function FloatingAssistant() {
   const { selectedIngredients, language } = useBasketStore();
   const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState("");
   const [showBubble, setShowBubble] = useState(false);
+  const [isBubbleDismissed, setIsBubbleDismissed] = useState(false);
   const [poriStatus, setPoriStatus] = useState<'idle' | 'thinking' | 'happy'>('idle');
 
   const hasItems = selectedIngredients.length > 0;
@@ -109,6 +111,7 @@ export default function FloatingAssistant() {
   useEffect(() => {
     if (!isVisible) return;
     setShowBubble(false);
+    setIsBubbleDismissed(false);
     setTimeout(() => {
       setMessage(messages[0]);
       setShowBubble(true);
@@ -116,7 +119,7 @@ export default function FloatingAssistant() {
   }, [language, isVisible]);
 
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isVisible || isBubbleDismissed) return;
     const interval = setInterval(() => {
       setShowBubble(false);
       setPoriStatus('thinking');
@@ -128,28 +131,28 @@ export default function FloatingAssistant() {
       }, 1200);
     }, 15000);
     return () => clearInterval(interval);
-  }, [isVisible, messages]);
+  }, [isVisible, messages, isBubbleDismissed]);
 
   if (!isVisible) return null;
 
   return (
     <div 
       className={cn(
-        "fixed right-4 md:right-8 z-[100] flex flex-col items-end pointer-events-none transition-all duration-1000 ease-in-out",
-        hasItems ? "bottom-36 md:bottom-32" : "bottom-10 md:bottom-12"
+        "fixed right-3 md:right-8 z-[100] flex flex-col items-end pointer-events-none transition-all duration-1000 ease-in-out",
+        hasItems ? "bottom-32 md:bottom-32" : "bottom-10 md:bottom-12"
       )} 
       id="pori-assistant-root"
     >
       <AnimatePresence>
-        {showBubble && (
+        {showBubble && !isBubbleDismissed && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20, filter: 'blur(10px)' }}
             animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, scale: 0.8, y: 20, filter: 'blur(10px)' }}
-            className="mb-3 relative"
+            className="mb-2 md:mb-3 relative"
           >
             <div
-              className="relative px-5 py-4 rounded-[2rem] max-w-[200px] md:max-w-[260px] pointer-events-auto"
+              className="relative px-4 py-3 md:px-5 md:py-4 rounded-[1.5rem] md:rounded-[2rem] max-w-[160px] md:max-w-[260px] pointer-events-auto group/bubble"
               style={{
                 background: "linear-gradient(145deg, rgba(8,12,24,0.92) 0%, rgba(10,22,20,0.92) 100%)",
                 border: "1px solid rgba(16,185,129,0.25)",
@@ -172,10 +175,22 @@ export default function FloatingAssistant() {
                 />
               </div>
 
+              {/* 닫기 버튼 */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowBubble(false);
+                  setIsBubbleDismissed(true);
+                }}
+                className="absolute top-2 right-2 p-1 rounded-full opacity-100 md:opacity-0 md:group-hover/bubble:opacity-100 transition-opacity hover:bg-white/10 text-white/40 hover:text-white"
+              >
+                <X size={12} />
+              </button>
+
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-2 mt-0.5">
                   <span
-                    className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full"
+                    className="text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2 md:px-2.5 py-0.5 rounded-full"
                     style={{
                       background: "linear-gradient(90deg, rgba(16,185,129,0.2), rgba(6,182,212,0.1))",
                       border: "1px solid rgba(16,185,129,0.3)",
@@ -199,7 +214,7 @@ export default function FloatingAssistant() {
                   )}
                 </div>
                 <p
-                  className="text-[12px] md:text-[13px] font-semibold leading-relaxed tracking-tight break-keep"
+                  className="text-[11px] md:text-[13px] font-semibold leading-relaxed tracking-tight break-keep"
                   style={{ color: "rgba(255,255,255,0.82)" }}
                 >
                   {message}
@@ -208,7 +223,7 @@ export default function FloatingAssistant() {
 
               {/* 말풍선 꼬리 */}
               <div
-                className="absolute -bottom-2 right-9 w-4 h-4 rotate-45"
+                className="absolute -bottom-1.5 md:-bottom-2 right-7 md:right-9 w-3 h-3 md:w-4 md:h-4 rotate-45"
                 style={{
                   background: "linear-gradient(145deg, rgba(10,22,20,0.92), rgba(8,12,24,0.92))",
                   borderRight: "1px solid rgba(16,185,129,0.2)",
@@ -226,6 +241,7 @@ export default function FloatingAssistant() {
           whileTap={{ scale: 0.9 }}
           onClick={() => {
             setShowBubble(false);
+            setIsBubbleDismissed(false);
             setPoriStatus('happy');
             setTimeout(() => {
               const nextMsg = messages[Math.floor(Math.random() * messages.length)];
@@ -234,7 +250,7 @@ export default function FloatingAssistant() {
               setPoriStatus('idle');
             }, 400);
           }}
-          className="relative w-20 h-20 md:w-32 md:h-32 cursor-pointer"
+          className="relative w-16 h-16 md:w-32 md:h-32 cursor-pointer"
         >
           {/* 하이퍼 코어 오라 */}
           <div className="absolute -inset-6 bg-gradient-to-tr from-emerald-500/30 via-teal-400/20 to-amber-300/20 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-1000 animate-pulse-slow" />

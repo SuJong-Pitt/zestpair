@@ -281,122 +281,138 @@ function ProductCard({ product, index, sourceIngredient }: { product: CoupangPro
     const t = UI_TRANSLATIONS[language];
 
     const configs = [
-        { label: t.products.bestAi, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100", gradient: "from-blue-600 to-indigo-600", glow: "shadow-blue-500/20" },
-        { label: t.products.maxSynergy, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", gradient: "from-emerald-600 to-teal-600", glow: "shadow-emerald-500/20" },
-        { label: t.products.bestValue, color: "text-amber-600", bg: "bg-amber-50", border: "border-orange-100", gradient: "from-orange-500 to-amber-600", glow: "shadow-orange-500/20" },
+        { label: t.products.bestAi, color: "text-blue-600", bg: "bg-blue-500/5", border: "border-blue-100/50", gradient: "from-blue-600 to-indigo-600", glow: "shadow-blue-500/20", icon: <Sparkles size={10} className="text-blue-400" /> },
+        { label: t.products.maxSynergy, color: "text-emerald-600", bg: "bg-emerald-500/5", border: "border-emerald-100/50", gradient: "from-emerald-600 to-teal-600", glow: "shadow-emerald-500/20", icon: <Zap size={10} className="text-emerald-400" /> },
+        { label: t.products.bestValue, color: "text-amber-600", bg: "bg-amber-500/5", border: "border-orange-100/50", gradient: "from-orange-500 to-amber-600", glow: "shadow-orange-500/20", icon: <TrendingUp size={10} className="text-orange-400" /> },
     ];
     const config = configs[index % configs.length];
 
     return (
-        <Card className="group h-full flex flex-col overflow-hidden border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-700 rounded-[2.5rem] bg-white relative">
-            {/* 배경 글로우 장식 */}
-            <div className={cn("absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[80px] opacity-0 group-hover:opacity-20 transition-opacity duration-1000", config.bg)} />
-
-            {/* 상단 비주얼 영역 */}
-            <div className="relative aspect-[4/3] bg-gradient-to-b from-slate-50/50 to-white flex items-center justify-center p-8 overflow-hidden">
-                {/* 랭킹 넘버링 */}
-                <div className="absolute top-5 left-6 z-10">
-                    <span className="text-4xl font-[1000] italic text-slate-100 group-hover:text-emerald-50 transition-colors select-none">
-                        0{index + 1}
-                    </span>
-                </div>
-
-                {/* 매칭 뱃지 */}
-                <div className="absolute top-5 right-5 z-10 flex flex-col items-end gap-2">
-                    <Badge className={cn("px-2.5 py-1 border-none shadow-sm text-[10px] font-black uppercase tracking-tight text-white bg-gradient-to-r", config.gradient)}>
-                        {config.label}
-                    </Badge>
-                </div>
-
-                {product.image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        src={product.image_url}
-                        alt={product.name}
-                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000 drop-shadow-xl"
-                    />
-                ) : (
-                    <div className="relative">
-                        <div className="text-7xl group-hover:scale-110 transition-transform duration-700 select-none drop-shadow-2xl">
-                            {index % 4 === 0 ? "💊" : index % 4 === 1 ? "🧬" : index % 4 === 2 ? "🧪" : "🧴"}
-                        </div>
-                        <div className="absolute inset-0 bg-white/40 blur-3xl rounded-full -z-10 animate-pulse" />
+        <Card className="group relative h-full flex flex-col overflow-hidden border-none shadow-[0_8px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.12)] transition-all duration-700 rounded-[2.2rem] bg-white group/card">
+            {/* 상단 비주얼 영역 - 콤팩트화 */}
+            <div className="relative h-[160px] md:h-[180px] bg-gradient-to-b from-slate-50/80 to-white flex items-center justify-center p-6 overflow-hidden">
+                {/* 랭킹 넘버링 - 모던한 스타일 */}
+                <div className="absolute top-4 left-5 z-20">
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/40 backdrop-blur-md border border-white/40 shadow-sm">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Rank</span>
+                        <span className="text-[14px] font-[1000] italic text-slate-800">0{index + 1}</span>
                     </div>
-                )}
+                </div>
 
-                {/* 하단 샴페인 데코레이션 */}
-                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent" />
+                {/* 매칭 뱃지 - 플로팅 스타일 */}
+                <div className="absolute top-4 right-5 z-20">
+                    <div className={cn("px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-lg shadow-black/5 bg-white border border-slate-100 transition-all duration-500 group-hover/card:-translate-y-1")}>
+                        {config.icon}
+                        <span className={cn("text-[9px] font-black uppercase tracking-tight", config.color)}>{config.label}</span>
+                    </div>
+                </div>
+
+                {/* 상품 이미지 */}
+                <div className="relative z-10 w-full h-full flex items-center justify-center transition-transform duration-700 group-hover/card:scale-110">
+                    {product.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img 
+                            src={product.image_url} 
+                            alt={product.name} 
+                            className="h-full w-full object-contain drop-shadow-2xl" 
+                        />
+                    ) : (
+                        <div className="relative">
+                            <div className="text-6xl drop-shadow-2xl group-hover/card:scale-110 transition-all duration-500">
+                                {index % 4 === 0 ? "💊" : index % 4 === 1 ? "🧬" : index % 4 === 2 ? "🧪" : "🧴"}
+                            </div>
+                            <div className={cn("absolute inset-0 blur-2xl opacity-20 rounded-full animate-pulse", config.bg)} />
+                        </div>
+                    )}
+                </div>
+
+                {/* 하단 페이드 */}
+                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent" />
             </div>
 
-            <CardContent className="px-6 pb-8 pt-2 flex flex-col flex-1">
-                {/* 매칭 정보 태그 */}
-                <div className="flex items-center gap-2 mb-3">
-                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <p className="text-[10px] font-black text-emerald-600/70 uppercase tracking-widest">
-                        {sourceIngredient
-                            ? t.products.relatedTo.replace("{ingredient}", sourceIngredient)
-                            : t.products.curationTitle}
+            <CardContent className="px-5 pb-6 pt-2 flex flex-col flex-1 bg-white">
+                {/* 메타 정보 */}
+                <div className="flex items-center gap-1.5 mb-2.5">
+                    <div className="flex h-1 w-1 rounded-full bg-emerald-500 animate-pulse" />
+                    <p className="text-[9px] font-black text-emerald-600/60 uppercase tracking-[0.15em] truncate">
+                        {sourceIngredient ? t.products.relatedTo.replace("{ingredient}", sourceIngredient) : t.products.curationTitle}
                     </p>
                 </div>
 
-                {/* 상품명 - 가독성 중심 */}
-                <h4 className="font-ex-bold text-lg text-slate-900 leading-[1.4] mb-6 line-clamp-2 min-h-[2.8em] tracking-tight group-hover:text-emerald-700 transition-colors">
+                {/* 상품명 */}
+                <h4 className="font-extrabold text-[15px] sm:text-base text-slate-900 leading-[1.3] mb-4 line-clamp-2 min-h-[40px] tracking-tight group-hover/card:text-blue-600 transition-colors">
                     {product.name}
                 </h4>
 
-                {/* 별점 & 배송 - 깔끔한 인디케이터 */}
-                <div className="flex items-center gap-4 mb-8">
-                    <div className="flex items-center gap-1.5 text-slate-500">
-                        <Star size={14} fill="#F59E0B" className="text-amber-500" />
-                        <span className="text-sm font-black text-slate-700">{typeof product.rating === 'number' ? product.rating.toFixed(1) : "4.8"}</span>
+                {/* 별점 & 배송 */}
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-50 border border-slate-100">
+                        <Star size={10} fill="#F59E0B" className="text-amber-500" />
+                        <span className="text-[11px] font-black text-slate-700 pt-0.5">{typeof product.rating === 'number' ? product.rating.toFixed(1) : "4.8"}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-sky-500 bg-sky-50 px-2 py-0.5 rounded-lg border border-sky-100">
-                        <Truck size={14} strokeWidth={2.5} />
-                        <span className="text-[10px] font-black uppercase italic">Rocket</span>
-                    </div>
+                    {product.is_rocket ? (
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 border border-sky-100 text-sky-500">
+                            <Truck size={10} strokeWidth={2.5} />
+                            <span className="text-[9px] font-black uppercase italic">Rocket</span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-50 border border-orange-100 text-orange-600">
+                            <ShoppingCart size={10} />
+                            <span className="text-[9px] font-black uppercase tracking-tighter">Prime</span>
+                        </div>
+                    )}
                 </div>
 
-                {/* 가격 및 구매 인터페이스 */}
-                <div className="mt-auto flex flex-col gap-5">
-                    <div className="flex items-end justify-between border-t border-slate-50 pt-5 pr-2">
-                        <div className="flex flex-col">
-                            {product.discount_rate && (
-                                <span className="text-rose-500 text-[11px] font-black italic mb-0.5 animate-bounce-subtle">{product.discount_rate}% Limited Sale</span>
-                            )}
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-sm font-black text-slate-400">₩</span>
-                                <span className="text-3xl font-[1000] text-slate-900 tracking-tighter">
-                                    {product.price > 0 ? Math.floor(product.price).toLocaleString() : t.products.outOfStock}
-                                </span>
-                            </div>
-                        </div>
-                        {product.original_price && (
-                            <span className="text-xs text-slate-300 line-through font-bold pb-1">
-                                ₩{Math.floor(product.original_price).toLocaleString()}
-                            </span>
+                {/* 가격 및 구매 인터페이스 - 콤팩트 레이아웃 */}
+                <div className="mt-auto border-t border-slate-50 pt-5 flex items-end justify-between">
+                    <div className="flex flex-col">
+                        {product.discount_rate && (
+                           <div className="flex items-center gap-1 mb-0.5">
+                                <span className="text-rose-500 text-[10px] font-black italic">{product.discount_rate}% OFF</span>
+                                {product.original_price && (
+                                    <span className="text-[9px] text-slate-300 line-through font-bold">
+                                        ₩{Math.floor(product.original_price).toLocaleString()}
+                                    </span>
+                                )}
+                           </div>
                         )}
+                        <div className="flex items-baseline gap-0.5">
+                            <span className="text-[12px] font-black text-slate-400">₩</span>
+                            <span className="text-2xl md:text-3xl font-[1000] text-slate-900 tracking-tighter">
+                                {product.price > 0 ? Math.floor(product.price).toLocaleString() : t.products.outOfStock}
+                            </span>
+                        </div>
                     </div>
 
                     <Button
                         className={cn(
-                            "w-full h-15 rounded-2xl text-white font-[900] text-[15px] transition-all duration-500 shadow-lg hover:shadow-2xl group-hover:scale-[1.02] active:scale-[0.98] hover:-translate-y-1 relative overflow-hidden bg-gradient-to-r border border-white/20",
+                            "group/btn relative overflow-hidden rounded-[1.2rem] px-5 h-11 transition-all duration-500 shadow-lg hover:shadow-xl active:scale-95 border border-white/10",
                             config.gradient,
                             config.glow
                         )}
                         asChild
                     >
-                        <a href={product.product_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2.5 w-full h-full py-4">
-                            {/* 고급스러운 빛 반사 쉬머 효과 */}
-                            <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
-
-                            <ShoppingCart size={18} className="text-white/90 drop-shadow-sm" />
-                            <span className="tracking-wide drop-shadow-md">
-                                {UI_TRANSLATIONS[useBasketStore.getState().language].common[useBasketStore.getState().language === "ko" ? 'shoppingCoupang' : 'shoppingAmazon']}
+                        <a href={product.product_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                            {/* 쉬머 효과 */}
+                            <div className="absolute inset-0 -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
+                            <ShoppingCart size={14} className="text-white/90" />
+                            <span className="text-[13px] font-black tracking-tight text-white whitespace-nowrap">
+                                 {language === 'ko' ? t.common.shoppingCoupang : t.common.shoppingAmazon}
                             </span>
                         </a>
                     </Button>
                 </div>
             </CardContent>
+
+            {/* AI 신뢰성 점수 바 (장식용) */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-50 overflow-hidden">
+                <motion.div 
+                    initial={{ width: 0 }}
+                    whileInView={{ width: '99%' }}
+                    transition={{ duration: 1, delay: 0.5 }}
+                    className={cn("h-full bg-gradient-to-r opacity-40", config.gradient)} 
+                />
+            </div>
         </Card>
     );
 }
@@ -431,7 +447,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
 
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] pointer-events-none opacity-50 md:opacity-100" />
 
-                    <CardContent className="p-10 md:p-24 relative z-10 flex flex-col items-center text-center">
+                    <CardContent className="p-8 md:p-16 relative z-10 flex flex-col items-center text-center">
                         {/* 0. 점수 링 섹션 (최상단) */}
                         <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
@@ -683,7 +699,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         dragConstraints={{ left: -1000, right: 0 }} // 임시, 실제 너비에 맞춰 자동 계산 로직 필요 시 추가
                         dragElastic={0.05}
                         dragTransition={{ power: 0.1, timeConstant: 200 }}
-                        className="flex flex-nowrap lg:grid lg:grid-cols-2 pt-4 pb-16 gap-4 sm:gap-6 lg:gap-8 cursor-grab active:cursor-grabbing lg:cursor-default lg:overflow-visible"
+                        className="flex flex-nowrap lg:grid lg:grid-cols-2 pt-4 pb-10 gap-4 sm:gap-6 lg:gap-8 cursor-grab active:cursor-grabbing lg:cursor-default lg:overflow-visible"
                     >
                         {result.ingredients.map((ing, idx) => {
                             const searchKeyword = language === "ko"
@@ -695,7 +711,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                 : `https://www.amazon.com/s?k=${encodeURIComponent(searchKeyword)}`;
 
                             return (
-                                <div key={`${ing.id}-${idx}`} className="w-[280px] sm:w-[320px] lg:w-auto flex-shrink-0 lg:flex-shrink snap-center lg:snap-align-none">
+                                <div key={`${ing.id}-${idx}`} className="w-[240px] sm:w-[300px] lg:w-auto flex-shrink-0 lg:flex-shrink snap-center lg:snap-align-none">
                                     <ProductCard
                                         index={idx}
                                         sourceIngredient={language === "ko" ? ing.name : ing.name_en}

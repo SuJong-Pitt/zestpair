@@ -297,10 +297,9 @@ export default function HomePage() {
                 transition={{ duration: 0.5, delay: 0.7 }}
                 className="relative z-10 block text-[2.2rem] md:text-6xl lg:text-7xl font-[1000] px-6 md:px-12 py-3 md:py-5 leading-none"
                 style={{
-                  background: "linear-gradient(135deg, #b2f5ea 0%, #ffffff 35%, #e0fdf4 55%, #7dd3fc 80%, #c4b5fd 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  filter: "drop-shadow(0 2px 40px rgba(52,211,153,0.5))",
+                  color: "#ffffff",
+                  textShadow: "0 0 30px rgba(52,211,153,0.3)",
+                  letterSpacing: "-0.04em",
                 }}
               >
                 {t.hero.title2}
@@ -723,7 +722,6 @@ export default function HomePage() {
 
       <FloatingBasketBar onAnalyze={handleAnalyze} allIngredients={dbIngredients} />
       <FloatingAssistant />
-      <ScrollToTop />
     </div>
   );
 }
