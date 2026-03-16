@@ -386,7 +386,7 @@ function ProductCard({ product, index, sourceIngredient }: { product: CoupangPro
 
                     <Button
                         className={cn(
-                            "group/btn relative overflow-hidden rounded-[1.2rem] px-5 h-11 transition-all duration-500 shadow-lg hover:shadow-xl active:scale-95 border border-white/10",
+                            "group/btn relative overflow-hidden rounded-[1.2rem] px-5 h-11 transition-all duration-500 shadow-lg hover:shadow-xl active:scale-95 border border-white/10 bg-gradient-to-r",
                             config.gradient,
                             config.glow
                         )}
@@ -395,8 +395,8 @@ function ProductCard({ product, index, sourceIngredient }: { product: CoupangPro
                         <a href={product.product_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
                             {/* 쉬머 효과 */}
                             <div className="absolute inset-0 -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
-                            <ShoppingCart size={14} className="text-white/90" />
-                            <span className="text-[13px] font-black tracking-tight text-white whitespace-nowrap">
+                            <ShoppingCart size={11} className="text-white/90" />
+                            <span className="text-[10px] font-black tracking-tight text-white whitespace-nowrap">
                                  {language === 'ko' ? t.common.shoppingCoupang : t.common.shoppingAmazon}
                             </span>
                         </a>

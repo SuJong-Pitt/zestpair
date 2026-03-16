@@ -100,10 +100,17 @@ export default function FloatingAssistant() {
   const messages = language === "ko" ? MIXY_MESSAGES_KO : MIXY_MESSAGES_EN;
 
   useEffect(() => {
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      setIsBubbleDismissed(true);
+    }
+
     const timer = setTimeout(() => {
       setIsVisible(true);
       setMessage(messages[0]);
-      setTimeout(() => setShowBubble(true), 500);
+      if (!isMobile) {
+        setTimeout(() => setShowBubble(true), 500);
+      }
     }, 1500);
     return () => clearTimeout(timer);
   }, []);
