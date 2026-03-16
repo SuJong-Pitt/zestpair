@@ -146,15 +146,44 @@ export default function FloatingAssistant() {
             initial={{ opacity: 0, scale: 0.8, y: 20, filter: 'blur(10px)' }}
             animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, scale: 0.8, y: 20, filter: 'blur(10px)' }}
-            className="mb-4 relative"
+            className="mb-3 relative"
           >
-            <div className="relative px-5 py-4 bg-white/80 backdrop-blur-2xl rounded-[2rem] shadow-[0_20px_50px_rgba(16,185,129,0.15)] border border-emerald-100/80 max-w-[200px] md:max-w-[260px] pointer-events-auto group">
-              {/* 내부 에너지 펄스 */}
-              <div className="absolute top-2 left-6 w-1 h-1 bg-emerald-400 rounded-full animate-ping" />
-              
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-widest">Pori AI</span>
+            <div
+              className="relative px-5 py-4 rounded-[2rem] max-w-[200px] md:max-w-[260px] pointer-events-auto"
+              style={{
+                background: "linear-gradient(145deg, rgba(8,12,24,0.92) 0%, rgba(10,22,20,0.92) 100%)",
+                border: "1px solid rgba(16,185,129,0.25)",
+                backdropFilter: "blur(40px)",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06)"
+              }}
+            >
+              {/* 내부 글로우 오브 */}
+              <div
+                className="absolute -top-6 -right-6 w-20 h-20 rounded-full opacity-30 pointer-events-none"
+                style={{ background: "radial-gradient(circle, rgba(16,185,129,0.5) 0%, transparent 70%)", filter: "blur(15px)" }}
+              />
+              {/* 폄리 상태 인디케이터 */}
+              <div className="absolute top-3 left-4 flex items-center gap-1">
+                <motion.div
+                  animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.3, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ background: "#10b981", boxShadow: "0 0 6px #10b981" }}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span
+                    className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full"
+                    style={{
+                      background: "linear-gradient(90deg, rgba(16,185,129,0.2), rgba(6,182,212,0.1))",
+                      border: "1px solid rgba(16,185,129,0.3)",
+                      color: "#6ee7b7"
+                    }}
+                  >
+                    Pori AI
+                  </span>
                   {poriStatus === 'thinking' && (
                     <div className="flex gap-0.5">
                       {[1, 2, 3].map(i => (
@@ -162,19 +191,30 @@ export default function FloatingAssistant() {
                           key={i}
                           animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
                           transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
-                          className="w-1 h-1 bg-emerald-400 rounded-full"
+                          className="w-1 h-1 rounded-full"
+                          style={{ background: "#34d399" }}
                         />
                       ))}
                     </div>
                   )}
                 </div>
-                <p className="text-[12px] md:text-[14px] font-bold text-slate-800 leading-relaxed tracking-tight break-keep">
+                <p
+                  className="text-[12px] md:text-[13px] font-semibold leading-relaxed tracking-tight break-keep"
+                  style={{ color: "rgba(255,255,255,0.82)" }}
+                >
                   {message}
                 </p>
               </div>
 
-              {/* 말풍선 꼬리 - 프리미엄 버전 */}
-              <div className="absolute -bottom-2 right-10 w-4 h-4 bg-white/80 backdrop-blur-2xl border-r border-b border-emerald-100/80 rotate-45" />
+              {/* 말풍선 꼬리 */}
+              <div
+                className="absolute -bottom-2 right-9 w-4 h-4 rotate-45"
+                style={{
+                  background: "linear-gradient(145deg, rgba(10,22,20,0.92), rgba(8,12,24,0.92))",
+                  borderRight: "1px solid rgba(16,185,129,0.2)",
+                  borderBottom: "1px solid rgba(16,185,129,0.2)"
+                }}
+              />
             </div>
           </motion.div>
         )}

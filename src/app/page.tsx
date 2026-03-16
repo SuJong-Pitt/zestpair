@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { Search, Pill, ChevronDown, Info, Sparkles, RefreshCcw, Languages, ChevronRight, Database } from "lucide-react";
+import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import IngredientCard from "@/components/IngredientCard";
 import FloatingBasketBar from "@/components/FloatingBasketBar";
@@ -188,7 +188,12 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50/50">
-      <section className="relative overflow-hidden pb-24 pt-16 md:pt-14 md:pb-32 bg-[#0F172A]">
+      <section
+        className="relative overflow-hidden pb-24 pt-14 md:pt-12 md:pb-32"
+        style={{
+          background: "linear-gradient(145deg, #080c14 0%, #0c1220 30%, #0d1a1a 60%, #0a0e1a 100%)"
+        }}
+      >
         {/* 고도화된 배경 장식 */}
         <VisualDecorations />
 
@@ -202,54 +207,205 @@ export default function HomePage() {
           </button>
         </div>
 
-        <div className="relative mx-auto max-w-2xl px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-2 mt-2 sm:mt-0">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-              <Pill size={22} className="text-white" />
-            </div>
-            <span className="text-white font-black text-xl tracking-tight">ZestPair</span>
-          </div>
+        <div className="relative mx-auto max-w-3xl px-4 text-center">
 
-          <h1 className="text-[1.8rem] md:text-5xl lg:text-6xl font-[1000] text-white mb-4 leading-[1.05] tracking-tighter">
-            <span className="block opacity-90 drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)] mb-2 italic">{t.hero.title1}</span>
-            <span className="relative inline-block mt-2 md:mt-4 group">
-              <span className="relative z-10 bg-gradient-to-br from-emerald-200 via-white to-emerald-200 bg-clip-text text-transparent px-6 md:px-10 py-3 md:py-4 block">
-                {t.hero.title2}
-              </span>
-              <motion.span 
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: "100%", opacity: 1 }}
-                transition={{ duration: 1.5, ease: "circOut" }}
-                className="absolute inset-0 bg-gradient-to-r from-emerald-600/30 via-emerald-500/20 to-teal-600/30 backdrop-blur-3xl rounded-[2rem] md:rounded-[3rem] border-2 border-emerald-400/30 shadow-[0_30px_60px_rgba(16,185,129,0.4)] md:-skew-x-3"
-              ></motion.span>
-              
-              {/* 스파클 데코레이션 */}
-              <motion.div 
-                animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="absolute -top-4 -right-4 text-emerald-300 hidden md:block"
-              >
-                <Sparkles size={32} />
-              </motion.div>
+          {/* === 로고 배지 === */}
+          <motion.div
+            initial={{ opacity: 0, y: -16, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-2.5 mb-6 mt-2 sm:mt-0 px-4 py-2 rounded-full"
+            style={{
+              background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              backdropFilter: "blur(20px)"
+            }}
+          >
+            <div className="relative w-7 h-7 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-[0_0_16px_rgba(52,211,153,0.5)]">
+              <Pill size={14} className="text-white" />
+            </div>
+            <span className="text-white/90 font-black text-sm tracking-widest uppercase">ZestPair</span>
+            <span
+              className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+              style={{
+                background: "linear-gradient(90deg, rgba(16,185,129,0.25), rgba(6,182,212,0.15))",
+                border: "1px solid rgba(16,185,129,0.3)",
+                color: "#6ee7b7"
+              }}
+            >
+              AI POWERED
             </span>
+          </motion.div>
+
+          {/* === 메인 헤드라인 === */}
+          <h1 className="mb-6 tracking-tight">
+            {/* 라인 1: 작은 선행 텍스트 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="text-base md:text-2xl font-bold mb-1 md:mb-2"
+              style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "0.05em" }}
+            >
+              {language === 'ko' ? '복잡한 영양제 조합,' : 'Complex supplements,'}
+            </motion.div>
+
+            {/* 라인 2: 핵심 임팩트 문구 */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.88, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="relative inline-block"
+            >
+              {/* 뒤 글로우 */}
+              <span
+                aria-hidden
+                className="absolute -inset-3 rounded-[2.5rem] opacity-50 blur-3xl pointer-events-none"
+                style={{ background: "linear-gradient(135deg, #10b981 0%, #0891b2 50%, #7c3aed 100%)" }}
+              />
+              {/* 홀로그램 박스 */}
+              <motion.span
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                style={{ transformOrigin: "left" }}
+                className="absolute inset-0 rounded-[2rem] pointer-events-none"
+              >
+                <span
+                  className="absolute inset-0 rounded-[2rem]"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(8,145,178,0.1) 50%, rgba(124,58,237,0.12) 100%)",
+                    border: "1.5px solid rgba(16,185,129,0.4)",
+                    boxShadow: "0 0 50px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.07)",
+                  }}
+                />
+                {/* 스캐너 */}
+                <motion.span
+                  animate={{ x: ["-110%", "210%"] }}
+                  transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
+                  className="absolute inset-y-0 left-0 w-1/3 pointer-events-none"
+                  style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)", transform: "skewX(-12deg)" }}
+                />
+              </motion.span>
+
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+                className="relative z-10 block text-[2.2rem] md:text-6xl lg:text-7xl font-[1000] px-6 md:px-12 py-3 md:py-5 leading-none"
+                style={{
+                  background: "linear-gradient(135deg, #b2f5ea 0%, #ffffff 35%, #e0fdf4 55%, #7dd3fc 80%, #c4b5fd 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  filter: "drop-shadow(0 2px 40px rgba(52,211,153,0.5))",
+                }}
+              >
+                {t.hero.title2}
+              </motion.span>
+
+              {/* 코너 브래킷 */}
+              {[["top-1.5 left-2.5", "border-t-2 border-l-2"], ["top-1.5 right-2.5", "border-t-2 border-r-2"], ["bottom-1.5 left-2.5", "border-b-2 border-l-2"], ["bottom-1.5 right-2.5", "border-b-2 border-r-2"]].map(([pos, border], i) => (
+                <span key={i} className={`absolute ${pos} w-4 h-4 ${border} border-emerald-400/60 hidden md:block`} style={{ borderRadius: "3px" }} />
+              ))}
+              {/* 스파클 */}
+              <motion.span
+                animate={{ opacity: [0,1,0], scale: [0.6,1.4,0.6], rotate: [-10,10,-10] }}
+                transition={{ duration: 2.8, repeat: Infinity, delay: 1.2 }}
+                className="absolute -top-6 -right-6 hidden md:block"
+              >
+                <Sparkles size={26} className="text-amber-300" />
+              </motion.span>
+              <motion.span
+                animate={{ opacity: [0,0.8,0], scale: [0.5,1.2,0.5] }}
+                transition={{ duration: 3.5, repeat: Infinity, delay: 2.5 }}
+                className="absolute -bottom-5 -left-4 hidden md:block"
+              >
+                <Sparkles size={18} className="text-cyan-300" />
+              </motion.span>
+            </motion.div>
           </h1>
 
-          <p className="text-white/90 text-sm md:text-xl mb-6 md:mb-8 leading-relaxed font-bold max-w-sm md:max-w-lg mx-auto drop-shadow-sm px-4">
-            {t.hero.subtitle1} {" "}
-            <span className="bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent font-[900]">{t.hero.subtitle2}</span>
-            {t.hero.subtitle3}
-          </p>
+          {/* === 서브타이틀 === */}
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.85 }}
+            className="text-sm md:text-lg mb-5 leading-relaxed max-w-md mx-auto px-2"
+            style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500 }}
+          >
+            {t.hero.subtitle1}{" "}
+            <span
+              style={{
+                background: "linear-gradient(90deg, #6ee7b7, #22d3ee)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontWeight: 800
+              }}
+            >{t.hero.subtitle2}</span>
+            <span style={{ color: "rgba(255,255,255,0.7)" }}>{t.hero.subtitle3}</span>
+          </motion.p>
 
-          <div className="relative max-w-2xl mx-auto group">
-            {/* 고해상도 퀀텀 글로우 */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/30 via-teal-400/20 to-emerald-600/30 rounded-[5rem] blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
-            
-            <div className="relative flex items-center bg-slate-950/40 backdrop-blur-3xl border border-white/20 rounded-[5rem] p-1.5 md:p-3 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] transition-all duration-500 group-focus-within:bg-slate-900/60 group-focus-within:border-emerald-400/60 group-focus-within:scale-[1.02]">
-              {/* 테크니컬 스캔라인 */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/5 to-transparent -translate-x-full group-hover:animate-[scan-once_1.5s_ease-in-out] pointer-events-none" />
-              
-              <div className="pl-4 md:pl-6 flex items-center justify-center text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">
-                <Search size={24} className="md:size-7 group-focus-within:scale-110 transition-transform duration-500" />
+          {/* === 소셜 프루프 배지 행 === */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.0 }}
+            className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-7"
+          >
+            {[
+              { icon: "⚡", text: language === 'ko' ? '0.5초 분석' : '0.5s Analysis', color: "rgba(251,191,36,0.9)" },
+              { icon: "🔬", text: language === 'ko' ? 'AI 성분 매칭' : 'AI Matching', color: "rgba(52,211,153,0.9)" },
+              { icon: "🛡️", text: language === 'ko' ? '충돌 감지' : 'Conflict Alert', color: "rgba(239,68,68,0.9)" },
+              { icon: "✨", text: language === 'ko' ? '시너지 발견' : 'Synergy Finder', color: "rgba(167,139,250,0.9)" },
+              { icon: "💚", text: language === 'ko' ? '무료 서비스' : 'Free Forever', color: "rgba(52,211,153,0.9)" },
+            ].map((badge, i) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1.1 + i * 0.07 }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  backdropFilter: "blur(12px)",
+                  color: badge.color
+                }}
+              >
+                <span>{badge.icon}</span>
+                <span>{badge.text}</span>
+              </motion.span>
+            ))}
+          </motion.div>
+
+          {/* === 검색 바 === */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.7, delay: 1.25, ease: [0.22, 1, 0.36, 1] }}
+            className="relative max-w-2xl mx-auto group"
+          >
+            {/* 글로우 */}
+            <div
+              className="absolute -inset-3 rounded-[4rem] opacity-0 group-focus-within:opacity-100 transition-opacity duration-700 blur-2xl"
+              style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.4), rgba(6,182,212,0.25), rgba(124,58,237,0.2))" }}
+            />
+            <div
+              className="absolute -inset-1 rounded-[4rem] opacity-30 blur-xl"
+              style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.3), rgba(6,182,212,0.15))" }}
+            />
+
+            <div
+              className="relative flex items-center rounded-[4rem] p-1.5 md:p-2.5 transition-all duration-500 group-focus-within:scale-[1.01]"
+              style={{
+                background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
+                border: "1.5px solid rgba(255,255,255,0.12)",
+                backdropFilter: "blur(40px)",
+                boxShadow: "0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)"
+              }}
+            >
+              <div className="pl-4 md:pl-6 text-emerald-400">
+                <Search size={22} className="md:size-6" />
               </div>
               <Input
                 ref={searchRef}
@@ -257,134 +413,200 @@ export default function HomePage() {
                 placeholder={t.hero.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-none text-white placeholder:text-white/30 focus-visible:ring-0 text-xs md:text-2xl h-10 md:h-16 flex-1 font-[800] px-2 md:px-5 tracking-tighter md:tracking-tight"
+                className="bg-transparent border-none text-white placeholder:text-white/25 focus-visible:ring-0 text-sm md:text-xl h-11 md:h-14 flex-1 font-bold px-3 md:px-5 tracking-tight"
               />
-              <div className="flex items-center gap-2 md:gap-4 pr-1.5 md:pr-3">
+              <div className="flex items-center gap-2 pr-1.5 md:pr-2">
                 {searchQuery && (
-                  <button onClick={() => setSearchQuery("")} className="hidden sm:block p-3 text-white/40 hover:text-white transition-colors bg-white/10 rounded-full">
-                    <RefreshCcw size={22} />
+                  <button onClick={() => setSearchQuery("")} className="p-2.5 text-white/30 hover:text-white/70 transition-colors">
+                    <RefreshCcw size={16} />
                   </button>
                 )}
-                <button 
+                <button
                   onClick={handleAnalyze}
-                  className="flex items-center gap-2 md:gap-3 px-6 md:px-10 py-2.5 md:py-4 bg-gradient-to-br from-emerald-400 via-teal-400 to-emerald-600 hover:brightness-110 text-emerald-950 rounded-full font-[1000] text-xs md:text-base transition-all active:scale-95 shadow-[0_15px_40px_rgba(16,185,129,0.5)] group/btn whitespace-nowrap"
+                  className="flex items-center gap-2 px-5 md:px-8 py-2.5 md:py-3.5 rounded-full font-[900] text-xs md:text-sm transition-all active:scale-95 whitespace-nowrap group/btn"
+                  style={{
+                    background: "linear-gradient(135deg, #10b981 0%, #0891b2 60%, #7c3aed 100%)",
+                    color: "white",
+                    boxShadow: "0 8px 32px rgba(16,185,129,0.45), 0 2px 8px rgba(0,0,0,0.3)",
+                    letterSpacing: "0.08em"
+                  }}
                 >
-                  <span className="tracking-[0.1em] uppercase">{language === 'ko' ? '분석' : 'ANALYZE'}</span>
-                  <ChevronDown size={18} className="md:size-5 -rotate-90 group-hover/btn:translate-x-1 transition-transform" />
+                  <span className="uppercase">{language === 'ko' ? '분석하기' : 'ANALYZE'}</span>
+                  <ChevronRight size={16} className="group-hover/btn:translate-x-0.5 transition-transform" />
                 </button>
               </div>
             </div>
-            
-            {/* 검색창 하단 팁 */}
-            <div className="mt-6 flex items-center justify-center gap-4 opacity-50">
-              <span className="text-[10px] text-white font-black uppercase tracking-[0.2em]">Popular:</span>
-              <div className="flex gap-3">
-                {['Vitamin C', 'Zinc', 'Biotin'].map(tag => (
-                   <button key={tag} onClick={() => setSearchQuery(tag)} className="text-[10px] text-emerald-300 font-bold hover:text-white transition-colors">#{tag}</button>
+
+            {/* 인기 태그 */}
+            <div className="mt-5 flex items-center justify-center gap-3" style={{ opacity: 0.45 }}>
+              <span className="text-[9px] text-white font-black uppercase tracking-[0.25em]">
+                {language === 'ko' ? '인기' : 'POPULAR'}:
+              </span>
+              <div className="flex gap-2.5">
+                {['Vitamin C', 'Zinc', 'Biotin', 'Omega-3'].map(tag => (
+                  <button
+                    key={tag}
+                    onClick={() => setSearchQuery(tag)}
+                    className="text-[10px] font-bold transition-all hover:opacity-100"
+                    style={{ color: "#6ee7b7" }}
+                  >
+                    #{tag}
+                  </button>
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        {/* 
-            고급 하단 스크림(Scrim): 
-            콘텐츠를 가리지 않도록 높이를 조절하고 부드러운 전이 유지
-        */}
-        <div 
-          className="absolute bottom-0 left-0 right-0 h-44 pointer-events-none z-20" 
+        {/* 하단 스크림 */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-20"
           style={{
-            background: 'linear-gradient(to top, ' +
-              'rgba(255,255,255,1) 0%, ' +
-              'rgba(255,255,255,0.95) 20%, ' +
-              'rgba(255,255,255,0.7) 45%, ' +
-              'rgba(255,255,255,0.3) 75%, ' +
-              'rgba(255,255,255,0) 100%)'
+            background: "linear-gradient(to top, rgba(248,250,252,1) 0%, rgba(248,250,252,0.9) 25%, rgba(248,250,252,0.5) 55%, rgba(248,250,252,0.15) 80%, transparent 100%)"
           }}
         />
       </section>
 
       <main className="mx-auto max-w-2xl px-4 py-8">
-        <div className="relative mb-12">
-          <div className="flex items-center gap-2 mb-6 px-1">
-            <div className="w-1 h-4 bg-emerald-500 rounded-full" />
-            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t.common.categoryTitle}</span>
+        <div className="relative mb-10">
+          {/* 섹션 라벨 */}
+          <div className="flex items-center gap-2 mb-5 px-1">
+            <div className="flex items-center gap-1.5">
+              <div className="w-0.5 h-4 rounded-full" style={{ background: "linear-gradient(180deg, #10b981, #06b6d4)" }} />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "#94a3b8" }}>
+                {t.common.categoryTitle}
+              </span>
+            </div>
           </div>
 
-          <HorizontalScroll className="gap-3 pt-2 pb-4">
-            {Object.entries(CATEGORIES_TRANSLATIONS).map(([key, data]) => (
-              <motion.button
-                key={key}
-                layout
-                whileHover={{ y: -4 }}
-                whileTap={{ scale: 0.96 }}
-                onClick={() => setSelectedCategory(key)}
-                className={cn(
-                  "relative flex items-center gap-2.5 whitespace-nowrap px-6 py-3.5 rounded-2xl text-[13px] font-black transition-all duration-500",
-                  selectedCategory === key 
-                    ? "text-white shadow-[0_20px_40px_-10px_rgba(15,23,42,0.3)]" 
-                    : "bg-white text-slate-500 hover:text-slate-900 border border-slate-100 shadow-sm"
-                )}
-              >
-                {selectedCategory === key && (
-                  <motion.div
-                    layoutId="activeCategory"
-                    className="absolute inset-0 bg-slate-900 rounded-2xl z-0"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
-                <span className="relative z-10 text-lg">{data.emoji}</span>
-                <span className="relative z-10 tracking-tight">{data[language]}</span>
-                
-                {selectedCategory === key && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_10px_#34d399]"
-                  />
-                )}
-              </motion.button>
-            ))}
+          <HorizontalScroll className="gap-2 pt-1 pb-4">
+            {Object.entries(CATEGORIES_TRANSLATIONS).map(([key, data]) => {
+              const isActive = selectedCategory === key;
+              return (
+                <motion.button
+                  key={key}
+                  layout
+                  whileHover={{ y: -3, scale: 1.02 }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => setSelectedCategory(key)}
+                  className="relative flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-2xl text-[12px] font-black transition-all duration-300"
+                  style={isActive ? {
+                    background: "linear-gradient(135deg, #0a1a15 0%, #071210 100%)",
+                    border: "1.5px solid rgba(16,185,129,0.4)",
+                    color: "#34d399",
+                    boxShadow: "0 0 20px rgba(16,185,129,0.2), 0 8px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)"
+                  } : {
+                    background: "rgba(255,255,255,0.8)",
+                    border: "1.5px solid rgba(0,0,0,0.05)",
+                    color: "#64748b",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                    backdropFilter: "blur(12px)"
+                  }}
+                >
+                  {/* 활성 배경 글로우 */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeCategoryGlow"
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      style={{
+                        background: "radial-gradient(ellipse at center, rgba(16,185,129,0.12) 0%, transparent 70%)"
+                      }}
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                    />
+                  )}
+                  <span className="relative z-10 text-base leading-none">{data.emoji}</span>
+                  <span className="relative z-10 tracking-tight">{data[language]}</span>
+                  {/* 활성 하단 닷 */}
+                  {isActive && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                      style={{ background: "#10b981", boxShadow: "0 0 6px #10b981" }}
+                    />
+                  )}
+                </motion.button>
+              );
+            })}
           </HorizontalScroll>
         </div>
 
         {searchQuery === "" && selectedCategory === "all" && (
-          <div className="mb-16 -mx-4 px-4 py-10 bg-gradient-to-b from-slate-50/50 via-white to-transparent rounded-[3rem] border-b border-slate-100">
-            <div className="flex items-center justify-between mb-8 px-2">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-amber-100 rounded-lg">
-                    <Sparkles size={16} className="text-amber-600 animate-pulse" />
-                  </div>
-                  <h2 className="text-xl font-[1000] text-slate-900 tracking-tighter italic uppercase">{t.common.popular}</h2>
+          <div
+            className="mb-16 -mx-4 px-5 py-8 rounded-[2rem]"
+            style={{
+              background: "linear-gradient(160deg, rgba(240,253,250,0.8) 0%, rgba(255,255,255,0.95) 40%, rgba(240,249,255,0.6) 100%)",
+              border: "1px solid rgba(16,185,129,0.1)",
+              boxShadow: "0 4px 30px rgba(16,185,129,0.06), inset 0 1px 0 rgba(255,255,255,0.8)"
+            }}
+          >
+            {/* 섹션 헤더 */}
+            <div className="flex items-center justify-between mb-7">
+              <div className="flex items-start gap-3">
+                {/* 아이콘 오브 */}
+                <motion.div
+                  animate={{ scale: [1, 1.12, 1], rotate: [0, 5, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(251,191,36,0.08) 100%)",
+                    border: "1px solid rgba(245,158,11,0.2)",
+                    boxShadow: "0 0 20px rgba(245,158,11,0.15)"
+                  }}
+                >
+                  <Sparkles size={18} style={{ color: "#f59e0b" }} />
+                </motion.div>
+
+                <div>
+                  <h2 className="text-xl font-[900] tracking-tight" style={{ color: "#0f172a" }}>
+                    {t.common.popular}
+                  </h2>
+                  <p className="text-[10px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.18em" }}>
+                    Curated trending picks
+                  </p>
                 </div>
-                <p className="text-[10px] text-emerald-600 font-black uppercase tracking-[0.2em] ml-9 opacity-70">Curated trending picks</p>
               </div>
-              
-              <div className="flex items-center gap-4">
-                <div className="hidden md:flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-slate-100 shadow-sm">
-                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
-                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{t.common.popularPicks}</span>
+
+              <div className="flex items-center gap-3">
+                {/* 라이브 뱃지 */}
+                <div
+                  className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full"
+                  style={{
+                    background: "rgba(16,185,129,0.06)",
+                    border: "1px solid rgba(16,185,129,0.15)"
+                  }}
+                >
+                  <motion.div
+                    animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ background: "#10b981", boxShadow: "0 0 6px #10b981" }}
+                  />
+                  <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: "#10b981" }}>
+                    {t.common.popularPicks}
+                  </span>
                 </div>
+
+                {/* 전체보기 버튼 */}
                 {popularIngredients.length > 8 && (
-                  <motion.button 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowAllPopular(!showAllPopular)} 
-                    className={cn(
-                      "group flex items-center gap-2.5 px-5 py-2.5 rounded-2xl font-black transition-all duration-300 shadow-lg",
-                      "text-[11px] uppercase tracking-widest italic",
-                      showAllPopular 
-                        ? "bg-emerald-500 text-white shadow-emerald-500/20" 
-                        : "bg-slate-900 text-white shadow-slate-900/40 hover:bg-slate-800"
-                    )}
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => setShowAllPopular(!showAllPopular)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all"
+                    style={showAllPopular ? {
+                      background: "linear-gradient(135deg, #10b981, #06b6d4)",
+                      color: "white",
+                      boxShadow: "0 6px 20px rgba(16,185,129,0.35)"
+                    } : {
+                      background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+                      color: "white",
+                      boxShadow: "0 6px 20px rgba(0,0,0,0.25)"
+                    }}
                   >
                     <span>{showAllPopular ? t.common.hide : t.common.showAll}</span>
-                    <motion.div
-                      animate={{ rotate: showAllPopular ? 180 : 0 }}
-                      className="flex items-center justify-center"
-                    >
-                      <ChevronDown size={14} strokeWidth={3} />
+                    <motion.div animate={{ rotate: showAllPopular ? 180 : 0 }} transition={{ duration: 0.3 }}>
+                      <ChevronDown size={13} strokeWidth={3} />
                     </motion.div>
                   </motion.button>
                 )}
@@ -393,27 +615,22 @@ export default function HomePage() {
 
             <AnimatePresence mode="wait">
               {showAllPopular ? (
-                <motion.div 
+                <motion.div
                   key="grid"
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-6 px-1"
+                  className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-4 px-1"
                 >
                   {popularIngredients.map((ing) => (
                     <IngredientCard key={ing.id} ingredient={ing} isFeatured={true} />
                   ))}
                 </motion.div>
               ) : (
-                <motion.div
-                  key="scroll"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <HorizontalScroll className="gap-4 pt-2 pb-6 px-1">
+                <motion.div key="scroll" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <HorizontalScroll className="gap-4 pt-2 pb-4 px-1">
                     {popularIngredients.slice(0, 8).map((ing) => (
-                      <div key={ing.id} className="w-[170px] md:w-[220px] flex-shrink-0">
+                      <div key={ing.id} className="w-[160px] md:w-[210px] flex-shrink-0">
                         <IngredientCard ingredient={ing} isFeatured={true} />
                       </div>
                     ))}
@@ -427,18 +644,45 @@ export default function HomePage() {
         <div className="mb-8 relative pt-4">
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-emerald-500/50 to-transparent" />
           
-          <div className="flex items-center justify-between mb-6 text-xs text-gray-400 px-1">
+          {/* ── 전체 목록 헤더 ── */}
+          <div className="flex items-center justify-between mb-6 px-1">
             <div className="flex items-center gap-3">
-              <h2 className="font-[1000] text-slate-900 uppercase tracking-widest italic flex items-center gap-2">
-                <Database size={14} className="text-slate-400" />
-                {t.common.all} 
-                <span className="text-emerald-500 ml-1">[{filteredIngredients.length}]</span>
-              </h2>
+              <div
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                style={{
+                  background: "linear-gradient(135deg, rgba(15,23,42,0.06) 0%, rgba(15,23,42,0.03) 100%)",
+                  border: "1px solid rgba(0,0,0,0.06)"
+                }}
+              >
+                <Database size={12} style={{ color: "#10b981" }} />
+                <h2 className="font-[900] text-sm tracking-tight" style={{ color: "#0f172a" }}>
+                  {t.common.all}
+                </h2>
+                <span
+                  className="text-xs font-black px-1.5 py-0.5 rounded-lg"
+                  style={{
+                    background: "rgba(16,185,129,0.1)",
+                    color: "#10b981"
+                  }}
+                >
+                  {filteredIngredients.length}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
-              <Info size={12} className="text-emerald-500" />
-              <span className="font-black text-[9px] uppercase tracking-tighter text-slate-500">
-                {language === 'ko' ? '2개 이상 선택 시 분석 시스템 활성화' : 'Select 2+ for Analysis'}
+
+            <div
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+              style={{
+                background: "rgba(16,185,129,0.05)",
+                border: "1px solid rgba(16,185,129,0.12)"
+              }}
+            >
+              <Info size={10} style={{ color: "#10b981" }} />
+              <span
+                className="text-[9px] font-black uppercase tracking-tight"
+                style={{ color: "#64748b" }}
+              >
+                {language === 'ko' ? '2개 이상 선택 시 분석 활성화' : 'Select 2+ to Analyze'}
               </span>
             </div>
           </div>
