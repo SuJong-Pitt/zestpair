@@ -104,48 +104,61 @@ export default function VisualDecorations() {
       <div className="absolute inset-0">
         {/* 에메랄드 오브 – 좌상단 */}
         <motion.div
-          animate={{ scale: [1, 1.35, 1], x: ["-5%", "8%", "-5%"], y: ["-5%", "5%", "-5%"] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[15%] -left-[10%] w-[65%] h-[70%]"
-          style={{ background: "radial-gradient(circle at 40% 40%, rgba(16,185,129,0.28) 0%, transparent 65%)", filter: isMobile ? "blur(40px)" : "blur(80px)" }}
+          animate={{ scale: [1, 1.25, 1], x: ["-2%", "5%", "-2%"], y: ["-2%", "3%", "-2%"] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-[10%] -left-[5%] w-[60%] h-[65%]"
+          style={{ 
+            background: "radial-gradient(circle at 40% 40%, rgba(16,185,129,0.2) 0%, transparent 70%)", 
+            filter: isMobile ? "blur(30px)" : "blur(60px)",
+            willChange: "transform"
+          }}
         />
         {/* 시안/퍼플 오브 – 우상단 */}
         <motion.div
-          animate={{ scale: [1.2, 0.9, 1.2], x: ["5%", "-8%", "5%"], y: ["5%", "-5%", "5%"] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[10%] -right-[15%] w-[70%] h-[75%]"
-          style={{ background: "radial-gradient(circle at 60% 35%, rgba(139,92,246,0.25) 0%, rgba(6,182,212,0.15) 40%, transparent 65%)", filter: isMobile ? "blur(50px)" : "blur(90px)" }}
+          animate={{ scale: [1.1, 0.95, 1.1], x: ["3%", "-5%", "3%"], y: ["3%", "-3%", "3%"] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-[5%] -right-[10%] w-[65%] h-[70%]"
+          style={{ 
+            background: "radial-gradient(circle at 60% 35%, rgba(139,92,246,0.18) 0%, rgba(6,182,212,0.12) 40%, transparent 70%)", 
+            filter: isMobile ? "blur(40px)" : "blur(70px)",
+            willChange: "transform"
+          }}
         />
         {/* 골든 오브 – 가운데 하단 */}
         <motion.div
-          animate={{ scale: [1, 1.3, 1], opacity: [0.08, 0.15, 0.08] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-0 left-0 right-0 h-[40%]"
-          style={{ background: "radial-gradient(circle at 50% 100%, rgba(16,185,129,0.15) 0%, transparent 70%)", filter: "blur(100px)" }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.06, 0.12, 0.06] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-0 left-0 right-0 h-[35%]"
+          style={{ 
+            background: "radial-gradient(circle at 50% 100%, rgba(16,185,129,0.12) 0%, transparent 70%)", 
+            filter: "blur(70px)",
+            willChange: "opacity, transform"
+          }}
         />
       </div>
 
       {/* === 우아한 부유 보케 효과 === */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(isMobile ? 3 : 8)].map((_, i) => (
+        {[...Array(isMobile ? 2 : 5)].map((_, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ 
-              opacity: [0, 0.15, 0], 
+              opacity: [0, 0.12, 0], 
               y: [100, -100], 
-              x: [(Math.random() - 0.5) * 50, (Math.random() - 0.5) * 100],
-              scale: [0.5, 1.5, 0.8]
+              x: [(Math.random() - 0.5) * 40, (Math.random() - 0.5) * 80],
+              scale: [0.5, 1.3, 0.8]
             }}
-            transition={{ duration: 15 + i * 5, repeat: Infinity, ease: "linear", delay: i * 2 }}
+            transition={{ duration: 18 + i * 5, repeat: Infinity, ease: "linear", delay: i * 2 }}
             className="absolute rounded-full"
             style={{ 
-              width: 150 + i * 50, 
-              height: 150 + i * 50, 
-              left: `${(i * 15) % 100}%`, 
-              top: '80%',
-              background: `radial-gradient(circle, ${["#10b98115", "#06b6d415", "#8b5cf615"][i % 3]} 0%, transparent 70%)`,
-              filter: "blur(40px)"
+              width: 120 + i * 40, 
+              height: 120 + i * 40, 
+              left: `${(i * 20) % 100}%`, 
+              top: '85%',
+              background: `radial-gradient(circle, ${["#10b98110", "#06b6d410", "#8b5cf610"][i % 3]} 0%, transparent 70%)`,
+              filter: "blur(30px)",
+              willChange: "transform, opacity"
             }}
           />
         ))}
@@ -243,7 +256,7 @@ export default function VisualDecorations() {
       ))}
 
       {/* === 리치 파티클 시스템 (다양한 색상) === */}
-      {[...Array(isMobile ? 8 : 25)].map((_, i) => {
+      {[...Array(isMobile ? 6 : 15)].map((_, i) => {
         const colors = ["#10b981", "#06b6d4", "#a78bfa", "#f59e0b", "#f97316", "#ec4899"];
         const color = colors[i % colors.length];
         const size = 2 + seededRand(i * 3) * 2;
@@ -252,13 +265,13 @@ export default function VisualDecorations() {
             key={i}
             initial={{ opacity: 0 }}
             animate={{
-              opacity: [0, 0.6, 0],
-              y: [0, -(60 + seededRand(i) * 100)],
-              x: [0, (seededRand(i * 2) - 0.5) * 40],
-              scale: [1, 0.4],
+              opacity: [0, 0.5, 0],
+              y: [0, -(50 + seededRand(i) * 80)],
+              x: [0, (seededRand(i * 2) - 0.5) * 30],
+              scale: [1, 0.5],
             }}
             transition={{
-              duration: 5 + seededRand(i * 5) * 6,
+              duration: 6 + seededRand(i * 5) * 6,
               repeat: Infinity,
               delay: seededRand(i * 7) * 8,
               ease: "easeOut",
@@ -269,8 +282,9 @@ export default function VisualDecorations() {
               height: size,
               background: color,
               left: `${seededRand(i * 11) * 100}%`,
-              top: `${60 + seededRand(i * 13) * 40}%`,
-              boxShadow: `0 0 ${size * 2}px ${color}`,
+              top: `${65 + seededRand(i * 13) * 35}%`,
+              boxShadow: `0 0 ${size * 1.5}px ${color}`,
+              willChange: "transform, opacity"
             }}
           />
         );

@@ -170,7 +170,7 @@ export default function FloatingAssistant() {
                       style={{
                         background: "linear-gradient(145deg, rgba(8,12,24,0.92) 0%, rgba(10,22,20,0.92) 100%)",
                         border: "1px solid rgba(16,185,129,0.25)",
-                        backdropFilter: "blur(40px)",
+                        backdropFilter: "blur(20px)",
                         boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06)"
                       }}
                     >

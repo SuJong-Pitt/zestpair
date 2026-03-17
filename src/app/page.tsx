@@ -315,7 +315,7 @@ export default function HomePage() {
               {/* 뒤 글로우 */}
               <span
                 aria-hidden
-                className="absolute -inset-3 rounded-[2.5rem] opacity-50 blur-3xl pointer-events-none"
+                className="absolute -inset-2 rounded-[2.5rem] opacity-40 blur-2xl pointer-events-none"
                 style={{ background: "linear-gradient(135deg, #10b981 0%, #0891b2 50%, #7c3aed 100%)" }}
               />
               {/* 홀로그램 박스 */}
@@ -454,7 +454,7 @@ export default function HomePage() {
               style={{
                 background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
                 border: "1.5px solid rgba(255,255,255,0.12)",
-                backdropFilter: "blur(40px)",
+                backdropFilter: "blur(20px)",
                 boxShadow: "0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)"
               }}
             >
