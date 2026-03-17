@@ -94,7 +94,7 @@ export default function HomePage() {
     fetchIngredients();
   }, []);
 
-  const { 
+  const {
     selectedIngredients, isAnalyzing, hasResult, setAnalyzing, setHasResult, clearBasket, language, setLanguage,
     analysisResult, setAnalysisResult
   } = useBasketStore();
@@ -125,7 +125,7 @@ export default function HomePage() {
     setHasResult(false);
     setAnalysisResult(null);
     setAnalyzing(true);
-    
+
     // 분석 시작 시 하단으로 미세하게 프리뷰 스크롤 (애니메이션 유도)
     // 약간의 지연을 주어 상태 업데이트(isAnalyzing)가 DOM에 반영되도록 함
     setTimeout(() => {
@@ -196,7 +196,7 @@ export default function HomePage() {
   const handleAnimationComplete = () => {
     setAnalyzing(false);
     setHasResult(true);
-    
+
     // 결과 컴포넌트가 실제로 렌더링되고 높이가 확정될 때까지 감시하는 로직
     const performScroll = () => {
       const target = document.getElementById("analysis-report-top");
@@ -220,7 +220,7 @@ export default function HomePage() {
           resizeObserver.disconnect();
         });
         resizeObserver.observe(target);
-        
+
         performScroll();
         obs.disconnect(); // 타겟을 찾았으므로 감시 종료
       }
