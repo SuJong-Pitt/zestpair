@@ -14,6 +14,7 @@ interface BasketState {
 
     language: "ko" | "en";
     isBasketExpanded: boolean;
+    analysisResult: any | null;
 
     // Actions
     addIngredient: (ingredient: Ingredient) => void;
@@ -25,6 +26,7 @@ interface BasketState {
     isSelected: (id: string) => boolean;
     setLanguage: (lang: "ko" | "en") => void;
     setBasketExpanded: (value: boolean) => void;
+    setAnalysisResult: (result: any | null) => void;
 }
 
 /**
@@ -40,6 +42,7 @@ export const useBasketStore = create<BasketState>()(
             hasResult: false,
             language: "ko",
             isBasketExpanded: false,
+            analysisResult: null,
 
             addIngredient: (ingredient) => {
                 const { selectedIngredients } = get();
@@ -47,7 +50,8 @@ export const useBasketStore = create<BasketState>()(
                 if (selectedIngredients.some((i) => i.id === ingredient.id)) return;
                 set({
                     selectedIngredients: [...selectedIngredients, ingredient],
-                    hasResult: false // 바구니 변경 시 결과 초기화
+                    hasResult: false, // 바구니 변경 시 결과 초기화
+                    analysisResult: null
                 });
             },
 
@@ -55,6 +59,7 @@ export const useBasketStore = create<BasketState>()(
                 set((state) => ({
                     selectedIngredients: state.selectedIngredients.filter((i) => i.id !== id),
                     hasResult: false, // 바구니 변경 시 결과 초기화
+                    analysisResult: null
                 }));
             },
 
@@ -68,7 +73,7 @@ export const useBasketStore = create<BasketState>()(
             },
 
             clearBasket: () => {
-                set({ selectedIngredients: [], hasResult: false });
+                set({ selectedIngredients: [], hasResult: false, analysisResult: null });
             },
 
             setAnalyzing: (value) => set({ isAnalyzing: value }),
@@ -82,6 +87,8 @@ export const useBasketStore = create<BasketState>()(
             setLanguage: (lang) => set({ language: lang }),
 
             setBasketExpanded: (value) => set({ isBasketExpanded: value }),
+
+            setAnalysisResult: (result) => set({ analysisResult: result }),
         }),
         {
             name: "zestpair-basket", // localStorage key

@@ -75,7 +75,6 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showAllPopular, setShowAllPopular] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   const [dbIngredients, setDbIngredients] = useState<Ingredient[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(true);
@@ -95,8 +94,10 @@ export default function HomePage() {
     fetchIngredients();
   }, []);
 
-  const { selectedIngredients, isAnalyzing, hasResult, setAnalyzing, setHasResult, clearBasket, language, setLanguage } =
-    useBasketStore();
+  const { 
+    selectedIngredients, isAnalyzing, hasResult, setAnalyzing, setHasResult, clearBasket, language, setLanguage,
+    analysisResult, setAnalysisResult
+  } = useBasketStore();
 
   const t = UI_TRANSLATIONS[language];
 
@@ -120,9 +121,19 @@ export default function HomePage() {
   const handleAnalyze = async () => {
     if (selectedIngredients.length < 2) return;
 
+    // 분석 시작 시 기존 결과 초기화
+    setHasResult(false);
+    setAnalysisResult(null);
     setAnalyzing(true);
+    
+    // 분석 시작 시 하단으로 미세하게 프리뷰 스크롤 (애니메이션 유도)
+    // 약간의 지연을 주어 상태 업데이트(isAnalyzing)가 DOM에 반영되도록 함
     setTimeout(() => {
-      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (resultRef.current) {
+        resultRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+      }
     }, 100);
 
     const ingredientIds = selectedIngredients.map((i) => i.id);
@@ -176,7 +187,7 @@ export default function HomePage() {
     }
 
     setAnalysisResult({
-      ingredients: selectedIngredients,
+      ingredients: [...selectedIngredients], // 참조 끊기
       synergies, cautions, conflicts, score, summary,
       analyzed_at: new Date().toISOString()
     });
@@ -185,9 +196,46 @@ export default function HomePage() {
   const handleAnimationComplete = () => {
     setAnalyzing(false);
     setHasResult(true);
+    
+    // 결과 컴포넌트가 실제로 렌더링되고 높이가 확정될 때까지 감시하는 로직
+    const performScroll = () => {
+      const target = document.getElementById("analysis-report-top");
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return true;
+      }
+      return false;
+    };
+
+    // 1. 이미 존재한다면 즉시 실행
+    if (performScroll()) return;
+
+    // 2. 존재하지 않는다면 DOM 변화를 감시 (MutationObserver)
+    const observer = new MutationObserver((_mutations, obs) => {
+      const target = document.getElementById("analysis-report-top");
+      if (target) {
+        // 이미지가 로딩되거나 레이아웃이 변할 수 있으므로 ResizeObserver도 결합
+        const resizeObserver = new ResizeObserver(() => {
+          performScroll();
+          resizeObserver.disconnect();
+        });
+        resizeObserver.observe(target);
+        
+        performScroll();
+        obs.disconnect(); // 타겟을 찾았으므로 감시 종료
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // 3. 만약의 경우를 대비한 타임아웃 백업
     setTimeout(() => {
-      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 200);
+      performScroll();
+      observer.disconnect();
+    }, 1500); // 넉넉하게 1.5초
   };
 
   return (
@@ -704,20 +752,10 @@ export default function HomePage() {
           )}
         </div>
 
-        <div ref={resultRef} className="mt-8">
+        <div ref={resultRef} id="analysis-results-section" className="mt-8 min-h-[50vh]">
           {isAnalyzing && <AnalyzingAnimation onComplete={handleAnimationComplete} />}
           {!isAnalyzing && hasResult && analysisResult && (
-            <>
-              <div className="flex items-center gap-2 mb-8">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent" />
-                <h2 className="text-base font-bold text-gray-600 px-3 flex items-center gap-2 uppercase tracking-widest">
-                  <Sparkles size={16} className="text-emerald-500" />
-                  {t.common.resultTitle}
-                </h2>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent" />
-              </div>
-              <AnalysisResults result={analysisResult} />
-            </>
+            <AnalysisResults result={analysisResult} />
           )}
         </div>
       </main>

@@ -455,8 +455,34 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-24 pb-48 w-full max-w-7xl mx-auto px-4 md:px-8"
+            className="space-y-10 md:space-y-16 pb-32 w-full max-w-7xl mx-auto px-4 md:px-8"
         >
+            {/* 0. 최상단 리포트 헤더 라벨 - 스크롤 타겟 */}
+            <div id="analysis-report-top" className="flex flex-col items-center gap-2 pt-32 pb-0">
+                <motion.div 
+                    initial={{ y: -10, opacity: 0 }} 
+                    animate={{ y: 0, opacity: 1 }}
+                    className="flex items-center gap-3 px-6 py-2 rounded-2xl bg-white/50 border border-emerald-100 backdrop-blur-xl shadow-[0_8px_32px_rgba(16,185,129,0.05)]"
+                >
+                    <div className="relative">
+                        <motion.div 
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                            className="absolute -inset-1 rounded-full border border-dashed border-emerald-400/30"
+                        />
+                        <Sparkles size={14} className="text-emerald-500 relative z-10" />
+                    </div>
+                    <h2 className="text-[11px] font-[1000] uppercase tracking-[0.4em] text-emerald-700/70 pt-0.5">
+                        {language === 'ko' ? 'Analysis Protocol' : 'Analysis Report'}
+                    </h2>
+                </motion.div>
+                <motion.div 
+                    initial={{ height: 0 }}
+                    animate={{ height: 8 }}
+                    className="w-px bg-gradient-to-b from-emerald-500/30 via-emerald-500/10 to-transparent" 
+                />
+            </div>
+
             {/* 종합 점수 카드 - Centered Impact & Premium Report */}
             <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-emerald-500 to-cyan-500 rounded-[3rem] blur opacity-15 group-hover:opacity-30 transition duration-1000"></div>
