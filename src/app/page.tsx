@@ -49,9 +49,9 @@ function HorizontalScroll({ children, className }: { children: React.ReactNode; 
 
   return (
     <div ref={containerRef} className="relative group/hscroll w-full overflow-hidden">
-      {/* 페이드 효과 */}
-      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none opacity-0 group-hover/hscroll:opacity-100 transition-opacity" />
-      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none opacity-0 group-hover/hscroll:opacity-100 transition-opacity" />
+      {/* 페이드 효과: 모바일에서는 항상 보이거나 스크롤 상태에 따라 조절 가능하지만, 일단 항상 보이게 하거나 제거 */}
+      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white/90 to-transparent z-10 pointer-events-none md:opacity-0 md:group-hover/hscroll:opacity-100 transition-opacity" />
+      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/90 to-transparent z-10 pointer-events-none md:opacity-0 md:group-hover/hscroll:opacity-100 transition-opacity" />
 
       <motion.div
         ref={contentRef}
@@ -271,21 +271,21 @@ export default function HomePage() {
             {/* 뒤 배경 글로우 */}
             <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
 
-            <div className="relative flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
-              <div className="relative w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.6)]">
-                <Pill size={16} className="text-white animate-bounce-slow" />
+            <div className="relative flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
+              <div className="relative w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.6)]">
+                <Pill size={14} className="text-white animate-bounce-slow" />
               </div>
-              <span className="text-white font-[1000] text-sm tracking-[0.2em] uppercase">ZestPair</span>
-              <div className="w-px h-4 bg-white/20 mx-1" />
+              <span className="text-white font-[1000] text-xs md:text-sm tracking-[0.2em] uppercase">ZestPair</span>
+              <div className="w-px h-3 md:h-4 bg-white/20 mx-0.5 md:mx-1" />
               <span
-                className="text-[9px] font-black uppercase tracking-widest text-[#6ee7b7] flex items-center gap-1.5"
+                className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#6ee7b7] flex items-center gap-1 md:gap-1.5"
               >
                 <motion.span
                   animate={{ opacity: [0.4, 1, 0.4] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"
+                  className="w-1 md:h-1.5 h-1 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"
                 />
-                AI Core v2.5
+                <span className="hidden xs:inline">AI Synergy Core</span> v2.5
               </span>
             </div>
           </motion.div>
@@ -490,16 +490,16 @@ export default function HomePage() {
             </div>
 
             {/* 인기 태그 */}
-            <div className="mt-5 flex items-center justify-center gap-3" style={{ opacity: 0.45 }}>
-              <span className="text-[9px] text-white font-black uppercase tracking-[0.25em]">
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2" style={{ opacity: 0.55 }}>
+              <span className="text-[9px] text-white font-black uppercase tracking-[0.25em] whitespace-nowrap">
                 {language === 'ko' ? '인기' : 'POPULAR'}:
               </span>
-              <div className="flex gap-2.5">
+              <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
                 {['Vitamin C', 'Zinc', 'Biotin', 'Omega-3'].map(tag => (
                   <button
                     key={tag}
                     onClick={() => setSearchQuery(tag)}
-                    className="text-[10px] font-bold transition-all hover:opacity-100"
+                    className="text-[10px] md:text-xs font-bold transition-all hover:opacity-100 hover:scale-105 active:scale-95"
                     style={{ color: "#6ee7b7" }}
                   >
                     #{tag}

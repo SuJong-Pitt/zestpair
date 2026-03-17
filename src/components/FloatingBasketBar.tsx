@@ -15,7 +15,7 @@ interface FloatingBasketBarProps {
 }
 
 export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: FloatingBasketBarProps) {
-  const { selectedIngredients, addIngredient, removeIngredient, clearBasket, isAnalyzing, language, isSelected, isBasketExpanded, setBasketExpanded } = useBasketStore();
+  const { selectedIngredients, addIngredient, removeIngredient, clearBasket, isAnalyzing, language, isSelected, isBasketExpanded, setBasketExpanded, hasResult } = useBasketStore();
   const [isVisible, setIsVisible] = useState(false);
   const isExpanded = isBasketExpanded;
   const setIsExpanded = setBasketExpanded;
@@ -27,9 +27,15 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
   const canAnalyze = count >= 2;
 
   useEffect(() => {
-    setIsVisible(count > 0 || isSearchActive);
-    if (count === 0 && !isSearchActive) setIsExpanded(false);
-  }, [count, isSearchActive]);
+    // 분석 결과가 있거나 분석 중일 때는 바스켓 바를 숨김 (모바일 우선, 데스크탑은 선택)
+    // 하지만 "다시 분석" 등의 기능이 필요할 수 있으므로, 
+    // 여기서는 count가 있고 분석 결과가 없을 때만 보이게 하거나, 
+    // 혹은 분석 결과가 있어도 사용자가 원할 때 볼 수 있게 함.
+    // 일단 사용자의 요청대로 "모바일 최적화"를 위해 분석 결과 화면에서는 숨기도록 함.
+    const shouldShow = (count > 0 || isSearchActive) && !hasResult && !isAnalyzing;
+    setIsVisible(shouldShow);
+    if ((count === 0 || hasResult) && !isSearchActive) setIsExpanded(false);
+  }, [count, isSearchActive, hasResult, isAnalyzing]);
 
   const filteredSearch = allIngredients.filter(ing => {
     if (!searchQuery) return false;
@@ -43,11 +49,7 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ y: 120, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 120, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none"
+          className="fixed inset-x-0 bottom-0 z-40 pointer-events-none"
         >
           {/* 배경 블러 오버레이 */}
           <AnimatePresence>
@@ -62,9 +64,14 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
             )}
           </AnimatePresence>
 
-          <div className="mx-auto max-w-2xl px-3 pb-5 pointer-events-auto">
+          <div 
+            className="mx-auto max-w-2xl px-3 pointer-events-auto"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 2rem)' }}
+          >
             <motion.div
-              layout
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
               className="relative rounded-[2rem] overflow-hidden"
               style={{
                 background: "linear-gradient(145deg, rgba(8,12,24,0.95) 0%, rgba(10,20,18,0.95) 100%)",
@@ -142,8 +149,8 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
                                   onClick={() => active ? removeIngredient(ingredient.id) : addIngredient(ingredient)}
                                   className={cn(
                                     "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-[13px] font-black transition-all",
-                                    active 
-                                      ? "bg-emerald-500 text-white shadow-[0_8px_20px_rgba(16,185,129,0.3)]" 
+                                    active
+                                      ? "bg-emerald-500 text-white shadow-[0_8px_20px_rgba(16,185,129,0.3)]"
                                       : "bg-white/5 border border-white/10 text-white/70 hover:bg-white/10"
                                   )}
                                 >
@@ -207,73 +214,86 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
               {/* 메인 컨트롤 바 */}
               <div className="flex items-center gap-3 p-3 md:p-4">
 
-                  {/* 검색 & 정보 토글 가능 영역 */}
-                  <div className="flex items-center flex-1 min-w-0 gap-3">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsSearchActive(!isSearchActive);
-                        if (!isSearchActive) {
-                          setIsExpanded(true);
-                          setTimeout(() => document.getElementById('bar-search')?.focus(), 100);
-                        }
-                      }}
-                      className={cn(
-                        "w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all shrink-0",
-                        isSearchActive 
-                          ? "bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]" 
-                          : "bg-white/5 border border-white/10 text-white/40 hover:text-white/80"
-                      )}
-                    >
-                      {isSearchActive ? <X size={20} /> : <SearchIcon size={20} />}
-                    </button>
+                {/* 검색 & 정보 토글 가능 영역 */}
+                <div className="flex items-center flex-1 min-w-0 gap-3">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsSearchActive(!isSearchActive);
+                      if (!isSearchActive) {
+                        setIsExpanded(true);
+                        setTimeout(() => document.getElementById('bar-search')?.focus(), 100);
+                      }
+                    }}
+                    className={cn(
+                      "w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all shrink-0",
+                      isSearchActive
+                        ? "bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]"
+                        : "bg-white/5 border border-white/10 text-white/40 hover:text-white/80"
+                    )}
+                  >
+                    {isSearchActive ? <X size={20} /> : <SearchIcon size={20} />}
+                  </button>
 
-                    <div className="flex-1 min-w-0">
-                      <AnimatePresence mode="wait">
-                        {isSearchActive ? (
-                          <motion.div
-                            key="search"
-                            initial={{ opacity: 0, x: 10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            className="w-full"
-                          >
-                            <input
-                              id="bar-search"
-                              autoFocus
-                              type="text"
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              placeholder={language === 'ko' ? "성분 추가..." : "Add ingredient..."}
-                              className="w-full bg-transparent border-none focus:ring-0 text-white p-0 font-bold placeholder:text-white/20"
-                            />
-                          </motion.div>
-                        ) : (
-                          <motion.button
-                            key="info"
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 10 }}
-                            onClick={() => setIsExpanded(!isExpanded)}
-                            className="flex flex-col text-left w-full min-w-0"
-                          >
+                  <div className="flex-1 min-w-0">
+                    <AnimatePresence mode="wait">
+                      {isSearchActive ? (
+                        <motion.div
+                          key="search"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          className="w-full"
+                        >
+                          <input
+                            id="bar-search"
+                            autoFocus
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={language === 'ko' ? "성분 추가..." : "Add ingredient..."}
+                            className="w-full bg-transparent border-none focus:ring-0 text-white p-0 font-bold placeholder:text-white/20"
+                          />
+                        </motion.div>
+                      ) : (
+                        <motion.button
+                          key="info"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 10 }}
+                          whileHover={{ x: 2 }}
+                          onClick={() => setIsExpanded(!isExpanded)}
+                          className="flex flex-col text-left w-full min-w-0 group/info cursor-pointer select-none"
+                        >
+                          <div className="flex items-center gap-2">
                             <span
-                              className="font-black text-sm md:text-base tracking-tight flex items-center gap-1.5 truncate"
+                              className="font-black text-sm md:text-base tracking-tight flex items-center gap-1.5 truncate transition-colors group-hover/info:text-emerald-400"
                               style={{ color: "rgba(255,255,255,0.95)" }}
                             >
                               {t.basket.itemsSelected.replace('{count}', count.toString())}
                             </span>
-                            <span
-                              className="text-[10px] md:text-xs font-semibold truncate"
-                              style={{ color: canAnalyze ? "rgba(52,211,153,0.8)" : "rgba(255,255,255,0.35)" }}
+                            <motion.div
+                              animate={{
+                                rotate: isExpanded ? 180 : 0,
+                                y: isExpanded ? 0 : [0, -3, 0]
+                              }}
+                              transition={isExpanded ? { duration: 0.3 } : { duration: 2, repeat: Infinity }}
+                              className="text-emerald-500/50 group-hover/info:text-emerald-400"
                             >
-                              {count < 2 ? t.basket.notEnough : t.basket.ready}
-                            </span>
-                          </motion.button>
-                        )}
-                      </AnimatePresence>
-                    </div>
+                              <ChevronUp size={14} strokeWidth={3} />
+                            </motion.div>
+                          </div>
+                          <span
+                            className="text-[10px] md:text-xs font-semibold truncate opacity-60 group-hover/info:opacity-100 transition-opacity"
+                            style={{ color: canAnalyze ? "rgba(52,211,153,0.8)" : "rgba(255,255,255,0.35)" }}
+                          >
+                            {count < 2 ? t.basket.notEnough : t.basket.ready}
+                          </span>
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
                   </div>
+                </div>
 
                 {/* 분석 버튼 */}
                 <motion.button

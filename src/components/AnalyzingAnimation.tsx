@@ -297,7 +297,7 @@ export default function AnalyzingAnimation({ onComplete }: Props) {
             </AnimatePresence>
           </div>
           <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: "rgba(16,185,129,0.45)" }}>
-            AI · SYNERGY ENGINE · v2.0
+            AI SYNERGY CORE · V2.5
           </p>
         </div>
 

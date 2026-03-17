@@ -138,7 +138,7 @@ const SynergyCard = memo(function SynergyCard({
                 delay: index * 0.05
             }}
             inherit={false}
-            className="relative w-full max-w-[340px] aspect-[2/3] mx-auto cursor-pointer"
+            className="relative w-full max-w-[280px] xs:max-w-[320px] md:max-w-[340px] aspect-[2/3] mx-auto cursor-pointer"
             style={{ perspective: "1200px" }}
             onClick={() => setIsFlipped(!isFlipped)}
         >

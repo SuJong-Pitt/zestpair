@@ -192,7 +192,7 @@ function ScoreRing({ score }: { score: number }) {
                 />
 
                 <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.4em] text-white/40">
-                    AI Protocol
+                    AI SYNERGY CORE V2.5
                 </span>
             </div>
         </div>
@@ -455,7 +455,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-10 md:space-y-16 pb-32 w-full max-w-7xl mx-auto px-4 md:px-8"
+            className="space-y-10 md:space-y-16 pb-48 w-full max-w-7xl mx-auto px-4 md:px-8"
         >
             {/* 0. 최상단 리포트 헤더 라벨 - 스크롤 타겟 */}
             <div id="analysis-report-top" className="flex flex-col items-center gap-2 pt-32 pb-0">
@@ -605,7 +605,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 </div>
 
                 {allInteractions.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-x-16 md:gap-y-20 py-10 place-items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-14 md:gap-x-16 md:gap-y-24 py-10 place-items-center">
                         {[...result.synergies, ...result.cautions, ...result.conflicts].map(
                             (r, idx) =>
                                 r.interaction && (
@@ -797,7 +797,10 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                     <div className="absolute -inset-8 bg-gradient-to-r from-emerald-400/10 via-teal-400/5 to-cyan-400/10 rounded-full blur-[80px] opacity-100 group-hover:opacity-100 transition duration-1000" />
 
                     <Button
-                        onClick={clearBasket}
+                        onClick={() => {
+                            clearBasket();
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
                         className={cn(
                             "w-full pt-20 pb-16 md:pt-28 md:pb-20 h-auto rounded-[2.5rem] md:rounded-[3rem] relative overflow-hidden transition-all duration-700",
                             "bg-slate-900 border border-white/10",
