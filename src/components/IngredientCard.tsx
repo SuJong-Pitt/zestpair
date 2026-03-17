@@ -1,6 +1,7 @@
 "use client";
 
 import { memo } from "react";
+import { motion } from "framer-motion";
 import type { Ingredient } from "@/types/database";
 import { useBasketStore } from "@/store/basketStore";
 import { cn } from "@/lib/utils";
@@ -40,26 +41,37 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
     >
       {/* ── 카드 본체 ── */}
       <div
-        className="relative w-full rounded-[1.75rem] overflow-hidden transition-all duration-300"
+        className="relative w-full rounded-[1.75rem] overflow-hidden transition-all duration-500"
         style={selected ? {
           background: "linear-gradient(145deg, #0a1a15 0%, #060e10 100%)",
           border: `1.5px solid ${theme.color}`,
-          boxShadow: `0 10px 30px ${theme.glow}`,
+          boxShadow: `0 15px 40px ${theme.glow}, inset 0 0 12px ${theme.color}15`,
         } : {
           background: isFeatured
             ? "linear-gradient(145deg, #ffffff 0%, #f8fffe 100%)"
             : "linear-gradient(145deg, #ffffff 0%, #f9fafb 100%)",
-          border: isFeatured ? "1.5px solid rgba(16,185,129,0.15)" : "1.5px solid rgba(0,0,0,0.05)",
+          border: isFeatured ? "1.5px solid rgba(16,185,129,0.2)" : "1.5px solid rgba(0,0,0,0.06)",
           boxShadow: isFeatured
-            ? "0 8px 30px rgba(16,185,129,0.08)"
-            : "0 4px 20px rgba(0,0,0,0.06)",
+            ? "0 12px 40px rgba(16,185,129,0.1)"
+            : "0 4px 24px rgba(0,0,0,0.04)",
         }}
       >
+        {/* ── 쉬머 효과 (Premium Glossy Feel) ── */}
+        <motion.div
+           animate={{ x: ["-100%", "200%"] }}
+           transition={{ duration: 4, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
+           className="absolute inset-0 z-10 pointer-events-none opacity-[0.4]"
+           style={{
+             background: "linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%)",
+             backgroundSize: "200% 100%"
+           }}
+        />
+
         {/* ── 배경 글로우 오브 (Selected) ── */}
         {selected && (
           <div
-            className="absolute -top-8 -right-8 w-28 h-28 rounded-full pointer-events-none opacity-40"
-            style={{ background: `radial-gradient(circle, ${theme.glow} 0%, transparent 70%)`, filter: "blur(20px)" }}
+            className="absolute -top-8 -right-8 w-28 h-28 rounded-full pointer-events-none opacity-50"
+            style={{ background: `radial-gradient(circle, ${theme.glow} 0%, transparent 70%)`, filter: "blur(25px)" }}
           />
         )}
 

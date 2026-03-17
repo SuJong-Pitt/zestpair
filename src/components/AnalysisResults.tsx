@@ -103,11 +103,11 @@ function ScoreRing({ score }: { score: number }) {
     const colors = getColor(score);
 
     return (
-        <div className="relative flex items-center justify-center w-56 h-56 md:w-64 md:h-64 select-none">
+        <div className="relative flex items-center justify-center w-64 h-64 md:w-72 md:h-72 select-none">
             {/* 주변 네온 오라 (Subtle Glow) */}
             <div
-                className="absolute inset-0 rounded-full opacity-20 transition-all duration-1000 scale-110"
-                style={{ background: `radial-gradient(circle, ${colors.main} 0%, transparent 70%)`, filter: "blur(40px)" }}
+                className="absolute inset-0 rounded-full opacity-30 transition-all duration-1000 scale-125"
+                style={{ background: `radial-gradient(circle, ${colors.main} 0%, transparent 75%)`, filter: "blur(50px)" }}
             />
 
             <svg viewBox="0 0 180 180" className="w-full h-full transform transition-all duration-1000">

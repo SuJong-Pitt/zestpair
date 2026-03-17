@@ -92,6 +92,13 @@
     letter-spacing: -0.02em;
     word-break: keep-all;
     /* 한글 가독성 향상 */
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  html {
+    overflow-x: hidden;
+    width: 100%;
   }
 
   *::selection {

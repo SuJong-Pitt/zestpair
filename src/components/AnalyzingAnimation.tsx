@@ -131,12 +131,24 @@ export default function AnalyzingAnimation({ onComplete }: Props) {
         ))}
       </div>
 
+      {/* ── 수직 스크롤 HUD 데이타 (Cinematic Technical UI) ── */}
+      <div className="absolute inset-y-0 left-4 hidden md:flex flex-col justify-center gap-4 pointer-events-none opacity-20">
+        {["MATRIX_A_091", "PULSE_SYNC_OK", "BUFFER_X_77", "LOAD_RATIO_88%"].map(t => (
+          <div key={t} className="text-[8px] font-mono text-emerald-400 tracking-[0.3em] vertical-rl rotate-180 uppercase">{t}</div>
+        ))}
+      </div>
+      <div className="absolute inset-y-0 right-4 hidden md:flex flex-col justify-center gap-4 pointer-events-none opacity-20">
+        {["CORE_V2.5_ACTIVE", "SYNC_INDEX_99", "TEMP_RANGE_CAL", "PORT_LINK_8080"].map(t => (
+          <div key={t} className="text-[8px] font-mono text-emerald-400 tracking-[0.3em] vertical-rl uppercase">{t}</div>
+        ))}
+      </div>
+
       {/* ── 수평 스캔라인 ── */}
       <motion.div
-        className="absolute inset-x-0 h-[1px] pointer-events-none"
-        style={{ background: "linear-gradient(90deg, transparent, rgba(16,185,129,0.4), transparent)" }}
+        className="absolute inset-x-0 h-[1px] pointer-events-none z-20"
+        style={{ background: "linear-gradient(90deg, transparent, rgba(16,185,129,0.5), transparent)" }}
         animate={{ y: ["-100vh", "100vh"] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
       />
 
       {/* ── 메인 콘텐츠 ── */}
@@ -343,21 +355,21 @@ export default function AnalyzingAnimation({ onComplete }: Props) {
             </div>
 
             <motion.div
-              animate={isFinished ? { scale: [1, 1.15, 1] } : {}}
+              animate={isFinished ? { scale: [1, 1.1, 1], rotate: [0, 1, -1, 0] } : {}}
               className="text-right"
             >
-              <span className="block text-[9px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: "rgba(16,185,129,0.45)" }}>
+              <span className="block text-[9px] font-black uppercase tracking-[0.25em] mb-1.5" style={{ color: "rgba(16,185,129,0.5)" }}>
                 Blend Index
               </span>
               <span
-                className="text-6xl md:text-7xl font-[900] leading-none tracking-tighter"
+                className="text-7xl md:text-8xl font-[1000] leading-none tracking-tighter"
                 style={{
                   color: isFinished ? "#34d399" : "white",
-                  textShadow: isFinished ? "0 0 30px rgba(16,185,129,0.8)" : "0 0 30px rgba(255,255,255,0.15)"
+                  textShadow: isFinished ? "0 0 40px rgba(16,185,129,1)" : "0 0 30px rgba(255,255,255,0.2)"
                 }}
               >
                 {Math.floor(progress)}
-                <span className="text-2xl ml-1" style={{ color: "#34d399" }}>%</span>
+                <span className="text-3xl ml-1 font-black" style={{ color: "#34d399" }}>%</span>
               </span>
             </motion.div>
           </div>

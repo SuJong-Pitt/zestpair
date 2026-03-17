@@ -103,15 +103,12 @@ export default function FloatingAssistant() {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
-    if (isMobile) {
-      setIsBubbleDismissed(true);
-    }
+    // 모바일에서도 말풍선을 보여주되, 조금 더 컴팩트하게 조절
     const timer = setTimeout(() => {
       setIsVisible(true);
       setMessage(messages[0]);
-      if (!isMobile) {
-        setTimeout(() => setShowBubble(true), 500);
-      }
+      // 모바일에서는 3초 후에 말풍선 노출 (약간의 레이턴시로 주목도 높임)
+      setTimeout(() => setShowBubble(true), isMobile ? 3000 : 500);
     }, 1500);
     return () => clearTimeout(timer);
   }, [isMobile, messages]);
@@ -119,15 +116,11 @@ export default function FloatingAssistant() {
   useEffect(() => {
     if (!isVisible) return;
     setShowBubble(false);
-    if (!isMobile) {
-      setIsBubbleDismissed(false);
-      setTimeout(() => {
-        setMessage(messages[0]);
-        setShowBubble(true);
-      }, 500);
-    } else {
-      setIsBubbleDismissed(true);
-    }
+    setIsBubbleDismissed(false);
+    setTimeout(() => {
+      setMessage(messages[0]);
+      setShowBubble(true);
+    }, 800);
   }, [language, isVisible, isMobile, messages]);
 
   useEffect(() => {
@@ -151,7 +144,7 @@ export default function FloatingAssistant() {
     <AnimatePresence>
       {!isBasketExpanded && (
         <motion.div
-           className="fixed right-3 md:right-8 bottom-0 z-[100] pointer-events-none"
+           className="fixed right-7 md:right-8 bottom-0 z-[100] pointer-events-none"
            id="pori-assistant-root"
          >
            <motion.div

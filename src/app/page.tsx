@@ -249,13 +249,15 @@ export default function HomePage() {
         {/* 고도화된 배경 장식 */}
         {!isMobile && <VisualDecorations />}
 
-        <div className="absolute top-5 right-5 sm:top-8 sm:right-8 z-50">
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-50">
           <button
             onClick={() => setLanguage(language === "ko" ? "en" : "ko")}
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white font-[1000] text-[10px] sm:text-xs transition-all hover:bg-white/30 active:scale-95 shadow-lg group"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-[10px] transition-all hover:bg-white/20 active:scale-90 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group"
           >
-            <Languages size={14} className="group-hover:rotate-12 transition-transform" />
-            <span className="tracking-widest uppercase">{language === "ko" ? "ENGLISH" : "한국어"}</span>
+            <div className="w-5 h-5 rounded-full bg-emerald-400 flex items-center justify-center group-hover:rotate-180 transition-transform duration-500">
+              <Languages size={12} className="text-slate-900" />
+            </div>
+            <span className="tracking-widest uppercase mr-1">{language === "ko" ? "EN" : "KO"}</span>
           </button>
         </div>
 
@@ -345,11 +347,11 @@ export default function HomePage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.7 }}
-                className="relative z-10 block text-[2.2rem] md:text-6xl lg:text-7xl font-[1000] px-6 md:px-12 py-3 md:py-5 leading-none"
+                className="relative z-10 block text-[2.5rem] md:text-6xl lg:text-7xl font-[1000] px-8 md:px-12 py-4 md:py-5 leading-none"
                 style={{
                   color: "#ffffff",
                   textShadow: "0 0 30px rgba(52,211,153,0.3)",
-                  letterSpacing: "-0.04em",
+                  letterSpacing: "-0.05em",
                 }}
               >
                 {t.hero.title2}
@@ -742,9 +744,17 @@ export default function HomePage() {
           {isLoadingList ? (
             <div className="text-center py-16 text-gray-400 animate-pulse">{t.common.loading}</div>
           ) : filteredIngredients.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {filteredIngredients.map((ing) => (
-                <IngredientCard key={ing.id} ingredient={ing} />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1">
+              {filteredIngredients.map((ing, i) => (
+                <motion.div
+                  key={ing.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: (i % 4) * 0.1 }}
+                >
+                  <IngredientCard ingredient={ing} />
+                </motion.div>
               ))}
             </div>
           ) : (
