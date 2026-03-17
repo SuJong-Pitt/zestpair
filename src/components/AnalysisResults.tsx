@@ -95,19 +95,19 @@ function ScoreRing({ score }: { score: number }) {
     });
 
     const getColor = (s: number) => {
-        if (s >= 70) return { main: "#10b981", light: "#34d399", accent: "#fbbf24" };
-        if (s >= 40) return { main: "#f59e0b", light: "#fbbf24", accent: "#ffffff" };
-        return { main: "#ef4444", light: "#f87171", accent: "#ffffff" };
+        if (s >= 70) return { main: "#10b981", light: "#34d399", accent: "#34d399" };
+        if (s >= 40) return { main: "#f59e0b", light: "#fbbf24", accent: "#fbbf24" };
+        return { main: "#ef4444", light: "#f87171", accent: "#f87171" };
     };
 
     const colors = getColor(score);
 
     return (
-        <div className="relative flex items-center justify-center w-72 h-72 md:w-80 md:h-80 select-none">
-            {/* 주변 네온 오라 (Super Deep Glow) */}
+        <div className="relative flex items-center justify-center w-56 h-56 md:w-64 md:h-64 select-none">
+            {/* 주변 네온 오라 (Subtle Glow) */}
             <div
-                className="absolute inset-0 rounded-full opacity-30 transition-all duration-1000 scale-125"
-                style={{ background: `radial-gradient(circle, ${colors.main} 0%, transparent 70%)`, filter: "blur(60px)" }}
+                className="absolute inset-0 rounded-full opacity-20 transition-all duration-1000 scale-110"
+                style={{ background: `radial-gradient(circle, ${colors.main} 0%, transparent 70%)`, filter: "blur(40px)" }}
             />
 
             <svg viewBox="0 0 180 180" className="w-full h-full transform transition-all duration-1000">
@@ -170,13 +170,13 @@ function ScoreRing({ score }: { score: number }) {
             </svg>
 
             {/* 텍스트 정보 레이어 */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pt-2">
+            <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
                 <div className="relative">
-                    <motion.span className="text-7xl md:text-8xl font-[1000] text-white tracking-tighter drop-shadow-2xl">
+                    <motion.span className="text-5xl md:text-6xl font-[1000] text-white tracking-tighter">
                         {rounded}
                     </motion.span>
                     <span 
-                        className="absolute -top-1 -right-8 text-xs font-black italic tracking-widest uppercase"
+                        className="absolute -top-0.5 -right-6 text-[8px] font-black italic tracking-widest uppercase"
                         style={{ color: colors.accent }}
                     >
                         PTS
@@ -186,12 +186,12 @@ function ScoreRing({ score }: { score: number }) {
                 {/* 하단 장식선 */}
                 <motion.div 
                     initial={{ width: 0, opacity: 0 }}
-                    animate={{ width: 60, opacity: 0.5 }}
+                    animate={{ width: 40, opacity: 0.3 }}
                     transition={{ delay: 1, duration: 1 }}
-                    className="h-px bg-white/50 mb-4 mt-2"
+                    className="h-px bg-white/50 mb-2 mt-1"
                 />
 
-                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] text-white/60">
+                <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.4em] text-white/40">
                     AI Protocol
                 </span>
             </div>
@@ -493,35 +493,35 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
 
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] pointer-events-none opacity-50 md:opacity-100" />
 
-                    <CardContent className="p-8 md:p-16 relative z-10 flex flex-col items-center text-center">
+                    <CardContent className="p-6 md:p-12 relative z-10 flex flex-col items-center text-center">
                         {/* 0. 점수 링 섹션 (최상단) */}
                         <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="relative mb-12"
+                            className="relative mb-8"
                         >
-                            <div className="absolute inset-0 bg-emerald-500/20 blur-[40px] rounded-full scale-150 pointer-events-none" />
+                            <div className="absolute inset-0 bg-emerald-500/10 blur-[30px] rounded-full scale-125 pointer-events-none" />
                             <ScoreRing score={result.score} />
                         </motion.div>
 
                         {/* 1. AI 뱃지 */}
                         <motion.div
-                            initial={{ y: -20, opacity: 0 }}
+                            initial={{ y: -10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.2 }}
-                            className="flex items-center gap-2.5 px-5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md mb-8"
+                            className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md mb-6"
                         >
-                            <Sparkles size={14} className="text-indigo-300 animate-pulse" />
-                            <span className="text-[10px] md:text-xs font-black text-indigo-100 uppercase tracking-[0.3em] pt-0.5">AI Precision Analysis</span>
+                            <Sparkles size={12} className="text-indigo-300 animate-pulse" />
+                            <span className="text-[9px] md:text-[10px] font-black text-indigo-100 uppercase tracking-[0.2em] pt-0.5">AI Precision Analysis</span>
                         </motion.div>
 
-                        {/* 2. 초대형 타이틀 */}
-                        <div className="mb-10 space-y-4">
+                        {/* 2. 최적화된 타이틀 */}
+                        <div className="mb-8 space-y-2">
                             <motion.h2 
-                                initial={{ scale: 0.9, opacity: 0 }}
+                                initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-                                className="text-6xl md:text-8xl font-[1000] tracking-tighter leading-none text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
+                                className="text-4xl md:text-6xl font-[1000] tracking-tighter leading-none text-white drop-shadow-xl"
                             >
                                 {result.score >= 70 ? t.results.synergy : result.score >= 40 ? t.results.caution : t.results.conflict}
                             </motion.h2>
@@ -529,7 +529,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.5 }}
-                                className="text-xl md:text-3xl font-black text-emerald-400 tracking-tight"
+                                className="text-lg md:text-xl font-black text-emerald-400/90 tracking-tight"
                             >
                                 {result.score >= 70 
                                     ? t.results.bestMix 
@@ -539,26 +539,22 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             </motion.p>
                         </div>
 
-                        {/* 3. 인용문 형태의 요약 박스 */}
+                        {/* 3. 요약 박스 (Compact) */}
                         <motion.div 
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.6 }}
-                            className="relative w-full max-w-2xl mb-16 group/summary"
+                            className="relative w-full max-w-xl mb-12"
                         >
-                            <div className="absolute -top-4 -left-4 text-4xl text-white/10 font-serif select-none">“</div>
-                            <div className="absolute -bottom-10 -right-4 text-4xl text-white/10 font-serif select-none rotate-180">“</div>
-                            
-                            <div className="relative px-8 py-10 rounded-[2.5rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-inner overflow-hidden">
-                                {/* 내부 체크 아이콘 배경 */}
-                                <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-                                    <ShieldCheck size={180} />
+                            <div className="relative px-6 py-8 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-inner overflow-hidden">
+                                <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none">
+                                    <ShieldCheck size={120} />
                                 </div>
                                 <div className="relative flex items-center justify-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                                        <ShieldCheck size={18} className="text-emerald-400" />
+                                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                                        <ShieldCheck size={16} className="text-emerald-400" />
                                     </div>
-                                    <p className="text-lg md:text-2xl font-bold text-white/90 tracking-tight text-center">
+                                    <p className="text-base md:text-xl font-bold text-white/90 tracking-tight text-center">
                                         {(() => {
                                             if (result.conflicts.length > 0) return t.results.summaryConflict.replace("{count}", result.conflicts.length.toString());
                                             if (result.synergies.length > 0) return t.results.summarySynergy.replace("{count}", result.synergies.length.toString());
