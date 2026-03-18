@@ -16,6 +16,9 @@ export const UI_TRANSLATIONS = {
                 instant: "0.5초 이내"
             }
         },
+        metadata: {
+            title: "ZestPair | 영양제 궁합 분석"
+        },
         common: {
             analyze: "분석하기",
             reset: "결과 리셋하고 처음부터 다시하기",
@@ -106,6 +109,9 @@ export const UI_TRANSLATIONS = {
                 unlimited: "Unlimited Analysis",
                 instant: "Under 0.5s"
             }
+        },
+        metadata: {
+            title: "ZestPair | AI Supplement Synergy Core"
         },
         common: {
             analyze: "Analyze",

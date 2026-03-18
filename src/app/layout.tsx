@@ -4,32 +4,33 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
   title: {
-    default: "ZestPair | 영양제 궁합 분석 서비스",
+    default: "ZestPair | AI Supplement Analysis & Synergy (영양제 궁합 분석)",
     template: "%s | ZestPair",
   },
   description:
-    "내가 먹는 영양제들, 같이 먹어도 괜찮을까? AI 기반 영양제 궁합 분석으로 최적의 조합을 찾아보세요. 비타민, 미네랄, 오메가-3 등 수십 종의 영양제 상호작용을 무료로 확인하세요.",
+    "AI-Powered Supplement Synergy Analysis. Check conflicts and boost benefits of your daily vitamins with ZestPair. AI 기반 영양제 궁합 분석으로 최상의 시너지를 찾아보세요.",
   keywords: [
+    "Supplement Synergy",
+    "Vitamin Interaction",
+    "AI Supplement Analysis",
+    "Drug-Nutrient Interaction",
     "영양제 궁합",
-    "영양제 조합",
     "비타민 조합",
-    "영양제 함께먹기",
-    "영양제 상호작용",
     "ZestPair",
     "제스트페어",
   ],
-  authors: [{ name: "ZestPair" }],
+  authors: [{ name: "ZestPair AI Core" }],
   openGraph: {
     type: "website",
     locale: "ko_KR",
     siteName: "ZestPair",
-    title: "ZestPair | 영양제 궁합 분석 서비스",
-    description: "내가 먹는 영양제들, 같이 먹어도 괜찮을까?",
+    title: "ZestPair | AI Supplement Synergy Core",
+    description: "AI-Powered Supplement Synergy Analysis (영양제 궁합 분석)",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ZestPair | 영양제 궁합 분석",
-    description: "AI 기반 영양제 궁합 분석 서비스",
+    title: "ZestPair | AI Supplement Synergy Core",
+    description: "AI-Powered Supplement Synergy Analysis Service",
   },
   icons: {
     icon: "/favicon.ico",
@@ -46,6 +47,7 @@ export const viewport: Viewport = {
 };
 
 import ScrollToTop from "@/components/ScrollToTop";
+import LanguageDetector from "@/components/LanguageDetector";
 
 export default function RootLayout({
   children,
@@ -64,6 +66,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-sans bg-white" suppressHydrationWarning>
+        <LanguageDetector />
         <TooltipProvider delayDuration={300}>
 
           <main className="relative">
