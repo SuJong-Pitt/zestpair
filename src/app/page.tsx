@@ -274,8 +274,8 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
 
             <div className="relative flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
-              <div className="relative w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.6)]">
-                <Pill size={14} className="text-white animate-bounce-slow" />
+              <div className="relative w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-slate-900 border border-emerald-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.3)] overflow-hidden">
+                <img src="/icon.png" alt="ZestPair Logo" className="w-full h-full object-cover" />
               </div>
               <span className="text-white font-[1000] text-xs md:text-sm tracking-[0.2em] uppercase">ZestPair</span>
               <div className="w-px h-3 md:h-4 bg-white/20 mx-0.5 md:mx-1" />
@@ -343,19 +343,73 @@ export default function HomePage() {
                 />
               </motion.span>
 
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.7 }}
-                className="relative z-10 block text-[2.5rem] md:text-6xl lg:text-7xl font-[1000] px-8 md:px-12 py-4 md:py-5 leading-none"
-                style={{
-                  color: "#ffffff",
-                  textShadow: "0 0 30px rgba(52,211,153,0.3)",
-                  letterSpacing: "-0.05em",
-                }}
-              >
-                {t.hero.title2}
-              </motion.span>
+                <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-2 md:gap-x-4 text-[2.5rem] md:text-6xl lg:text-7xl font-[1000] px-6 md:px-12 py-4 md:py-5 leading-none tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                  {language === 'ko' ? (
+                    <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5">
+                      <span className="opacity-90">포리가</span>
+                      <div className="flex items-center">
+                        {"딱".split("").map((char, i) => (
+                          <motion.span
+                            key={i}
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ 
+                              y: [0, -15, 0],
+                              scale: [1, 1.3, 1],
+                              rotate: [0, -8, 8, 0],
+                              opacity: 1
+                            }}
+                            transition={{ 
+                              duration: 2, 
+                              repeat: Infinity, 
+                              delay: i * 0.1,
+                              ease: "easeInOut" 
+                            }}
+                            className="relative inline-block"
+                          >
+                            <span className="relative z-10 bg-gradient-to-br from-emerald-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(52,211,153,0.7)]">
+                              {char}
+                            </span>
+                            <motion.span 
+                              animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.4, 1] }}
+                              transition={{ duration: 1.5, repeat: Infinity }}
+                              className="absolute -inset-4 bg-emerald-500/40 blur-2xl rounded-full -z-10"
+                            />
+                          </motion.span>
+                        ))}
+                      </div>
+                      <span className="opacity-90">정해줄게요!</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5">
+                      <span className="opacity-90">Let Pori</span>
+                      <div className="flex items-center mx-1">
+                        {"decide".split("").map((char, i) => (
+                          <motion.span
+                            key={i}
+                            initial={{ y: 15, opacity: 0 }}
+                            animate={{ 
+                              y: [0, -10, 0],
+                              scale: [1, 1.2, 1],
+                              opacity: 1
+                            }}
+                            transition={{ 
+                              duration: 2.5, 
+                              repeat: Infinity, 
+                              delay: i * 0.08,
+                              ease: "easeInOut" 
+                            }}
+                            className="relative inline-block"
+                          >
+                            <span className="relative z-10 bg-gradient-to-br from-emerald-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]">
+                              {char}
+                            </span>
+                          </motion.span>
+                        ))}
+                      </div>
+                      <span className="opacity-90">for you!</span>
+                    </div>
+                  )}
+                </span>
 
               {/* 코너 브래킷 */}
               {[["top-1.5 left-2.5", "border-t-2 border-l-2"], ["top-1.5 right-2.5", "border-t-2 border-r-2"], ["bottom-1.5 left-2.5", "border-b-2 border-l-2"], ["bottom-1.5 right-2.5", "border-b-2 border-r-2"]].map(([pos, border], i) => (

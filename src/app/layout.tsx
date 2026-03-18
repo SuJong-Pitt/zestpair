@@ -31,6 +31,11 @@ export const metadata: Metadata = {
     title: "ZestPair | 영양제 궁합 분석",
     description: "AI 기반 영양제 궁합 분석 서비스",
   },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/icon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
