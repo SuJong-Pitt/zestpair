@@ -62,19 +62,18 @@ const interactionTypeConfig = {
     },
 } as const;
 
-/** 점수 링 컴포넌트 - 시네마틱 AI 프로토콜 버전 */
+/** 점수 링 컴포넌트 - 미래형 AI HUD 버전 */
 function ScoreRing({ score }: { score: number }) {
     const radius = 72;
-    const strokeWidth = 8;
+    const strokeWidth = 6;
     const circumference = 2 * Math.PI * radius;
     
-    // 애니메이션을 위한 모션 벨류
     const count = useMotionValue(0);
     const rounded = useTransform(count, (latest) => Math.round(latest));
-    const spring = useSpring(count, { stiffness: 45, damping: 20 });
+    const spring = useSpring(count, { stiffness: 40, damping: 15 });
 
     useEffect(() => {
-        const animation = animate(count, score, { duration: 2.5, ease: [0.22, 1, 0.36, 1] });
+        const animation = animate(count, score, { duration: 3, ease: [0.22, 1, 0.36, 1] });
         return animation.stop;
     }, [score, count]);
 
@@ -82,70 +81,103 @@ function ScoreRing({ score }: { score: number }) {
         circumference - (latest / 100) * circumference
     );
 
-    // 구슬(Orbital Particle)의 위치 계산
-    const orbX = useTransform(spring, (latest) => {
+    const orbPos = useTransform(spring, (latest) => {
         const angle = (latest / 100) * 360 - 90;
         const rad = (angle * Math.PI) / 180;
-        return 90 + radius * Math.cos(rad);
-    });
-    const orbY = useTransform(spring, (latest) => {
-        const angle = (latest / 100) * 360 - 90;
-        const rad = (angle * Math.PI) / 180;
-        return 90 + radius * Math.sin(rad);
+        return {
+            x: 90 + radius * Math.cos(rad),
+            y: 90 + radius * Math.sin(rad)
+        };
     });
 
     const getColor = (s: number) => {
-        if (s >= 70) return { main: "#10b981", light: "#34d399", accent: "#34d399" };
-        if (s >= 40) return { main: "#f59e0b", light: "#fbbf24", accent: "#fbbf24" };
-        return { main: "#ef4444", light: "#f87171", accent: "#f87171" };
+        if (s >= 70) return { main: "#10b981", light: "#34d399", accent: "#34d399", dark: "#064e3b" };
+        if (s >= 40) return { main: "#f59e0b", light: "#fbbf24", accent: "#fbbf24", dark: "#451a03" };
+        return { main: "#ef4444", light: "#f87171", accent: "#f87171", dark: "#450a0a" };
     };
 
     const colors = getColor(score);
 
     return (
-        <div className="relative flex items-center justify-center w-64 h-64 md:w-72 md:h-72 select-none">
+        <div className="relative flex items-center justify-center w-52 h-52 md:w-60 md:h-60 select-none group/score">
             {/* 주변 네온 오라 (Subtle Glow) */}
             <div
-                className="absolute inset-0 rounded-full opacity-30 transition-all duration-1000 scale-125"
-                style={{ background: `radial-gradient(circle, ${colors.main} 0%, transparent 75%)`, filter: "blur(50px)" }}
+                className="absolute inset-0 rounded-full opacity-20 transition-all duration-1000 scale-150"
+                style={{ background: `radial-gradient(circle, ${colors.main} 0%, transparent 70%)`, filter: "blur(60px)" }}
             />
 
-            <svg viewBox="0 0 180 180" className="w-full h-full transform transition-all duration-1000">
+            <svg viewBox="0 0 180 180" className="w-full h-full transform transition-all duration-1000 overflow-visible">
                 <defs>
                     <linearGradient id="scoreProgressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor={colors.main} />
                         <stop offset="100%" stopColor={colors.light} />
                     </linearGradient>
-                    <filter id="orbGlow" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur stdDeviation="3" result="blur" />
+                    <filter id="hudGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="2.5" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
+                    <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.1" strokeOpacity="0.2"/>
+                    </pattern>
                 </defs>
 
-                {/* 베이스 가이드 링 (Track) */}
+                {/* 1. 홀로그램 배경 그리드 */}
+                <circle cx="90" cy="90" r={radius + 10} fill="url(#grid)" opacity="0.3" />
+                
+                {/* 2. HUD 데코레이션 - 외부 눈금 링 */}
+                <g opacity="0.15">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                        <rect
+                            key={i}
+                            x="89.5"
+                            y="2"
+                            width="1"
+                            height="8"
+                            fill="white"
+                            transform={`rotate(${i * 30} 90 90)`}
+                        />
+                    ))}
+                </g>
+
+                {/* 3. 베이스 가이드 링 (HUD Track) */}
                 <circle
                     cx="90"
                     cy="90"
                     r={radius}
-                    stroke="rgba(255,255,255,0.05)"
-                    strokeWidth={strokeWidth}
+                    stroke="white"
+                    strokeWidth="1"
+                    strokeDasharray="2 4"
                     fill="transparent"
+                    opacity="0.1"
                 />
 
-                {/* 프로그레스 링 1 (Outer Blur Layer) */}
+                {/* 4. 회전하는 HUD 아웃라인 */}
+                <motion.circle
+                    cx="90"
+                    cy="90"
+                    r={radius + 6}
+                    stroke={colors.main}
+                    strokeWidth="0.5"
+                    strokeDasharray="20 160"
+                    fill="transparent"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                    className="origin-center"
+                    opacity="0.4"
+                />
+
+                {/* 5. 프로그레스 링 (메인) */}
                 <motion.circle
                     cx="90"
                     cy="90"
                     r={radius}
                     stroke={colors.main}
-                    strokeWidth={strokeWidth + 4}
+                    strokeWidth={strokeWidth}
                     fill="transparent"
                     strokeDasharray={circumference}
-                    style={{ strokeDashoffset: offset, opacity: 0.2, filter: "blur(8px)", strokeLinecap: "round" }}
+                    style={{ strokeDashoffset: offset, opacity: 0.2, filter: "blur(6px)", strokeLinecap: "round" }}
                     className="-rotate-90 origin-center"
                 />
-
-                {/* 프로그레스 링 2 (Inner Pure Layer) */}
                 <motion.circle
                     cx="90"
                     cy="90"
@@ -158,42 +190,94 @@ function ScoreRing({ score }: { score: number }) {
                     className="-rotate-90 origin-center"
                 />
 
-                {/* 궤도 위 구슬 (Particle Orb) */}
+                {/* 6. 코너 브래킷 (HUD 스타일) */}
+                <g opacity="0.4" stroke={colors.light} strokeWidth="0.5" fill="none">
+                    <path d="M 60 40 L 40 40 L 40 60" />
+                    <path d="M 120 40 L 140 40 L 140 60" />
+                    <path d="M 60 140 L 40 140 L 40 120" />
+                    <path d="M 120 140 L 140 140 L 140 120" />
+                </g>
+
+                {/* 7. 스캐닝 빔 (회전하는 그라디언트 레이) */}
+                <motion.rect
+                    x="90"
+                    y="10"
+                    width="1"
+                    height={radius}
+                    fill={`url(#beamGrad-${colors.main})`}
+                    className="origin-bottom"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    style={{ transformOrigin: "90px 90px", opacity: 0.5 }}
+                >
+                    <defs>
+                        <linearGradient id={`beamGrad-${colors.main}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor={colors.light} stopOpacity="1" />
+                            <stop offset="100%" stopColor={colors.light} stopOpacity="0" />
+                        </linearGradient>
+                    </defs>
+                </motion.rect>
+
+                {/* 8. 데이터 포인트 (궤도 구슬) */}
                 <motion.circle
-                    cx={orbX}
-                    cy={orbY}
-                    r="4.5"
+                    cx={orbPos.get().x}
+                    cy={orbPos.get().y}
+                    r="4"
                     fill="white"
-                    filter="url(#orbGlow)"
-                    style={{ filter: "drop-shadow(0 0 8px rgba(255,255,255,0.8))" }}
+                    filter="url(#hudGlow)"
+                    style={{ filter: `drop-shadow(0 0 8px ${colors.light})` }}
                 />
             </svg>
 
             {/* 텍스트 정보 레이어 */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
-                <div className="relative">
-                    <motion.span className="text-5xl md:text-6xl font-[1000] text-white tracking-tighter">
-                        {rounded}
-                    </motion.span>
-                    <span 
-                        className="absolute -top-0.5 -right-6 text-[8px] font-black italic tracking-widest uppercase"
-                        style={{ color: colors.accent }}
+                <div className="relative group/scoreText">
+                    <motion.div
+                        animate={{ opacity: [1, 0.8, 1], scale: [1, 1.02, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="flex items-baseline"
                     >
-                        PTS
-                    </span>
+                        <motion.span className="text-4xl md:text-5xl font-[1000] text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                            {rounded}
+                        </motion.span>
+                        <span 
+                            className="ml-1 text-[9px] font-black italic tracking-widest uppercase opacity-60"
+                            style={{ color: colors.accent }}
+                        >
+                            %
+                        </span>
+                    </motion.div>
+                    
+                    {/* 데이터 락 레이블 */}
+                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <motion.div
+                            animate={{ opacity: [0.3, 1, 0.3] }}
+                            transition={{ duration: 3, repeat: Infinity }}
+                            className="flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-white/5 border border-white/10"
+                        >
+                            <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                            <span className="text-[7px] font-mono text-white/40 tracking-widest uppercase">Sync_Stable</span>
+                        </motion.div>
+                    </div>
                 </div>
                 
-                {/* 하단 장식선 */}
-                <motion.div 
-                    initial={{ width: 0, opacity: 0 }}
-                    animate={{ width: 40, opacity: 0.3 }}
-                    transition={{ delay: 1, duration: 1 }}
-                    className="h-px bg-white/50 mb-2 mt-1"
-                />
-
-                <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.4em] text-white/40">
-                    AI SYNERGY CORE V2.5
-                </span>
+                {/* 하단 장식선 & 정보 */}
+                <div className="mt-4 flex flex-col items-center">
+                    <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: 60 }}
+                        className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-2"
+                    />
+                    <div className="flex items-center gap-2">
+                        <span className="text-[7px] md:text-[8px] font-mono uppercase tracking-[0.3em] text-white/30">
+                            Core_V2.5
+                        </span>
+                        <div className="w-1 h-1 rounded-full bg-white/10" />
+                        <span className="text-[7px] md:text-[8px] font-mono uppercase tracking-[0.3em] text-white/30">
+                            {score >= 70 ? "HIGH_SYNERGY" : score >= 40 ? "CAUTION_REQ" : "CRIT_CONFLICT"}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -286,8 +370,8 @@ const ProductCard = memo(function ProductCard({ product, index, sourceIngredient
 
     return (
         <Card className="group relative h-full flex flex-col overflow-hidden border-none shadow-[0_8px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.12)] transition-all duration-700 rounded-[2.2rem] bg-white group/card">
-            {/* 상단 비주얼 영역 - 콤팩트화 */}
-            <div className="relative h-[160px] md:h-[180px] bg-gradient-to-b from-slate-50/80 to-white flex items-center justify-center p-6 overflow-hidden">
+            {/* 상단 비주얼 영역 - 한층 더 콤팩트하게 */}
+            <div className="relative h-[140px] md:h-[160px] bg-gradient-to-b from-slate-50/80 to-white flex items-center justify-center p-5 overflow-hidden">
                 {/* 랭킹 넘버링 - 모던한 스타일 */}
                 <div className="absolute top-4 left-5 z-20">
                     <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/40 backdrop-blur-md border border-white/40 shadow-sm">
@@ -337,7 +421,7 @@ const ProductCard = memo(function ProductCard({ product, index, sourceIngredient
                 </div>
 
                 {/* 상품명 */}
-                <h4 className="font-extrabold text-[15px] sm:text-base text-slate-900 leading-[1.3] mb-4 line-clamp-2 min-h-[40px] tracking-tight group-hover/card:text-blue-600 transition-colors">
+                <h4 className="font-extrabold text-[14px] sm:text-[15px] text-slate-900 leading-[1.3] mb-3 line-clamp-2 min-h-[36px] tracking-tight group-hover/card:text-blue-600 transition-colors">
                     {product.name}
                 </h4>
 
@@ -360,40 +444,42 @@ const ProductCard = memo(function ProductCard({ product, index, sourceIngredient
                     )}
                 </div>
 
-                {/* 가격 및 구매 인터페이스 - 콤팩트 레이아웃 */}
-                <div className="mt-auto border-t border-slate-50 pt-5 flex items-end justify-between">
+                {/* 가격 및 구매 인터페이스 - 초고밀도 레이아웃 */}
+                <div className="mt-auto border-t border-slate-50 pt-4 flex items-end justify-between">
                     <div className="flex flex-col">
                         {product.discount_rate && (
                            <div className="flex items-center gap-1 mb-0.5">
                                 <span className="text-rose-500 text-[10px] font-black italic">{product.discount_rate}% OFF</span>
                                 {product.original_price && (
                                     <span className="text-[9px] text-slate-300 line-through font-bold">
-                                        ₩{Math.floor(product.original_price).toLocaleString()}
+                                        {language === 'ko' ? `₩${Math.floor(product.original_price).toLocaleString()}` : `$${product.original_price.toFixed(2)}`}
                                     </span>
                                 )}
                            </div>
                         )}
                         <div className="flex items-baseline gap-0.5">
-                            <span className="text-[12px] font-black text-slate-400">₩</span>
-                            <span className="text-2xl md:text-3xl font-[1000] text-slate-900 tracking-tighter">
-                                {product.price > 0 ? Math.floor(product.price).toLocaleString() : t.products.outOfStock}
+                            <span className="text-[10px] font-black text-slate-400">{language === 'ko' ? '₩' : '$'}</span>
+                            <span className="text-xl md:text-2xl font-[1000] text-slate-900 tracking-tighter">
+                                {product.price > 0 
+                                    ? (language === 'ko' ? Math.floor(product.price).toLocaleString() : product.price.toFixed(2)) 
+                                    : t.products.outOfStock}
                             </span>
                         </div>
                     </div>
 
                     <Button
                         className={cn(
-                            "group/btn relative overflow-hidden rounded-[1.2rem] px-5 h-11 transition-all duration-500 shadow-lg hover:shadow-xl active:scale-95 border border-white/10 bg-gradient-to-r",
+                            "group/btn relative overflow-hidden rounded-[1.2rem] px-4 h-10 transition-all duration-500 shadow-lg hover:shadow-xl active:scale-95 border border-white/10 bg-gradient-to-r",
                             config.gradient,
                             config.glow
                         )}
                         asChild
                     >
-                        <a href={product.product_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                        <a href={product.product_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5">
                             {/* 쉬머 효과 */}
                             <div className="absolute inset-0 -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
-                            <ShoppingCart size={11} className="text-white/90" />
-                            <span className="text-[10px] font-black tracking-tight text-white whitespace-nowrap">
+                            <ShoppingCart size={10} className="text-white/90" />
+                            <span className="text-[9px] font-black tracking-tight text-white whitespace-nowrap">
                                  {language === 'ko' ? t.common.shoppingCoupang : t.common.shoppingAmazon}
                             </span>
                         </a>
@@ -493,12 +579,12 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
 
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] pointer-events-none opacity-50 md:opacity-100" />
 
-                    <CardContent className="p-6 md:p-12 relative z-10 flex flex-col items-center text-center">
+                    <CardContent className="p-5 md:p-10 relative z-10 flex flex-col items-center text-center">
                         {/* 0. 점수 링 섹션 (최상단) */}
                         <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="relative mb-8"
+                            className="relative mb-6"
                         >
                             <div className="absolute inset-0 bg-emerald-500/10 blur-[30px] rounded-full scale-125 pointer-events-none" />
                             <ScoreRing score={result.score} />
@@ -516,12 +602,12 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         </motion.div>
 
                         {/* 2. 최적화된 타이틀 */}
-                        <div className="mb-8 space-y-2">
+                        <div className="mb-6 space-y-1.5">
                             <motion.h2 
                                 initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-                                className="text-4xl md:text-6xl font-[1000] tracking-tighter leading-none text-white drop-shadow-xl"
+                                className="text-3xl md:text-5xl font-[1000] tracking-tighter leading-none text-white drop-shadow-xl"
                             >
                                 {result.score >= 70 ? t.results.synergy : result.score >= 40 ? t.results.caution : t.results.conflict}
                             </motion.h2>
@@ -529,7 +615,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.5 }}
-                                className="text-lg md:text-xl font-black text-emerald-400/90 tracking-tight"
+                                className="text-base md:text-lg font-black text-emerald-400/90 tracking-tight"
                             >
                                 {result.score >= 70 
                                     ? t.results.bestMix 
@@ -544,17 +630,17 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.6 }}
-                            className="relative w-full max-w-xl mb-12"
+                            className="relative w-full max-w-xl mb-10"
                         >
-                            <div className="relative px-6 py-8 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-inner overflow-hidden">
+                            <div className="relative px-6 py-6 rounded-[1.8rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-inner overflow-hidden">
                                 <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none">
-                                    <ShieldCheck size={120} />
+                                    <ShieldCheck size={100} />
                                 </div>
                                 <div className="relative flex items-center justify-center gap-3">
-                                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                                        <ShieldCheck size={16} className="text-emerald-400" />
+                                    <div className="w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                                        <ShieldCheck size={14} className="text-emerald-400" />
                                     </div>
-                                    <p className="text-base md:text-xl font-bold text-white/90 tracking-tight text-center">
+                                    <p className="text-sm md:text-lg font-bold text-white/90 tracking-tight text-center">
                                         {(() => {
                                             if (result.conflicts.length > 0) return t.results.summaryConflict.replace("{count}", result.conflicts.length.toString());
                                             if (result.synergies.length > 0) return t.results.summarySynergy.replace("{count}", result.synergies.length.toString());
@@ -575,7 +661,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: 0.8 + i * 0.1 }}
-                                    className="flex items-center gap-4 bg-slate-800/40 border border-white/5 rounded-2xl px-6 py-4 backdrop-blur-sm group/ing hover:bg-slate-800/60 transition-colors"
+                                    className="flex items-center gap-3 bg-slate-800/40 border border-white/5 rounded-2xl px-5 py-3.5 backdrop-blur-sm group/ing hover:bg-slate-800/60 transition-colors"
                                 >
                                     <span className="text-2xl drop-shadow-sm group-hover/ing:scale-110 transition-transform">
                                         {ing.icon_emoji}

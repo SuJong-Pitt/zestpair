@@ -47,22 +47,22 @@ export default function AnalyzingAnimation({ onComplete }: Props) {
   useEffect(() => {
     const msgInterval = setInterval(() => {
       setMessageIdx((prev) => (prev + 1) % messages.length);
-    }, 1100);
+    }, 700);
 
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(progressInterval);
           setIsFinished(true);
-          setTimeout(() => onComplete?.(), 900);
+          setTimeout(() => onComplete?.(), 500);
           return 100;
         }
         const remaining = 100 - prev;
-        const step = Math.max(0.4, remaining * 0.07);
-        const jitter = Math.random() * 1.5;
+        const step = Math.max(0.8, remaining * 0.12);
+        const jitter = Math.random() * 2.5;
         return Math.min(100, prev + step + jitter);
       });
-    }, 120);
+    }, 80);
 
     return () => { clearInterval(msgInterval); clearInterval(progressInterval); };
   }, [messages.length, onComplete]);
