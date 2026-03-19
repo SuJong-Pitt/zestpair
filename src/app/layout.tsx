@@ -61,10 +61,14 @@ export const metadata: Metadata = {
     images: ["/hero-illustration.png"],
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+    ],
     shortcut: "/icon.png",
     apple: "/apple-icon.png",
   },
+  manifest: "/manifest.json",
   robots: {
     index: true,
     follow: true,
