@@ -103,12 +103,14 @@ export default function FloatingAssistant() {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
-    // 모바일에서도 말풍선을 보여주되, 조금 더 컴팩트하게 조절
+    // 쾌적한 모바일 UI를 위해 첫 진입 시 말풍선을 자동으로 띄우지 않도록 조정
     const timer = setTimeout(() => {
       setIsVisible(true);
       setMessage(messages[0]);
-      // 모바일에서는 3초 후에 말풍선 노출 (약간의 레이턴시로 주목도 높임)
-      setTimeout(() => setShowBubble(true), isMobile ? 3000 : 500);
+      // 데스크탑에서만 자동으로 첫 말풍선 노출 (모바일은 클릭 시에만)
+      if (!isMobile) {
+        setTimeout(() => setShowBubble(true), 500);
+      }
     }, 1500);
     return () => clearTimeout(timer);
   }, [isMobile, messages]);
@@ -117,14 +119,19 @@ export default function FloatingAssistant() {
     if (!isVisible) return;
     setShowBubble(false);
     setIsBubbleDismissed(false);
-    setTimeout(() => {
-      setMessage(messages[0]);
-      setShowBubble(true);
-    }, 800);
+    
+    // 언어 변경 시에만 반응하고, 모바일에서는 여전히 자동으로 띄우지 않음
+    if (!isMobile) {
+      setTimeout(() => {
+        setMessage(messages[0]);
+        setShowBubble(true);
+      }, 800);
+    }
   }, [language, isVisible, isMobile, messages]);
 
   useEffect(() => {
-    if (!isVisible || isBubbleDismissed) return;
+    // 모바일에서는 인터벌 메시지도 최소화하여 시야 방해 방지
+    if (!isVisible || isBubbleDismissed || isMobile) return;
     const interval = setInterval(() => {
       setShowBubble(false);
       setPoriStatus('thinking');
@@ -136,7 +143,7 @@ export default function FloatingAssistant() {
       }, 1200);
     }, 15000);
     return () => clearInterval(interval);
-  }, [isVisible, messages, isBubbleDismissed]);
+  }, [isVisible, messages, isBubbleDismissed, isMobile]);
 
   if (!isVisible) return null;
 
