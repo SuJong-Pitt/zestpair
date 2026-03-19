@@ -88,6 +88,13 @@ export const UI_TRANSLATIONS = {
             analyzing: "분석 중...",
             analyze: "분석 시작",
         },
+        upsell: {
+            title: "보이지 않는 마지막 퍼즐",
+            subtitle: "현재 조합에 이 성분만 더하면 시너지가 완벽해집니다.",
+            complete: "시너지 완성하기",
+            benefit: "기대 효과",
+            buyToComplete: "{ingredient} 구매하고 시너지 완성",
+        },
         products: {
             curationTitle: "AI 정밀 시너지 추천",
             relatedTo: "{ingredient} 관련 맞춤추천",
@@ -184,6 +191,13 @@ export const UI_TRANSLATIONS = {
             ready: "Analyze now!",
             analyzing: "Analyzing...",
             analyze: "Start Analysis",
+        },
+        upsell: {
+            title: "The Missing Piece",
+            subtitle: "Add this ingredient to complete the perfect synergy triad.",
+            complete: "Complete the Synergy",
+            benefit: "Key Benefit",
+            buyToComplete: "Buy {ingredient} to Complete",
         },
         products: {
             curationTitle: "AI Precision Synergy Recommendation",

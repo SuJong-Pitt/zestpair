@@ -63,6 +63,46 @@ const interactionTypeConfig = {
     },
 } as const;
 
+/* --- 시너지 완성 전용 트라이어드 데이터 --- */
+const SYNERGY_TRIADS = [
+    {
+        id: "immune",
+        ingredients: ["vitamin d", "zinc", "비타민 d", "아연"],
+        missing: { id: "magnesium", name: "마그네슘", name_en: "Magnesium" },
+        benefit: { 
+            ko: "비타민 D의 활성화를 돕고 아연과 함께 면역 체계의 상호작용을 완성합니다.", 
+            en: "Completes the immune system by aiding Vit D activation and Zinc synergy." 
+        }
+    },
+    {
+        id: "bone",
+        ingredients: ["calcium", "vitamin d", "칼슘", "비타민 d"],
+        missing: { id: "vitamin k2", name: "비타민 K2", name_en: "Vitamin K2" },
+        benefit: { 
+            ko: "칼슘이 혈관 대신 뼈로 직접 흡수되도록 돕는 결정적인 역할을 합니다.", 
+            en: "Ensures calcium is directed to bones rather than arteries (Essential Triad)." 
+        }
+    },
+    {
+        id: "eye",
+        ingredients: ["lutein", "zeaxanthin", "루테인", "지아잔틴"],
+        missing: { id: "omega-3", name: "오메가3", name_en: "Omega-3" },
+        benefit: { 
+            ko: "망막 보호 성분들에 지질막 안정화를 더해 안구 건조와 피로를 동시에 해결합니다.", 
+            en: "Adds lipid membrane stability to retinal protectors for a complete eye care solution." 
+        }
+    },
+    {
+        id: "stress",
+        ingredients: ["magnesium", "b-vitamin", "b-complex", "마그네슘", "비타민 b"],
+        missing: { id: "coq10", name: "코엔자임 Q10", name_en: "CoQ10" },
+        benefit: { 
+            ko: "신경 안정과 에너지 생성을 너머, 미토콘드리아 건강의 마지막 퍼즐을 맞춥니다.", 
+            en: "Goes beyond nerve stability to complete the mitochondrial energy production cycle." 
+        }
+    }
+];
+
 /** 점수 링 컴포넌트 - 미래형 AI HUD 버전 */
 function ScoreRing({ score }: { score: number }) {
     const radius = 72;
@@ -676,6 +716,19 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                     </p>
                                 </div>
                             </div>
+
+                            {/* Prominent Disclaimer Below Summary */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                transition={{ delay: 1 }}
+                                className="mt-4 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20"
+                            >
+                                <AlertTriangle size={12} className="text-amber-400" />
+                                <p className="text-[10px] md:text-[11px] font-bold text-amber-200/70 tracking-tight">
+                                    {t.common.medicalDisclaimerBody}
+                                </p>
+                            </motion.div>
                         </motion.div>
 
                         {/* 공유 버튼 (Share Action) */}
@@ -818,6 +871,122 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                     </motion.div>
                 )}
             </div>
+
+            {/* --- 시너지 완성 추천 (Contextual Upselling) --- */}
+            {(() => {
+                // 현재 장바구니 성분 이름 리스트 (소문자/트림)
+                const currentIngNames = result.ingredients.map(ing => (ing.name_en || ing.name).toLowerCase().trim());
+                
+                // 아직 장바구니에 없는 누락된 트라이어드 찾기
+                const triad = SYNERGY_TRIADS.find(t => {
+                    // 트라이어드 필수 성분 중 2개 이상이 이미 있고, 보완 성분(missing)은 아직 없을 때
+                    const matchedCount = t.ingredients.filter(req => 
+                        currentIngNames.some(own => own.includes(req.toLowerCase()))
+                    ).length;
+                    
+                    const isMissingPresent = currentIngNames.some(own => 
+                        own.includes(t.missing.id.toLowerCase()) || 
+                        own.includes(t.missing.name_en.toLowerCase()) ||
+                        own.includes(t.missing.name.toLowerCase())
+                    );
+
+                    return matchedCount >= 2 && !isMissingPresent;
+                });
+
+                if (!triad) return null;
+
+                const missingName = language === 'ko' ? triad.missing.name : triad.missing.name_en;
+                const buyUrl = language === 'ko' 
+                    ? `https://www.coupang.com/np/search?q=${encodeURIComponent(triad.missing.name)}`
+                    : `https://www.amazon.com/s?k=${encodeURIComponent(triad.missing.name_en)}`;
+
+                return (
+                    <div className="px-4 pt-16 pb-8">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="max-w-3xl mx-auto relative group"
+                        >
+                            {/* 프리미엄 백그라운드 효과 */}
+                            <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 via-yellow-400/20 to-amber-500/20 rounded-[3rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000" />
+                            
+                            <div className="relative p-1 bg-gradient-to-br from-amber-200/50 via-white/10 to-transparent rounded-[3rem] backdrop-blur-xl shadow-2xl">
+                                <div className="bg-white/80 rounded-[2.8rem] p-8 md:p-12 overflow-hidden relative">
+                                    {/* 장식용 패턴 */}
+                                    <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
+                                        <Sparkles size={120} className="text-amber-500" />
+                                    </div>
+                                    
+                                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                                        {/* 시각적 도식 (Triad Visualization) */}
+                                        <div className="flex-shrink-0 relative">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-16 h-16 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center shadow-inner relative overflow-hidden">
+                                                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-emerald-500/10" />
+                                                    <ShieldCheck size={28} className="text-slate-400" />
+                                                </div>
+                                                <div className="text-2xl font-black text-slate-300">+</div>
+                                                <div className="w-20 h-20 rounded-2xl bg-amber-50 border-2 border-dashed border-amber-300 flex flex-col items-center justify-center p-2 relative">
+                                                    <div className="absolute inset-0 bg-amber-500/5 animate-pulse rounded-2xl" />
+                                                    <Zap size={20} className="text-amber-500 mb-1" />
+                                                    <span className="text-[10px] font-black text-amber-600 uppercase tracking-tighter line-clamp-1">{missingName}</span>
+                                                </div>
+                                            </div>
+                                            {/* 커넥션 애니메이션 */}
+                                            <div className="absolute -inset-4 border border-amber-500/10 rounded-full animate-[spin_10s_linear_infinite]" />
+                                        </div>
+
+                                        <div className="flex-1 text-center md:text-left space-y-4">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 border border-amber-200">
+                                                <Sparkles size={12} className="text-amber-600" />
+                                                <span className="text-[10px] font-black text-amber-700 uppercase tracking-widest leading-none pt-px">
+                                                    {language === 'ko' ? '시너지 완성 추천' : 'Synergy Completion'}
+                                                </span>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <h3 className="text-2xl md:text-3xl font-[1000] text-slate-800 tracking-tight leading-tight">
+                                                    {language === 'ko' ? '보이지 않는 마지막 퍼즐' : 'The Missing Piece'}
+                                                </h3>
+                                                <p className="text-sm md:text-base text-slate-500 font-bold leading-relaxed max-w-sm">
+                                                    {language === 'ko' 
+                                                        ? `${missingName} 성분만 더하면 현재 조합의 시너지가 완벽해집니다.` 
+                                                        : `Add ${missingName} to complete the perfectly balanced synergy triad.`}
+                                                </p>
+                                            </div>
+
+                                            <div className="pt-2">
+                                                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100/50">
+                                                    <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1 opacity-60">
+                                                        {language === 'ko' ? '기대 효과' : 'Key Benefit'}
+                                                    </p>
+                                                    <p className="text-[13px] md:text-sm text-slate-600 font-bold leading-relaxed">
+                                                        " {language === 'ko' ? triad.benefit.ko : triad.benefit.en} "
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
+                                                <a 
+                                                    href={buyUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-amber-500 text-white font-[1000] text-sm transition-all hover:bg-amber-600 hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(245,158,11,0.3)] group/btn"
+                                                >
+                                                    <ShoppingCart size={18} className="group-hover/btn:animate-bounce" />
+                                                    <span>{language === 'ko' ? `${missingName} 구매하고 시너지 완성` : `Buy ${missingName} to Complete`}</span>
+                                                    <ArrowRight size={18} className="ml-1 opacity-50" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                );
+            })()}
 
             {/* 쇼핑 섹션 - Personalized Medical Recommendation */}
             <div className="relative rounded-[3rem] md:rounded-[4rem] bg-[#0f172a] shadow-[0_40px_100px_rgba(0,0,0,0.6)]">
@@ -989,51 +1158,6 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 </motion.div>
             </div>
 
-            {/* 법적 고지 - Premium Professional Layout */}
-            <div className="mt-32 pb-32 px-4">
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    className="max-w-3xl mx-auto relative"
-                >
-                    {/* 상단 장식선 */}
-                    <div className="flex items-center justify-center gap-4 mb-8">
-                        <div className="h-px w-12 bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-                        <div className="relative group/icon">
-                            <div className="absolute inset-0 bg-amber-500/10 blur-xl rounded-full scale-150 animate-pulse" />
-                            <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center relative z-10">
-                                <AlertTriangle size={18} className="text-amber-500" />
-                            </div>
-                        </div>
-                        <div className="h-px w-12 bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-                    </div>
-
-                    <div className="text-center space-y-4">
-                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4">
-                            {t.common.medicalDisclaimerTitle}
-                        </h4>
-
-                        <div className="relative p-8 md:p-10 rounded-[2.5rem] bg-slate-50/30 border border-slate-100/50 backdrop-blur-sm shadow-inner group/body">
-                            {/* 코너 데코레이션 */}
-                            <div className="absolute top-0 right-10 w-20 h-px bg-gradient-to-r from-transparent via-emerald-200/50 to-transparent" />
-                            <div className="absolute bottom-0 left-10 w-20 h-px bg-gradient-to-r from-transparent via-sky-200/50 to-transparent" />
-
-                            <p className="text-[13px] md:text-[15px] text-slate-400 font-medium leading-[1.8] tracking-tight max-w-2xl mx-auto italic opacity-80 group-hover/body:opacity-100 transition-opacity duration-700">
-                                {t.common.medicalDisclaimerBody}
-                            </p>
-                        </div>
-
-                        {/* 하단 시스템 시그니처 */}
-                        <div className="pt-6 flex flex-col items-center opacity-40">
-                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mb-2" />
-                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-[0.5em] pl-[0.5em]">
-                                ZestPair Security Protocol
-                            </span>
-                        </div>
-                    </div>
-                </motion.div>
-            </div>
         </motion.div>
     );
 }

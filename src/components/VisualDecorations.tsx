@@ -181,7 +181,7 @@ export default function VisualDecorations() {
       />
 
       {/* === 데이터 통계 뱃지 === */}
-      <div className="absolute top-16 left-8 z-20 hidden xl:flex flex-col gap-5">
+      <div className="absolute top-24 left-8 z-20 hidden xl:flex flex-col gap-5">
         <motion.div
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}

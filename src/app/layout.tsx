@@ -97,6 +97,7 @@ export const viewport: Viewport = {
 
 import ScrollToTop from "@/components/ScrollToTop";
 import LanguageDetector from "@/components/LanguageDetector";
+import GlobalFooter from "@/components/GlobalFooter";
 
 export default function RootLayout({
   children,
@@ -121,6 +122,8 @@ export default function RootLayout({
           <main className="relative">
             {children}
           </main>
+
+          <GlobalFooter />
 
         </TooltipProvider>
       </body>

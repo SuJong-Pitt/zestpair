@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database } from "lucide-react";
+import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database, Smartphone } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import IngredientCard from "@/components/IngredientCard";
 import FloatingBasketBar from "@/components/FloatingBasketBar";
 import dynamic from "next/dynamic";
@@ -249,20 +250,26 @@ export default function HomePage() {
         {/* 고도화된 배경 장식 */}
         {!isMobile && <VisualDecorations />}
 
-        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-50">
+        <div className="absolute top-6 left-6 right-6 sm:top-10 sm:left-10 sm:right-10 z-50 flex items-center justify-between pointer-events-none">
           <button
             onClick={() => setLanguage(language === "ko" ? "en" : "ko")}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-[10px] transition-all hover:bg-white/20 active:scale-90 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-[10px] transition-all hover:bg-white/20 active:scale-95 shadow-lg group pointer-events-auto"
           >
             <div className="w-5 h-5 rounded-full bg-emerald-400 flex items-center justify-center group-hover:rotate-180 transition-transform duration-500">
               <Languages size={12} className="text-slate-900" />
             </div>
             <span className="tracking-widest uppercase mr-1">{language === "ko" ? "EN" : "KO"}</span>
           </button>
+          
+          <Link
+            href="/about"
+            className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl text-white/70 font-black text-[10px] transition-all hover:bg-white/20 hover:text-white active:scale-95 shadow-lg pointer-events-auto"
+          >
+            <span>{language === 'ko' ? '서비스 소개' : 'About'}</span>
+          </Link>
         </div>
 
         <div className="relative mx-auto max-w-3xl px-4 text-center">
-
           {/* === 로고 배지 === */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -279,8 +286,9 @@ export default function HomePage() {
               </div>
               <span className="text-white font-[1000] text-xs md:text-sm tracking-[0.2em] uppercase">ZestPair</span>
               <div className="w-px h-3 md:h-4 bg-white/20 mx-0.5 md:mx-1" />
-              <span
-                className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#6ee7b7] flex items-center gap-1 md:gap-1.5"
+              <Link
+                href="/about"
+                className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#6ee7b7] flex items-center gap-1 md:gap-1.5 hover:opacity-80 transition-opacity group/core"
               >
                 <motion.span
                   animate={{ opacity: [0.4, 1, 0.4] }}
@@ -288,7 +296,8 @@ export default function HomePage() {
                   className="w-1 md:h-1.5 h-1 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"
                 />
                 <span className="hidden xs:inline">AI Synergy Core</span> v2.5
-              </span>
+                <Info size={10} className="text-[#6ee7b7]/60 group-hover/core:text-[#6ee7b7] transition-colors" />
+              </Link>
             </div>
           </motion.div>
 
@@ -465,6 +474,7 @@ export default function HomePage() {
               { icon: "🔬", text: language === 'ko' ? 'AI 성분 매칭' : 'AI Matching', color: "rgba(52,211,153,0.9)" },
               { icon: "🛡️", text: language === 'ko' ? '충돌 감지' : 'Conflict Alert', color: "rgba(239,68,68,0.9)" },
               { icon: "✨", text: language === 'ko' ? '시너지 발견' : 'Synergy Finder', color: "rgba(167,139,250,0.9)" },
+              { icon: "📱", text: language === 'ko' ? 'App 출시 예정' : 'App Coming Soon', color: "rgba(96,165,250,0.9)" },
               { icon: "💚", text: language === 'ko' ? '무료 서비스' : 'Free Forever', color: "rgba(52,211,153,0.9)" },
             ].map((badge, i) => (
               <motion.span
