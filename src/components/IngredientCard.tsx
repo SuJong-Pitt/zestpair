@@ -1,7 +1,7 @@
 "use client";
 
-import { memo } from "react";
-import { motion } from "framer-motion";
+import { memo, useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { Ingredient } from "@/types/database";
 import { useBasketStore } from "@/store/basketStore";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
   const hasMounted = useHasMounted();
   const { isSelected, toggleIngredient, language } = useBasketStore();
   const selected = hasMounted ? isSelected(ingredient.id) : false;
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const t = UI_TRANSLATIONS[language];
   const name = language === "ko" ? ingredient.name : ingredient.name_en;
@@ -34,9 +35,25 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
   const desc = language === "ko" ? ingredient.description : (ingredient.description_en || ingredient.description);
   const theme = getCategoryTheme(ingredient.name);
 
+  // 말풍선 자동 사라짐 타이머 (3초)
+  useEffect(() => {
+    if (showTooltip) {
+      const timer = setTimeout(() => setShowTooltip(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showTooltip]);
+
+  const handleToggle = () => {
+    toggleIngredient(ingredient);
+    // 선택할 때마다 말풍선을 자연스럽게 보여줌
+    setShowTooltip(true);
+  };
+
   return (
     <button
-      onClick={() => toggleIngredient(ingredient)}
+      onClick={handleToggle}
+      onMouseEnter={() => !selected && setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
       className="group relative w-full text-left transition-transform duration-200 active:scale-95 hover:-translate-y-1"
     >
       {/* ── 카드 본체 ── */}
@@ -58,13 +75,13 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
       >
         {/* ── 쉬머 효과 (Premium Glossy Feel) ── */}
         <motion.div
-           animate={{ x: ["-100%", "200%"] }}
-           transition={{ duration: 4, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
-           className="absolute inset-0 z-10 pointer-events-none opacity-[0.4]"
-           style={{
-             background: "linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%)",
-             backgroundSize: "200% 100%"
-           }}
+          animate={{ x: ["-100%", "200%"] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
+          className="absolute inset-0 z-10 pointer-events-none opacity-[0.4]"
+          style={{
+            background: "linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%)",
+            backgroundSize: "200% 100%"
+          }}
         />
 
         {/* ── 배경 글로우 오브 (Selected) ── */}
@@ -122,11 +139,11 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
         >
           <span
             className="relative z-10 text-4xl md:text-5xl transition-transform duration-500"
-            style={selected ? { 
-              transform: "scale(1.1)", 
-              filter: `drop-shadow(0 0 12px ${theme.glow})` 
-            } : { 
-              filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.12))" 
+            style={selected ? {
+              transform: "scale(1.1)",
+              filter: `drop-shadow(0 0 12px ${theme.glow})`
+            } : {
+              filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.12))"
             }}
           >
             {ingredient.icon_emoji}
@@ -202,29 +219,39 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
         </div>
       </div>
 
-      {/* ── 인라인 툴팁 (단순화) ── */}
-      <div
-        className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full mb-2 w-[220px] z-[200] pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-200 scale-95 group-hover:scale-100"
-      >
-        <div
-          className="rounded-2xl p-4 bg-slate-950/95 border backdrop-blur-xl shadow-2xl"
-          style={{ borderColor: `${theme.color}40` }}
-        >
-          <div className="flex items-center gap-2 mb-2 pb-2" style={{ borderBottom: `1px solid ${theme.color}20` }}>
-            <span className="text-base">{ingredient.icon_emoji}</span>
-            <span className="text-[9px] font-[1000] uppercase tracking-widest" style={{ color: theme.color }}>
-              {t.common.analysisProtocol}
-            </span>
-          </div>
-          <p className="text-[11px] leading-relaxed text-slate-200 font-semibold">
-            {desc}
-          </p>
-        </div>
-        <div
-          className="w-3 h-3 mx-auto rotate-45 -mt-1.5 bg-[#020617] border-r border-b"
-          style={{ borderRightColor: `${theme.color}40`, borderBottomColor: `${theme.color}40` }}
-        />
-      </div>
+      {/* ── 개선된 인라인 툴팁 (마이크로 말풍선) ── */}
+      <AnimatePresence>
+        {showTooltip && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: -5, x: "-50%" }}
+            animate={{ opacity: 1, scale: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, scale: 0.8, y: 5, x: "-50%" }}
+            className="absolute -top-3 left-1/2 z-[200] pointer-events-none"
+          >
+            <div
+              className="relative rounded-2xl p-3 md:p-4 bg-slate-950/95 border backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-[200px] md:w-[240px]"
+              style={{ borderColor: `${theme.color}40`, borderTop: `1.5px solid ${theme.color}80` }}
+            >
+              <div className="flex items-center gap-2 mb-1.5 md:mb-2 pb-1.5 md:pb-2" style={{ borderBottom: `1px solid ${theme.color}20` }}>
+                <span className="text-sm md:text-base">{ingredient.icon_emoji}</span>
+                <span className="text-[8px] md:text-[9px] font-[1000] uppercase tracking-widest" style={{ color: theme.color }}>
+                  {t.common.analysisProtocol}
+                </span>
+                <span className="ml-auto w-1 h-1 rounded-full animate-pulse" style={{ background: theme.color }} />
+              </div>
+              <p className="text-[10px] md:text-[11px] leading-relaxed text-slate-200 font-semibold tracking-tight">
+                {desc}
+              </p>
+
+              {/* 말풍선 꼬리 */}
+              <div
+                className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 rotate-45 bg-[#020617] border-r border-b"
+                style={{ borderRightColor: `${theme.color}40`, borderBottomColor: `${theme.color}40` }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </button>
   );
 });
