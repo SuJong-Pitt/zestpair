@@ -6,6 +6,7 @@ import { FlaskConical, X, Sparkles, ShoppingBasket, ChevronUp, Trash2, Zap, Sear
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UI_TRANSLATIONS } from "@/lib/i18n";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 import type { Ingredient } from "@/types/database";
 
@@ -21,6 +22,8 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
   const setIsExpanded = setBasketExpanded;
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const t = UI_TRANSLATIONS[language];
   const count = selectedIngredients.length;
@@ -49,7 +52,7 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className="fixed left-0 right-0 bottom-0 z-40 pointer-events-none flex justify-center"
+          className="fixed left-0 right-0 bottom-0 z-50 pointer-events-none flex justify-center"
           style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 2rem)' }}
         >
           {/* 배경 블러 오버레이 */}
@@ -216,7 +219,9 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
 
               {/* 검색 & 정보 토글 가능 영역 */}
               <div className="flex items-center flex-1 min-w-0 gap-3">
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsSearchActive(!isSearchActive);
@@ -226,19 +231,30 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
                     }
                   }}
                   className={cn(
-                    "h-11 md:h-12 rounded-xl flex items-center justify-center transition-all shrink-0 px-4",
+                    "h-11 md:h-12 rounded-xl flex items-center justify-center transition-all shrink-0 px-4 relative overflow-hidden",
                     isSearchActive
-                      ? "w-11 md:w-12 bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]"
-                      : "bg-white/5 border border-white/10 text-white/40 hover:text-white/80"
+                      ? "w-11 md:w-12 text-white"
+                      : "w-auto bg-white/[0.03] border border-white/10 backdrop-blur-xl text-white/40 hover:text-white/80 hover:bg-white/[0.06] hover:border-white/20"
                   )}
+                  style={isSearchActive ? {
+                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                    boxShadow: "0 0 20px rgba(16,185,129,0.4), inset 0 1px 0 rgba(255,255,255,0.2)"
+                  } : {}}
                 >
+                  {isSearchActive && (
+                    <motion.div
+                      animate={{ opacity: [0.4, 1, 0.4] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="absolute inset-0 bg-white/10 pointer-events-none"
+                    />
+                  )}
                   {isSearchActive ? <X size={20} /> : (
                     <div className="flex items-center gap-2">
-                      <SearchIcon size={20} />
-                      <span className="text-[10px] font-black uppercase tracking-widest">{language === 'ko' ? '검색' : 'SEARCH'}</span>
+                      <SearchIcon size={20} className="transition-transform group-hover:scale-110" />
+                      <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest">{language === 'ko' ? '검색' : 'SEARCH'}</span>
                     </div>
                   )}
-                </button>
+                </motion.button>
 
                 <div className="flex-1 min-w-0">
                   <AnimatePresence mode="wait">
@@ -288,65 +304,89 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
                             <ChevronUp size={14} strokeWidth={3} />
                           </motion.div>
                         </div>
-                        <span
-                          className="text-[10px] md:text-xs font-semibold truncate opacity-60 group-hover/info:opacity-100 transition-opacity"
-                          style={{ color: canAnalyze ? "rgba(52,211,153,0.8)" : "rgba(255,255,255,0.35)" }}
+                        <motion.span
+                          initial={false}
+                          animate={canAnalyze ? {
+                            y: [0, -1.5, 0],
+                            opacity: [0.7, 1, 0.7],
+                            scale: [1, 1.05, 1],
+                            color: ["rgba(52,211,153,0.8)", "rgba(110,231,183,1)", "rgba(52,211,153,0.8)"]
+                          } : { y: 0, opacity: 0.6, scale: 1, color: "rgba(255,255,255,0.35)" }}
+                          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                          className="text-[10px] md:text-xs font-bold truncate group-hover/info:opacity-100 flex items-center gap-1.5"
                         >
-                          {count < 2 ? t.basket.notEnough : t.basket.ready}
-                        </span>
+                          {count < 2 ? t.basket.notEnough : (
+                            <>
+                              {t.basket.ready}
+                              <motion.span
+                                animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.3, 1] }}
+                                transition={{ duration: 3, repeat: Infinity }}
+                              >
+                                <Sparkles size={10} className="text-amber-300" />
+                              </motion.span>
+                            </>
+                          )}
+                        </motion.span>
                       </motion.button>
                     )}
                   </AnimatePresence>
                 </div>
               </div>
 
-              {/* 분석 버튼 */}
-              <motion.button
-                whileHover={canAnalyze ? { scale: 1.04 } : {}}
-                whileTap={canAnalyze ? { scale: 0.95 } : {}}
-                onClick={() => {
-                  setIsExpanded(false);
-                  setIsSearchActive(false);
-                  onAnalyze();
-                }}
-                disabled={!canAnalyze || isAnalyzing}
-                className="relative shrink-0 overflow-hidden rounded-full font-[900] text-xs md:text-sm px-6 md:px-9 h-11 md:h-12 transition-all duration-400"
-                style={canAnalyze ? {
-                  background: "linear-gradient(135deg, #10b981 0%, #0891b2 60%, #7c3aed 100%)",
-                  color: "white",
-                  boxShadow: isAnalyzing ? "none" : "0 6px 30px rgba(16,185,129,0.5), 0 2px 8px rgba(0,0,0,0.3)",
-                  letterSpacing: "0.07em",
-                } : {
-                  background: "rgba(255,255,255,0.06)",
-                  color: "rgba(255,255,255,0.2)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  letterSpacing: "0.07em"
-                }}
-              >
-                {/* 호버 시 스캐너 효과 */}
-                {canAnalyze && (
-                  <motion.span
-                    animate={{ x: ["-120%", "220%"] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
-                    className="absolute inset-y-0 w-1/3 pointer-events-none"
-                    style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)", transform: "skewX(-12deg)" }}
-                  />
+              {/* 분석 버튼 (모바일 검색 시에는 숨김 처리하여 검색창 공간 확보) */}
+              <AnimatePresence>
+                {!(isMobile && isSearchActive) && (
+                  <motion.button
+                    initial={isMobile ? { opacity: 0, x: 20 } : undefined}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={isMobile ? { opacity: 0, x: 20 } : undefined}
+                    whileHover={canAnalyze ? { scale: 1.04 } : {}}
+                    whileTap={canAnalyze ? { scale: 0.95 } : {}}
+                    onClick={() => {
+                      setIsExpanded(false);
+                      setIsSearchActive(false);
+                      onAnalyze();
+                    }}
+                    disabled={!canAnalyze || isAnalyzing}
+                    className="relative shrink-0 overflow-hidden rounded-full font-[900] text-xs md:text-sm px-6 md:px-9 h-11 md:h-12 transition-all duration-400"
+                    style={canAnalyze ? {
+                      background: "linear-gradient(135deg, #10b981 0%, #0891b2 60%, #7c3aed 100%)",
+                      color: "white",
+                      boxShadow: isAnalyzing ? "none" : "0 6px 30px rgba(16,185,129,0.5), 0 2px 8px rgba(0,0,0,0.3)",
+                      letterSpacing: "0.07em",
+                    } : {
+                      background: "rgba(255,255,255,0.06)",
+                      color: "rgba(255,255,255,0.2)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      letterSpacing: "0.07em"
+                    }}
+                  >
+                    {/* 호버 시 스캐너 효과 */}
+                    {canAnalyze && (
+                      <motion.span
+                        animate={{ x: ["-120%", "220%"] }}
+                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
+                        className="absolute inset-y-0 w-1/3 pointer-events-none"
+                        style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)", transform: "skewX(-12deg)" }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center gap-2">
+                      {isAnalyzing ? (
+                        <>
+                          <FlaskConical size={15} className="animate-spin" />
+                          <span className="hidden sm:inline uppercase">{t.basket.analyzing}</span>
+                          <span className="sm:hidden">···</span>
+                        </>
+                      ) : (
+                        <>
+                          <Zap size={15} className={canAnalyze ? "text-yellow-200" : ""} />
+                          <span className="uppercase">{language === 'ko' ? '분석' : 'ANALYZE'}</span>
+                        </>
+                      )}
+                    </span>
+                  </motion.button>
                 )}
-                <span className="relative z-10 flex items-center gap-2">
-                  {isAnalyzing ? (
-                    <>
-                      <FlaskConical size={15} className="animate-spin" />
-                      <span className="hidden sm:inline uppercase">{t.basket.analyzing}</span>
-                      <span className="sm:hidden">···</span>
-                    </>
-                  ) : (
-                    <>
-                      <Zap size={15} className={canAnalyze ? "text-yellow-200" : ""} />
-                      <span className="uppercase">{language === 'ko' ? '분석' : 'ANALYZE'}</span>
-                    </>
-                  )}
-                </span>
-              </motion.button>
+              </AnimatePresence>
             </div>
 
             {/* 하단 프로그레스 바 */}

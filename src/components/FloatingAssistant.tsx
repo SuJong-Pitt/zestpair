@@ -103,14 +103,12 @@ export default function FloatingAssistant() {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
-    // 쾌적한 모바일 UI를 위해 첫 진입 시 말풍선을 자동으로 띄우지 않도록 조정
+    // 모바일에서도 첫 진입 시 자동으로 말풍선 노출 (선택 시 숨겨지는 로직이 추가되었으므로 가이드로 활용)
     const timer = setTimeout(() => {
       setIsVisible(true);
       setMessage(messages[0]);
-      // 데스크탑에서만 자동으로 첫 말풍선 노출 (모바일은 클릭 시에만)
-      if (!isMobile) {
-        setTimeout(() => setShowBubble(true), 500);
-      }
+      // 모바일은 주목도를 위해 2.5초 뒤에, 데스크탑은 0.5초 뒤에 노출
+      setTimeout(() => setShowBubble(true), isMobile ? 2500 : 500);
     }, 1500);
     return () => clearTimeout(timer);
   }, [isMobile, messages]);
@@ -120,18 +118,16 @@ export default function FloatingAssistant() {
     setShowBubble(false);
     setIsBubbleDismissed(false);
     
-    // 언어 변경 시에만 반응하고, 모바일에서는 여전히 자동으로 띄우지 않음
-    if (!isMobile) {
-      setTimeout(() => {
-        setMessage(messages[0]);
-        setShowBubble(true);
-      }, 800);
-    }
+    // 언어 변경 시 가이드를 위해 노출
+    setTimeout(() => {
+      setMessage(messages[0]);
+      setShowBubble(true);
+    }, isMobile ? 1200 : 800);
   }, [language, isVisible, isMobile, messages]);
 
   useEffect(() => {
-    // 모바일에서는 인터벌 메시지도 최소화하여 시야 방해 방지
-    if (!isVisible || isBubbleDismissed || isMobile) return;
+    // 선택 안된 상태에서는 모바일에서도 이따금씩 팁을 보여주도록 인터벌 재활성화
+    if (!isVisible || isBubbleDismissed) return;
     const interval = setInterval(() => {
       setShowBubble(false);
       setPoriStatus('thinking');
@@ -141,17 +137,20 @@ export default function FloatingAssistant() {
         setPoriStatus('idle');
         setShowBubble(true);
       }, 1200);
-    }, 15000);
+    }, 20000); // 모바일 배려를 위해 인터벌 주기를 조금 늘림 (20초)
     return () => clearInterval(interval);
   }, [isVisible, messages, isBubbleDismissed, isMobile]);
+
+  const shouldShowOnMobile = !hasItems || hasResult;
+  const renderAssistant = !isBasketExpanded && (!isMobile || shouldShowOnMobile);
 
   if (!isVisible) return null;
 
   return (
     <AnimatePresence>
-      {!isBasketExpanded && (
+      {renderAssistant && (
         <motion.div
-           className="fixed right-7 md:right-8 bottom-0 z-[100] pointer-events-none"
+           className="fixed right-7 md:right-8 bottom-0 z-60 pointer-events-none"
            id="pori-assistant-root"
          >
            <motion.div

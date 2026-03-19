@@ -55,6 +55,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
       onMouseEnter={() => !selected && setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
       className="group relative w-full text-left transition-transform duration-200 active:scale-95 hover:-translate-y-1"
+      style={{ zIndex: showTooltip ? 30 : 1 }}
     >
       {/* ── 카드 본체 ── */}
       <div
@@ -227,7 +228,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
             animate={{ opacity: 1, scale: 1, y: 0, x: "-50%" }}
             exit={{ opacity: 0, scale: 0.8, y: 5, x: "-50%" }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute -top-3 left-1/2 z-[200] pointer-events-none"
+            className="absolute -top-3 left-1/2 z-[40] pointer-events-none"
           >
             <div
               className="relative rounded-[1.25rem] p-2.5 md:p-3.5 bg-slate-950/98 border backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] w-[175px] md:w-[240px]"
@@ -238,11 +239,11 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
                 <span className="text-[7.5px] md:text-[8.5px] font-[1000] uppercase tracking-widest" style={{ color: theme.color }}>
                   {t.common.analysisProtocol}
                 </span>
-                <motion.span 
-                  animate={{ opacity: [0.4, 1, 0.4] }} 
+                <motion.span
+                  animate={{ opacity: [0.4, 1, 0.4] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
-                  className="ml-auto w-1 h-1 rounded-full" 
-                  style={{ background: theme.color, boxShadow: `0 0 5px ${theme.color}` }} 
+                  className="ml-auto w-1 h-1 rounded-full"
+                  style={{ background: theme.color, boxShadow: `0 0 5px ${theme.color}` }}
                 />
               </div>
               <p className="text-[9.5px] md:text-[10.5px] leading-snug text-slate-200 font-bold tracking-tight">

@@ -597,40 +597,54 @@ export default function HomePage() {
                   whileHover={{ y: -3, scale: 1.02 }}
                   whileTap={{ scale: 0.96 }}
                   onClick={() => setSelectedCategory(key)}
-                  className="relative flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-2xl text-[12px] font-black transition-all duration-300"
+                  className="group relative flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-2xl text-[12px] font-black transition-all duration-300"
                   style={isActive ? {
                     background: "linear-gradient(135deg, #0a1a15 0%, #071210 100%)",
-                    border: "1.5px solid rgba(16,185,129,0.4)",
+                    border: "1.5px solid rgba(16,185,129,0.5)",
                     color: "#34d399",
-                    boxShadow: "0 0 20px rgba(16,185,129,0.2), 0 8px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)"
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.3), 0 0 15px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.08)"
                   } : {
-                    background: "rgba(255,255,255,0.8)",
-                    border: "1.5px solid rgba(0,0,0,0.05)",
+                    background: "rgba(255,255,255,0.45)",
+                    border: "1px solid rgba(0,0,0,0.04)",
                     color: "#64748b",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                    backdropFilter: "blur(12px)"
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+                    backdropFilter: "blur(16px)"
                   }}
                 >
-                  {/* 활성 배경 글로우 */}
+                  {/* 활성 배경 글로우 (Liquid Light 효과) */}
                   {isActive && (
                     <motion.div
                       layoutId="activeCategoryGlow"
-                      className="absolute inset-0 rounded-2xl pointer-events-none"
-                      style={{
-                        background: "radial-gradient(ellipse at center, rgba(16,185,129,0.12) 0%, transparent 70%)"
-                      }}
+                      className="absolute inset-x-0 -bottom-1 h-3 blur-md opacity-60 z-0 pointer-events-none"
+                      style={{ background: "#10b981" }}
                       transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                     />
                   )}
-                  <span className="relative z-10 text-base leading-none">{data.emoji}</span>
-                  <span className="relative z-10 tracking-tight">{data[language]}</span>
-                  {/* 활성 하단 닷 */}
+                  {/* 내부 광원 효과 (Active 전용) */}
                   {isActive && (
                     <motion.div
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                      style={{ background: "#10b981", boxShadow: "0 0 6px #10b981" }}
+                      animate={{ opacity: [0.1, 0.25, 0.1] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute inset-0 bg-emerald-400/10 rounded-2xl pointer-events-none"
+                    />
+                  )}
+                  <span className="relative z-10 text-base leading-none group-hover:scale-110 transition-transform">{data.emoji}</span>
+                  <motion.span 
+                    className="relative z-10 tracking-tight"
+                    animate={isActive ? { scale: 1.05 } : { scale: 1 }}
+                  >
+                    {data[language]}
+                  </motion.span>
+                  {/* 활성 하단 포인트 닷 */}
+                  {isActive && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0, y: 5 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-0.5 rounded-full"
+                      style={{ 
+                        background: "#10b981", 
+                        boxShadow: "0 0 8px #10b981, 0 0 16px #10b981" 
+                      }}
                     />
                   )}
                 </motion.button>
