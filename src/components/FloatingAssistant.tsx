@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
 // 포리의 풍부한 메시지 라이브러리 (상황별/성격별)
-const MIXY_MESSAGES_KO = [
+const PORI_MESSAGES_KO = [
   // 인사 및 환영
   "안녕! 나는 상호작용 마스터 포리야! 🧪✨",
   "오늘도 대표님의 영양 밸런스를 위해 포리 가동! 🚀",
@@ -48,7 +48,7 @@ const MIXY_MESSAGES_KO = [
   "포리는 대표님만의 전용 AI 영양사라구! 👩‍🔬",
 ];
 
-const MIXY_MESSAGES_EN = [
+const PORI_MESSAGES_EN = [
   // Greeting & Welcome
   "Hi! I'm Pori, the Master of Interactions! 🧪✨",
   "Activating Pori for your nutritional balance today! 🚀",
@@ -99,7 +99,7 @@ export default function FloatingAssistant() {
   const hasItems = selectedIngredients.length > 0;
   // 바구니 바가 보일 때 (바구니에 아이템이 있고, 분석 중이 아니고, 분석 결과가 없을 때)
   const isBasketBarVisible = hasItems && !isAnalyzing && !hasResult;
-  const messages = language === "ko" ? MIXY_MESSAGES_KO : MIXY_MESSAGES_EN;
+  const messages = language === "ko" ? PORI_MESSAGES_KO : PORI_MESSAGES_EN;
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
@@ -117,7 +117,7 @@ export default function FloatingAssistant() {
     if (!isVisible) return;
     setShowBubble(false);
     setIsBubbleDismissed(false);
-    
+
     // 언어 변경 시 가이드를 위해 노출
     setTimeout(() => {
       setMessage(messages[0]);
@@ -150,160 +150,216 @@ export default function FloatingAssistant() {
     <AnimatePresence>
       {renderAssistant && (
         <motion.div
-           className="fixed right-7 md:right-8 bottom-0 z-60 pointer-events-none"
-           id="pori-assistant-root"
-         >
-           <motion.div
-             initial={{ opacity: 0, scale: 0.8, y: 30 }}
-             animate={{ opacity: 1, scale: 1, y: 0 }}
-             exit={{ opacity: 0, scale: 0.8, y: 30 }}
-             transition={{ duration: 0.5, ease: "easeOut" }}
-             className="flex flex-col items-end"
-             style={{ 
-               paddingBottom: `calc(env(safe-area-inset-bottom, 0px) + ${isBasketBarVisible ? '130px' : (isMobile ? '20px' : '48px')})` 
-             }}
-           >
-             <AnimatePresence>
-                {showBubble && !isBubbleDismissed && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8, y: 20, filter: 'blur(10px)' }}
-                    animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
-                    exit={{ opacity: 0, scale: 0.8, y: 20, filter: 'blur(10px)' }}
-                    className="mb-2 md:mb-3 relative"
+          className="fixed right-7 md:right-8 bottom-0 z-60 pointer-events-none"
+          id="pori-assistant-root"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 30 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="flex flex-col items-end"
+            style={{
+              paddingBottom: `calc(env(safe-area-inset-bottom, 0px) + ${isBasketBarVisible ? '130px' : (isMobile ? '20px' : '48px')})`
+            }}
+          >
+            <AnimatePresence>
+              {showBubble && !isBubbleDismissed && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, y: 20, filter: 'blur(10px)' }}
+                  animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, scale: 0.8, y: 20, filter: 'blur(10px)' }}
+                  className="mb-2 md:mb-3 relative"
+                >
+                  <div
+                    className="relative px-4 py-3 md:px-5 md:py-4 rounded-[1.5rem] md:rounded-[2rem] max-w-[160px] md:max-w-[260px] pointer-events-auto group/bubble"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(8,12,24,0.92) 0%, rgba(10,22,20,0.92) 100%)",
+                      border: "1px solid rgba(16,185,129,0.25)",
+                      backdropFilter: "blur(20px)",
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06)"
+                    }}
                   >
-                    <div
-                      className="relative px-4 py-3 md:px-5 md:py-4 rounded-[1.5rem] md:rounded-[2rem] max-w-[160px] md:max-w-[260px] pointer-events-auto group/bubble"
-                      style={{
-                        background: "linear-gradient(145deg, rgba(8,12,24,0.92) 0%, rgba(10,22,20,0.92) 100%)",
-                        border: "1px solid rgba(16,185,129,0.25)",
-                        backdropFilter: "blur(20px)",
-                        boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06)"
-                      }}
-                    >
-                      <div className="absolute top-3 left-4 flex items-center gap-1">
-                        <motion.div
-                          animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.3, 1] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                          className="w-1.5 h-1.5 rounded-full"
-                          style={{ background: "#10b981", boxShadow: "0 0 6px #10b981" }}
-                        />
-                      </div>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowBubble(false);
-                          setIsBubbleDismissed(true);
-                        }}
-                        className="absolute top-2 right-2 p-1 rounded-full opacity-100 md:opacity-0 md:group-hover/bubble:opacity-100 transition-opacity hover:bg-white/10 text-white/40 hover:text-white"
-                      >
-                        <X size={12} />
-                      </button>
-
-                      <div className="flex flex-col gap-1.5">
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span
-                            className="text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2 md:px-2.5 py-0.5 rounded-full"
-                            style={{
-                              background: "linear-gradient(90deg, rgba(16,185,129,0.2), rgba(6,182,212,0.1))",
-                              border: "1px solid rgba(16,185,129,0.3)",
-                              color: "#6ee7b7"
-                            }}
-                          >
-                            Pori AI
-                          </span>
-                          {poriStatus === 'thinking' && (
-                            <div className="flex gap-0.5">
-                              {[1, 2, 3].map(i => (
-                                <motion.div
-                                  key={i}
-                                  animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
-                                  transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
-                                  className="w-1 h-1 rounded-full"
-                                  style={{ background: "#34d399" }}
-                                />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-[11px] md:text-[13px] font-semibold leading-relaxed tracking-tight break-keep" style={{ color: "rgba(255,255,255,0.82)" }}>
-                          {message}
-                        </p>
-                      </div>
-
-                      <div
-                        className="absolute -bottom-1.5 md:-bottom-2 right-7 md:right-9 w-3 h-3 md:w-4 md:h-4 rotate-45"
-                        style={{
-                          background: "linear-gradient(145deg, rgba(10,22,20,0.92), rgba(8,12,24,0.92))",
-                          borderRight: "1px solid rgba(16,185,129,0.2)",
-                          borderBottom: "1px solid rgba(16,185,129,0.2)"
-                        }}
+                    <div className="absolute top-3 left-4 flex items-center gap-1">
+                      <motion.div
+                        animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.3, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{ background: "#10b981", boxShadow: "0 0 6px #10b981" }}
                       />
                     </div>
-                  </motion.div>
-                )}
-             </AnimatePresence>
 
-             <div className="relative group pointer-events-auto">
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => {
-                    setShowBubble(false);
-                    setIsBubbleDismissed(false);
-                    setPoriStatus('happy');
-                    setTimeout(() => {
-                      const nextMsg = messages[Math.floor(Math.random() * messages.length)];
-                      setMessage(nextMsg);
-                      setShowBubble(true);
-                      setPoriStatus('idle');
-                    }, 400);
-                  }}
-                  className="relative w-16 h-16 md:w-32 md:h-32 cursor-pointer"
-                >
-                  <div className="absolute -inset-6 bg-gradient-to-tr from-emerald-500/30 via-teal-400/20 to-amber-300/20 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-1000 animate-pulse-slow" />
-                  
-                  <motion.div 
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-x-0 inset-y-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  >
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center border border-white/20 shadow-xl">
-                      <span className="text-xs">🧬</span>
-                    </div>
-                    <div className="absolute top-1/2 -right-4 -translate-y-1/2 w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center border border-white/20 shadow-xl">
-                      <span className="text-xs">⚡</span>
-                    </div>
-                    <div className="absolute bottom-1/2 -left-4 translate-y-1/2 w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center border border-white/20 shadow-xl">
-                      <span className="text-xs">🔬</span>
-                    </div>
-                  </motion.div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowBubble(false);
+                        setIsBubbleDismissed(true);
+                      }}
+                      className="absolute top-2 right-2 p-1 rounded-full opacity-100 md:opacity-0 md:group-hover/bubble:opacity-100 transition-opacity hover:bg-white/10 text-white/40 hover:text-white"
+                    >
+                      <X size={12} />
+                    </button>
 
-                  <img
-                    src="/images/mixy.png"
-                    alt="Pori"
-                    className={cn(
-                      "w-full h-full object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.25)] transition-all duration-500",
-                      poriStatus === 'thinking' ? "brightness-110 saturate-150" : ""
-                    )}
-                    style={{
-                      mixBlendMode: 'multiply',
-                      maskImage: 'radial-gradient(circle, black 65%, transparent 95%)',
-                      WebkitMaskImage: 'radial-gradient(circle, black 65%, transparent 95%)'
-                    }}
-                  />
-                  
-                  <div className="absolute bottom-4 right-4 md:bottom-7 md:right-7 flex items-center justify-center">
-                    <div className="absolute w-6 h-6 md:w-8 md:h-8 bg-emerald-400/30 rounded-full animate-ping" />
-                    <div className="relative w-3 h-3 md:w-5 md:h-5 bg-emerald-500 border-[3px] border-white rounded-full shadow-[0_0_15px_rgba(16,185,129,0.8)]" />
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span
+                          className="text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2 md:px-2.5 py-0.5 rounded-full"
+                          style={{
+                            background: "linear-gradient(90deg, rgba(16,185,129,0.2), rgba(6,182,212,0.1))",
+                            border: "1px solid rgba(16,185,129,0.3)",
+                            color: "#6ee7b7"
+                          }}
+                        >
+                          Pori AI
+                        </span>
+                        {poriStatus === 'thinking' && (
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3].map(i => (
+                              <motion.div
+                                key={i}
+                                animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
+                                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
+                                className="w-1 h-1 rounded-full"
+                                style={{ background: "#34d399" }}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-[11px] md:text-[13px] font-semibold leading-relaxed tracking-tight break-keep" style={{ color: "rgba(255,255,255,0.82)" }}>
+                        {message}
+                      </p>
+                    </div>
+
+                    <div
+                      className="absolute -bottom-1.5 md:-bottom-2 right-7 md:right-9 w-3 h-3 md:w-4 md:h-4 rotate-45"
+                      style={{
+                        background: "linear-gradient(145deg, rgba(10,22,20,0.92), rgba(8,12,24,0.92))",
+                        borderRight: "1px solid rgba(16,185,129,0.2)",
+                        borderBottom: "1px solid rgba(16,185,129,0.2)"
+                      }}
+                    />
                   </div>
-
-                  <motion.div animate={{ y: [0, -20, 0], opacity: [1, 0, 1] }} transition={{ duration: 3, repeat: Infinity }} className="absolute -top-2 -right-2 text-sm md:text-xl">✨</motion.div>
-                  <motion.div animate={{ x: [0, 15, 0], rotate: [0, 360, 0] }} transition={{ duration: 5, repeat: Infinity }} className="absolute top-1/2 -left-6 text-sm md:text-lg opacity-80">💊</motion.div>
-                  <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} className="absolute -bottom-2 -left-2 text-sm md:text-lg">💎</motion.div>
                 </motion.div>
-             </div>
-           </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="relative group pointer-events-auto">
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => {
+                  setShowBubble(false);
+                  setIsBubbleDismissed(false);
+                  setPoriStatus('happy');
+                  setTimeout(() => {
+                    const nextMsg = messages[Math.floor(Math.random() * messages.length)];
+                    setMessage(nextMsg);
+                    setShowBubble(true);
+                    setPoriStatus('idle');
+                  }, 400);
+                }}
+                className="relative w-16 h-16 md:w-32 md:h-32 cursor-pointer"
+              >
+                {/* ── ULTIMATE AURA: 다채로운 오로라 레이어 ── */}
+                <div className="absolute inset-x-[-20%] inset-y-[-20%] flex items-center justify-center pointer-events-none overflow-hidden">
+                  <motion.div 
+                    animate={{ rotate: 360, scale: [1, 1.1, 1] }} 
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="w-full h-full bg-emerald-500/20 blur-[60px] rounded-full opacity-60" 
+                  />
+                  <motion.div 
+                    animate={{ rotate: -360, scale: [1, 1.2, 1] }} 
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                    className="absolute w-full h-full bg-cyan-400/10 blur-[50px] rounded-full opacity-40 translate-x-4" 
+                  />
+                </div>
+
+                {/* ── HUD SCANNER: 정밀 분석 링 ── */}
+                <div className="absolute inset-[-10%] pointer-events-none">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-0 border-[1px] border-emerald-500/10 rounded-full"
+                    style={{ borderStyle: 'dotted' }}
+                  />
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-3 border-[0.5px] border-cyan-400/15 rounded-full"
+                    style={{ borderStyle: 'dashed' }}
+                  />
+                </div>
+
+                {/* ── VITAMIN ESSENCE: 플로팅 파티클 효과 ── */}
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ 
+                      y: [-10, -60], 
+                      x: [0, (i % 2 === 0 ? 25 : -25)],
+                      opacity: [0, 0.8, 0],
+                      scale: [0.3, 0.6, 0.2]
+                    }}
+                    transition={{ 
+                      duration: 2 + i * 0.5, 
+                      repeat: Infinity, 
+                      delay: i * 0.4,
+                      ease: "easeOut" 
+                    }}
+                    className="absolute left-1/2 bottom-1/2 w-2 h-2 rounded-full pointer-events-none z-0"
+                    style={{ background: i % 2 === 0 ? '#10b981' : '#06b6d2', filter: 'blur(2px)' }}
+                  />
+                ))}
+
+                {/* ── PORI MAIN UNIT: 공중 부양 ── */}
+                <motion.img
+                  src="/images/pori.png"
+                  alt="Pori"
+                  animate={{ 
+                    y: [0, -14, 0],
+                    rotate: [0, 3, -2, 0]
+                  }}
+                  transition={{ 
+                    duration: 4.5, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                  className={cn(
+                    "relative z-10 w-full h-full object-contain rounded-full transition-all duration-500 drop-shadow-[0_15px_30px_rgba(16,185,129,0.3)]",
+                    poriStatus === 'thinking' ? "brightness-125 saturate-150 scale-105" : "brightness-[1.03] contrast-[1.05]"
+                  )}
+                  style={{
+                    maskImage: 'radial-gradient(circle at center, black 65%, transparent 72%)',
+                    WebkitMaskImage: 'radial-gradient(circle at center, black 65%, transparent 72%)'
+                  }}
+                />
+
+                {/* ── HOLOGRAPHIC HUD: 오비팅 코어 ── */}
+                <motion.div 
+                   animate={{ rotate: 360 }}
+                   transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                   className="absolute inset-x-[-25%] inset-y-[-25%] opacity-0 group-hover:opacity-100 transition-all duration-700 z-20 pointer-events-none"
+                >
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-black/80 backdrop-blur-xl rounded-[1rem] flex items-center justify-center border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.4)]">
+                    <span className="text-lg">🧬</span>
+                  </div>
+                  <div className="absolute top-1/2 right-0 -translate-y-1/2 w-10 h-10 bg-black/80 backdrop-blur-xl rounded-[1rem] flex items-center justify-center border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+                    <span className="text-lg">⚡</span>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-black/80 backdrop-blur-xl rounded-[1rem] flex items-center justify-center border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                    <span className="text-lg">🔬</span>
+                  </div>
+                </motion.div>
+                 
+                {/* ── 상태 표시 코어 (PING) ── */}
+                <div className="absolute bottom-2 right-2 md:bottom-5 md:right-5 flex items-center justify-center z-30">
+                  <div className="absolute w-10 h-10 md:w-16 md:h-16 bg-emerald-400/20 rounded-full animate-ping opacity-20" />
+                  <div className="relative w-4 h-4 md:w-6 md:h-6 bg-emerald-500 border-[4px] border-white rounded-full shadow-[0_0_25px_rgba(16,185,129,1)]" />
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

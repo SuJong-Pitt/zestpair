@@ -343,73 +343,73 @@ export default function HomePage() {
                 />
               </motion.span>
 
-                <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-2 md:gap-x-4 text-[2.5rem] md:text-6xl lg:text-7xl font-[1000] px-6 md:px-12 py-4 md:py-5 leading-none tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                  {language === 'ko' ? (
-                    <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5">
-                      <span className="opacity-90">포리가</span>
-                      <div className="flex items-center">
-                        {"딱".split("").map((char, i) => (
+              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-2 md:gap-x-4 text-[2.5rem] md:text-6xl lg:text-7xl font-[1000] px-6 md:px-12 py-4 md:py-5 leading-none tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                {language === 'ko' ? (
+                  <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5">
+                    <span className="opacity-90">포리가</span>
+                    <div className="flex items-center">
+                      {"딱".split("").map((char, i) => (
+                        <motion.span
+                          key={i}
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{
+                            y: [0, -15, 0],
+                            scale: [1, 1.3, 1],
+                            rotate: [0, -8, 8, 0],
+                            opacity: 1
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            delay: i * 0.1,
+                            ease: "easeInOut"
+                          }}
+                          className="relative inline-block"
+                        >
+                          <span className="relative z-10 bg-gradient-to-br from-emerald-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(52,211,153,0.7)]">
+                            {char}
+                          </span>
                           <motion.span
-                            key={i}
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ 
-                              y: [0, -15, 0],
-                              scale: [1, 1.3, 1],
-                              rotate: [0, -8, 8, 0],
-                              opacity: 1
-                            }}
-                            transition={{ 
-                              duration: 2, 
-                              repeat: Infinity, 
-                              delay: i * 0.1,
-                              ease: "easeInOut" 
-                            }}
-                            className="relative inline-block"
-                          >
-                            <span className="relative z-10 bg-gradient-to-br from-emerald-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(52,211,153,0.7)]">
-                              {char}
-                            </span>
-                            <motion.span 
-                              animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.4, 1] }}
-                              transition={{ duration: 1.5, repeat: Infinity }}
-                              className="absolute -inset-4 bg-emerald-500/40 blur-2xl rounded-full -z-10"
-                            />
-                          </motion.span>
-                        ))}
-                      </div>
-                      <span className="opacity-90">정해줄게요!</span>
+                            animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.4, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="absolute -inset-4 bg-emerald-500/40 blur-2xl rounded-full -z-10"
+                          />
+                        </motion.span>
+                      ))}
                     </div>
-                  ) : (
-                    <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5">
-                      <span className="opacity-90">Let Pori</span>
-                      <div className="flex items-center mx-1">
-                        {"decide".split("").map((char, i) => (
-                          <motion.span
-                            key={i}
-                            initial={{ y: 15, opacity: 0 }}
-                            animate={{ 
-                              y: [0, -10, 0],
-                              scale: [1, 1.2, 1],
-                              opacity: 1
-                            }}
-                            transition={{ 
-                              duration: 2.5, 
-                              repeat: Infinity, 
-                              delay: i * 0.08,
-                              ease: "easeInOut" 
-                            }}
-                            className="relative inline-block"
-                          >
-                            <span className="relative z-10 bg-gradient-to-br from-emerald-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]">
-                              {char}
-                            </span>
-                          </motion.span>
-                        ))}
-                      </div>
-                      <span className="opacity-90">for you!</span>
+                    <span className="opacity-90">정해줄게요!</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5">
+                    <span className="opacity-90">Let Pori</span>
+                    <div className="flex items-center mx-1">
+                      {"decide".split("").map((char, i) => (
+                        <motion.span
+                          key={i}
+                          initial={{ y: 15, opacity: 0 }}
+                          animate={{
+                            y: [0, -10, 0],
+                            scale: [1, 1.2, 1],
+                            opacity: 1
+                          }}
+                          transition={{
+                            duration: 2.5,
+                            repeat: Infinity,
+                            delay: i * 0.08,
+                            ease: "easeInOut"
+                          }}
+                          className="relative inline-block"
+                        >
+                          <span className="relative z-10 bg-gradient-to-br from-emerald-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]">
+                            {char}
+                          </span>
+                        </motion.span>
+                      ))}
                     </div>
-                  )}
-                </span>
+                    <span className="opacity-90">for you!</span>
+                  </div>
+                )}
+              </span>
 
               {/* 코너 브래킷 */}
               {[["top-1.5 left-2.5", "border-t-2 border-l-2"], ["top-1.5 right-2.5", "border-t-2 border-r-2"], ["bottom-1.5 left-2.5", "border-b-2 border-l-2"], ["bottom-1.5 right-2.5", "border-b-2 border-r-2"]].map(([pos, border], i) => (
@@ -629,7 +629,7 @@ export default function HomePage() {
                     />
                   )}
                   <span className="relative z-10 text-base leading-none group-hover:scale-110 transition-transform">{data.emoji}</span>
-                  <motion.span 
+                  <motion.span
                     className="relative z-10 tracking-tight"
                     animate={isActive ? { scale: 1.05 } : { scale: 1 }}
                   >
@@ -641,9 +641,9 @@ export default function HomePage() {
                       initial={{ opacity: 0, scale: 0, y: 5 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-0.5 rounded-full"
-                      style={{ 
-                        background: "#10b981", 
-                        boxShadow: "0 0 8px #10b981, 0 0 16px #10b981" 
+                      style={{
+                        background: "#10b981",
+                        boxShadow: "0 0 8px #10b981, 0 0 16px #10b981"
                       }}
                     />
                   )}
@@ -826,7 +826,74 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 text-gray-400">{t.common.noResult}</div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="flex flex-col items-center justify-center py-20 px-8 text-center"
+            >
+              <div className="relative mb-10 group">
+                {/* 프리미엄 리어 글로우 (오로라 효과) - 일관성 유지 */}
+                <div className="absolute inset-0 bg-emerald-300 blur-[100px] opacity-30 rounded-full group-hover:scale-110 transition-transform duration-1000" />
+                <div className="absolute inset-0 bg-cyan-200 blur-[70px] opacity-20 rounded-full -translate-x-6 translate-y-6" />
+                
+                {/* 깜찍한 3D 포리 애니메이션 */}
+                <motion.img
+                  src="/images/pori.png"
+                  alt="Pori Mascot"
+                  className="relative z-10 w-44 h-44 md:w-60 md:h-60 object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)]"
+                  animate={{
+                    y: [0, -15, 0],
+                    rotate: [0, 2, -1, 0]
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+                
+                {/* 바닥 그림자 애니메이션 */}
+                <motion.div 
+                  animate={{ 
+                    scaleX: [0.8, 1, 0.8],
+                    opacity: [0.1, 0.18, 0.1] 
+                  }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-2.5 bg-black/30 blur-lg rounded-full"
+                />
+              </div>
+
+              <div className="space-y-4 max-w-sm">
+                <h3 className="text-2xl md:text-3xl font-[1000] text-slate-800 tracking-tighter leading-tight drop-shadow-sm">
+                  {t.common.poriNoResult}
+                </h3>
+                <p className="text-slate-400 font-bold text-sm md:text-base leading-relaxed opacity-90">
+                  {t.common.poriNoResultSub}
+                </p>
+              </div>
+
+              <div className="mt-12">
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSelectedCategory("all");
+                  }}
+                  className="group/btn relative px-10 h-14 rounded-full font-black text-lg transition-all active:scale-95 shadow-xl hover:shadow-2xl overflow-hidden"
+                  style={{
+                    background: "linear-gradient(135deg, #10b981 0%, #0891b2 100%)",
+                    color: "white"
+                  }}
+                >
+                  {/* 내부 쉬머(Shimmer) 애니메이션 */}
+                  <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] animate-shimmer pointer-events-none" />
+                  
+                  <div className="relative flex items-center gap-3">
+                    <RefreshCcw className="h-5 w-5 group-hover/btn:rotate-180 transition-transform duration-700" />
+                    <span>{t.common.viewAllIngredients}</span>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
           )}
         </div>
 

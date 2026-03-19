@@ -17,6 +17,7 @@ import {
     Zap,
     ShieldCheck,
     ArrowRight,
+    Share2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -526,6 +527,31 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
         };
     }, [result.ingredients]);
 
+    const handleShare = async () => {
+        const shareData = {
+            title: language === 'ko' ? "ZestPair | 영양제 궁합 분석 결과" : "ZestPair | Supplement Synergy Analysis",
+            text: language === 'ko' 
+                ? `🔥 나의 영양제 궁합 점수는 ${result.score}점! Pori AI가 알려주는 최적의 조합을 확인해보세요.` 
+                : `🔥 My supplement synergy score is ${result.score}! Check your personalized analysis by Pori AI at ZestPair.`,
+            url: window.location.origin
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.log('Error sharing', err);
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(window.location.origin);
+                alert(language === 'ko' ? "링크가 복사되었습니다!" : "Link copied to clipboard!");
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+        }
+    };
+
     const synergyCount = result.synergies.length;
     if (!result || !result.ingredients) {
         return <div className="p-20 text-center text-slate-400">{t.common.loading}...</div>;
@@ -630,7 +656,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.6 }}
-                            className="relative w-full max-w-xl mb-10"
+                            className="relative w-full max-w-xl mb-4"
                         >
                             <div className="relative px-6 py-6 rounded-[1.8rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-inner overflow-hidden">
                                 <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none">
@@ -650,6 +676,25 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                     </p>
                                 </div>
                             </div>
+                        </motion.div>
+
+                        {/* 공유 버튼 (Share Action) */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.7 }}
+                            className="mb-10"
+                        >
+                            <Button
+                                onClick={handleShare}
+                                className="group/share relative px-8 h-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-black transition-all duration-300 shadow-[0_10px_30px_rgba(16,185,129,0.3)] active:scale-95"
+                            >
+                                <div className="absolute inset-x-0 -bottom-1 h-3 blur-md opacity-50 bg-emerald-400 group-hover/share:opacity-80 transition-opacity" />
+                                <div className="relative flex items-center gap-2">
+                                    <Share2 size={16} />
+                                    <span>{language === 'ko' ? "분석 결과 공유하기" : "Share Analysis"}</span>
+                                </div>
+                            </Button>
                         </motion.div>
 
                         {/* 4. 성분 캡슐 그리드 (2열) */}

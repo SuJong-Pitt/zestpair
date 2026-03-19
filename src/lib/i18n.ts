@@ -45,6 +45,9 @@ export const UI_TRANSLATIONS = {
             shareText: "결과가 클립보드에 복사되었습니다!",
             errorDownload: "이미지 저장 중 오류가 발생했습니다.",
             swipeToSeeMore: "스와이프하여 더보기",
+            poriNoResult: "포리가 돋보기를 들고 열심히 찾았지만 없어요!",
+            poriNoResultSub: "다른 검색어나 카테고리로 찾아보는 건 어떨까요? ✨",
+            viewAllIngredients: "모든 성분 보기",
         },
         results: {
             synergy: "시너지 폭발!",
@@ -139,6 +142,9 @@ export const UI_TRANSLATIONS = {
             shareText: "Result copied to clipboard!",
             errorDownload: "Error occurred while saving image.",
             swipeToSeeMore: "Swipe to see more",
+            poriNoResult: "Pori searched hard with a magnifying glass, but it's not here!",
+            poriNoResultSub: "How about searching with a different keyword or category? ✨",
+            viewAllIngredients: "View All Ingredients",
         },
         results: {
             synergy: "Synergy Explosion!",
