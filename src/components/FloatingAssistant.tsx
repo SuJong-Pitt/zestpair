@@ -335,23 +335,23 @@ export default function FloatingAssistant() {
                   }}
                 />
 
-                {/* ── HOLOGRAPHIC HUD: 오비팅 코어 (모바일 대응 최적화) ── */}
+                {/* ── HOLOGRAPHIC HUD: 오비팅 코어 (모바일 소형화/숨김 최적화) ── */}
                 <motion.div 
                    animate={{ rotate: 360 }}
                    transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
                    className={cn(
                      "absolute opacity-0 group-hover:opacity-100 transition-all duration-700 z-20 pointer-events-none",
-                     "inset-x-[-15%] inset-y-[-15%] md:inset-x-[-25%] md:inset-y-[-25%]"
+                     "hidden md:block inset-x-[-25%] inset-y-[-25%]"
                    )}
                 >
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-7 h-7 md:w-10 md:h-10 bg-black/80 backdrop-blur-xl rounded-lg md:rounded-[1rem] flex items-center justify-center border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.4)]">
-                    <span className="text-xs md:text-lg">🧬</span>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-black/80 backdrop-blur-xl rounded-[1rem] flex items-center justify-center border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.4)]">
+                    <span className="text-lg">🧬</span>
                   </div>
-                  <div className="absolute top-1/2 right-0 -translate-y-1/2 w-7 h-7 md:w-10 md:h-10 bg-black/80 backdrop-blur-xl rounded-lg md:rounded-[1rem] flex items-center justify-center border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.4)]">
-                    <span className="text-xs md:text-lg">⚡</span>
+                  <div className="absolute top-1/2 right-0 -translate-y-1/2 w-10 h-10 bg-black/80 backdrop-blur-xl rounded-[1rem] flex items-center justify-center border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+                    <span className="text-lg">⚡</span>
                   </div>
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-7 md:w-10 md:h-10 bg-black/80 backdrop-blur-xl rounded-lg md:rounded-[1rem] flex items-center justify-center border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                    <span className="text-xs md:text-lg">🔬</span>
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-black/80 backdrop-blur-xl rounded-[1rem] flex items-center justify-center border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                    <span className="text-lg">🔬</span>
                   </div>
                 </motion.div>
                  
