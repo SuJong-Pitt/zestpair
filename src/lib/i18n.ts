@@ -16,6 +16,14 @@ export const UI_TRANSLATIONS = {
                 instant: "0.5초 이내"
             }
         },
+        howItWorks: {
+            title: "ZestPair 이용 가이드",
+            subtitle: "포리가 알려주는 4단계 분석 프로세스",
+            step1: "영양 성분 선택",
+            step2: "AI 정밀 분석",
+            step3: "결과 및 리포트 확인",
+            step4: "최적화된 제품 구매",
+        },
         metadata: {
             title: "ZestPair | 영양제 궁합 분석"
         },
@@ -119,6 +127,14 @@ export const UI_TRANSLATIONS = {
                 unlimited: "Unlimited Analysis",
                 instant: "Under 0.5s"
             }
+        },
+        howItWorks: {
+            title: "How ZestPair Works",
+            subtitle: "4-step analysis process with Pori",
+            step1: "Select Ingredients",
+            step2: "AI Analysis",
+            step3: "Check Results",
+            step4: "Purchase Optimized",
         },
         metadata: {
             title: "ZestPair | AI Supplement Synergy Core"

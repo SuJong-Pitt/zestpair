@@ -20,6 +20,7 @@ import VisualDecorations from "@/components/VisualDecorations";
 import { motion, AnimatePresence } from "framer-motion";
 import { UI_TRANSLATIONS, CATEGORIES_TRANSLATIONS } from "@/lib/i18n";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import HowItWorks from "@/components/HowItWorks";
 
 // 헬퍼 컴포넌트: 가로 스크롤 컨테이너 (관성 드래그 지원)
 function HorizontalScroll({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -584,6 +585,12 @@ export default function HomePage() {
           }}
         />
       </section>
+
+      {/* === 이용 가이드 섹션 (How It Works) === */}
+      <HowItWorks onStart={() => {
+        searchRef.current?.focus();
+        searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }} />
 
       <main className="mx-auto max-w-2xl px-4 py-8">
         <div className="relative mb-10">
