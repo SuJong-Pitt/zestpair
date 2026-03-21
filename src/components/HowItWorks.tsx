@@ -5,6 +5,7 @@ import { motion, useMotionValue, useTransform, useSpring, AnimatePresence } from
 import { Pill, Sparkles, Database, Smartphone, ChevronRight, Info } from "lucide-react";
 import { useBasketStore } from "@/store/basketStore";
 import { UI_TRANSLATIONS } from "@/lib/i18n";
+import Image from "next/image";
 
 export default function HowItWorks({ onStart }: { onStart?: () => void }) {
   const { language } = useBasketStore();
@@ -118,11 +119,14 @@ export default function HowItWorks({ onStart }: { onStart?: () => void }) {
                  className="relative rounded-[1.5rem] overflow-hidden border border-slate-200/50 shadow-2xl shadow-emerald-500/5 group-hover:shadow-emerald-500/10 transition-shadow duration-500"
                  style={{ transform: "translateZ(40px)" }} // 3D 효과 강화
                >
-                 <img 
-                    src="/hero-illustration-v3.png" 
-                    alt="ZestPair Process Guide" 
-                    className="w-full h-auto transform transition-all duration-1000 group-hover:scale-[1.03]"
-                 />
+                 <Image 
+                   src="/hero-illustration-guide.webp" 
+                   alt="ZestPair Process Guide" 
+                   width={1200}
+                   height={1000}
+                   className="w-full h-auto transform transition-all duration-1000 group-hover:scale-[1.03]"
+                   sizes="(max-width: 768px) 100vw, 896px"
+                />
                  
                  {/* 이미지 위 오버레이 (Floating Badge) */}
                  <div className="absolute top-4 left-4 p-3 bg-white/95 rounded-2xl border border-white/40 shadow-xl opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-100">
@@ -200,7 +204,13 @@ export default function HowItWorks({ onStart }: { onStart?: () => void }) {
 
           {/* 코너 데코 배경 아이콘 */}
           <div className="absolute -bottom-10 -right-10 opacity-[0.03] select-none pointer-events-none group-hover:rotate-12 transition-transform duration-1000">
-             <img src="/icon.png" alt="" className="w-64 h-64 grayscale" />
+             <Image
+                src="/icon.png"
+                alt=""
+                width={256}
+                height={256}
+                className="w-64 h-64 grayscale"
+             />
           </div>
         </motion.div>
       </div>

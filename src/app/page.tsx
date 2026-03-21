@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Suspense } from "react";
 import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database, Smartphone } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -8,19 +8,21 @@ import IngredientCard from "@/components/IngredientCard";
 import FloatingBasketBar from "@/components/FloatingBasketBar";
 import dynamic from "next/dynamic";
 import { useBasketStore } from "@/store/basketStore";
-
-const AnalyzingAnimation = dynamic(() => import("@/components/AnalyzingAnimation"), { ssr: false });
-const AnalysisResults = dynamic(() => import("@/components/AnalysisResults"), { ssr: false });
 import { supabase } from "@/lib/supabase";
 import type { AnalysisResult, Ingredient, InteractionResult } from "@/types/database";
 import { cn } from "@/lib/utils";
 import FloatingAssistant from "@/components/FloatingAssistant";
 import ScrollToTop from "@/components/ScrollToTop";
-import VisualDecorations from "@/components/VisualDecorations";
+import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { UI_TRANSLATIONS, CATEGORIES_TRANSLATIONS } from "@/lib/i18n";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import HowItWorks from "@/components/HowItWorks";
+import Image from "next/image";
+
+const AnalyzingAnimation = dynamic(() => import("@/components/AnalyzingAnimation"), { ssr: false });
+const AnalysisResults = dynamic(() => import("@/components/AnalysisResults"), { ssr: false });
+const VisualDecorations = dynamic(() => import("@/components/VisualDecorations"), { ssr: false });
+const HowItWorks = dynamic(() => import("@/components/HowItWorks"), { ssr: false });
 
 // 헬퍼 컴포넌트: 가로 스크롤 컨테이너 (관성 드래그 지원)
 function HorizontalScroll({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -283,7 +285,14 @@ export default function HomePage() {
 
             <div className="relative flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
               <div className="relative w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-slate-900 border border-emerald-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.3)] overflow-hidden">
-                <img src="/icon.png" alt="ZestPair Logo" className="w-full h-full object-cover" />
+                <Image
+                  src="/icon.png"
+                  alt="ZestPair Logo"
+                  width={32}
+                  height={32}
+                  className="w-full h-full object-cover"
+                  priority
+                />
               </div>
               <span className="text-white font-[1000] text-xs md:text-sm tracking-[0.2em] uppercase">ZestPair</span>
               <div className="w-px h-3 md:h-4 bg-white/20 mx-0.5 md:mx-1" />
@@ -587,10 +596,12 @@ export default function HomePage() {
       </section>
 
       {/* === 이용 가이드 섹션 (How It Works) === */}
-      <HowItWorks onStart={() => {
-        searchRef.current?.focus();
-        searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }} />
+      <Suspense fallback={<div className="h-[400px] md:h-[600px] w-full bg-white/30 backdrop-blur-sm -mt-16 z-30" />}>
+        <HowItWorks onStart={() => {
+          searchRef.current?.focus();
+          searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }} />
+      </Suspense>
 
       <main className="mx-auto max-w-2xl px-4 py-8">
         <div className="relative mb-10">
@@ -753,7 +764,13 @@ export default function HomePage() {
             </div>
 
             <AnimatePresence mode="wait">
-              {showAllPopular ? (
+              {isLoadingList ? (
+                <div key="skeleton" className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-4 px-1">
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
+                  ))}
+                </div>
+              ) : showAllPopular ? (
                 <motion.div
                   key="grid"
                   initial={{ opacity: 0, height: 0 }}
@@ -827,7 +844,11 @@ export default function HomePage() {
           </div>
 
           {isLoadingList ? (
-            <div className="text-center py-16 text-gray-400 animate-pulse">{t.common.loading}</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
+              ))}
+            </div>
           ) : filteredIngredients.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1">
               {filteredIngredients.map((ing, i) => (
@@ -854,20 +875,26 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-cyan-200 blur-[70px] opacity-20 rounded-full -translate-x-6 translate-y-6" />
                 
                 {/* 깜찍한 3D 포리 애니메이션 */}
-                <motion.img
-                  src="/images/pori.png"
-                  alt="Pori Mascot"
+                <motion.div
                   className="relative z-10 w-44 h-44 md:w-60 md:h-60 object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)]"
                   animate={{
                     y: [0, -15, 0],
                     rotate: [0, 2, -1, 0]
-                  }}
-                  transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                />
+                   }}
+                   transition={{
+                     duration: 5,
+                     repeat: Infinity,
+                     ease: "easeInOut"
+                   }}
+                >
+                  <Image
+                    src="/images/pori.png"
+                    alt="Pori Mascot"
+                    width={240}
+                    height={240}
+                    className="w-full h-full object-contain"
+                  />
+                </motion.div>
                 
                 {/* 바닥 그림자 애니메이션 */}
                 <motion.div 

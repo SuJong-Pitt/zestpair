@@ -25,17 +25,12 @@ function CapsuleIcon({ color1, color2, size = 28 }: { color1: string; color2: st
 
 /* 분자 연결선 네트워크 */
 function MolecularNetwork() {
-  const nodes = [
+  const nodes = useMemo(() => [
     { x: 15, y: 20 }, { x: 35, y: 10 }, { x: 55, y: 25 },
     { x: 25, y: 45 }, { x: 50, y: 55 }, { x: 70, y: 35 },
     { x: 80, y: 15 }, { x: 10, y: 65 }, { x: 65, y: 75 },
     { x: 42, y: 72 }, { x: 85, y: 60 }, { x: 5, y: 40 },
-  ];
-  const connections = [
-    [0, 1], [1, 2], [1, 3], [2, 5], [3, 4], [4, 5],
-    [5, 6], [3, 7], [4, 8], [4, 9], [8, 10], [0, 11],
-    [7, 9], [2, 6], [8, 9],
-  ];
+  ], []);
 
   return (
     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -52,8 +47,8 @@ function MolecularNetwork() {
           fill={i % 3 === 0 ? "#10b981" : i % 3 === 1 ? "#06b6d4" : "#a78bfa"}
           filter="url(#softglow)"
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0.1, 0.3, 0.1], scale: [1, 1.5, 1] }}
-          transition={{ duration: 4 + i * 0.5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ opacity: [0.1, 0.25, 0.1], scale: [1, 1.4, 1] }}
+          transition={{ duration: 5 + i * 0.7, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}
     </svg>
@@ -84,10 +79,8 @@ export default function VisualDecorations() {
     fetchStats();
   }, []);
 
-  if (!hasMounted) return null;
-
   /* 부유 알약 캡슐 정적 데이터 */
-  const capsules = [
+  const capsules = useMemo(() => [
     { color1: "#10b981", color2: "#06b6d4", x: "8%",  y: "18%", rotate: -20, delay: 0,   scale: 1.1 },
     { color1: "#f59e0b", color2: "#f97316", x: "88%", y: "14%", rotate:  15, delay: 1.2, scale: 0.9 },
     { color1: "#8b5cf6", color2: "#ec4899", x: "6%",  y: "62%", rotate:  30, delay: 2.4, scale: 1.0 },
@@ -95,7 +88,9 @@ export default function VisualDecorations() {
     { color1: "#f97316", color2: "#f59e0b", x: "18%", y: "80%", rotate:  25, delay: 0.8, scale: 0.85 },
     { color1: "#10b981", color2: "#8b5cf6", x: "80%", y: "80%", rotate: -35, delay: 2.0, scale: 0.95 },
     { color1: "#ec4899", color2: "#f59e0b", x: "50%", y: "88%", rotate:  10, delay: 1.6, scale: 0.8 },
-  ];
+  ], []);
+
+  if (!hasMounted) return null;
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
@@ -171,8 +166,11 @@ export default function VisualDecorations() {
         </div>
       )}
 
-      {/* === 노이즈 텍스처 === */}
-      <div className="absolute inset-0 opacity-[0.035] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      {/* === 노이즈 텍스처 (로컬 인라인 CSS로 변경하여 외부 요청 제거) === */}
+      <div 
+        className="absolute inset-0 opacity-[0.025] mix-blend-overlay pointer-events-none" 
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
+      />
 
       {/* === 수평 스캔라인 (프리미엄 기술감) === */}
       <div
@@ -256,7 +254,7 @@ export default function VisualDecorations() {
       ))}
 
       {/* === 리치 파티클 시스템 (다양한 색상) === */}
-      {[...Array(isMobile ? 6 : 15)].map((_, i) => {
+      {[...Array(isMobile ? 4 : 10)].map((_, i) => {
         const colors = ["#10b981", "#06b6d4", "#a78bfa", "#f59e0b", "#f97316", "#ec4899"];
         const color = colors[i % colors.length];
         const size = 2 + seededRand(i * 3) * 2;
