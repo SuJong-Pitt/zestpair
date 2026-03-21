@@ -128,18 +128,7 @@ export default function HowItWorks({ onStart }: { onStart?: () => void }) {
                    sizes="(max-width: 768px) 100vw, 896px"
                 />
                  
-                 {/* 이미지 위 오버레이 (Floating Badge) */}
-                 <div className="absolute top-4 left-4 p-3 bg-white/95 rounded-2xl border border-white/40 shadow-xl opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-100">
-                    <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white">
-                          <Pill size={20} className="animate-bounce" />
-                       </div>
-                       <div>
-                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Status</p>
-                          <p className="text-xs font-black text-slate-800">Optimizing Synergy</p>
-                       </div>
-                    </div>
-                 </div>
+
                </motion.div>
             </div>
 

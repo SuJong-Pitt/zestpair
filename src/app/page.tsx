@@ -263,7 +263,7 @@ export default function HomePage() {
             </div>
             <span className="tracking-widest uppercase mr-1">{language === "ko" ? "EN" : "KO"}</span>
           </button>
-          
+
           <Link
             href="/about"
             className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl text-white/70 font-black text-[10px] transition-all hover:bg-white/20 hover:text-white active:scale-95 shadow-lg pointer-events-auto"
@@ -873,19 +873,19 @@ export default function HomePage() {
                 {/* 프리미엄 리어 글로우 (오로라 효과) - 일관성 유지 */}
                 <div className="absolute inset-0 bg-emerald-300 blur-[100px] opacity-30 rounded-full group-hover:scale-110 transition-transform duration-1000" />
                 <div className="absolute inset-0 bg-cyan-200 blur-[70px] opacity-20 rounded-full -translate-x-6 translate-y-6" />
-                
+
                 {/* 깜찍한 3D 포리 애니메이션 */}
                 <motion.div
                   className="relative z-10 w-44 h-44 md:w-60 md:h-60 object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)]"
                   animate={{
                     y: [0, -15, 0],
                     rotate: [0, 2, -1, 0]
-                   }}
-                   transition={{
-                     duration: 5,
-                     repeat: Infinity,
-                     ease: "easeInOut"
-                   }}
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
                 >
                   <Image
                     src="/images/pori.png"
@@ -895,12 +895,12 @@ export default function HomePage() {
                     className="w-full h-full object-contain"
                   />
                 </motion.div>
-                
+
                 {/* 바닥 그림자 애니메이션 */}
-                <motion.div 
-                  animate={{ 
+                <motion.div
+                  animate={{
                     scaleX: [0.8, 1, 0.8],
-                    opacity: [0.1, 0.18, 0.1] 
+                    opacity: [0.1, 0.18, 0.1]
                   }}
                   transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-2.5 bg-black/30 blur-lg rounded-full"
@@ -930,7 +930,7 @@ export default function HomePage() {
                 >
                   {/* 내부 쉬머(Shimmer) 애니메이션 */}
                   <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] animate-shimmer pointer-events-none" />
-                  
+
                   <div className="relative flex items-center gap-3">
                     <RefreshCcw className="h-5 w-5 group-hover/btn:rotate-180 transition-transform duration-700" />
                     <span>{t.common.viewAllIngredients}</span>
