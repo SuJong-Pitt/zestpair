@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, Suspense } from "react";
-import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database, Smartphone } from "lucide-react";
+import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database, Smartphone, X, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import IngredientCard from "@/components/IngredientCard";
@@ -22,7 +22,7 @@ import Image from "next/image";
 const AnalyzingAnimation = dynamic(() => import("@/components/AnalyzingAnimation"), { ssr: false });
 const AnalysisResults = dynamic(() => import("@/components/AnalysisResults"), { ssr: false });
 const VisualDecorations = dynamic(() => import("@/components/VisualDecorations"), { ssr: false });
-const HowItWorks = dynamic(() => import("@/components/HowItWorks"), { ssr: false });
+
 
 // 헬퍼 컴포넌트: 가로 스크롤 컨테이너 (관성 드래그 지원)
 function HorizontalScroll({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -82,7 +82,19 @@ export default function HomePage() {
 
   const [dbIngredients, setDbIngredients] = useState<Ingredient[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
+
+  // 바깥 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -100,25 +112,25 @@ export default function HomePage() {
 
   const {
     selectedIngredients, isAnalyzing, hasResult, setAnalyzing, setHasResult, clearBasket, language, setLanguage,
-    analysisResult, setAnalysisResult
+    analysisResult, setAnalysisResult, removeIngredient, addIngredient
   } = useBasketStore();
 
   const t = UI_TRANSLATIONS[language];
 
+  // 메인 그리드용 필터링 (검색어 제외, 카테고리만)
   const filteredIngredients = dbIngredients.filter((ing) => {
+    return selectedCategory === "all" || ing.category === selectedCategory;
+  });
+
+  // 드롭다운 검색 결과용 필터링
+  const dropdownResults = searchQuery ? dbIngredients.filter((ing) => {
     const name = language === "ko" ? ing.name : ing.name_en;
     const desc = language === "ko" ? ing.short_description : (ing.short_description_en || ing.short_description);
-
-    const matchesSearch =
-      searchQuery === "" ||
+    return (
       name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      desc.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesCategory =
-      selectedCategory === "all" || ing.category === selectedCategory;
-
-    return matchesSearch && matchesCategory;
-  });
+      desc.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }).slice(0, 8) : [];
 
   const popularIngredients = dbIngredients.filter((i) => i.is_popular);
 
@@ -245,7 +257,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-slate-50/50">
       <section
-        className="relative overflow-hidden pb-24 pt-14 md:pt-12 md:pb-32"
+        className="relative pb-24 pt-14 md:pt-12 md:pb-32 z-40"
         style={{
           background: "radial-gradient(circle at 50% 0%, #0d1a15 0%, #080c14 50%, #030712 100%)"
         }}
@@ -283,30 +295,37 @@ export default function HomePage() {
             {/* 뒤 배경 글로우 */}
             <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
 
-            <div className="relative flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
-              <div className="relative w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-slate-900 border border-emerald-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.3)] overflow-hidden">
-                <Image
-                  src="/icon.png"
-                  alt="ZestPair Logo"
-                  width={32}
-                  height={32}
-                  className="w-full h-full object-cover"
-                  priority
-                />
+            <div className="relative flex items-center gap-2.5 md:gap-3 px-3.5 md:px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
+              <div className="relative flex items-center justify-center">
+                <div className="relative w-8 h-8 md:w-9 md:h-9 rounded-xl bg-slate-900/50 border border-emerald-500/20 p-1.5 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                  <Image
+                    src="/icon.png"
+                    alt="ZestPair Icon"
+                    width={36}
+                    height={36}
+                    className="w-full h-full object-contain"
+                    priority
+                  />
+                </div>
               </div>
-              <span className="text-white font-[1000] text-xs md:text-sm tracking-[0.2em] uppercase">ZestPair</span>
-              <div className="w-px h-3 md:h-4 bg-white/20 mx-0.5 md:mx-1" />
+              <div className="flex items-center text-[15px] md:text-[18px] font-black tracking-tight cursor-default">
+                <span className="text-[#10b981]">Zest</span>
+                <span className="text-white">Pair</span>
+              </div>
+              <div className="w-px h-3 md:h-4 bg-white/20 mx-1" />
               <Link
                 href="/about"
-                className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#6ee7b7] flex items-center gap-1 md:gap-1.5 hover:opacity-80 transition-opacity group/core"
+                className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#6ee7b7]/80 flex items-center gap-1.5 hover:text-[#6ee7b7] transition-all group/core"
               >
-                <motion.span
-                  animate={{ opacity: [0.4, 1, 0.4] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="w-1 md:h-1.5 h-1 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"
-                />
-                <span className="hidden xs:inline">AI Synergy Core</span> v2.5
-                <Info size={10} className="text-[#6ee7b7]/60 group-hover/core:text-[#6ee7b7] transition-colors" />
+                <div className="flex items-center gap-1">
+                  <motion.div
+                    animate={{ opacity: [0.4, 1, 0.4] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"
+                  />
+                  <span>AI Core v2.5</span>
+                </div>
+                <Info size={10} className="text-[#6ee7b7]/40 group-hover/core:text-[#6ee7b7] transition-colors" />
               </Link>
             </div>
           </motion.div>
@@ -506,6 +525,51 @@ export default function HomePage() {
             ))}
           </motion.div>
 
+          {/* === 선택된 성분 목록 (검색바 위) - Pill Style === */}
+          <AnimatePresence>
+            {selectedIngredients.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                className="flex flex-wrap justify-center gap-2 mb-10 px-4"
+              >
+                {selectedIngredients.map((ingredient, i) => {
+                  const isFirst = i === 0;
+                  return (
+                    <motion.div
+                      layout
+                      key={ingredient.id}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                      className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-full transition-all duration-300"
+                      style={{
+                        background: "rgba(15, 23, 42, 0.6)",
+                        border: isFirst ? "1px solid rgba(16, 185, 129, 0.4)" : "1px solid rgba(255, 255, 255, 0.08)",
+                        boxShadow: isFirst ? "0 0 15px rgba(16, 185, 129, 0.15)" : "none",
+                        backdropFilter: "blur(12px)"
+                      }}
+                    >
+                      <span className="text-xl group-hover:scale-110 transition-transform">
+                        {ingredient.icon_emoji}
+                      </span>
+                      <span className="text-[13px] font-[900] text-white tracking-tight">
+                        {language === 'ko' ? ingredient.name : ingredient.name_en}
+                      </span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
+                        className="ml-1 p-0.5 text-white/30 hover:text-white/80 transition-colors"
+                      >
+                        <X size={12} strokeWidth={3} />
+                      </button>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* === 검색 바 === */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.97 }}
@@ -540,7 +604,11 @@ export default function HomePage() {
                 type="text"
                 placeholder={t.hero.searchPlaceholder}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsDropdownOpen(true);
+                }}
+                onFocus={() => setIsDropdownOpen(true)}
                 className="bg-transparent border-none text-white placeholder:text-white/25 focus-visible:ring-0 text-sm md:text-xl h-11 md:h-14 flex-1 font-bold px-3 md:px-5 tracking-tight"
               />
               <div className="flex items-center gap-2 pr-1.5 md:pr-2">
@@ -564,6 +632,74 @@ export default function HomePage() {
                 </button>
               </div>
             </div>
+
+            {/* === 검색 드롭다운 === */}
+            <AnimatePresence>
+              {isDropdownOpen && dropdownResults.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 5, scale: 0.98 }}
+                  className="absolute top-full left-0 right-0 mt-3 z-[150] overflow-hidden rounded-[2.5rem] p-1.5"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)",
+                    backdropFilter: "blur(40px)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5), 0 0 20px rgba(16,185,129,0.1)"
+                  }}
+                >
+                  <div className="bg-[#0f172a]/90 rounded-[2.2rem] overflow-hidden">
+                    <div className="max-h-[350px] overflow-y-auto scrollbar-hide py-2">
+                      {dropdownResults.map((ing, i) => {
+                        const active = selectedIngredients.some(item => item.id === ing.id);
+                        return (
+                          <motion.button
+                            key={ing.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.03 }}
+                            onClick={() => {
+                              if (!active) addIngredient(ing);
+                              setSearchQuery("");
+                              setIsDropdownOpen(false);
+                            }}
+                            className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors group/item border-b border-white/[0.03] last:border-none"
+                          >
+                            <div className="flex items-center gap-4">
+                              <span className="text-3xl group-hover/item:scale-110 transition-transform">{ing.icon_emoji}</span>
+                              <div className="flex flex-col text-left">
+                                <span className="text-[15px] font-black text-white tracking-tight">
+                                  {language === 'ko' ? ing.name : ing.name_en}
+                                </span>
+                                <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-0.5">
+                                  {CATEGORIES_TRANSLATIONS[ing.category as keyof typeof CATEGORIES_TRANSLATIONS]?.[language]}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {active ? (
+                              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                                <Zap size={10} className="text-emerald-400" fill="currentColor" />
+                                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-tighter">In Basket</span>
+                              </div>
+                            ) : (
+                              <div className="opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                <ChevronRight size={14} className="text-white/40" />
+                              </div>
+                            )}
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                    {/* 드롭다운 푸터 */}
+                    <div className="px-6 py-3 bg-white/[0.02] border-t border-white/[0.05] flex justify-between items-center">
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Select to add</span>
+                      <span className="text-[9px] font-bold text-emerald-400/50 italic">Pori AI Search</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* 인기 태그 */}
             <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2" style={{ opacity: 0.55 }}>
@@ -595,13 +731,7 @@ export default function HomePage() {
         />
       </section>
 
-      {/* === 이용 가이드 섹션 (How It Works) === */}
-      <Suspense fallback={<div className="h-[400px] md:h-[600px] w-full bg-white/30 backdrop-blur-sm -mt-16 z-30" />}>
-        <HowItWorks onStart={() => {
-          searchRef.current?.focus();
-          searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }} />
-      </Suspense>
+
 
       <main className="mx-auto max-w-2xl px-4 py-8">
         <div className="relative mb-10">

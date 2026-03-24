@@ -69,36 +69,36 @@ const SYNERGY_TRIADS = [
         id: "immune",
         ingredients: ["vitamin d", "zinc", "비타민 d", "아연"],
         missing: { id: "magnesium", name: "마그네슘", name_en: "Magnesium" },
-        benefit: { 
-            ko: "비타민 D의 활성화를 돕고 아연과 함께 면역 체계의 상호작용을 완성합니다.", 
-            en: "Completes the immune system by aiding Vit D activation and Zinc synergy." 
+        benefit: {
+            ko: "비타민 D의 활성화를 돕고 아연과 함께 면역 체계의 상호작용을 완성합니다.",
+            en: "Completes the immune system by aiding Vit D activation and Zinc synergy."
         }
     },
     {
         id: "bone",
         ingredients: ["calcium", "vitamin d", "칼슘", "비타민 d"],
         missing: { id: "vitamin k2", name: "비타민 K2", name_en: "Vitamin K2" },
-        benefit: { 
-            ko: "칼슘이 혈관 대신 뼈로 직접 흡수되도록 돕는 결정적인 역할을 합니다.", 
-            en: "Ensures calcium is directed to bones rather than arteries (Essential Triad)." 
+        benefit: {
+            ko: "칼슘이 혈관 대신 뼈로 직접 흡수되도록 돕는 결정적인 역할을 합니다.",
+            en: "Ensures calcium is directed to bones rather than arteries (Essential Triad)."
         }
     },
     {
         id: "eye",
         ingredients: ["lutein", "zeaxanthin", "루테인", "지아잔틴"],
         missing: { id: "omega-3", name: "오메가3", name_en: "Omega-3" },
-        benefit: { 
-            ko: "망막 보호 성분들에 지질막 안정화를 더해 안구 건조와 피로를 동시에 해결합니다.", 
-            en: "Adds lipid membrane stability to retinal protectors for a complete eye care solution." 
+        benefit: {
+            ko: "망막 보호 성분들에 지질막 안정화를 더해 안구 건조와 피로를 동시에 해결합니다.",
+            en: "Adds lipid membrane stability to retinal protectors for a complete eye care solution."
         }
     },
     {
         id: "stress",
         ingredients: ["magnesium", "b-vitamin", "b-complex", "마그네슘", "비타민 b"],
         missing: { id: "coq10", name: "코엔자임 Q10", name_en: "CoQ10" },
-        benefit: { 
-            ko: "신경 안정과 에너지 생성을 너머, 미토콘드리아 건강의 마지막 퍼즐을 맞춥니다.", 
-            en: "Goes beyond nerve stability to complete the mitochondrial energy production cycle." 
+        benefit: {
+            ko: "신경 안정과 에너지 생성을 너머, 미토콘드리아 건강의 마지막 퍼즐을 맞춥니다.",
+            en: "Goes beyond nerve stability to complete the mitochondrial energy production cycle."
         }
     }
 ];
@@ -108,7 +108,7 @@ function ScoreRing({ score }: { score: number }) {
     const radius = 72;
     const strokeWidth = 6;
     const circumference = 2 * Math.PI * radius;
-    
+
     const count = useMotionValue(0);
     const rounded = useTransform(count, (latest) => Math.round(latest));
     const spring = useSpring(count, { stiffness: 40, damping: 15 });
@@ -118,7 +118,7 @@ function ScoreRing({ score }: { score: number }) {
         return animation.stop;
     }, [score, count]);
 
-    const offset = useTransform(spring, (latest) => 
+    const offset = useTransform(spring, (latest) =>
         circumference - (latest / 100) * circumference
     );
 
@@ -158,13 +158,13 @@ function ScoreRing({ score }: { score: number }) {
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
                     <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.1" strokeOpacity="0.2"/>
+                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.1" strokeOpacity="0.2" />
                     </pattern>
                 </defs>
 
                 {/* 1. 홀로그램 배경 그리드 */}
                 <circle cx="90" cy="90" r={radius + 10} fill="url(#grid)" opacity="0.3" />
-                
+
                 {/* 2. HUD 데코레이션 - 외부 눈금 링 */}
                 <g opacity="0.15">
                     {Array.from({ length: 12 }).map((_, i) => (
@@ -281,14 +281,14 @@ function ScoreRing({ score }: { score: number }) {
                         <motion.span className="text-4xl md:text-5xl font-[1000] text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
                             {rounded}
                         </motion.span>
-                        <span 
+                        <span
                             className="ml-1 text-[9px] font-black italic tracking-widest uppercase opacity-60"
                             style={{ color: colors.accent }}
                         >
                             %
                         </span>
                     </motion.div>
-                    
+
                     {/* 데이터 락 레이블 */}
                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
                         <motion.div
@@ -301,10 +301,10 @@ function ScoreRing({ score }: { score: number }) {
                         </motion.div>
                     </div>
                 </div>
-                
+
                 {/* 하단 장식선 & 정보 */}
                 <div className="mt-4 flex flex-col items-center">
-                    <motion.div 
+                    <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: 60 }}
                         className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-2"
@@ -433,10 +433,10 @@ const ProductCard = memo(function ProductCard({ product, index, sourceIngredient
                 <div className="relative z-10 w-full h-full flex items-center justify-center transition-transform duration-700 group-hover/card:scale-110">
                     {product.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img 
-                            src={product.image_url} 
-                            alt={product.name} 
-                            className="h-full w-full object-contain drop-shadow-2xl" 
+                        <img
+                            src={product.image_url}
+                            alt={product.name}
+                            className="h-full w-full object-contain drop-shadow-2xl"
                         />
                     ) : (
                         <div className="relative">
@@ -489,20 +489,20 @@ const ProductCard = memo(function ProductCard({ product, index, sourceIngredient
                 <div className="mt-auto border-t border-slate-50 pt-4 flex items-end justify-between">
                     <div className="flex flex-col">
                         {product.discount_rate && (
-                           <div className="flex items-center gap-1 mb-0.5">
+                            <div className="flex items-center gap-1 mb-0.5">
                                 <span className="text-rose-500 text-[10px] font-black italic">{product.discount_rate}% OFF</span>
                                 {product.original_price && (
                                     <span className="text-[9px] text-slate-300 line-through font-bold">
                                         {language === 'ko' ? `₩${Math.floor(product.original_price).toLocaleString()}` : `$${product.original_price.toFixed(2)}`}
                                     </span>
                                 )}
-                           </div>
+                            </div>
                         )}
                         <div className="flex items-baseline gap-0.5">
                             <span className="text-[10px] font-black text-slate-400">{language === 'ko' ? '₩' : '$'}</span>
                             <span className="text-xl md:text-2xl font-[1000] text-slate-900 tracking-tighter">
-                                {product.price > 0 
-                                    ? (language === 'ko' ? Math.floor(product.price).toLocaleString() : product.price.toFixed(2)) 
+                                {product.price > 0
+                                    ? (language === 'ko' ? Math.floor(product.price).toLocaleString() : product.price.toFixed(2))
                                     : t.products.outOfStock}
                             </span>
                         </div>
@@ -521,7 +521,7 @@ const ProductCard = memo(function ProductCard({ product, index, sourceIngredient
                             <div className="absolute inset-0 -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
                             <ShoppingCart size={10} className="text-white/90" />
                             <span className="text-[9px] font-black tracking-tight text-white whitespace-nowrap">
-                                 {language === 'ko' ? t.common.shoppingCoupang : t.common.shoppingAmazon}
+                                {language === 'ko' ? t.common.shoppingCoupang : t.common.shoppingAmazon}
                             </span>
                         </a>
                     </Button>
@@ -530,11 +530,11 @@ const ProductCard = memo(function ProductCard({ product, index, sourceIngredient
 
             {/* AI 신뢰성 점수 바 (장식용) */}
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-50 overflow-hidden">
-                <motion.div 
+                <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: '99%' }}
                     transition={{ duration: 1, delay: 0.5 }}
-                    className={cn("h-full bg-gradient-to-r opacity-40", config.gradient)} 
+                    className={cn("h-full bg-gradient-to-r opacity-40", config.gradient)}
                 />
             </div>
         </Card>
@@ -570,8 +570,8 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
     const handleShare = async () => {
         const shareData = {
             title: language === 'ko' ? "ZestPair | 영양제 궁합 분석 결과" : "ZestPair | Supplement Synergy Analysis",
-            text: language === 'ko' 
-                ? `🔥 나의 영양제 궁합 점수는 ${result.score}점! Pori AI가 알려주는 최적의 조합을 확인해보세요.` 
+            text: language === 'ko'
+                ? `🔥 나의 영양제 궁합 점수는 ${result.score}점! Pori AI가 알려주는 최적의 조합을 확인해보세요.`
                 : `🔥 My supplement synergy score is ${result.score}! Check your personalized analysis by Pori AI at ZestPair.`,
             url: window.location.origin
         };
@@ -611,13 +611,13 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
         >
             {/* 0. 최상단 리포트 헤더 라벨 - 스크롤 타겟 */}
             <div id="analysis-report-top" className="flex flex-col items-center gap-2 pt-32 pb-0">
-                <motion.div 
-                    initial={{ y: -10, opacity: 0 }} 
+                <motion.div
+                    initial={{ y: -10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     className="flex items-center gap-3 px-6 py-2 rounded-2xl bg-white/50 border border-emerald-100 backdrop-blur-xl shadow-[0_8px_32px_rgba(16,185,129,0.05)]"
                 >
                     <div className="relative">
-                        <motion.div 
+                        <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                             className="absolute -inset-1 rounded-full border border-dashed border-emerald-400/30"
@@ -628,10 +628,10 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         {language === 'ko' ? 'Analysis Protocol' : 'Analysis Report'}
                     </h2>
                 </motion.div>
-                <motion.div 
+                <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: 8 }}
-                    className="w-px bg-gradient-to-b from-emerald-500/30 via-emerald-500/10 to-transparent" 
+                    className="w-px bg-gradient-to-b from-emerald-500/30 via-emerald-500/10 to-transparent"
                 />
             </div>
 
@@ -669,7 +669,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
 
                         {/* 2. 최적화된 타이틀 */}
                         <div className="mb-6 space-y-1.5">
-                            <motion.h2 
+                            <motion.h2
                                 initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
@@ -677,22 +677,22 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             >
                                 {result.score >= 70 ? t.results.synergy : result.score >= 40 ? t.results.caution : t.results.conflict}
                             </motion.h2>
-                            <motion.p 
+                            <motion.p
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.5 }}
                                 className="text-base md:text-lg font-black text-emerald-400/90 tracking-tight"
                             >
-                                {result.score >= 70 
-                                    ? t.results.bestMix 
-                                    : result.score >= 40 
-                                        ? t.results.potentialConflict 
+                                {result.score >= 70
+                                    ? t.results.bestMix
+                                    : result.score >= 40
+                                        ? t.results.potentialConflict
                                         : t.results.dangerous}
                             </motion.p>
                         </div>
 
                         {/* 3. 요약 박스 (Compact) */}
-                        <motion.div 
+                        <motion.div
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.6 }}
@@ -798,7 +798,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         )}
                     </div>
                 ) : (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         className="relative overflow-hidden rounded-[3rem] p-16 md:p-24 text-center group"
@@ -819,17 +819,17 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             {/* 초대형 시큐리티 실드 애니메이션 */}
                             <div className="relative w-28 h-28 md:w-36 md:h-36">
                                 {/* 바깥 궤도 링 */}
-                                <motion.div 
+                                <motion.div
                                     animate={{ rotate: 360 }}
                                     transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                                    className="absolute inset-0 rounded-full border-2 border-dashed border-emerald-500/20" 
+                                    className="absolute inset-0 rounded-full border-2 border-dashed border-emerald-500/20"
                                 />
-                                
+
                                 {/* 스캐너 빔 */}
-                                <motion.div 
+                                <motion.div
                                     animate={{ rotate: -360 }}
                                     transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                                    className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent_0deg,rgba(16,185,129,0.4)_20deg,transparent_40deg)]" 
+                                    className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent_0deg,rgba(16,185,129,0.4)_20deg,transparent_40deg)]"
                                 />
 
                                 <div className="absolute inset-4 rounded-[1.8rem] bg-white shadow-xl flex items-center justify-center border border-emerald-50/50">
@@ -876,16 +876,16 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
             {(() => {
                 // 현재 장바구니 성분 이름 리스트 (소문자/트림)
                 const currentIngNames = result.ingredients.map(ing => (ing.name_en || ing.name).toLowerCase().trim());
-                
+
                 // 아직 장바구니에 없는 누락된 트라이어드 찾기
                 const triad = SYNERGY_TRIADS.find(t => {
                     // 트라이어드 필수 성분 중 2개 이상이 이미 있고, 보완 성분(missing)은 아직 없을 때
-                    const matchedCount = t.ingredients.filter(req => 
+                    const matchedCount = t.ingredients.filter(req =>
                         currentIngNames.some(own => own.includes(req.toLowerCase()))
                     ).length;
-                    
-                    const isMissingPresent = currentIngNames.some(own => 
-                        own.includes(t.missing.id.toLowerCase()) || 
+
+                    const isMissingPresent = currentIngNames.some(own =>
+                        own.includes(t.missing.id.toLowerCase()) ||
                         own.includes(t.missing.name_en.toLowerCase()) ||
                         own.includes(t.missing.name.toLowerCase())
                     );
@@ -896,7 +896,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 if (!triad) return null;
 
                 const missingName = language === 'ko' ? triad.missing.name : triad.missing.name_en;
-                const buyUrl = language === 'ko' 
+                const buyUrl = language === 'ko'
                     ? `https://www.coupang.com/np/search?q=${encodeURIComponent(triad.missing.name)}`
                     : `https://www.amazon.com/s?k=${encodeURIComponent(triad.missing.name_en)}`;
 
@@ -910,14 +910,14 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         >
                             {/* 프리미엄 백그라운드 효과 */}
                             <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 via-yellow-400/20 to-amber-500/20 rounded-[3rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000" />
-                            
+
                             <div className="relative p-1 bg-gradient-to-br from-amber-200/50 via-white/10 to-transparent rounded-[3rem] backdrop-blur-xl shadow-2xl">
                                 <div className="bg-white/80 rounded-[2.8rem] p-8 md:p-12 overflow-hidden relative">
                                     {/* 장식용 패턴 */}
                                     <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
                                         <Sparkles size={120} className="text-amber-500" />
                                     </div>
-                                    
+
                                     <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
                                         {/* 시각적 도식 (Triad Visualization) */}
                                         <div className="flex-shrink-0 relative">
@@ -950,8 +950,8 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                                     {language === 'ko' ? '보이지 않는 마지막 퍼즐' : 'The Missing Piece'}
                                                 </h3>
                                                 <p className="text-sm md:text-base text-slate-500 font-bold leading-relaxed max-w-sm">
-                                                    {language === 'ko' 
-                                                        ? `${missingName} 성분만 더하면 현재 조합의 시너지가 완벽해집니다.` 
+                                                    {language === 'ko'
+                                                        ? `${missingName} 성분만 더하면 현재 조합의 시너지가 완벽해집니다.`
                                                         : `Add ${missingName} to complete the perfectly balanced synergy triad.`}
                                                 </p>
                                             </div>
@@ -968,7 +968,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                             </div>
 
                                             <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
-                                                <a 
+                                                <a
                                                     href={buyUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
@@ -1112,7 +1112,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         <div className="absolute inset-0 pointer-events-none">
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] opacity-0 group-hover/reset:opacity-100 transition-opacity duration-700" />
                             <div className="absolute -inset-[100%] group-hover/reset:animate-[spin_10s_linear_infinite] opacity-20 pointer-events-none"
-                                 style={{ background: "conic-gradient(from_0deg, transparent_0deg, #10b981_20deg, transparent_40deg, transparent_180deg, #06b6d4_200deg, transparent_220deg)" }} />
+                                style={{ background: "conic-gradient(from_0deg, transparent_0deg, #10b981_20deg, transparent_40deg, transparent_180deg, #06b6d4_200deg, transparent_220deg)" }} />
                         </div>
 
                         <div className="relative z-10 flex flex-col items-center justify-center w-full gap-6 md:gap-8">
@@ -1149,10 +1149,10 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         </div>
 
                         {/* 프리미엄 쉬머 스캔 */}
-                        <motion.div 
+                        <motion.div
                             animate={{ x: ["-100%", "200%"] }}
                             transition={{ duration: 3, repeat: Infinity, repeatDelay: 5 }}
-                            className="absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 pointer-events-none" 
+                            className="absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 pointer-events-none"
                         />
                     </Button>
                 </motion.div>
