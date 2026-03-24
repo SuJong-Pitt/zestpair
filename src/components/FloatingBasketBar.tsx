@@ -13,9 +13,14 @@ import type { Ingredient } from "@/types/database";
 interface FloatingBasketBarProps {
   onAnalyze: () => void;
   allIngredients?: Ingredient[];
+  isHeroSearchVisible?: boolean;
 }
 
-export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: FloatingBasketBarProps) {
+export default function FloatingBasketBar({ 
+  onAnalyze, 
+  allIngredients = [], 
+  isHeroSearchVisible = false 
+}: FloatingBasketBarProps) {
   const { selectedIngredients, addIngredient, removeIngredient, clearBasket, isAnalyzing, language, isSelected, isBasketExpanded, setBasketExpanded, hasResult } = useBasketStore();
   const [isVisible, setIsVisible] = useState(false);
   const isExpanded = isBasketExpanded;
@@ -35,10 +40,10 @@ export default function FloatingBasketBar({ onAnalyze, allIngredients = [] }: Fl
     // 여기서는 count가 있고 분석 결과가 없을 때만 보이게 하거나, 
     // 혹은 분석 결과가 있어도 사용자가 원할 때 볼 수 있게 함.
     // 일단 사용자의 요청대로 "모바일 최적화"를 위해 분석 결과 화면에서는 숨기도록 함.
-    const shouldShow = (count > 0 || isSearchActive) && !hasResult && !isAnalyzing;
+    const shouldShow = (count > 0 || isSearchActive) && !hasResult && !isAnalyzing && !isHeroSearchVisible;
     setIsVisible(shouldShow);
-    if ((count === 0 || hasResult) && !isSearchActive) setIsExpanded(false);
-  }, [count, isSearchActive, hasResult, isAnalyzing]);
+    if ((count === 0 || hasResult || isHeroSearchVisible) && !isSearchActive) setIsExpanded(false);
+  }, [count, isSearchActive, hasResult, isAnalyzing, isHeroSearchVisible]);
 
   const filteredSearch = allIngredients.filter(ing => {
     if (!searchQuery) return false;

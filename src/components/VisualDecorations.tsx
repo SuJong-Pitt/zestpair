@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -56,6 +56,8 @@ function MolecularNetwork() {
 }
 
 export default function VisualDecorations() {
+  const containerRef = useRef(null);
+  const isInView = useInView(containerRef, { amount: 0.1 });
   const [hasMounted, setHasMounted] = useState(false);
   const [stats, setStats] = useState({ ingredients: 0, interactions: 0 });
   const [isLoading, setIsLoading] = useState(true);
@@ -93,13 +95,13 @@ export default function VisualDecorations() {
   if (!hasMounted) return null;
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+    <div ref={containerRef} className="absolute inset-0 overflow-hidden pointer-events-none select-none">
 
       {/* === 배경: 3중 레이어 메쉬 그라데이션 오브 === */}
       <div className="absolute inset-0">
         {/* 에메랄드 오브 – 좌상단 */}
         <motion.div
-          animate={{ scale: [1, 1.25, 1], x: ["-2%", "5%", "-2%"], y: ["-2%", "3%", "-2%"] }}
+          animate={isInView ? { scale: [1, 1.25, 1], x: ["-2%", "5%", "-2%"], y: ["-2%", "3%", "-2%"] } : {}}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -top-[10%] -left-[5%] w-[60%] h-[65%]"
           style={{ 
@@ -110,7 +112,7 @@ export default function VisualDecorations() {
         />
         {/* 시안/퍼플 오브 – 우상단 */}
         <motion.div
-          animate={{ scale: [1.1, 0.95, 1.1], x: ["3%", "-5%", "3%"], y: ["3%", "-3%", "3%"] }}
+          animate={isInView ? { scale: [1.1, 0.95, 1.1], x: ["3%", "-5%", "3%"], y: ["3%", "-3%", "3%"] } : {}}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -top-[5%] -right-[10%] w-[65%] h-[70%]"
           style={{ 
@@ -121,7 +123,7 @@ export default function VisualDecorations() {
         />
         {/* 골든 오브 – 가운데 하단 */}
         <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.06, 0.12, 0.06] }}
+          animate={isInView ? { scale: [1, 1.2, 1], opacity: [0.06, 0.12, 0.06] } : {}}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
           className="absolute bottom-0 left-0 right-0 h-[35%]"
           style={{ 
@@ -138,12 +140,12 @@ export default function VisualDecorations() {
           <motion.div
             key={i}
             initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ 
+            animate={isInView ? { 
               opacity: [0, 0.12, 0], 
               y: [100, -100], 
               x: [(Math.random() - 0.5) * 40, (Math.random() - 0.5) * 80],
               scale: [0.5, 1.3, 0.8]
-            }}
+            } : { opacity: 0 }}
             transition={{ duration: 18 + i * 5, repeat: Infinity, ease: "linear", delay: i * 2 }}
             className="absolute rounded-full"
             style={{ 
@@ -240,11 +242,11 @@ export default function VisualDecorations() {
           className="absolute hidden md:block"
           style={{ left: cap.x, top: cap.y, rotate: cap.rotate, scale: cap.scale }}
           initial={{ opacity: 0, y: 20 }}
-          animate={{
+          animate={isInView ? {
             opacity: [0, 0.75, 0.55],
             y: [-12, 12, -12],
             rotate: [cap.rotate - 5, cap.rotate + 5, cap.rotate - 5],
-          }}
+          } : { opacity: 0 }}
           transition={{ duration: 6 + i, delay: cap.delay, repeat: Infinity, ease: "easeInOut" }}
         >
           <div style={{ filter: `drop-shadow(0 8px 20px ${cap.color1}55)` }}>
@@ -262,12 +264,12 @@ export default function VisualDecorations() {
           <motion.div
             key={i}
             initial={{ opacity: 0 }}
-            animate={{
+            animate={isInView ? {
               opacity: [0, 0.5, 0],
               y: [0, -(50 + seededRand(i) * 80)],
               x: [0, (seededRand(i * 2) - 0.5) * 30],
               scale: [1, 0.5],
-            }}
+            } : { opacity: 0 }}
             transition={{
               duration: 6 + seededRand(i * 5) * 6,
               repeat: Infinity,

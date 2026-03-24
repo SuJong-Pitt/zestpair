@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, Suspense } from "react";
+import { useRef, useState, useEffect, Suspense, useMemo, useCallback } from "react";
 import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database, Smartphone, X, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import FloatingAssistant from "@/components/FloatingAssistant";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Skeleton } from "@/components/ui/skeleton";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import { UI_TRANSLATIONS, CATEGORIES_TRANSLATIONS } from "@/lib/i18n";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import Image from "next/image";
@@ -75,6 +75,9 @@ function HorizontalScroll({ children, className }: { children: React.ReactNode; 
 export default function HomePage() {
   const resultRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const heroSearchContainerRef = useRef<HTMLDivElement>(null);
+  const isHeroSearchVisible = useInView(heroSearchContainerRef, { amount: 0.1 });
+
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -117,33 +120,37 @@ export default function HomePage() {
 
   const t = UI_TRANSLATIONS[language];
 
-  // 메인 그리드용 필터링 (검색어 제외, 카테고리만)
-  const filteredIngredients = dbIngredients.filter((ing) => {
-    return selectedCategory === "all" || ing.category === selectedCategory;
-  });
+  // 메인 그리드용 필터링 (검색어 제외, 카테고리만) - 성능 최적화: useMemo
+  const filteredIngredients = useMemo(() => {
+    return dbIngredients.filter((ing) => {
+      return selectedCategory === "all" || ing.category === selectedCategory;
+    });
+  }, [dbIngredients, selectedCategory]);
+    
+  // 드롭다운 검색 결과용 필터링 - 성능 최적화: useMemo
+  const dropdownResults = useMemo(() => {
+    if (!searchQuery) return [];
+    return dbIngredients.filter((ing) => {
+      const name = language === "ko" ? ing.name : ing.name_en;
+      const desc = language === "ko" ? ing.short_description : (ing.short_description_en || ing.short_description);
+      return (
+        name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        desc.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }).slice(0, 8);
+  }, [dbIngredients, searchQuery, language]);
+    
+  const popularIngredients = useMemo(() => {
+    return dbIngredients.filter((i) => i.is_popular);
+  }, [dbIngredients]);
 
-  // 드롭다운 검색 결과용 필터링
-  const dropdownResults = searchQuery ? dbIngredients.filter((ing) => {
-    const name = language === "ko" ? ing.name : ing.name_en;
-    const desc = language === "ko" ? ing.short_description : (ing.short_description_en || ing.short_description);
-    return (
-      name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      desc.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }).slice(0, 8) : [];
-
-  const popularIngredients = dbIngredients.filter((i) => i.is_popular);
-
-  const handleAnalyze = async () => {
+  const handleAnalyze = useCallback(async () => {
     if (selectedIngredients.length < 2) return;
 
-    // 분석 시작 시 기존 결과 초기화
     setHasResult(false);
     setAnalysisResult(null);
     setAnalyzing(true);
 
-    // 분석 시작 시 하단으로 미세하게 프리뷰 스크롤 (애니메이션 유도)
-    // 약간의 지연을 주어 상태 업데이트(isAnalyzing)가 DOM에 반영되도록 함
     setTimeout(() => {
       if (resultRef.current) {
         resultRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -203,17 +210,16 @@ export default function HomePage() {
     }
 
     setAnalysisResult({
-      ingredients: [...selectedIngredients], // 참조 끊기
+      ingredients: [...selectedIngredients],
       synergies, cautions, conflicts, score, summary,
       analyzed_at: new Date().toISOString()
     });
-  };
+  }, [selectedIngredients, language, setHasResult, setAnalysisResult, setAnalyzing]);
 
-  const handleAnimationComplete = () => {
+  const handleAnimationComplete = useCallback(() => {
     setAnalyzing(false);
     setHasResult(true);
 
-    // 결과 컴포넌트가 실제로 렌더링되고 높이가 확정될 때까지 감시하는 로직
     const performScroll = () => {
       const target = document.getElementById("analysis-report-top");
       if (target) {
@@ -223,14 +229,11 @@ export default function HomePage() {
       return false;
     };
 
-    // 1. 이미 존재한다면 즉시 실행
     if (performScroll()) return;
 
-    // 2. 존재하지 않는다면 DOM 변화를 감시 (MutationObserver)
     const observer = new MutationObserver((_mutations, obs) => {
       const target = document.getElementById("analysis-report-top");
       if (target) {
-        // 이미지가 로딩되거나 레이아웃이 변할 수 있으므로 ResizeObserver도 결합
         const resizeObserver = new ResizeObserver(() => {
           performScroll();
           resizeObserver.disconnect();
@@ -238,7 +241,7 @@ export default function HomePage() {
         resizeObserver.observe(target);
 
         performScroll();
-        obs.disconnect(); // 타겟을 찾았으므로 감시 종료
+        obs.disconnect();
       }
     });
 
@@ -247,12 +250,11 @@ export default function HomePage() {
       subtree: true
     });
 
-    // 3. 만약의 경우를 대비한 타임아웃 백업
     setTimeout(() => {
       performScroll();
       observer.disconnect();
-    }, 1500); // 넉넉하게 1.5초
-  };
+    }, 1500);
+  }, [setAnalyzing, setHasResult]);
 
   return (
     <div className="min-h-screen bg-slate-50/50">
@@ -572,6 +574,7 @@ export default function HomePage() {
 
           {/* === 검색 바 === */}
           <motion.div
+            ref={heroSearchContainerRef}
             initial={{ opacity: 0, y: 20, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.7, delay: 1.25, ease: [0.22, 1, 0.36, 1] }}
@@ -707,10 +710,14 @@ export default function HomePage() {
                 {language === 'ko' ? '인기' : 'POPULAR'}:
               </span>
               <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
-                {['Vitamin C', 'Zinc', 'Biotin', 'Omega-3'].map(tag => (
+                {t.hero.popularTags.map(tag => (
                   <button
                     key={tag}
-                    onClick={() => setSearchQuery(tag)}
+                    onClick={() => {
+                      setSearchQuery(tag);
+                      setIsDropdownOpen(true);
+                      window.scrollTo({ top: 300, behavior: "smooth" }); // 검색 결과가 잘 보이도록 약간 스크롤
+                    }}
                     className="text-[10px] md:text-xs font-bold transition-all hover:opacity-100 hover:scale-105 active:scale-95"
                     style={{ color: "#6ee7b7" }}
                   >
@@ -1079,7 +1086,12 @@ export default function HomePage() {
         </div>
       </main>
 
-      <FloatingBasketBar onAnalyze={handleAnalyze} allIngredients={dbIngredients} />
+      <FloatingBasketBar 
+        onAnalyze={handleAnalyze} 
+        allIngredients={dbIngredients} 
+        isHeroSearchVisible={isHeroSearchVisible}
+      />
+
       <FloatingAssistant />
     </div>
   );

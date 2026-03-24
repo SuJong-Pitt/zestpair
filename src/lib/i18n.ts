@@ -14,7 +14,8 @@ export const UI_TRANSLATIONS = {
                 speed: "처리 속도",
                 unlimited: "무제한 분석",
                 instant: "0.5초 이내"
-            }
+            },
+            popularTags: ["비타민", "미네랄", "오메가", "유산균"]
         },
         howItWorks: {
             title: "ZestPair 이용 가이드",
@@ -126,7 +127,8 @@ export const UI_TRANSLATIONS = {
                 speed: "Processing Speed",
                 unlimited: "Unlimited Analysis",
                 instant: "Under 0.5s"
-            }
+            },
+            popularTags: ["Vitamin", "Mineral", "Omega", "Probiotics"]
         },
         howItWorks: {
             title: "How ZestPair Works",
