@@ -143,9 +143,13 @@ function ScoreRing({ score }: { score: number }) {
         <div className="relative flex items-center justify-center w-52 h-52 md:w-60 md:h-60 select-none group/score">
             {/* 주변 네온 오라 (Subtle Glow) */}
             <div
-                className="absolute inset-0 rounded-full opacity-20 transition-all duration-1000 scale-150"
-                style={{ background: `radial-gradient(circle, ${colors.main} 0%, transparent 70%)`, filter: "blur(60px)" }}
+                className="absolute inset-x-0 inset-y-0 rounded-full opacity-30 transition-all duration-1000 scale-125 group-hover/score:scale-150 group-hover/score:opacity-40"
+                style={{ 
+                    background: `radial-gradient(circle, ${colors.main} 0%, transparent 70%)`, 
+                    filter: "blur(60px)" 
+                }}
             />
+            <div className="absolute inset-0 rounded-full opacity-10 animate-pulse bg-white/5" />
 
             <svg viewBox="0 0 180 180" className="w-full h-full transform transition-all duration-1000 overflow-visible">
                 <defs>
@@ -165,17 +169,18 @@ function ScoreRing({ score }: { score: number }) {
                 {/* 1. 홀로그램 배경 그리드 */}
                 <circle cx="90" cy="90" r={radius + 10} fill="url(#grid)" opacity="0.3" />
 
-                {/* 2. HUD 데코레이션 - 외부 눈금 링 */}
-                <g opacity="0.15">
-                    {Array.from({ length: 12 }).map((_, i) => (
+                {/* 2. HUD 데코레이션 - 외부 눈금 링 (더 정교하게) */}
+                <g opacity="0.2">
+                    {Array.from({ length: 36 }).map((_, i) => (
                         <rect
                             key={i}
                             x="89.5"
                             y="2"
-                            width="1"
-                            height="8"
-                            fill="white"
-                            transform={`rotate(${i * 30} 90 90)`}
+                            width={i % 3 === 0 ? "1" : "0.5"}
+                            height={i % 3 === 0 ? "10" : "6"}
+                            fill={i % 3 === 0 ? colors.light : "white"}
+                            transform={`rotate(${i * 10} 90 90)`}
+                            opacity={i % 3 === 0 ? 0.8 : 0.3}
                         />
                     ))}
                 </g>
@@ -216,7 +221,7 @@ function ScoreRing({ score }: { score: number }) {
                     strokeWidth={strokeWidth}
                     fill="transparent"
                     strokeDasharray={circumference}
-                    style={{ strokeDashoffset: offset, opacity: 0.2, filter: "blur(6px)", strokeLinecap: "round" }}
+                    style={{ strokeDashoffset: offset, opacity: 0.3, filter: "blur(12px)", strokeLinecap: "round" }}
                     className="-rotate-90 origin-center"
                 />
                 <motion.circle
@@ -227,7 +232,11 @@ function ScoreRing({ score }: { score: number }) {
                     strokeWidth={strokeWidth}
                     fill="transparent"
                     strokeDasharray={circumference}
-                    style={{ strokeDashoffset: offset, strokeLinecap: "round" }}
+                    style={{ 
+                        strokeDashoffset: offset, 
+                        strokeLinecap: "round",
+                        filter: `drop-shadow(0 0 8px ${colors.main})`
+                    }}
                     className="-rotate-90 origin-center"
                 />
 
@@ -243,13 +252,13 @@ function ScoreRing({ score }: { score: number }) {
                 <motion.rect
                     x="90"
                     y="10"
-                    width="1"
+                    width="1.5"
                     height={radius}
                     fill={`url(#beamGrad-${colors.main})`}
                     className="origin-bottom"
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                    style={{ transformOrigin: "90px 90px", opacity: 0.5 }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    style={{ transformOrigin: "90px 90px", opacity: 0.6 }}
                 >
                     <defs>
                         <linearGradient id={`beamGrad-${colors.main}`} x1="0%" y1="0%" x2="0%" y2="100%">
@@ -278,7 +287,7 @@ function ScoreRing({ score }: { score: number }) {
                         transition={{ duration: 2, repeat: Infinity }}
                         className="flex items-baseline"
                     >
-                        <motion.span className="text-4xl md:text-5xl font-[1000] text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                        <motion.span className="text-5xl md:text-7xl font-[1000] text-white tracking-tighter drop-shadow-[0_0_25px_rgba(255,255,255,0.4)]">
                             {rounded}
                         </motion.span>
                         <span
@@ -640,8 +649,38 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-emerald-500 to-cyan-500 rounded-[3rem] blur opacity-15 group-hover:opacity-30 transition duration-1000"></div>
 
                 <Card className="relative rounded-[2.5rem] overflow-hidden border-none bg-slate-900 text-white shadow-2xl texture-grain">
-                    {/* 하이테크 스캔라인 효과 */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px)] bg-[size:100%_4px] pointer-events-none" />
+                    {/* 하이테크 애니메이션 배경 - 신경망/그리드 */}
+                    <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]" />
+                        <motion.div 
+                            animate={{ 
+                                backgroundPosition: ["0px 0px", "0px 40px"],
+                            }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.1)_1px,transparent_1px)] bg-[size:100%_40px] opacity-30" 
+                        />
+                        {/* 플로팅 데이터 입자들 */}
+                        <div className="absolute inset-0">
+                            {[...Array(6)].map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: "100%" }}
+                                    animate={{ 
+                                        opacity: [0, 1, 0],
+                                        y: "-100%",
+                                        x: `${Math.random() * 100}%`
+                                    }}
+                                    transition={{ 
+                                        duration: 5 + Math.random() * 5,
+                                        repeat: Infinity,
+                                        delay: Math.random() * 5,
+                                        ease: "linear"
+                                    }}
+                                    className="absolute w-px h-20 bg-gradient-to-t from-transparent via-emerald-500/50 to-transparent"
+                                />
+                            ))}
+                        </div>
+                    </div>
 
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] pointer-events-none opacity-50 md:opacity-100" />
 

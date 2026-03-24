@@ -63,6 +63,15 @@ const SynergyCard = memo(function SynergyCard({
     if (!result.interaction) return null;
     
     const [isFlipped, setIsFlipped] = useState(false);
+    const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (isFlipped) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        setMousePos({ x, y });
+    };
     const [isSharing, setIsSharing] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
@@ -146,6 +155,8 @@ const SynergyCard = memo(function SynergyCard({
                 ref={cardRef}
                 className="w-full h-full relative"
                 animate={{ rotateY: isFlipped ? 180 : 0 }}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={() => setMousePos({ x: 0.5, y: 0.5 })}
                 transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
                 style={{ transformStyle: "preserve-3d" }}
             >
@@ -163,13 +174,22 @@ const SynergyCard = memo(function SynergyCard({
                         {/* 카드 배경 텍스처 */}
                         <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.15),transparent_70%)]" />
+                        
+                        {/* 홀로그램 포일 효과 (Foil Shine) */}
+                        <div 
+                            className="absolute inset-0 opacity-[0.15] mix-blend-color-dodge pointer-events-none transition-opacity duration-500 group-hover:opacity-40"
+                            style={{
+                                background: `radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(255,255,255,0.8) 0%, transparent 50%), 
+                                             linear-gradient(${mousePos.x * 360}deg, rgba(255,0,0,0.1) 0%, rgba(0,255,0,0.1) 50%, rgba(0,0,255,0.1) 100%)`
+                            }}
+                        />
 
                         <div className="relative z-10 p-6 flex flex-col h-full">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] font-black text-white/40 tracking-[0.3em] uppercase mb-1">MIXY TRADING CARD</span>
-                                    <Badge variant="outline" className="border-white/20 text-white font-black px-3 py-0.5 rounded-full text-[9px] bg-white/5 backdrop-blur-md">
-                                        #{index + 1} MIX_ID
+                                    <span className="text-[10px] font-black text-white/50 tracking-[0.4em] uppercase mb-1">MIXY PREMIUM FOIL</span>
+                                    <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 font-black px-3 py-0.5 rounded-full text-[9px] bg-emerald-500/5 backdrop-blur-md">
+                                        LIMITED EDITION #{index + 1}
                                     </Badge>
                                 </div>
                                 <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 backdrop-blur-md">
@@ -180,20 +200,28 @@ const SynergyCard = memo(function SynergyCard({
                             <div className="flex-1 flex flex-col items-center justify-center relative mb-4">
                                 {/* 후광 오라 */}
                                 <div className={cn(
-                                    "absolute w-40 h-40 blur-[80px] rounded-full opacity-30 animate-pulse",
+                                    "absolute w-40 h-40 blur-[90px] rounded-full opacity-40 animate-pulse",
                                     "bg-gradient-to-tr", config.theme
                                 )} />
                                 
                                 <div className="relative flex items-center justify-center gap-6 mb-5">
-                                    <div className="flex flex-col items-center gap-2">
-                                        <div className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">{result.pair[0].icon_emoji}</div>
+                                    <motion.div 
+                                        animate={{ y: [0, -8, 0], rotate: [0, 2, 0] }}
+                                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                        className="flex flex-col items-center gap-2"
+                                    >
+                                        <div className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">{result.pair[0].icon_emoji}</div>
                                         <span className="text-[10px] font-black text-white/60 tracking-tighter uppercase">{nameA}</span>
-                                    </div>
+                                    </motion.div>
                                     <Zap className="text-yellow-400 animate-bounce mb-6" size={28} strokeWidth={3} />
-                                    <div className="flex flex-col items-center gap-2">
-                                        <div className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">{result.pair[1].icon_emoji}</div>
+                                    <motion.div 
+                                        animate={{ y: [0, -8, 0], rotate: [0, -2, 0] }}
+                                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                                        className="flex flex-col items-center gap-2"
+                                    >
+                                        <div className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">{result.pair[1].icon_emoji}</div>
                                         <span className="text-[10px] font-black text-white/60 tracking-tighter uppercase">{nameB}</span>
-                                    </div>
+                                    </motion.div>
                                 </div>
 
                                 <div className="flex flex-col items-center space-y-3">

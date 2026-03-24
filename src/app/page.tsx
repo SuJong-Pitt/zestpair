@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, Suspense, useMemo, useCallback } from "react";
-import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database, Smartphone, X, Zap } from "lucide-react";
+import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database, Smartphone, X, Zap, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import IngredientCard from "@/components/IngredientCard";
@@ -259,7 +259,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-slate-50/50">
       <section
-        className="relative pb-24 pt-14 md:pt-12 md:pb-32 z-40"
+        className="relative pb-16 pt-10 md:pb-32 md:pt-12 z-40"
         style={{
           background: "radial-gradient(circle at 50% 0%, #0d1a15 0%, #080c14 50%, #030712 100%)"
         }}
@@ -292,7 +292,7 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="inline-flex items-center gap-3 mb-8 px-5 py-2.5 rounded-full relative group cursor-default"
+            className="inline-flex items-center gap-3 mb-5 md:mb-8 px-5 py-2.5 rounded-full relative group cursor-default"
           >
             {/* 뒤 배경 글로우 */}
             <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -333,7 +333,7 @@ export default function HomePage() {
           </motion.div>
 
           {/* === 메인 헤드라인 === */}
-          <h1 className="mb-6 tracking-tight">
+          <h1 className="mb-3 md:mb-6 tracking-tight">
             {/* 라인 1: 작은 선행 텍스트 */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -383,7 +383,7 @@ export default function HomePage() {
                 />
               </motion.span>
 
-              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-2 md:gap-x-4 text-[2.5rem] md:text-6xl lg:text-7xl font-[1000] px-6 md:px-12 py-4 md:py-5 leading-none tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-2 md:gap-x-4 text-[2.5rem] md:text-6xl lg:text-7xl font-[1000] px-6 md:px-12 py-3 md:py-5 leading-none tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 {language === 'ko' ? (
                   <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5">
                     <span className="opacity-90">포리가</span>
@@ -478,7 +478,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.85 }}
-            className="text-sm md:text-lg mb-5 leading-relaxed max-w-md mx-auto px-2"
+            className="text-sm md:text-lg mb-3 md:mb-5 leading-relaxed max-w-md mx-auto px-2"
             style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500 }}
           >
             {t.hero.subtitle1}{" "}
@@ -498,7 +498,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.0 }}
-            className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-7"
+            className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-4 md:mb-7"
           >
             {[
               { icon: "⚡", text: language === 'ko' ? '0.5초 분석' : '0.5s Analysis', color: "rgba(251,191,36,0.9)" },
@@ -513,7 +513,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1.1 + i * 0.07 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black"
+                className="inline-flex items-center gap-1.5 px-2 py-1 md:px-3 md:py-1.5 rounded-full text-[10px] md:text-[11px] font-black"
                 style={{
                   background: "rgba(255,255,255,0.05)",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -534,7 +534,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                className="flex flex-wrap justify-center gap-2 mb-10 px-4"
+                className="flex flex-wrap justify-center gap-2 mb-5 md:mb-10 px-4"
               >
                 {selectedIngredients.map((ingredient, i) => {
                   const isFirst = i === 0;
@@ -545,18 +545,18 @@ export default function HomePage() {
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                      className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-full transition-all duration-300"
+                      className="group relative flex items-center gap-1.5 px-2 py-0.5 md:px-3 md:py-1 rounded-xl transition-all duration-300"
                       style={{
-                        background: "rgba(15, 23, 42, 0.6)",
-                        border: isFirst ? "1px solid rgba(16, 185, 129, 0.4)" : "1px solid rgba(255, 255, 255, 0.08)",
-                        boxShadow: isFirst ? "0 0 15px rgba(16, 185, 129, 0.15)" : "none",
-                        backdropFilter: "blur(12px)"
+                        background: "rgba(15, 23, 42, 0.85)",
+                        border: "1.5px solid rgba(16, 185, 129, 0.5)",
+                        boxShadow: "0 8px 20px rgba(16, 185, 129, 0.2)",
+                        backdropFilter: "blur(16px)"
                       }}
                     >
-                      <span className="text-xl group-hover:scale-110 transition-transform">
+                      <span className="text-sm group-hover:scale-110 transition-transform">
                         {ingredient.icon_emoji}
                       </span>
-                      <span className="text-[13px] font-[900] text-white tracking-tight">
+                      <span className="text-[10px] md:text-[12px] font-[900] text-white tracking-tight">
                         {language === 'ko' ? ingredient.name : ingredient.name_en}
                       </span>
                       <button
@@ -591,7 +591,7 @@ export default function HomePage() {
             />
 
             <div
-              className="relative flex items-center rounded-[4rem] p-1.5 md:p-2.5 transition-all duration-500 group-focus-within:scale-[1.01]"
+              className="relative flex items-center rounded-[4rem] p-1 md:p-1.5 transition-all duration-500 group-focus-within:scale-[1.01]"
               style={{
                 background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
                 border: "1.5px solid rgba(255,255,255,0.12)",
@@ -600,7 +600,7 @@ export default function HomePage() {
               }}
             >
               <div className="pl-4 md:pl-6 text-emerald-400">
-                <Search size={22} className="md:size-6" />
+                <Search size={18} className="md:size-5" />
               </div>
               <Input
                 ref={searchRef}
@@ -612,17 +612,21 @@ export default function HomePage() {
                   setIsDropdownOpen(true);
                 }}
                 onFocus={() => setIsDropdownOpen(true)}
-                className="bg-transparent border-none text-white placeholder:text-white/25 focus-visible:ring-0 text-sm md:text-xl h-11 md:h-14 flex-1 font-bold px-3 md:px-5 tracking-tight"
+                className="bg-transparent border-none text-white placeholder:text-white/25 focus-visible:ring-0 text-xs md:text-lg h-9 md:h-12 flex-1 font-bold px-2 md:px-4 tracking-tight"
               />
               <div className="flex items-center gap-2 pr-1.5 md:pr-2">
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery("")} className="p-2.5 text-white/30 hover:text-white/70 transition-colors">
-                    <RefreshCcw size={16} />
+                {selectedIngredients.length > 0 && (
+                  <button
+                    onClick={clearBasket}
+                    title={language === 'ko' ? '초기화' : 'Reset'}
+                    className="p-1.5 md:p-2 text-white/25 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-full transition-all active:scale-90 group/reset border border-white/5 hover:border-emerald-500/20 shadow-sm"
+                  >
+                    <RotateCcw size={14} className="group-hover/reset:rotate-[-180deg] transition-transform duration-500" />
                   </button>
                 )}
                 <button
                   onClick={handleAnalyze}
-                  className="flex items-center gap-2 px-5 md:px-8 py-2.5 md:py-3.5 rounded-full font-[900] text-xs md:text-sm transition-all active:scale-95 whitespace-nowrap group/btn"
+                  className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-full font-[900] text-[10px] md:text-xs transition-all active:scale-95 whitespace-nowrap group/btn"
                   style={{
                     background: "linear-gradient(135deg, #10b981 0%, #0891b2 60%, #7c3aed 100%)",
                     color: "white",
@@ -640,19 +644,19 @@ export default function HomePage() {
             <AnimatePresence>
               {isDropdownOpen && dropdownResults.length > 0 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                  initial={{ opacity: 0, y: -20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 5, scale: 0.98 }}
-                  className="absolute top-full left-0 right-0 mt-3 z-[150] overflow-hidden rounded-[2.5rem] p-1.5"
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  className="absolute bottom-full left-0 right-0 mb-3 z-[150] overflow-hidden rounded-[2.5rem] p-1.5"
                   style={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)",
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
                     backdropFilter: "blur(40px)",
-                    border: "1px solid rgba(255,255,255,0.15)",
-                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5), 0 0 20px rgba(16,185,129,0.1)"
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    boxShadow: "0 -25px 50px -12px rgba(0,0,0,0.5), 0 0 20px rgba(16,185,129,0.15)"
                   }}
                 >
-                  <div className="bg-[#0f172a]/90 rounded-[2.2rem] overflow-hidden">
-                    <div className="max-h-[350px] overflow-y-auto scrollbar-hide py-2">
+                  <div className="bg-[#0f172a]/95 rounded-[2.2rem] overflow-hidden shadow-2xl">
+                    <div className="max-h-[520px] overflow-y-auto scrollbar-hide py-1 px-1">
                       {dropdownResults.map((ing, i) => {
                         const active = selectedIngredients.some(item => item.id === ing.id);
                         return (
@@ -666,24 +670,31 @@ export default function HomePage() {
                               setSearchQuery("");
                               setIsDropdownOpen(false);
                             }}
-                            className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors group/item border-b border-white/[0.03] last:border-none"
+                            className={`w-full flex items-center justify-between px-4 py-1.5 transition-all duration-300 group/item border-b border-white/[0.02] last:border-none rounded-xl ${
+                              active ? "bg-emerald-500/5 opacity-80" : "hover:bg-emerald-500/10 active:scale-[0.99]"
+                            }`}
                           >
-                            <div className="flex items-center gap-4">
-                              <span className="text-3xl group-hover/item:scale-110 transition-transform">{ing.icon_emoji}</span>
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 group-hover/item:bg-emerald-500/20 transition-all duration-300 border border-white/5 group-hover/item:border-emerald-500/30">
+                                <span className="text-lg group-hover/item:scale-110 transition-transform">{ing.icon_emoji}</span>
+                              </div>
                               <div className="flex flex-col text-left">
-                                <span className="text-[15px] font-black text-white tracking-tight">
+                                <span className="text-[12px] md:text-[13px] font-black text-white tracking-tight leading-none">
                                   {language === 'ko' ? ing.name : ing.name_en}
                                 </span>
-                                <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-0.5">
-                                  {CATEGORIES_TRANSLATIONS[ing.category as keyof typeof CATEGORIES_TRANSLATIONS]?.[language]}
-                                </span>
+                                <div className="flex items-center gap-1 mt-0.5">
+                                  <span className={`w-1 h-1 rounded-full ${active ? 'bg-emerald-500' : 'bg-white/10'}`} />
+                                  <span className="text-[8px] md:text-[9px] font-bold text-white/20 uppercase tracking-widest">
+                                    {CATEGORIES_TRANSLATIONS[ing.category as keyof typeof CATEGORIES_TRANSLATIONS]?.[language]}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                             
                             {active ? (
-                              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                                <Zap size={10} className="text-emerald-400" fill="currentColor" />
-                                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-tighter">In Basket</span>
+                              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                                <Zap size={8} className="text-emerald-400" fill="currentColor" />
+                                <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest px-0.5">In Basket</span>
                               </div>
                             ) : (
                               <div className="opacity-0 group-hover/item:opacity-100 transition-opacity">
@@ -705,7 +716,7 @@ export default function HomePage() {
             </AnimatePresence>
 
             {/* 인기 태그 */}
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2" style={{ opacity: 0.55 }}>
+            <div className="mt-3 md:mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2" style={{ opacity: 0.55 }}>
               <span className="text-[9px] text-white font-black uppercase tracking-[0.25em] whitespace-nowrap">
                 {language === 'ko' ? '인기' : 'POPULAR'}:
               </span>
