@@ -82,6 +82,7 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showAllPopular, setShowAllPopular] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   const [dbIngredients, setDbIngredients] = useState<Ingredient[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(true);
@@ -278,12 +279,21 @@ export default function HomePage() {
             <span className="tracking-widest uppercase mr-1">{language === "ko" ? "EN" : "KO"}</span>
           </button>
 
-          <Link
-            href="/about"
-            className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl text-white/70 font-black text-[10px] transition-all hover:bg-white/20 hover:text-white active:scale-95 shadow-lg pointer-events-auto"
-          >
-            <span>{language === 'ko' ? '서비스 소개' : 'About'}</span>
-          </Link>
+          <div className="flex items-center gap-2 lg:gap-3 pointer-events-auto">
+            <button
+              onClick={() => setIsGuideOpen(true)}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl text-emerald-400 font-black text-[10px] transition-all hover:bg-emerald-500/20 hover:text-emerald-300 hover:scale-105 active:scale-95 shadow-lg relative group/guide overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/10 to-transparent -translate-x-[150%] group-hover/guide:translate-x-[150%] transition-transform duration-1000 ease-in-out" />
+              <span>{language === 'ko' ? '가이드보기' : 'Guide'}</span>
+            </button>
+            <Link
+              href="/about"
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl text-white/70 font-black text-[10px] transition-all hover:bg-white/20 hover:text-white active:scale-95 shadow-lg"
+            >
+              <span>{language === 'ko' ? '서비스 소개' : 'About'}</span>
+            </Link>
+          </div>
         </div>
 
         <div className="relative mx-auto max-w-3xl px-4 text-center mt-6 md:mt-4">
@@ -1151,6 +1161,49 @@ export default function HomePage() {
       />
 
       <FloatingAssistant />
+
+      {/* 가이드 팝업 */}
+      <AnimatePresence>
+        {isGuideOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6"
+          >
+            {/* 어두운 배경 (클릭 시 닫힘) */}
+            <div 
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md cursor-pointer"
+              onClick={() => setIsGuideOpen(false)}
+            />
+
+            <motion.div
+              initial={{ scale: 0.95, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 10, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative w-auto h-auto max-w-5xl max-h-[90vh] bg-transparent rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl flex flex-col pointer-events-auto"
+            >
+              {/* 닫기 버튼 */}
+              <button
+                onClick={() => setIsGuideOpen(false)}
+                className="absolute top-4 right-4 md:top-6 md:right-6 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white/70 hover:text-white hover:bg-black/60 backdrop-blur-sm border border-white/10 transition-all hover:scale-110 active:scale-95 shadow-xl"
+              >
+                <X size={20} />
+              </button>
+              
+              {/* 이미지 영역 (스크롤 가능) */}
+              <div className="overflow-y-auto scrollbar-hide flex-1">
+                <img
+                  src={language === 'ko' ? '/hero-illustration-guide.webp' : '/hero-illustration-guide-en.webp'}
+                  alt="ZestPair Using Guide"
+                  className="w-auto h-auto max-w-full max-h-[90vh] object-contain block leading-none"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
