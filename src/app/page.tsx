@@ -200,7 +200,11 @@ export default function HomePage() {
     const synergyWeight = synergies.length * 15;
     const cautionPenalty = cautions.length * 5;
     const conflictPenalty = conflicts.length * 25;
-    const score = Math.max(10, Math.min(100, 70 + synergyWeight - cautionPenalty - conflictPenalty));
+
+    // 기초 영양 보완 점수 (성분 개수 증가에 따른 밸런스 점수 상향)
+    const foundationBonus = Math.max(0, (selectedIngredients.length - 2) * 8);
+
+    const score = Math.max(10, Math.min(100, 70 + synergyWeight + foundationBonus - cautionPenalty - conflictPenalty));
 
     let summary = "";
     if (language === "ko") {
