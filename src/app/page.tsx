@@ -1,17 +1,20 @@
 "use client";
 
-import { useRef, useState, useEffect, Suspense, useMemo, useCallback } from "react";
+import { useRef, useState, useEffect, Suspense, useMemo, useCallback, useTransition } from "react";
 import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database, Smartphone, X, Zap, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import IngredientCard from "@/components/IngredientCard";
-import FloatingBasketBar from "@/components/FloatingBasketBar";
 import dynamic from "next/dynamic";
+
+const IngredientCard = dynamic(() => import("@/components/IngredientCard"), {
+  loading: () => <div className="w-full h-[180px] md:h-[220px] rounded-[1.75rem] bg-slate-200/20 animate-pulse" />,
+  ssr: true
+});
+const FloatingBasketBar = dynamic(() => import("@/components/FloatingBasketBar"), { ssr: false });
 import { useBasketStore } from "@/store/basketStore";
 import { supabase } from "@/lib/supabase";
 import type { AnalysisResult, Ingredient, InteractionResult } from "@/types/database";
 import { cn } from "@/lib/utils";
-import FloatingAssistant from "@/components/FloatingAssistant";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence, useInView } from "framer-motion";
@@ -80,6 +83,8 @@ export default function HomePage() {
 
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [inputValue, setInputValue] = useState("");
+  const [isPending, startTransition] = useTransition();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showAllPopular, setShowAllPopular] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
@@ -353,7 +358,7 @@ export default function HomePage() {
               className="text-base md:text-2xl font-bold mb-1 md:mb-2"
               style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "0.05em" }}
             >
-              {language === 'ko' ? '복잡한 영양제 조합,' : 'Complex supplements,'}
+              {language === 'ko' ? '복잡한 영양제 조합,' : 'Your daily supplements,'}
             </motion.div>
 
             {/* 라인 2: 핵심 임팩트 문구 */}
@@ -396,10 +401,10 @@ export default function HomePage() {
 
               <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-2 md:gap-x-4 text-[2.5rem] md:text-6xl lg:text-7xl font-[1000] px-6 md:px-12 py-3 md:py-5 leading-none tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 {language === 'ko' ? (
-                  <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5">
-                    <span className="opacity-90">포리가</span>
+                  <div className="flex flex-wrap justify-center items-center gap-x-2 md:gap-x-3">
+                    <span className="opacity-90">단</span>
                     <div className="flex items-center">
-                      {"딱".split("").map((char, i) => (
+                      {"1초".split("").map((char, i) => (
                         <motion.span
                           key={i}
                           initial={{ y: 20, opacity: 0 }}
@@ -428,13 +433,13 @@ export default function HomePage() {
                         </motion.span>
                       ))}
                     </div>
-                    <span className="opacity-90">정해줄게요!</span>
+                    <span className="opacity-90">만에 궁합 체크 끝!</span>
                   </div>
                 ) : (
-                  <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5">
-                    <span className="opacity-90">Let Pori</span>
-                    <div className="flex items-center mx-1">
-                      {"decide".split("").map((char, i) => (
+                  <div className="flex flex-wrap justify-center items-center gap-x-2 md:gap-x-3">
+                    <span className="opacity-90">Instant</span>
+                    <div className="flex items-center mx-1 md:mx-2">
+                      {"Synergy".split("").map((char, i) => (
                         <motion.span
                           key={i}
                           initial={{ y: 15, opacity: 0 }}
@@ -457,7 +462,7 @@ export default function HomePage() {
                         </motion.span>
                       ))}
                     </div>
-                    <span className="opacity-90">for you!</span>
+                    <span className="opacity-90">Check!</span>
                   </div>
                 )}
               </span>
@@ -627,10 +632,13 @@ export default function HomePage() {
                 ref={searchRef}
                 type="text"
                 placeholder={t.hero.searchPlaceholder}
-                value={searchQuery}
+                value={inputValue}
                 onChange={(e) => {
-                  setSearchQuery(e.target.value);
+                  setInputValue(e.target.value);
                   setIsDropdownOpen(true);
+                  startTransition(() => {
+                    setSearchQuery(e.target.value);
+                  });
                 }}
                 onFocus={() => setIsDropdownOpen(true)}
                 className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-xs md:text-lg h-9 md:h-12 flex-1 font-bold px-2 md:px-4 tracking-tight relative z-20"
@@ -703,7 +711,8 @@ export default function HomePage() {
                               transition={{ delay: Math.min(i * 0.01, 0.2) }}
                               onClick={() => {
                                 if (!active) addIngredient(ing);
-                                setSearchQuery("");
+                                setInputValue("");
+                                startTransition(() => setSearchQuery(""));
                                 setIsDropdownOpen(false);
                               }}
                               className={cn(
@@ -745,7 +754,8 @@ export default function HomePage() {
                   <button
                     key={tag}
                     onClick={() => {
-                      setSearchQuery(tag);
+                      setInputValue(tag);
+                      startTransition(() => setSearchQuery(tag));
                       setIsDropdownOpen(true);
                       window.scrollTo({ top: 300, behavior: "smooth" }); // 검색 결과가 잘 보이도록 약간 스크롤
                     }}
@@ -1124,7 +1134,8 @@ export default function HomePage() {
               <div className="mt-12">
                 <button
                   onClick={() => {
-                    setSearchQuery("");
+                    setInputValue("");
+                    startTransition(() => setSearchQuery(""));
                     setSelectedCategory("all");
                   }}
                   className="group/btn relative px-10 h-14 rounded-full font-black text-lg transition-all active:scale-95 shadow-xl hover:shadow-2xl overflow-hidden"
@@ -1159,8 +1170,6 @@ export default function HomePage() {
         allIngredients={dbIngredients}
         isHeroSearchVisible={isHeroSearchVisible}
       />
-
-      <FloatingAssistant />
 
       {/* 가이드 팝업 */}
       <AnimatePresence>

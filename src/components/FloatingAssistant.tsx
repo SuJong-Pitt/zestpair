@@ -6,6 +6,7 @@ import { useBasketStore } from "@/store/basketStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import Image from "next/image";
 
 // 포리의 풍부한 메시지 라이브러리 (상황별/성격별)
 const PORI_MESSAGES_KO = [
@@ -313,9 +314,7 @@ export default function FloatingAssistant() {
                 ))}
 
                 {/* ── PORI MAIN UNIT: 공중 부양 ── */}
-                <motion.img
-                  src="/images/pori.png"
-                  alt="Pori"
+                <motion.div
                   animate={{ 
                     y: [0, -14, 0],
                     rotate: [0, 3, -2, 0]
@@ -326,14 +325,23 @@ export default function FloatingAssistant() {
                     ease: "easeInOut" 
                   }}
                   className={cn(
-                    "relative z-10 w-full h-full object-contain rounded-full transition-all duration-500 drop-shadow-[0_15px_30px_rgba(16,185,129,0.3)]",
+                    "relative z-10 w-full h-full transition-all duration-500 drop-shadow-[0_15px_30px_rgba(16,185,129,0.3)]",
                     poriStatus === 'thinking' ? "brightness-125 saturate-150 scale-105" : "brightness-[1.03] contrast-[1.05]"
                   )}
                   style={{
                     maskImage: 'radial-gradient(circle at center, black 65%, transparent 72%)',
                     WebkitMaskImage: 'radial-gradient(circle at center, black 65%, transparent 72%)'
                   }}
-                />
+                >
+                  <Image
+                    src="/images/pori.png"
+                    alt="Pori"
+                    fill
+                    priority={true}
+                    sizes="(max-width: 768px) 64px, 128px"
+                    className="object-contain rounded-full"
+                  />
+                </motion.div>
 
                 {/* ── HOLOGRAPHIC HUD: 오비팅 코어 (모바일 소형화/숨김 최적화) ── */}
                 <motion.div 
