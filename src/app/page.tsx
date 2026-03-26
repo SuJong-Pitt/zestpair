@@ -399,7 +399,7 @@ export default function HomePage() {
                 />
               </motion.span>
 
-              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-2 md:gap-x-4 text-[2.5rem] md:text-6xl lg:text-7xl font-[1000] px-6 md:px-12 py-3 md:py-5 leading-none tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1.5 md:gap-x-3 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-[1000] px-4 md:px-10 py-3 md:py-4 leading-tight tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 {language === 'ko' ? (
                   <div className="flex flex-wrap justify-center items-center gap-x-2 md:gap-x-3">
                     <span className="opacity-90">단</span>
