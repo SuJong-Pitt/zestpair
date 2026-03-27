@@ -66,18 +66,17 @@ const interactionTypeConfig = {
 /* --- 시너지 완성 데이터는 이제 데이터베이스(result.potentialSynergy)에서 다이내믹하게 가져옵니다. --- */
 
 
-/** 점수 링 컴포넌트 - 미래형 AI HUD 버전 */
+/** 점수 링 컴포넌트 - 풀 컬러 네온 HUD 버전 */
 function ScoreRing({ score }: { score: number }) {
     const radius = 72;
-    const strokeWidth = 6;
+    const strokeWidth = 8;
     const circumference = 2 * Math.PI * radius;
 
     const count = useMotionValue(0);
     const rounded = useTransform(count, (latest) => Math.round(latest));
 
-    // 단순하고 부드러운 easeOut (1.5초 소요)
     useEffect(() => {
-        const animation = animate(count, score, { duration: 1.5, ease: "easeOut" });
+        const animation = animate(count, score, { duration: 1.8, ease: "easeOut" });
         return animation.stop;
     }, [score, count]);
 
@@ -94,189 +93,300 @@ function ScoreRing({ score }: { score: number }) {
         };
     });
 
+    // 점수에 따라 팔레트 변경 (더 다채롭게)
     const getColor = (s: number) => {
-        if (s >= 70) return { main: "#34d399", light: "#6ee7b7", accent: "#a7f3d0", shadow: "rgba(52,211,153,0.8)" }; // emerald-400
-        if (s >= 40) return { main: "#fbbf24", light: "#fcd34d", accent: "#fde68a", shadow: "rgba(251,191,36,0.8)" }; // amber-400
-        return { main: "#f87171", light: "#fca5a5", accent: "#fecaca", shadow: "rgba(248,113,113,0.8)" }; // red-400
+        if (s === 100) return {
+            main: "#e879f9", light: "#f0abfc", accent: "#fae8ff",
+            shadow: "rgba(232,121,249,1)",
+            gradA: "#e879f9",   // fuchsia
+            gradB: "#818cf8",   // indigo  
+            gradC: "#34d399",   // emerald
+            label: "✦  P E R F E C T  ✦", labelColor: "#f0abfc"
+        };
+        if (s >= 80) return {
+            main: "#34d399", light: "#6ee7b7", accent: "#a7f3d0",
+            shadow: "rgba(52,211,153,0.9)",
+            gradA: "#34d399", gradB: "#06b6d4", gradC: "#6366f1",
+            label: "HIGH_SYNERGY", labelColor: "#34d399"
+        };
+        if (s >= 60) return {
+            main: "#22d3ee", light: "#67e8f9", accent: "#a5f3fc",
+            shadow: "rgba(34,211,238,0.9)",
+            gradA: "#22d3ee", gradB: "#818cf8", gradC: "#c084fc",
+            label: "SYNC_STABLE", labelColor: "#22d3ee"
+        };
+        if (s >= 40) return {
+            main: "#fbbf24", light: "#fcd34d", accent: "#fde68a",
+            shadow: "rgba(251,191,36,0.9)",
+            gradA: "#fbbf24", gradB: "#f97316", gradC: "#fb7185",
+            label: "CAUTION_REQ", labelColor: "#fbbf24"
+        };
+        return {
+            main: "#f87171", light: "#fca5a5", accent: "#fecaca",
+            shadow: "rgba(248,113,113,0.9)",
+            gradA: "#f87171", gradB: "#e879f9", gradC: "#fb923c",
+            label: "CRIT_WARN", labelColor: "#f87171"
+        };
     };
 
     const colors = getColor(score);
+    const isMaxScore = score === 100;
 
     return (
         <div className="relative flex items-center justify-center w-52 h-52 md:w-60 md:h-60 select-none group/score">
-            {/* 주변 네온 오라 (Subtle Glow) */}
-            <div
-                className="absolute inset-x-0 inset-y-0 rounded-full opacity-30 transition-all duration-1000 scale-125 group-hover/score:scale-150 group-hover/score:opacity-40"
-                style={{
-                    background: `radial-gradient(circle, ${colors.main} 0%, transparent 70%)`,
-                    filter: "blur(60px)"
-                }}
+            {/* 100점 전용: 스피닝 홀로그래픽 코닉 오라 */}
+            {isMaxScore && (
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-[-8px] rounded-full pointer-events-none"
+                    style={{
+                        background: "conic-gradient(from 0deg, #e879f9, #818cf8, #06b6d4, #34d399, #fbbf24, #f87171, #e879f9)",
+                        filter: "blur(18px)",
+                        opacity: 0.55
+                    }}
+                />
+            )}
+            {/* 외부 다층 네온 오라 */}
+            <motion.div
+                animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.45, 0.2] }}
+                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{ background: `radial-gradient(circle, ${colors.gradA} 0%, ${colors.gradB} 40%, transparent 70%)`, filter: "blur(55px)" }}
             />
-            <div className="absolute inset-0 rounded-full opacity-10 animate-pulse bg-white/5" />
+            <motion.div
+                animate={{ scale: [1.1, 1.35, 1.1], opacity: [0.1, 0.25, 0.1] }}
+                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{ background: `radial-gradient(circle, ${colors.gradC} 0%, transparent 65%)`, filter: "blur(70px)" }}
+            />
 
-            <svg viewBox="0 0 180 180" className="w-full h-full transform transition-all duration-1000 overflow-visible">
+            <svg viewBox="0 0 180 180" className="w-full h-full overflow-visible">
                 <defs>
-                    <linearGradient id="scoreProgressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor={colors.main} />
-                        <stop offset="100%" stopColor={colors.light} />
+                    {/* 3색 무지개 그라디언트 */}
+                    <linearGradient id="scoreRainbowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={colors.gradA} />
+                        <stop offset="50%" stopColor={colors.gradB} />
+                        <stop offset="100%" stopColor={colors.gradC} />
                     </linearGradient>
-                    <filter id="hudGlow" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur stdDeviation="2.5" result="blur" />
-                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    {/* 글로우 필터 */}
+                    <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="3" result="blur" />
+                        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                     </filter>
-                    <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.1" strokeOpacity="0.2" />
+                    <filter id="orbGlow" x="-80%" y="-80%" width="360%" height="360%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
+                        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
+                    <pattern id="colorGrid" width="10" height="10" patternUnits="userSpaceOnUse">
+                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke={colors.gradA} strokeWidth="0.15" strokeOpacity="0.3" />
                     </pattern>
                 </defs>
 
-                {/* 1. 홀로그램 배경 그리드 */}
-                <circle cx="90" cy="90" r={radius + 10} fill="url(#grid)" opacity="0.3" />
+                {/* 배경 컬러 그리드 */}
+                <circle cx="90" cy="90" r={radius + 12} fill="url(#colorGrid)" opacity="0.35" />
 
-                {/* 2. HUD 데코레이션 - 외부 눈금 링 (더 정교하게) */}
-                <g opacity="0.2">
-                    {Array.from({ length: 36 }).map((_, i) => (
-                        <rect
-                            key={i}
-                            x="89.5"
-                            y="2"
-                            width={i % 3 === 0 ? "1" : "0.5"}
-                            height={i % 3 === 0 ? "10" : "6"}
-                            fill={i % 3 === 0 ? colors.light : "white"}
-                            transform={`rotate(${i * 10} 90 90)`}
-                            opacity={i % 3 === 0 ? 0.8 : 0.3}
-                        />
-                    ))}
+                {/* 컬러 눈금 링 (3색 분산) */}
+                <g opacity="0.4">
+                    {Array.from({ length: 48 }).map((_, i) => {
+                        const isMajor = i % 4 === 0;
+                        const col = i % 3 === 0 ? colors.gradA : i % 3 === 1 ? colors.gradB : colors.gradC;
+                        return (
+                            <rect key={i} x="89.5" y="0"
+                                width={isMajor ? "1.2" : "0.6"}
+                                height={isMajor ? "12" : "7"}
+                                fill={col}
+                                transform={`rotate(${i * 7.5} 90 90)`}
+                                opacity={isMajor ? 0.9 : 0.35}
+                            />
+                        );
+                    })}
                 </g>
 
-                {/* 3. 베이스 가이드 링 (HUD Track) */}
-                <circle
-                    cx="90"
-                    cy="90"
-                    r={radius}
-                    stroke="white"
-                    strokeWidth="1"
-                    strokeDasharray="2 4"
-                    fill="transparent"
-                    opacity="0.1"
+                {/* 트랙 링 */}
+                <circle cx="90" cy="90" r={radius} stroke="white" strokeWidth="1.5" strokeDasharray="3 5" fill="transparent" opacity="0.07" />
+
+                {/* 내부 동심원 장식 */}
+                <circle cx="90" cy="90" r={radius - 13} stroke={colors.gradB} strokeWidth="0.5" strokeDasharray="8 22" fill="transparent" opacity="0.18" />
+                <circle cx="90" cy="90" r={radius - 24} stroke={colors.gradC} strokeWidth="0.5" strokeDasharray="4 16" fill="transparent" opacity="0.12" />
+
+                {/* 역방향 회전 데코 링 */}
+                <motion.circle cx="90" cy="90" r={radius + 8}
+                    stroke={`url(#scoreRainbowGrad)`} strokeWidth="0.8"
+                    strokeDasharray="30 170" fill="transparent"
+                    animate={{ rotate: -360 }} transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
+                    className="origin-center" opacity="0.45"
+                />
+                {/* 정방향 빠른 데코 링 */}
+                <motion.circle cx="90" cy="90" r={radius + 15}
+                    stroke={colors.gradC} strokeWidth="0.5"
+                    strokeDasharray="6 55" fill="transparent"
+                    animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                    className="origin-center" opacity="0.28"
                 />
 
-                {/* 4. 회전하는 HUD 아웃라인 */}
-                <motion.circle
-                    cx="90"
-                    cy="90"
-                    r={radius + 6}
-                    stroke={colors.main}
-                    strokeWidth="0.5"
-                    strokeDasharray="20 160"
-                    fill="transparent"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                    className="origin-center"
-                    opacity="0.4"
+                {/* 메인 프로그레스 글로우 레이어 (흐릿한 두꺼운 후광) */}
+                <motion.circle cx="90" cy="90" r={radius}
+                    stroke="url(#scoreRainbowGrad)" strokeWidth={strokeWidth + 8}
+                    fill="transparent" strokeDasharray={circumference}
+                    style={{ strokeDashoffset: offset, strokeLinecap: "round", filter: "blur(9px)", opacity: 0.22 }}
+                    className="-rotate-90 origin-center"
                 />
-
-                {/* 5. 프로그레스 링 (메인) */}
-                <motion.circle
-                    cx="90"
-                    cy="90"
-                    r={radius}
-                    stroke="url(#scoreProgressGrad)"
-                    strokeWidth={strokeWidth}
-                    fill="transparent"
-                    strokeDasharray={circumference}
+                {/* 메인 프로그레스 링 */}
+                <motion.circle cx="90" cy="90" r={radius}
+                    stroke="url(#scoreRainbowGrad)" strokeWidth={strokeWidth}
+                    fill="transparent" strokeDasharray={circumference}
                     style={{
-                        strokeDashoffset: offset,
-                        strokeLinecap: "round",
-                        filter: `drop-shadow(0 0 15px ${colors.shadow})`
+                        strokeDashoffset: offset, strokeLinecap: "round",
+                        filter: `drop-shadow(0 0 10px ${colors.shadow}) drop-shadow(0 0 5px ${colors.gradB})`
                     }}
                     className="-rotate-90 origin-center"
                 />
 
-                {/* 6. 코너 브래킷 (HUD 스타일) */}
-                <g opacity="0.4" stroke={colors.light} strokeWidth="0.5" fill="none">
-                    <path d="M 60 40 L 40 40 L 40 60" />
-                    <path d="M 120 40 L 140 40 L 140 60" />
-                    <path d="M 60 140 L 40 140 L 40 120" />
-                    <path d="M 120 140 L 140 140 L 140 120" />
+                {/* 100점 전용: 별 파티클 8개 + 전체 무지개 링 */}
+                {isMaxScore && (
+                    <>
+                        {/* 전체 무지개 아웃라인 링 */}
+                        <motion.circle cx="90" cy="90" r={radius + 4}
+                            stroke="url(#scoreRainbowGrad)" strokeWidth="2"
+                            strokeDasharray="15 10" fill="transparent"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                            className="origin-center" opacity="0.7"
+                        />
+                        {/* 빠른 역방향 무지개 링 */}
+                        <motion.circle cx="90" cy="90" r={radius + 12}
+                            stroke="url(#scoreRainbowGrad)" strokeWidth="1.5"
+                            strokeDasharray="8 20" fill="transparent"
+                            animate={{ rotate: -360 }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            className="origin-center" opacity="0.5"
+                        />
+                        {/* 궤도 별 파티클 8개 (각기 다른 색+속도) */}
+                        {[
+                            { color: "#e879f9", r: radius + 4, dur: 3.2, delay: 0 },
+                            { color: "#818cf8", r: radius + 4, dur: 3.2, delay: 0.4 },
+                            { color: "#06b6d4", r: radius + 4, dur: 3.2, delay: 0.8 },
+                            { color: "#34d399", r: radius + 4, dur: 3.2, delay: 1.2 },
+                            { color: "#fbbf24", r: radius + 4, dur: 3.2, delay: 1.6 },
+                            { color: "#f87171", r: radius + 4, dur: 3.2, delay: 2.0 },
+                            { color: "#f0abfc", r: radius + 4, dur: 3.2, delay: 2.4 },
+                            { color: "#67e8f9", r: radius + 4, dur: 3.2, delay: 2.8 },
+                        ].map((p, i) => (
+                            <motion.g key={i}
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: p.dur, repeat: Infinity, ease: "linear", delay: -p.delay }}
+                                style={{ transformOrigin: "90px 90px" }}
+                            >
+                                {/* 별 모양 (4-point star via 2 rotated rects) */}
+                                <g transform={`translate(${90 + p.r}, 90)`}>
+                                    <motion.rect x="-2.5" y="-0.5" width="5" height="1" rx="0.5"
+                                        fill={p.color} filter="url(#orbGlow)"
+                                        animate={{ scale: [1, 1.8, 1], opacity: [0.7, 1, 0.7] }}
+                                        transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.15 }}
+                                    />
+                                    <motion.rect x="-0.5" y="-2.5" width="1" height="5" rx="0.5"
+                                        fill={p.color} filter="url(#orbGlow)"
+                                        animate={{ scale: [1, 1.8, 1], opacity: [0.7, 1, 0.7] }}
+                                        transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.15 }}
+                                    />
+                                </g>
+                            </motion.g>
+                        ))}
+                        {/* 중앙 흰색 코어 펄스 */}
+                        <motion.circle cx="90" cy="90" r="8"
+                            fill="white" opacity="0.06"
+                            animate={{ r: [6, 16, 6], opacity: [0.06, 0.15, 0.06] }}
+                            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                    </>
+                )}
+
+                {/* 컬러 모서리 브래킷 */}
+                <g opacity="0.5" strokeWidth="1" fill="none">
+                    <path d="M 58 38 L 38 38 L 38 58" stroke={colors.gradA} />
+                    <path d="M 122 38 L 142 38 L 142 58" stroke={colors.gradB} />
+                    <path d="M 58 142 L 38 142 L 38 122" stroke={colors.gradC} />
+                    <path d="M 122 142 L 142 142 L 142 122" stroke={colors.gradA} />
                 </g>
 
-                {/* 7. 스캐닝 빔 (회전하는 그라디언트 레이) */}
-                <motion.rect
-                    x="90"
-                    y="10"
-                    width="1.5"
-                    height={radius}
-                    fill={`url(#beamGrad-${colors.main})`}
-                    className="origin-bottom"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                    style={{ transformOrigin: "90px 90px", opacity: 0.6 }}
-                >
-                    <defs>
-                        <linearGradient id={`beamGrad-${colors.main}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor={colors.light} stopOpacity="1" />
-                            <stop offset="100%" stopColor={colors.light} stopOpacity="0" />
-                        </linearGradient>
-                    </defs>
-                </motion.rect>
+                {/* 회전하는 메인 스캐닝 광선 */}
+                <motion.g animate={{ rotate: 360 }} transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                    style={{ transformOrigin: "90px 90px" }}>
+                    <line x1="90" y1="90" x2="90" y2={90 - radius - 2} stroke={colors.gradA} strokeWidth="1.5" opacity="0.5" strokeLinecap="round" />
+                    <circle cx="90" cy={90 - radius} r="2.5" fill={colors.gradA} opacity="0.9" filter="url(#orbGlow)" />
+                </motion.g>
 
-                {/* 8. 데이터 포인트 (궤도 구슬) */}
-                <motion.circle
-                    cx={orbPos.get().x}
-                    cy={orbPos.get().y}
-                    r="4"
-                    fill="white"
-                    filter="url(#hudGlow)"
-                    style={{ filter: `drop-shadow(0 0 8px ${colors.light})` }}
-                />
+                {/* 역방향 느린 파티클 */}
+                <motion.g animate={{ rotate: -360 }} transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+                    style={{ transformOrigin: "90px 90px" }}>
+                    <circle cx="90" cy={90 - radius - 8} r="2" fill={colors.gradB} opacity="0.55" filter="url(#orbGlow)" />
+                </motion.g>
+                {/* 정방향 느린 파티클 */}
+                <motion.g animate={{ rotate: 360 }} transition={{ duration: 9.5, repeat: Infinity, ease: "linear", delay: 3 }}
+                    style={{ transformOrigin: "90px 90px" }}>
+                    <circle cx="90" cy={90 - radius + 4} r="1.5" fill={colors.gradC} opacity="0.45" filter="url(#orbGlow)" />
+                </motion.g>
+
+                {/* 궤도 끝 구슬 */}
+                <motion.circle cx={orbPos.get().x} cy={orbPos.get().y} r="5.5" fill="white"
+                    style={{ filter: `drop-shadow(0 0 10px ${colors.gradA}) drop-shadow(0 0 5px ${colors.gradB})` }} />
+                <motion.circle cx={orbPos.get().x} cy={orbPos.get().y} r="2.5" fill={colors.gradA}
+                    style={{ filter: `drop-shadow(0 0 8px ${colors.shadow})` }} />
             </svg>
 
-            {/* 텍스트 정보 레이어 */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
-                <div className="relative group/scoreText">
+            {/* 텍스트 레이어 */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                {/* 상단 상태 뱃지 */}
+                <div className="absolute top-[28%] left-1/2 -translate-x-1/2 whitespace-nowrap">
                     <motion.div
-                        animate={{ opacity: [1, 0.8, 1], scale: [1, 1.02, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="flex items-baseline"
+                        animate={{ opacity: [0.45, 1, 0.45] }} transition={{ duration: 2.5, repeat: Infinity }}
+                        className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full"
+                        style={{ background: `${colors.gradA}20`, border: `1px solid ${colors.gradA}50` }}
                     >
-                        <motion.span className="text-5xl md:text-7xl font-[1000] text-white tracking-tighter drop-shadow-[0_0_25px_rgba(255,255,255,0.4)]">
-                            {rounded}
-                        </motion.span>
-                        <span
-                            className="ml-1 text-[9px] font-black italic tracking-widest uppercase opacity-60"
-                            style={{ color: colors.accent }}
-                        >
-                            %
+                        <motion.div
+                            animate={{ scale: [1, 1.6, 1], opacity: [0.8, 1, 0.8] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ background: colors.gradA, boxShadow: `0 0 8px ${colors.gradA}` }}
+                        />
+                        <span className="text-[7px] font-mono tracking-widest uppercase" style={{ color: colors.labelColor }}>
+                            {colors.label}
                         </span>
                     </motion.div>
-
-                    {/* 데이터 락 레이블 */}
-                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                        <motion.div
-                            animate={{ opacity: [0.3, 1, 0.3] }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                            className="flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-white/5 border border-white/10"
-                        >
-                            <div className="w-1 h-1 rounded-full bg-emerald-400" />
-                            <span className="text-[7px] font-mono text-white/40 tracking-widest uppercase">Sync_Stable</span>
-                        </motion.div>
-                    </div>
                 </div>
 
-                {/* 하단 장식선 & 정보 */}
-                <div className="mt-4 flex flex-col items-center">
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: 60 }}
-                        className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-2"
+                {/* 점수 숫자 (그라디언트 텍스트) */}
+                <motion.div
+                    animate={{ opacity: [1, 0.85, 1] }} transition={{ duration: 2.2, repeat: Infinity }}
+                    className="flex items-baseline mt-7"
+                >
+                    <motion.span
+                        className="font-[1000] tracking-tighter leading-none"
+                        style={{
+                            fontSize: "clamp(2.8rem, 5.5vw, 4rem)",
+                            background: `linear-gradient(135deg, ${colors.gradA}, ${colors.gradB}, ${colors.gradC})`,
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            filter: `drop-shadow(0 0 18px ${colors.shadow})`
+                        }}
+                    >
+                        {rounded}
+                    </motion.span>
+                    <span className="ml-1 text-[10px] font-black italic tracking-widest uppercase" style={{ color: colors.accent, opacity: 0.7 }}>%</span>
+                </motion.div>
+
+                {/* 하단 데이터 라벨 */}
+                <div className="mt-3 flex flex-col items-center gap-1.5">
+                    <motion.div initial={{ width: 0 }} animate={{ width: 56 }} transition={{ duration: 1.2, delay: 0.5 }}
+                        className="h-px"
+                        style={{ background: `linear-gradient(90deg, transparent, ${colors.gradB}, ${colors.gradC}, transparent)` }}
                     />
                     <div className="flex items-center gap-2">
-                        <span className="text-[7px] md:text-[8px] font-mono uppercase tracking-[0.3em] text-white/30">
-                            Core_V2.5
-                        </span>
-                        <div className="w-1 h-1 rounded-full bg-white/10" />
-                        <span className="text-[7px] md:text-[8px] font-mono uppercase tracking-[0.3em] text-white/30">
-                            {score >= 70 ? "HIGH_SYNERGY" : score >= 40 ? "CAUTION_REQ" : "CRIT_CONFLICT"}
+                        <span className="text-[7px] font-mono tracking-[0.28em] uppercase" style={{ color: `${colors.gradA}90` }}>Core_V2.5</span>
+                        <div className="w-0.5 h-0.5 rounded-full" style={{ background: colors.gradB, opacity: 0.5 }} />
+                        <span className="text-[7px] font-mono tracking-[0.28em] uppercase" style={{ color: `${colors.gradC}90` }}>
+                            {score >= 60 ? "HIGH_SYNC" : score >= 40 ? "CAUTION" : "CRITICAL"}
                         </span>
                     </div>
                 </div>
@@ -967,70 +1077,208 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                     </div>
 
                                     <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 w-full pt-4">
-                                        {/* 현재 게이지 */}
+                                        {/* 현재 점수 카드 */}
                                         <motion.div
-                                            initial={{ opacity: 0, x: -20 }}
+                                            initial={{ opacity: 0, x: -30 }}
                                             whileInView={{ opacity: 1, x: 0 }}
-                                            className="flex flex-col items-center gap-4 bg-slate-800/40 p-6 rounded-[2rem] border border-slate-700/50 w-full max-w-[280px]"
+                                            transition={{ duration: 0.6 }}
+                                            className="relative flex flex-col items-center gap-4 p-6 rounded-[2rem] w-full max-w-[240px] overflow-hidden group/card"
+                                            style={{
+                                                background: "linear-gradient(145deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.9) 100%)",
+                                                border: "1px solid rgba(148,163,184,0.12)",
+                                                boxShadow: "0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)"
+                                            }}
                                         >
-                                            <span className="text-[11px] font-black text-slate-400 tracking-[0.2em] uppercase">Current Level</span>
-                                            <div className="relative w-32 h-32 flex items-center justify-center">
-                                                <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
-                                                    <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="8" fill="none" className="text-slate-700" />
-                                                    <motion.circle
-                                                        cx="50" cy="50" r="45" stroke="#94a3b8" strokeWidth="8" fill="none" strokeLinecap="round"
-                                                        strokeDasharray="283" strokeDashoffset={283 - (283 * result.score) / 100}
-                                                        initial={{ strokeDashoffset: 283 }} whileInView={{ strokeDashoffset: 283 - (283 * result.score) / 100 }} transition={{ duration: 1.5, ease: "easeOut" }}
-                                                    />
-                                                </svg>
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                    <span className="text-3xl font-[1000] text-white drop-shadow-lg">{result.score}</span>
-                                                </div>
+                                            {/* 배경 글로우 */}
+                                            <div className="absolute inset-0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 rounded-[2rem]"
+                                                style={{ background: "radial-gradient(circle at 50% 50%, rgba(148,163,184,0.05) 0%, transparent 70%)" }} />
+
+                                            {/* 헤더 레이블 */}
+                                            <div className="relative z-10 flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-pulse" />
+                                                <span className="text-[10px] font-black text-slate-400 tracking-[0.25em] uppercase">Current Level</span>
                                             </div>
-                                            <span className="text-sm font-bold text-slate-300">{language === 'ko' ? "현재 점수" : "Current Score"}</span>
-                                        </motion.div>
 
-                                        <ArrowRight size={24} className="text-slate-600 hidden md:block" />
-
-                                        {/* 추천(완벽) 게이지 (Dynamic Score) */}
-                                        <motion.div
-                                            initial={{ opacity: 0, x: 20 }}
-                                            whileInView={{ opacity: 1, x: 0 }}
-                                            className="relative flex flex-col items-center gap-4 bg-emerald-500/10 p-6 rounded-[2rem] border border-emerald-500/30 w-full max-w-[280px] shadow-[0_0_30px_rgba(16,185,129,0.15)] group"
-                                        >
-                                            <div className="absolute inset-0 bg-emerald-400/5 blur-xl group-hover:bg-emerald-400/10 transition-colors rounded-[2rem]" />
-                                            <span className={cn(
-                                                "relative z-10 text-[11px] font-black tracking-[0.2em] uppercase",
-                                                isTrueSynergy ? "text-emerald-400" : "text-blue-400"
-                                            )}>
-                                                {isTrueSynergy ? "Perfect Synergy" : "Foundation Support"}
-                                            </span>
+                                            {/* 게이지 링 */}
                                             <div className="relative z-10 w-32 h-32 flex items-center justify-center">
-                                                <svg viewBox="0 0 100 100" className={cn(
-                                                    "w-full h-full transform -rotate-90 filter",
-                                                    isTrueSynergy ? "drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]" : "drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]"
-                                                )}>
-                                                    <circle cx="50" cy="50" r="45" stroke={isTrueSynergy ? "rgba(16,185,129,0.2)" : "rgba(59,130,246,0.2)"} strokeWidth="8" fill="none" />
+                                                {/* 외부 글로우 */}
+                                                <div className="absolute inset-0 rounded-full opacity-20"
+                                                    style={{ background: "radial-gradient(circle, rgba(148,163,184,0.3) 0%, transparent 70%)", filter: "blur(15px)" }} />
+                                                <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90 overflow-visible">
+                                                    <defs>
+                                                        <linearGradient id="currentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                            <stop offset="0%" stopColor="#64748b" />
+                                                            <stop offset="100%" stopColor="#94a3b8" />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    {/* 트랙 */}
+                                                    <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.05)" strokeWidth="10" fill="none" />
+                                                    {/* 눈금선 */}
+                                                    {Array.from({ length: 20 }).map((_, i) => (
+                                                        <rect key={i} x="49" y="1" width="0.6" height="5"
+                                                            fill="rgba(148,163,184,0.3)"
+                                                            transform={`rotate(${i * 18} 50 50)`} />
+                                                    ))}
+                                                    {/* 메인 프로그레스 */}
                                                     <motion.circle
-                                                        cx="50" cy="50" r="45" stroke={isTrueSynergy ? "#34d399" : "#3b82f6"} strokeWidth="8" fill="none" strokeLinecap="round"
-                                                        strokeDasharray="283" strokeDashoffset={283 - (283 * projectedScore) / 100}
-                                                        initial={{ strokeDashoffset: 283 }} whileInView={{ strokeDashoffset: 283 - (283 * projectedScore) / 100 }} transition={{ duration: 2, ease: "easeOut", delay: 0.5 }}
+                                                        cx="50" cy="50" r="45"
+                                                        stroke="url(#currentGrad)" strokeWidth="9" fill="none" strokeLinecap="round"
+                                                        strokeDasharray="283"
+                                                        initial={{ strokeDashoffset: 283 }}
+                                                        whileInView={{ strokeDashoffset: 283 - (283 * result.score) / 100 }}
+                                                        transition={{ duration: 1.8, ease: "easeOut" }}
                                                     />
                                                 </svg>
+                                                {/* 숫자 */}
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                                                     <motion.span
-                                                        initial={{ scale: 0.8, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} transition={{ delay: 1 }}
-                                                        className={cn(
-                                                            "text-4xl font-[1000] drop-shadow-md",
-                                                            isTrueSynergy ? "text-emerald-400" : "text-blue-400"
-                                                        )}
+                                                        initial={{ opacity: 0, scale: 0.7 }}
+                                                        whileInView={{ opacity: 1, scale: 1 }}
+                                                        transition={{ delay: 0.5 }}
+                                                        className="text-3xl font-[1000] leading-none"
+                                                        style={{ color: "#94a3b8", textShadow: "0 0 12px rgba(148,163,184,0.4)" }}
+                                                    >{result.score}</motion.span>
+                                                </div>
+                                            </div>
+
+                                            {/* 하단 라벨 */}
+                                            <span className="relative z-10 text-xs font-bold text-slate-500">
+                                                {language === 'ko' ? "현재 점수" : "Current Score"}
+                                            </span>
+                                        </motion.div>
+
+                                        {/* 가운데 화살표 */}
+                                        <motion.div
+                                            animate={{ x: [0, 6, 0] }}
+                                            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                                            className="hidden md:flex flex-col items-center gap-1"
+                                        >
+                                            <div className="w-8 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(52,211,153,0.5))" }} />
+                                            <ArrowRight size={22} className="text-emerald-500/60" />
+                                            <div className="w-8 h-px" style={{ background: "linear-gradient(90deg, rgba(52,211,153,0.5), transparent)" }} />
+                                        </motion.div>
+
+                                        {/* 추천 최적 점수 카드 */}
+                                        <motion.div
+                                            initial={{ opacity: 0, x: 30 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.6, delay: 0.15 }}
+                                            className="relative flex flex-col items-center gap-4 p-6 rounded-[2rem] w-full max-w-[240px] overflow-hidden group/cardB"
+                                            style={{
+                                                background: isTrueSynergy
+                                                    ? "linear-gradient(145deg, rgba(6,20,15,0.98) 0%, rgba(5,46,22,0.9) 100%)"
+                                                    : "linear-gradient(145deg, rgba(6,12,28,0.98) 0%, rgba(15,23,60,0.9) 100%)",
+                                                border: isTrueSynergy
+                                                    ? "1px solid rgba(52,211,153,0.35)"
+                                                    : "1px solid rgba(99,102,241,0.35)",
+                                                boxShadow: isTrueSynergy
+                                                    ? "0 25px 50px rgba(0,0,0,0.5), 0 0 40px rgba(52,211,153,0.12), inset 0 1px 0 rgba(52,211,153,0.08)"
+                                                    : "0 25px 50px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.12), inset 0 1px 0 rgba(99,102,241,0.08)"
+                                            }}
+                                        >
+                                            {/* 배경 오라 */}
+                                            <motion.div
+                                                animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
+                                                transition={{ duration: 3, repeat: Infinity }}
+                                                className="absolute inset-0 rounded-[2rem] pointer-events-none"
+                                                style={{
+                                                    background: isTrueSynergy
+                                                        ? "radial-gradient(circle at 50% 40%, rgba(52,211,153,0.2) 0%, transparent 65%)"
+                                                        : "radial-gradient(circle at 50% 40%, rgba(99,102,241,0.2) 0%, transparent 65%)"
+                                                }}
+                                            />
+
+                                            {/* 헤더 레이블 */}
+                                            <div className="relative z-10 flex items-center gap-2">
+                                                <motion.div
+                                                    animate={{ scale: [1, 1.5, 1], opacity: [0.7, 1, 0.7] }}
+                                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                                    className="w-1.5 h-1.5 rounded-full"
+                                                    style={{ background: isTrueSynergy ? "#34d399" : "#818cf8", boxShadow: isTrueSynergy ? "0 0 6px #34d399" : "0 0 6px #818cf8" }}
+                                                />
+                                                <span
+                                                    className="text-[10px] font-black tracking-[0.22em] uppercase"
+                                                    style={{ color: isTrueSynergy ? "#34d399" : "#818cf8" }}
+                                                >
+                                                    {isTrueSynergy ? "Perfect Synergy" : "Foundation Support"}
+                                                </span>
+                                            </div>
+
+                                            {/* 게이지 링 */}
+                                            <div className="relative z-10 w-32 h-32 flex items-center justify-center">
+                                                {/* 외부 글로우 */}
+                                                <motion.div
+                                                    animate={{ opacity: [0.2, 0.5, 0.2] }}
+                                                    transition={{ duration: 2.5, repeat: Infinity }}
+                                                    className="absolute inset-0 rounded-full"
+                                                    style={{
+                                                        background: isTrueSynergy
+                                                            ? "radial-gradient(circle, rgba(52,211,153,0.35) 0%, transparent 70%)"
+                                                            : "radial-gradient(circle, rgba(99,102,241,0.35) 0%, transparent 70%)",
+                                                        filter: "blur(12px)"
+                                                    }}
+                                                />
+                                                <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90 overflow-visible">
+                                                    <defs>
+                                                        <linearGradient id="projGradA" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                            <stop offset="0%" stopColor={isTrueSynergy ? "#34d399" : "#818cf8"} />
+                                                            <stop offset="50%" stopColor={isTrueSynergy ? "#06b6d4" : "#6366f1"} />
+                                                            <stop offset="100%" stopColor={isTrueSynergy ? "#6366f1" : "#c084fc"} />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    {/* 트랙 */}
+                                                    <circle cx="50" cy="50" r="45"
+                                                        stroke={isTrueSynergy ? "rgba(52,211,153,0.1)" : "rgba(99,102,241,0.1)"}
+                                                        strokeWidth="10" fill="none" />
+                                                    {/* 눈금선 */}
+                                                    {Array.from({ length: 20 }).map((_, i) => (
+                                                        <rect key={i} x="49" y="1" width="0.6" height="5"
+                                                            fill={isTrueSynergy ? "rgba(52,211,153,0.35)" : "rgba(99,102,241,0.35)"}
+                                                            transform={`rotate(${i * 18} 50 50)`} />
+                                                    ))}
+                                                    {/* 글로우 후광 */}
+                                                    <motion.circle
+                                                        cx="50" cy="50" r="45"
+                                                        stroke="url(#projGradA)" strokeWidth="14" fill="none" strokeLinecap="round"
+                                                        strokeDasharray="283"
+                                                        initial={{ strokeDashoffset: 283 }}
+                                                        whileInView={{ strokeDashoffset: 283 - (283 * projectedScore) / 100 }}
+                                                        transition={{ duration: 2, ease: "easeOut", delay: 0.5 }}
+                                                        style={{ filter: "blur(6px)", opacity: 0.3 }}
+                                                    />
+                                                    {/* 메인 프로그레스 */}
+                                                    <motion.circle
+                                                        cx="50" cy="50" r="45"
+                                                        stroke="url(#projGradA)" strokeWidth="9" fill="none" strokeLinecap="round"
+                                                        strokeDasharray="283"
+                                                        initial={{ strokeDashoffset: 283 }}
+                                                        whileInView={{ strokeDashoffset: 283 - (283 * projectedScore) / 100 }}
+                                                        transition={{ duration: 2, ease: "easeOut", delay: 0.5 }}
+                                                        style={{ filter: isTrueSynergy ? "drop-shadow(0 0 6px rgba(52,211,153,0.8))" : "drop-shadow(0 0 6px rgba(99,102,241,0.8))" }}
+                                                    />
+                                                </svg>
+                                                {/* 숫자 */}
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                    <motion.span
+                                                        initial={{ scale: 0.7, opacity: 0 }}
+                                                        whileInView={{ scale: 1, opacity: 1 }}
+                                                        transition={{ delay: 1, type: "spring", stiffness: 200 }}
+                                                        className="text-4xl font-[1000] leading-none"
+                                                        style={{
+                                                            background: `linear-gradient(135deg, ${isTrueSynergy ? "#34d399, #06b6d4, #6366f1" : "#818cf8, #6366f1, #c084fc"})`,
+                                                            WebkitBackgroundClip: "text",
+                                                            WebkitTextFillColor: "transparent",
+                                                            filter: isTrueSynergy ? "drop-shadow(0 0 12px rgba(52,211,153,0.6))" : "drop-shadow(0 0 12px rgba(99,102,241,0.6))"
+                                                        }}
                                                     >{projectedScore}</motion.span>
                                                 </div>
                                             </div>
-                                            <span className={cn(
-                                                "relative z-10 text-sm font-bold",
-                                                isTrueSynergy ? "text-emerald-300" : "text-blue-300"
-                                            )}>
+
+                                            {/* 하단 라벨 */}
+                                            <span
+                                                className="relative z-10 text-xs font-bold"
+                                                style={{ color: isTrueSynergy ? "#6ee7b7" : "#a5b4fc" }}
+                                            >
                                                 {language === 'ko' ? `+ ${recName} 추가시` : `With ${recName}`}
                                             </span>
                                         </motion.div>
