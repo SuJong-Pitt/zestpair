@@ -335,7 +335,7 @@ function ScoreRing({ score }: { score: number }) {
                     style={{ filter: `drop-shadow(0 0 8px ${colors.shadow})` }} />
             </svg>
 
-            {/* 텍스트 레이어 - 가독성 강화 버전 */}
+            {/* 텍스트 레이어 - 가독성 강화 버전 (overflow 제거로 잘림 방지) */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
                 {/* 내부 다크 배경 - 텍스트 대비 강화 */}
                 <div
@@ -346,7 +346,7 @@ function ScoreRing({ score }: { score: number }) {
                     }}
                 />
                 {/* 상단 상태 뱃지 */}
-                <div className="absolute top-[28%] left-1/2 -translate-x-1/2 whitespace-nowrap">
+                <div className="absolute top-[28%] left-1/2 -translate-x-1/2 max-w-[85%]">
                     <motion.div
                         animate={{ opacity: [0.7, 1, 0.7] }} transition={{ duration: 2.5, repeat: Infinity }}
                         className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full"
@@ -355,10 +355,10 @@ function ScoreRing({ score }: { score: number }) {
                         <motion.div
                             animate={{ scale: [1, 1.6, 1], opacity: [0.8, 1, 0.8] }}
                             transition={{ duration: 1.5, repeat: Infinity }}
-                            className="w-1.5 h-1.5 rounded-full"
+                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                             style={{ background: colors.gradA, boxShadow: `0 0 8px ${colors.gradA}` }}
                         />
-                        <span className="text-[7px] font-mono tracking-widest uppercase font-bold" style={{ color: colors.labelColor }}>
+                        <span className="text-[7px] font-mono tracking-widest uppercase font-bold truncate" style={{ color: colors.labelColor }}>
                             {colors.label}
                         </span>
                     </motion.div>
@@ -367,12 +367,12 @@ function ScoreRing({ score }: { score: number }) {
                 {/* 점수 숫자 - 강한 네온 글로우 + 선명한 대비 */}
                 <motion.div
                     animate={{ opacity: [1, 0.9, 1] }} transition={{ duration: 2.2, repeat: Infinity }}
-                    className="flex items-baseline mt-5 relative z-10"
+                    className="flex items-baseline mt-7 relative z-10"
                 >
                     <motion.span
-                        className="font-[1000] tracking-tighter leading-none"
+                        className="font-[1000] tracking-tighter leading-none pr-[0.05em]"
                         style={{
-                            fontSize: "clamp(1.9rem, 4.5vw, 3.5rem)",
+                            fontSize: "clamp(2.5rem, 5vw, 3.6rem)",
                             background: `linear-gradient(135deg, #ffffff 0%, ${colors.gradA} 35%, ${colors.gradB} 70%, ${colors.gradC} 100%)`,
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
