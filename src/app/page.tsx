@@ -716,7 +716,7 @@ export default function HomePage() {
                     }}
                   >
                     <div className="bg-[#0f172a]/95 rounded-[2.2rem] overflow-hidden shadow-2xl">
-                      <div className="max-h-[140px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-wrap gap-1.5 justify-center">
+                      <div className="max-h-[140px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-col gap-1.5">
                         {dropdownResults.map((ing, i) => {
                           const active = selectedIngredients.some(item => item.id === ing.id);
                           return (
@@ -732,7 +732,7 @@ export default function HomePage() {
                                 setIsDropdownOpen(false);
                               }}
                               className={cn(
-                                "group/item flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all duration-300 border font-bold text-[11px] md:text-xs",
+                                "group/item flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl transition-all duration-300 border font-bold text-[10px] md:text-xs whitespace-nowrap shrink-0",
                                 active
                                   ? "bg-emerald-500 text-white border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
                                   : "bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white"
@@ -800,7 +800,7 @@ export default function HomePage() {
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                      className="group relative flex items-center gap-1 px-1.5 py-0.5 md:px-3 md:py-1 rounded-xl transition-all duration-300"
+                      className="group relative flex items-center gap-1 px-1.5 py-0.5 md:px-3 md:py-1 rounded-xl transition-all duration-300 whitespace-nowrap shrink-0"
                       style={{
                         background: "rgba(15, 23, 42, 0.85)",
                         border: "1.5px solid rgba(16, 185, 129, 0.5)",
@@ -808,10 +808,10 @@ export default function HomePage() {
                         backdropFilter: "blur(16px)"
                       }}
                     >
-                      <span className="text-xs md:text-sm group-hover:scale-110 transition-transform">
+                      <span className="text-[10px] md:text-sm group-hover:scale-110 transition-transform">
                         {ingredient.icon_emoji}
                       </span>
-                      <span className="text-[9px] md:text-[12px] font-[900] text-white tracking-tight">
+                      <span className="text-[8px] md:text-[11px] font-[900] text-white tracking-tight">
                         {language === 'ko' ? ingredient.name : ingredient.name_en}
                       </span>
                       <button

@@ -79,8 +79,8 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 animate={{ opacity: 1, y: 0 }}
                 className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 py-12 md:py-24"
             >
-                {/* Main Glass Panel */}
-                <div className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-6 md:p-12 lg:p-16 space-y-12 md:space-y-16">
+                {/* Main Glass Panel (Reduced vertical spacing) */}
+                <div className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-4 md:p-8 lg:p-10 space-y-8 md:space-y-10">
 
                     {/* 0. Report Header */}
                     <div id="analysis-report-top" className="flex flex-col items-center gap-2 pt-4 pb-0">
@@ -167,22 +167,34 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
 
                                 {/* Summary Box */}
                                 <motion.div
-                                    initial={{ y: 20, opacity: 0 }}
-                                    whileInView={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.6 }}
-                                    className="relative w-full max-w-xl mb-4"
+                                    initial={{ y: 10, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="relative w-full max-w-xl mb-2"
                                 >
-                                    <div className="relative px-6 py-6 rounded-[1.8rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-inner">
-                                        <div className="relative flex items-center justify-center gap-3">
-                                            <div className="w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                                                <ShieldCheck size={14} className="text-emerald-400" />
+                                    <div className="relative px-5 py-4 rounded-[1.5rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-inner">
+                                        <div className="relative flex items-center justify-center gap-2.5">
+                                            <div className="w-5 h-5 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                                                <ShieldCheck size={12} className="text-emerald-400" />
                                             </div>
-                                            <p className="text-sm md:text-lg font-bold text-white/90 tracking-tight text-center">
+                                            <p className="text-[13px] md:text-[16px] font-[900] text-white/90 tracking-tight text-center leading-relaxed">
                                                 {(() => {
-                                                    if (result.conflicts.length > 0) return t.results.summaryConflict.replace("{count}", result.conflicts.length.toString());
-                                                    if (result.synergies.length > 0) return t.results.summarySynergy.replace("{count}", result.synergies.length.toString());
-                                                    if (result.cautions.length > 0) return t.results.summaryCaution.replace("{count}", result.cautions.length.toString());
-                                                    return t.results.summaryNeutral;
+                                                    const count = result.conflicts.length || result.synergies.length || result.cautions.length;
+                                                    const countSpan = <span className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)] bg-emerald-500/10 px-1.5 py-0.5 rounded-lg mx-1">{count}</span>;
+                                                    const cautionSpan = <span className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)] bg-amber-500/10 px-1.5 py-0.5 rounded-lg mx-1">{count}</span>;
+                                                    const conflictSpan = <span className="text-rose-400 drop-shadow-[0_0_8px_rgba(244,63,94,0.5)] bg-rose-500/10 px-1.5 py-0.5 rounded-lg mx-1">{count}</span>;
+
+                                                    if (language === 'ko') {
+                                                        if (result.conflicts.length > 0) return <>⚠️ {conflictSpan}가지 충돌 조합이 발견되었습니다...</>;
+                                                        if (result.synergies.length > 0) return <>✅ {countSpan}가지 시너지 조합이 발견되었습니다!</>;
+                                                        if (result.cautions.length > 0) return <>🔶 {cautionSpan}가지 주의 조합이 발견되었습니다...</>;
+                                                        return t.results.summaryNeutral;
+                                                    } else {
+                                                        if (result.conflicts.length > 0) return <>{conflictSpan} conflicts detected...</>;
+                                                        if (result.synergies.length > 0) return <>{countSpan} synergies detected!</>;
+                                                        if (result.cautions.length > 0) return <>{cautionSpan} cautions detected...</>;
+                                                        return t.results.summaryNeutral;
+                                                    }
                                                 })()}
                                             </p>
                                         </div>
@@ -190,23 +202,25 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
 
                                     <motion.div
                                         initial={{ opacity: 0 }}
-                                        whileInView={{ opacity: 1 }}
-                                        transition={{ delay: 1 }}
-                                        className="mt-4 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20"
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.5 }}
+                                        className="mt-2.5 flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/60 border border-amber-500/20 shadow-lg"
                                     >
-                                        <AlertTriangle size={12} className="text-amber-400" />
-                                        <p className="text-[10px] md:text-[11px] font-bold text-amber-200/70 tracking-tight">
-                                            {t.common.medicalDisclaimerBody}
+                                        <AlertTriangle size={12} className="text-amber-500/70" />
+                                        <p className="text-[10px] md:text-[11px] font-bold text-slate-400 leading-tight break-keep text-center">
+                                            {language === 'ko' 
+                                                ? "본 리포트는 참고용이며 의학적 진단을 대체할 수 없습니다. 상호작용은 개인에 따라 다를 수 있으니 전문의와 상담하세요."
+                                                : "This report is for reference only and does not replace medical advice. Consult a doctor for professional diagnosis."}
                                         </p>
                                     </motion.div>
                                 </motion.div>
 
                                 {/* Share Action */}
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.7 }}
-                                    className="mb-10"
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.4 }}
+                                    className="mb-8"
                                 >
                                     <Button
                                         onClick={handleShare}
@@ -219,21 +233,27 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                     </Button>
                                 </motion.div>
 
-                                {/* Ingredients Capsule Grid */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl">
+                                {/* Ingredients Capsule List (Stabilized and tightened) */}
+                                <div className="flex flex-col gap-2 w-full max-w-xl">
                                     {result.ingredients.map((ing, i) => (
                                         <motion.div
                                             key={ing.id}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            transition={{ delay: 0.8 + i * 0.1 }}
-                                            className="flex items-center gap-3 bg-slate-800/40 border border-white/5 rounded-2xl px-5 py-3.5 backdrop-blur-sm"
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.1 + i * 0.05 }}
+                                            className="flex items-center gap-3 md:gap-4 bg-slate-800/40 border border-white/5 rounded-2xl px-4 py-2 md:px-5 md:py-2.5 backdrop-blur-sm group hover:bg-slate-800/60 transition-colors"
                                         >
-                                            <span className="text-2xl">{ing.icon_emoji}</span>
-                                            <span className="text-sm md:text-base font-black text-white/80 tracking-tight">
-                                                {language === "ko" ? ing.name : ing.name_en}
-                                            </span>
+                                            <div className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-xl bg-slate-900/50 border border-white/5 shadow-inner shrink-0">
+                                                <span className="text-lg md:text-xl group-hover:scale-110 transition-transform duration-300">{ing.icon_emoji}</span>
+                                            </div>
+                                            <div className="flex flex-col items-start min-w-0">
+                                                <span className="text-[10px] md:text-[13px] font-[900] text-white/90 tracking-tight leading-tight whitespace-nowrap overflow-hidden text-ellipsis w-full">
+                                                    {language === "ko" ? ing.name : ing.name_en}
+                                                </span>
+                                                <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
+                                                    {language === "ko" ? ing.category : ing.category}
+                                                </span>
+                                            </div>
                                         </motion.div>
                                     ))}
                                 </div>
@@ -314,18 +334,35 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                                 {result.score >= 100 && !isTrueSynergy ? "Continuous Maintenance" : isTrueSynergy ? "Synergy Optimization" : "Foundation Bridge"}
                                             </span>
                                         </motion.div>
-                                        <h3 className="text-2xl md:text-3xl lg:text-4xl font-[1000] text-white tracking-tight break-keep">
-                                            {language === 'ko'
-                                                ? isTrueSynergy
-                                                    ? `현재 조합에 [${recName}]를 추가하면 영양 시너지가 완성되며 ${projectedScore}점이 됩니다!`
-                                                    : result.score >= 100
-                                                        ? `이미 완벽한 조합입니다! 여기에 [${recName}]를 더해 기초 영양까지 완벽하게 관리해보세요.`
-                                                        : `현재 조합도 훌륭하지만, [${recName}]를 추가하면 전체적인 영양 밸런스가 ${projectedScore}점 수준으로 높아집니다!`
-                                                : isTrueSynergy
-                                                    ? `Adding [${recName}] completes your nutritional synergy triad! Potential: ${projectedScore}pts`
-                                                    : result.score >= 100
-                                                        ? `Your stack is already perfect! Adding [${recName}] will provide the ultimate foundational support.`
-                                                        : `Your combination is great, but adding [${recName}] balances your overall nutrition up to ${projectedScore}pts!`}
+                                        <h3 className="text-xl md:text-3xl lg:text-4xl font-[1000] text-white tracking-tight break-keep leading-[1.6] text-center max-w-2xl mx-auto uppercase">
+                                            {language === 'ko' ? (
+                                                <>
+                                                    현재 조합에{" "}
+                                                    <span className="relative inline-block px-1.5 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300 drop-shadow-[0_0_12px_rgba(52,211,153,0.4)] mx-1">
+                                                        [{recName}]
+                                                    </span>
+                                                    를 추가하면
+                                                    <br className="hidden sm:block" />
+                                                    {" "}영양 시너지가 완성되며{" "}
+                                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)] mx-1">
+                                                        {projectedScore}점
+                                                    </span>
+                                                    이 됩니다!
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Adding{" "}
+                                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.4)] px-1">
+                                                        [{recName}]
+                                                    </span>
+                                                    completes your nutritional
+                                                    <br className="hidden sm:block" />
+                                                    synergy triad! Potential:{" "}
+                                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 drop-shadow-[0_0_12px_rgba(251,191,36,0.4)]">
+                                                        {projectedScore}pts
+                                                    </span>
+                                                </>
+                                            )}
                                         </h3>
                                     </div>
 
@@ -615,19 +652,50 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                                 <span className="text-emerald-400">{isTrueSynergy ? "Synergy 1-Pick" : "Daily 1-Pick"}</span>
                                             </h3>
                                         </div>
-                                        <div className="flex items-start gap-4 bg-slate-800/50 p-6 rounded-2xl border border-white/5">
-                                            <div className="shrink-0 w-12 h-12 rounded-full border-2 border-emerald-400 bg-emerald-900/30 overflow-hidden">
+                                        <div className="flex items-start gap-3 md:gap-4 bg-white/[0.03] p-5 md:p-6 rounded-[2rem] border border-white/5 backdrop-blur-xl relative group/pori overflow-hidden">
+                                            {/* Decorative corner glow */}
+                                            <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover/pori:bg-emerald-500/20 transition-all duration-700" />
+
+                                            <div className="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-emerald-400/50 bg-slate-900/50 overflow-hidden shadow-[0_0_15px_rgba(52,211,153,0.3)]">
                                                 <img src="/hero-pori.png" alt="Pori" className="w-full h-full object-cover" />
                                             </div>
-                                            <div className="space-y-1">
-                                                <span className="text-xs font-bold text-emerald-400 block mb-1">💬 Pori says</span>
-                                                <p className="text-slate-200 text-sm leading-relaxed">
-                                                    {language === 'ko'
-                                                        ? isTrueSynergy
-                                                            ? `회원님이 드시는 성분들과 [${recName}]은 찰떡궁합이에요! 흡수율이 가장 높은 제품으로 특별히 찾아왔어요.`
-                                                            : `직접적인 충돌은 없으면서도, 부족한 기초 영양을 탄탄하게 채워줄 수 있는 [${recName}]를 골라봤어요!`
-                                                        : `[${recName}] is a perfect match with your current stack! I found the most absorbable one for you.`}
-                                                </p>
+                                            <div className="space-y-1.5 flex-1 pt-0.5">
+                                                <div className="flex items-center gap-1.5 mb-1.5">
+                                                    <div className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+                                                        <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest pl-0.5">AI Counselor</span>
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-white/40 italic">💬 Pori says</span>
+                                                </div>
+                                                <div className="text-slate-200 text-xs md:text-sm leading-[1.6] font-medium tracking-tight break-keep">
+                                                    {language === 'ko' ? (
+                                                        isTrueSynergy ? (
+                                                            <>
+                                                                회원님이 드시는 성분들과{" "}
+                                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300 font-black drop-shadow-[0_0_10px_rgba(52,211,153,0.3)]">
+                                                                    [{recName}]
+                                                                </span>
+                                                                은{" "}
+                                                                <span className="text-white font-[900] underline decoration-emerald-500/50 decoration-2 underline-offset-4">
+                                                                    찰떡궁합
+                                                                </span>
+                                                                이에요! 흡수율이 가장 높은 제품으로 특별히 찾아왔어요.
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                직접적인 충돌은 없으면서도, 부족한 기초 영양을 탄탄하게 채워줄 수 있는{" "}
+                                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300 font-black">
+                                                                    [{recName}]
+                                                                </span>
+                                                                를 골라봤어요!
+                                                            </>
+                                                        )
+                                                    ) : (
+                                                        <>
+                                                            <span className="text-emerald-400 font-black">[{recName}]</span>
+                                                            {" "}is a perfect match with your current stack! I found the most absorbable one for you.
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
