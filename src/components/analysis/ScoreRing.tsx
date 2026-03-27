@@ -325,8 +325,8 @@ const ScoreRing = memo(function ScoreRing({ score }: ScoreRingProps) {
                     >
                         {rounded}
                     </motion.span>
-                    <span 
-                        className="absolute left-[calc(100%+2px)] bottom-[15%] text-[10px] font-black italic tracking-widest uppercase" 
+                    <span
+                        className="absolute left-[calc(100%+2px)] bottom-[15%] text-[10px] font-black italic tracking-widest uppercase"
                         style={{ color: colors.light, opacity: 0.8 }}
                     >
                         %

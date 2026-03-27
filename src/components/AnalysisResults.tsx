@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { 
-    Sparkles, 
-    ShieldCheck, 
-    AlertTriangle, 
-    Share2, 
+import {
+    Sparkles,
+    ShieldCheck,
+    AlertTriangle,
+    Share2,
     ArrowRight,
     ShoppingCart,
-    RefreshCcw 
+    RefreshCcw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ interface AnalysisResultsProps {
 export default function AnalysisResults({ result, coupangProducts = [] }: AnalysisResultsProps) {
     const { clearBasket, language } = useBasketStore();
     const t = UI_TRANSLATIONS[language];
-    
+
     if (!result || !result.ingredients) {
         return <div className="p-20 text-center text-slate-400">{t.common.loading}...</div>;
     }
@@ -81,7 +81,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
             >
                 {/* Main Glass Panel */}
                 <div className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-6 md:p-12 lg:p-16 space-y-12 md:space-y-16">
-                    
+
                     {/* 0. Report Header */}
                     <div id="analysis-report-top" className="flex flex-col items-center gap-2 pt-4 pb-0">
                         <motion.div
@@ -274,10 +274,10 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         const potentialSynergy = result.potentialSynergy;
                         const isTrueSynergy = !!potentialSynergy;
                         const fallbackCandidates = [
-                           { ko: "비타민 C", en: "Vitamin C" },
-                           { ko: "오메가3", en: "Omega-3" },
-                           { ko: "유산균", en: "Probiotics" },
-                           { ko: "마그네슘", en: "Magnesium" }
+                            { ko: "비타민 C", en: "Vitamin C" },
+                            { ko: "오메가3", en: "Omega-3" },
+                            { ko: "유산균", en: "Probiotics" },
+                            { ko: "마그네슘", en: "Magnesium" }
                         ];
                         const bestFallback = fallbackCandidates.find(f =>
                             !currentIngNames.some(own =>
@@ -290,7 +290,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             ? { ko: targetPartner.name, en: targetPartner.name_en }
                             : bestFallback;
                         const recName = language === 'ko' ? targetIngredient.ko : targetIngredient.en;
-                        
+
                         const synergyBoost = isTrueSynergy ? 15 : 0;
                         const foundationBoost = result.ingredients.length >= 2 ? 8 : 0;
                         const totalBoost = synergyBoost + (synergyBoost === 0 && result.score >= 100 ? 0 : foundationBoost);
@@ -329,52 +329,275 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                         </h3>
                                     </div>
 
-                                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 w-full pt-4">
-                                        {/* Current Gauge */}
-                                        <div className="relative flex flex-col items-center gap-4 p-6 rounded-[2rem] w-full max-w-[240px] bg-slate-900/60 border border-white/10">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
-                                                <span className="text-[10px] font-black text-slate-400 tracking-[0.25em] uppercase">Current</span>
+                                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 w-full pt-4">
+                                        {/* ── CURRENT HUD Gauge ── */}
+                                        <motion.div
+                                            initial={{ opacity: 0, x: -20 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.6 }}
+                                            className="relative flex flex-col items-center gap-3 p-6 rounded-[2rem] w-full max-w-[260px] overflow-hidden"
+                                            style={{
+                                                background: "linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.8) 100%)",
+                                                border: "1px solid rgba(148,163,184,0.15)",
+                                                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05), 0 20px 60px rgba(0,0,0,0.5)"
+                                            }}
+                                        >
+                                            {/* scan line decoration */}
+                                            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2rem]">
+                                                <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.03)_1px,transparent_1px)] bg-[size:100%_8px]" />
+                                                <motion.div
+                                                    animate={{ y: ["-100%", "200%"] }}
+                                                    transition={{ duration: 3.5, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
+                                                    className="absolute inset-x-0 h-12 bg-gradient-to-b from-transparent via-slate-400/5 to-transparent"
+                                                />
                                             </div>
-                                            <div className="relative w-32 h-32 flex items-center justify-center">
-                                                <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
-                                                    <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.05)" strokeWidth="10" fill="none" />
-                                                    <motion.circle
-                                                        cx="50" cy="50" r="45"
-                                                        stroke="#94a3b8" strokeWidth="9" fill="none" strokeLinecap="round"
-                                                        strokeDasharray="283"
-                                                        initial={{ strokeDashoffset: 283 }}
-                                                        whileInView={{ strokeDashoffset: 283 - (283 * result.score) / 100 }}
-                                                        transition={{ duration: 1.5 }}
-                                                    />
-                                                </svg>
-                                                <span className="absolute text-3xl font-[1000] text-slate-400">{result.score}</span>
-                                            </div>
-                                        </div>
+                                            {/* corner brackets */}
+                                            <div className="absolute top-3 left-3 w-4 h-4 border-t border-l border-slate-500/40 rounded-tl pointer-events-none" />
+                                            <div className="absolute top-3 right-3 w-4 h-4 border-t border-r border-slate-500/40 rounded-tr pointer-events-none" />
+                                            <div className="absolute bottom-3 left-3 w-4 h-4 border-b border-l border-slate-500/40 rounded-bl pointer-events-none" />
+                                            <div className="absolute bottom-3 right-3 w-4 h-4 border-b border-r border-slate-500/40 rounded-br pointer-events-none" />
 
-                                        <ArrowRight className="hidden md:block text-slate-600" size={24} />
+                                            {/* header badge */}
+                                            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-600/30 backdrop-blur z-10">
+                                                <motion.div
+                                                    animate={{ opacity: [0.4, 1, 0.4] }}
+                                                    transition={{ duration: 2.2, repeat: Infinity }}
+                                                    className="w-1.5 h-1.5 rounded-full bg-slate-400"
+                                                />
+                                                <span className="text-[9px] font-black text-slate-400 tracking-[0.3em] uppercase">Current</span>
+                                            </div>
 
-                                        {/* Projected Gauge */}
-                                        <div className={cn("relative flex flex-col items-center gap-4 p-6 rounded-[2rem] w-full max-w-[240px] bg-slate-900 border", isTrueSynergy ? "border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.1)]" : "border-blue-500/30 shadow-[0_0_30px_rgba(59,130,246,0.1)]")}>
-                                            <div className="flex items-center gap-2">
-                                                <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isTrueSynergy ? "bg-emerald-400" : "bg-blue-400")} />
-                                                <span className={cn("text-[10px] font-black tracking-[0.25em] uppercase", isTrueSynergy ? "text-emerald-400" : "text-blue-400")}>Target</span>
-                                            </div>
-                                            <div className="relative w-32 h-32 flex items-center justify-center">
-                                                <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
-                                                    <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.05)" strokeWidth="10" fill="none" />
+                                            {/* ring */}
+                                            <div className="relative w-36 h-36 flex items-center justify-center z-10">
+                                                {/* outer blur glow */}
+                                                <div className="absolute inset-0 rounded-full" style={{ background: "radial-gradient(circle, rgba(148,163,184,0.08) 30%, transparent 70%)", filter: "blur(16px)" }} />
+                                                <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                                                    <defs>
+                                                        <filter id="cur-glow">
+                                                            <feGaussianBlur stdDeviation="2.5" result="blur" />
+                                                            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                                                        </filter>
+                                                    </defs>
+                                                    {/* track */}
+                                                    <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.04)" strokeWidth="10" fill="none" />
+                                                    {/* glow layer */}
                                                     <motion.circle
-                                                        cx="50" cy="50" r="45"
-                                                        stroke={isTrueSynergy ? "#34d399" : "#60a5fa"} strokeWidth="9" fill="none" strokeLinecap="round"
-                                                        strokeDasharray="283"
-                                                        initial={{ strokeDashoffset: 283 }}
-                                                        whileInView={{ strokeDashoffset: 283 - (283 * projectedScore) / 100 }}
-                                                        transition={{ duration: 1.5, delay: 0.5 }}
+                                                        cx="50" cy="50" r="42"
+                                                        stroke="#94a3b8" strokeWidth="14" fill="none" strokeLinecap="round"
+                                                        strokeDasharray="264"
+                                                        initial={{ strokeDashoffset: 264 }}
+                                                        whileInView={{ strokeDashoffset: 264 - (264 * result.score) / 100 }}
+                                                        transition={{ duration: 1.6, ease: "easeOut" }}
+                                                        style={{ opacity: 0.12, filter: "blur(6px)" }}
                                                     />
+                                                    {/* main ring */}
+                                                    <motion.circle
+                                                        cx="50" cy="50" r="42"
+                                                        stroke="#94a3b8" strokeWidth="8" fill="none" strokeLinecap="round"
+                                                        strokeDasharray="264"
+                                                        initial={{ strokeDashoffset: 264 }}
+                                                        whileInView={{ strokeDashoffset: 264 - (264 * result.score) / 100 }}
+                                                        transition={{ duration: 1.6, ease: "easeOut" }}
+                                                        filter="url(#cur-glow)"
+                                                        style={{ opacity: 0.7 }}
+                                                    />
+                                                    {/* tick marks */}
+                                                    {Array.from({ length: 20 }).map((_, i) => {
+                                                        const angle = (i / 20) * 360;
+                                                        const rad = (angle * Math.PI) / 180;
+                                                        const r1 = 48, r2 = i % 5 === 0 ? 44 : 46;
+                                                        return (
+                                                            <line key={i}
+                                                                x1={50 + r2 * Math.cos(rad)} y1={50 + r2 * Math.sin(rad)}
+                                                                x2={50 + r1 * Math.cos(rad)} y2={50 + r1 * Math.sin(rad)}
+                                                                stroke="rgba(148,163,184,0.25)" strokeWidth={i % 5 === 0 ? "1.2" : "0.6"}
+                                                            />
+                                                        );
+                                                    })}
                                                 </svg>
-                                                <span className={cn("absolute text-3xl font-[1000]", isTrueSynergy ? "text-emerald-400" : "text-blue-400")}>{projectedScore}</span>
+                                                {/* score text */}
+                                                <div className="absolute flex flex-col items-center">
+                                                    <motion.span
+                                                        className="text-3xl font-[1000] leading-none"
+                                                        style={{ color: "#94a3b8", textShadow: "0 0 20px rgba(148,163,184,0.4)" }}
+                                                    >
+                                                        {result.score}
+                                                    </motion.span>
+                                                    <span className="text-[8px] font-black text-slate-600 tracking-widest mt-0.5">PTS</span>
+                                                </div>
                                             </div>
-                                        </div>
+
+                                            {/* bottom data row */}
+                                            <div className="flex items-center gap-2 z-10">
+                                                <div className="h-px w-8 bg-gradient-to-r from-transparent to-slate-600" />
+                                                <span className="text-[8px] font-mono text-slate-600 tracking-widest uppercase">Stack_v1</span>
+                                                <div className="h-px w-8 bg-gradient-to-l from-transparent to-slate-600" />
+                                            </div>
+                                        </motion.div>
+
+                                        {/* ── ARROW ── */}
+                                        <motion.div
+                                            animate={{ x: [0, 5, 0], opacity: [0.4, 1, 0.4] }}
+                                            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                                            className="hidden md:flex flex-col items-center gap-1"
+                                        >
+                                            <div className="h-px w-12 bg-gradient-to-r from-slate-700 via-emerald-500/50 to-slate-700" />
+                                            <ArrowRight className="text-emerald-500/70" size={20} />
+                                            <div className="h-px w-12 bg-gradient-to-r from-slate-700 via-emerald-500/50 to-slate-700" />
+                                        </motion.div>
+
+                                        {/* ── TARGET HUD Gauge ── */}
+                                        <motion.div
+                                            initial={{ opacity: 0, x: 20 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.6, delay: 0.2 }}
+                                            className="relative flex flex-col items-center gap-3 p-6 rounded-[2rem] w-full max-w-[260px] overflow-hidden"
+                                            style={{
+                                                background: isTrueSynergy
+                                                    ? "linear-gradient(135deg, rgba(6,27,22,0.95) 0%, rgba(15,41,35,0.85) 100%)"
+                                                    : "linear-gradient(135deg, rgba(6,18,35,0.95) 0%, rgba(15,30,55,0.85) 100%)",
+                                                border: isTrueSynergy
+                                                    ? "1px solid rgba(52,211,153,0.25)"
+                                                    : "1px solid rgba(96,165,250,0.25)",
+                                                boxShadow: isTrueSynergy
+                                                    ? "inset 0 1px 0 rgba(52,211,153,0.08), 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(52,211,153,0.08)"
+                                                    : "inset 0 1px 0 rgba(96,165,250,0.08), 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(96,165,250,0.08)"
+                                            }}
+                                        >
+                                            {/* animated outer glow pulse */}
+                                            <motion.div
+                                                animate={{ opacity: [0.05, 0.18, 0.05] }}
+                                                transition={{ duration: 3, repeat: Infinity }}
+                                                className="absolute inset-0 rounded-[2rem] pointer-events-none"
+                                                style={{
+                                                    background: isTrueSynergy
+                                                        ? "radial-gradient(circle at 50% 50%, rgba(52,211,153,0.15) 0%, transparent 70%)"
+                                                        : "radial-gradient(circle at 50% 50%, rgba(96,165,250,0.15) 0%, transparent 70%)"
+                                                }}
+                                            />
+                                            {/* scan line decoration */}
+                                            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2rem]">
+                                                <div className={`absolute inset-0 bg-[linear-gradient(${isTrueSynergy ? "rgba(52,211,153,0.03)" : "rgba(96,165,250,0.03)"}_1px,transparent_1px)] bg-[size:100%_8px]`} />
+                                                <motion.div
+                                                    animate={{ y: ["-100%", "200%"] }}
+                                                    transition={{ duration: 2.8, repeat: Infinity, ease: "linear", repeatDelay: 0.8 }}
+                                                    className={`absolute inset-x-0 h-12 bg-gradient-to-b from-transparent ${isTrueSynergy ? "via-emerald-400/6" : "via-blue-400/6"} to-transparent`}
+                                                />
+                                            </div>
+                                            {/* corner brackets */}
+                                            <div className={`absolute top-3 left-3 w-4 h-4 border-t border-l rounded-tl pointer-events-none ${isTrueSynergy ? "border-emerald-500/40" : "border-blue-500/40"}`} />
+                                            <div className={`absolute top-3 right-3 w-4 h-4 border-t border-r rounded-tr pointer-events-none ${isTrueSynergy ? "border-emerald-500/40" : "border-blue-500/40"}`} />
+                                            <div className={`absolute bottom-3 left-3 w-4 h-4 border-b border-l rounded-bl pointer-events-none ${isTrueSynergy ? "border-emerald-500/40" : "border-blue-500/40"}`} />
+                                            <div className={`absolute bottom-3 right-3 w-4 h-4 border-b border-r rounded-br pointer-events-none ${isTrueSynergy ? "border-emerald-500/40" : "border-blue-500/40"}`} />
+
+                                            {/* header badge */}
+                                            <div className={`flex items-center gap-2 px-3 py-1 rounded-full backdrop-blur z-10 border ${isTrueSynergy ? "bg-emerald-900/50 border-emerald-500/30" : "bg-blue-900/50 border-blue-500/30"}`}>
+                                                <motion.div
+                                                    animate={{ scale: [1, 1.6, 1], opacity: [0.7, 1, 0.7] }}
+                                                    transition={{ duration: 1.4, repeat: Infinity }}
+                                                    className={`w-1.5 h-1.5 rounded-full ${isTrueSynergy ? "bg-emerald-400" : "bg-blue-400"}`}
+                                                    style={{ boxShadow: isTrueSynergy ? "0 0 8px rgba(52,211,153,0.8)" : "0 0 8px rgba(96,165,250,0.8)" }}
+                                                />
+                                                <span className={`text-[9px] font-black tracking-[0.3em] uppercase ${isTrueSynergy ? "text-emerald-400" : "text-blue-400"}`}>Target</span>
+                                            </div>
+
+                                            {/* ring */}
+                                            <div className="relative w-36 h-36 flex items-center justify-center z-10">
+                                                {/* outer blur glow */}
+                                                <motion.div
+                                                    animate={{ opacity: [0.3, 0.7, 0.3] }}
+                                                    transition={{ duration: 2.5, repeat: Infinity }}
+                                                    className="absolute inset-0 rounded-full"
+                                                    style={{
+                                                        background: isTrueSynergy
+                                                            ? "radial-gradient(circle, rgba(52,211,153,0.15) 30%, transparent 70%)"
+                                                            : "radial-gradient(circle, rgba(96,165,250,0.15) 30%, transparent 70%)",
+                                                        filter: "blur(18px)"
+                                                    }}
+                                                />
+                                                <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90 overflow-visible">
+                                                    <defs>
+                                                        <linearGradient id="tgt-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                            <stop offset="0%" stopColor={isTrueSynergy ? "#34d399" : "#60a5fa"} />
+                                                            <stop offset="100%" stopColor={isTrueSynergy ? "#06b6d4" : "#a78bfa"} />
+                                                        </linearGradient>
+                                                        <filter id="tgt-glow">
+                                                            <feGaussianBlur stdDeviation="3" result="blur" />
+                                                            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                                                        </filter>
+                                                    </defs>
+                                                    {/* track */}
+                                                    <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.04)" strokeWidth="10" fill="none" />
+                                                    {/* glow layer */}
+                                                    <motion.circle
+                                                        cx="50" cy="50" r="42"
+                                                        stroke="url(#tgt-grad)" strokeWidth="16" fill="none" strokeLinecap="round"
+                                                        strokeDasharray="264"
+                                                        initial={{ strokeDashoffset: 264 }}
+                                                        whileInView={{ strokeDashoffset: 264 - (264 * projectedScore) / 100 }}
+                                                        transition={{ duration: 1.6, ease: "easeOut", delay: 0.4 }}
+                                                        style={{ opacity: 0.18, filter: "blur(8px)" }}
+                                                    />
+                                                    {/* main ring */}
+                                                    <motion.circle
+                                                        cx="50" cy="50" r="42"
+                                                        stroke="url(#tgt-grad)" strokeWidth="8" fill="none" strokeLinecap="round"
+                                                        strokeDasharray="264"
+                                                        initial={{ strokeDashoffset: 264 }}
+                                                        whileInView={{ strokeDashoffset: 264 - (264 * projectedScore) / 100 }}
+                                                        transition={{ duration: 1.6, ease: "easeOut", delay: 0.4 }}
+                                                        filter="url(#tgt-glow)"
+                                                    />
+                                                    {/* spinning accent arc */}
+                                                    <motion.circle
+                                                        cx="50" cy="50" r="48"
+                                                        stroke={isTrueSynergy ? "#34d399" : "#60a5fa"} strokeWidth="0.8"
+                                                        strokeDasharray="20 80" fill="none" opacity="0.3"
+                                                        animate={{ rotate: 360 }}
+                                                        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                                                        style={{ transformOrigin: "50px 50px" }}
+                                                    />
+                                                    {/* tick marks */}
+                                                    {Array.from({ length: 20 }).map((_, i) => {
+                                                        const angle = (i / 20) * 360;
+                                                        const rad = (angle * Math.PI) / 180;
+                                                        const r1 = 48, r2 = i % 5 === 0 ? 44 : 46;
+                                                        return (
+                                                            <line key={i}
+                                                                x1={50 + r2 * Math.cos(rad)} y1={50 + r2 * Math.sin(rad)}
+                                                                x2={50 + r1 * Math.cos(rad)} y2={50 + r1 * Math.sin(rad)}
+                                                                stroke={isTrueSynergy ? "rgba(52,211,153,0.3)" : "rgba(96,165,250,0.3)"}
+                                                                strokeWidth={i % 5 === 0 ? "1.2" : "0.6"}
+                                                            />
+                                                        );
+                                                    })}
+                                                </svg>
+                                                {/* score text */}
+                                                <div className="absolute flex flex-col items-center">
+                                                    <motion.span
+                                                        animate={{ opacity: [0.85, 1, 0.85] }}
+                                                        transition={{ duration: 2, repeat: Infinity }}
+                                                        className="text-3xl font-[1000] leading-none"
+                                                        style={{
+                                                            color: isTrueSynergy ? "#34d399" : "#60a5fa",
+                                                            textShadow: isTrueSynergy
+                                                                ? "0 0 24px rgba(52,211,153,0.6)"
+                                                                : "0 0 24px rgba(96,165,250,0.6)"
+                                                        }}
+                                                    >
+                                                        {projectedScore}
+                                                    </motion.span>
+                                                    <span className={`text-[8px] font-black tracking-widest mt-0.5 ${isTrueSynergy ? "text-emerald-700" : "text-blue-700"}`}>PTS</span>
+                                                </div>
+                                            </div>
+
+                                            {/* bottom data row */}
+                                            <div className="flex items-center gap-2 z-10">
+                                                <div className={`h-px w-8 bg-gradient-to-r from-transparent ${isTrueSynergy ? "to-emerald-600" : "to-blue-600"}`} />
+                                                <span className={`text-[8px] font-mono tracking-widest uppercase ${isTrueSynergy ? "text-emerald-700" : "text-blue-700"}`}>Optimized</span>
+                                                <div className={`h-px w-8 bg-gradient-to-l from-transparent ${isTrueSynergy ? "to-emerald-600" : "to-blue-600"}`} />
+                                            </div>
+                                        </motion.div>
                                     </div>
                                 </div>
 
