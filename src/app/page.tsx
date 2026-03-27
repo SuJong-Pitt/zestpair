@@ -77,9 +77,13 @@ function HorizontalScroll({ children, className }: { children: React.ReactNode; 
 
 export default function HomePage() {
   const resultRef = useRef<HTMLDivElement>(null);
+  const ingredientsRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const heroSearchContainerRef = useRef<HTMLDivElement>(null);
   const isHeroSearchVisible = useInView(heroSearchContainerRef, { amount: 0.1 });
+  const isIngredientsVisible = useInView(ingredientsRef, { amount: 0.01 }); // 더 민감하게 (1%만 보여도 감지)
+
+
 
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -197,6 +201,35 @@ export default function HomePage() {
       }
     }
 
+    // --- 4단계 다이내믹 시너지 추천 로직 (Step 2 & 3) ---
+    let potentialSynergy: InteractionResult | null = null;
+    for (const ing of selectedIngredients) {
+      // 해당 성분이 포함된 모든 시너지 조합 검색
+      const { data: dbPotential } = await supabase
+        .from("interactions")
+        .select("*")
+        .or(`ingredient_a_id.eq.${ing.id},ingredient_b_id.eq.${ing.id}`)
+        .eq("type", "SYNERGY");
+
+      const potentialMatch = (dbPotential as any[])?.find(int => {
+        const partnerId = int.ingredient_a_id === ing.id ? int.ingredient_b_id : int.ingredient_a_id;
+        // 파트너가 현재 선택된 성분 목록에 없는 경우 추천 대상으로 선정
+        return !ingredientIds.includes(partnerId);
+      });
+
+      if (potentialMatch) {
+        const partnerId = potentialMatch.ingredient_a_id === ing.id ? potentialMatch.ingredient_b_id : potentialMatch.ingredient_a_id;
+        const partner = dbIngredients.find(i => i.id === partnerId);
+        if (partner) {
+          potentialSynergy = {
+            pair: [ing, partner],
+            interaction: potentialMatch
+          };
+          break; // 1개만 찾으면 중단 (요청사항)
+        }
+      }
+    }
+
     const synergyWeight = synergies.length * 15;
     const cautionPenalty = cautions.length * 5;
     const conflictPenalty = conflicts.length * 25;
@@ -222,9 +255,11 @@ export default function HomePage() {
     setAnalysisResult({
       ingredients: [...selectedIngredients],
       synergies, cautions, conflicts, score, summary,
+      potentialSynergy,
       analyzed_at: new Date().toISOString()
     });
-  }, [selectedIngredients, language, setHasResult, setAnalysisResult, setAnalyzing]);
+  }, [selectedIngredients, language, dbIngredients, setHasResult, setAnalysisResult, setAnalyzing]);
+
 
   const handleAnimationComplete = useCallback(() => {
     setAnalyzing(false);
@@ -823,6 +858,8 @@ export default function HomePage() {
 
 
       <main className="mx-auto max-w-2xl px-4 py-8">
+        <div ref={ingredientsRef}> {/* 영양제 선택 영역만 ref로 감싸기 */}
+
         <div className="relative mb-10">
           {/* 섹션 라벨 */}
           <div className="flex items-center gap-2 mb-5 px-1">
@@ -1160,8 +1197,10 @@ export default function HomePage() {
             </motion.div>
           )}
         </div>
+        </div> {/* ingredientsRef 닫기 */}
 
         <div ref={resultRef} id="analysis-results-section" className="mt-8 min-h-[50vh]">
+
           {isAnalyzing && <AnalyzingAnimation onComplete={handleAnimationComplete} />}
           {!isAnalyzing && hasResult && analysisResult && (
             <AnalysisResults result={analysisResult} />
@@ -1173,7 +1212,9 @@ export default function HomePage() {
         onAnalyze={handleAnalyze}
         allIngredients={dbIngredients}
         isHeroSearchVisible={isHeroSearchVisible}
+        isIngredientsVisible={isIngredientsVisible}
       />
+
 
       {/* 가이드 팝업 */}
       <AnimatePresence>

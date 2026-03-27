@@ -14,13 +14,17 @@ interface FloatingBasketBarProps {
   onAnalyze: () => void;
   allIngredients?: Ingredient[];
   isHeroSearchVisible?: boolean;
+  isIngredientsVisible?: boolean;
 }
+
 
 export default function FloatingBasketBar({ 
   onAnalyze, 
   allIngredients = [], 
-  isHeroSearchVisible = false 
+  isHeroSearchVisible = false,
+  isIngredientsVisible = false
 }: FloatingBasketBarProps) {
+
   const { selectedIngredients, addIngredient, removeIngredient, clearBasket, isAnalyzing, language, isSelected, isBasketExpanded, setBasketExpanded, hasResult } = useBasketStore();
   const [isVisible, setIsVisible] = useState(false);
   const isExpanded = isBasketExpanded;
@@ -35,15 +39,21 @@ export default function FloatingBasketBar({
   const canAnalyze = count >= 2;
 
   useEffect(() => {
-    // 분석 결과가 있거나 분석 중일 때는 바스켓 바를 숨김 (모바일 우선, 데스크탑은 선택)
-    // 하지만 "다시 분석" 등의 기능이 필요할 수 있으므로, 
-    // 여기서는 count가 있고 분석 결과가 없을 때만 보이게 하거나, 
-    // 혹은 분석 결과가 있어도 사용자가 원할 때 볼 수 있게 함.
-    // 일단 사용자의 요청대로 "모바일 최적화"를 위해 분석 결과 화면에서는 숨기도록 함.
-    const shouldShow = (count > 0 || isSearchActive) && !hasResult && !isAnalyzing && !isHeroSearchVisible;
+    // 분석 결과가 있더라도 성분이 선택되어 있고, 
+    // 히어로 검색바가 보이지 않으며,
+    // (결과가 없거나 또는 결과가 있더라도 성분 리스트 영역에 있을 때) 바를 보여줌
+    const shouldShow = (count > 0 || isSearchActive) && 
+                       !isAnalyzing && 
+                       !isHeroSearchVisible && 
+                       (!hasResult || isIngredientsVisible);
+                       
     setIsVisible(shouldShow);
-    if ((count === 0 || hasResult || isHeroSearchVisible) && !isSearchActive) setIsExpanded(false);
-  }, [count, isSearchActive, hasResult, isAnalyzing, isHeroSearchVisible]);
+    
+    if ((count === 0 || isHeroSearchVisible || (hasResult && !isIngredientsVisible)) && !isSearchActive) {
+      setIsExpanded(false);
+    }
+  }, [count, isSearchActive, hasResult, isAnalyzing, isHeroSearchVisible, isIngredientsVisible]);
+
 
   const filteredSearch = allIngredients.filter(ing => {
     if (!searchQuery) return false;
@@ -57,9 +67,13 @@ export default function FloatingBasketBar({
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className="fixed left-0 right-0 bottom-0 z-50 pointer-events-none flex justify-center"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 2rem)' }}
+          className={cn(
+            "fixed left-0 right-0 z-50 pointer-events-none flex justify-center px-4",
+            hasResult ? "top-8 md:top-12" : "bottom-0"
+          )}
+          style={!hasResult ? { paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 2rem)' } : {}}
         >
+
           {/* 배경 블러 오버레이 */}
           <AnimatePresence>
             {isExpanded && (

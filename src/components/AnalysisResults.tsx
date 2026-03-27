@@ -63,45 +63,8 @@ const interactionTypeConfig = {
     },
 } as const;
 
-/* --- 시너지 완성 전용 트라이어드 데이터 --- */
-const SYNERGY_TRIADS = [
-    {
-        id: "immune",
-        ingredients: ["vitamin d", "zinc", "비타민 d", "아연"],
-        missing: { id: "magnesium", name: "마그네슘", name_en: "Magnesium" },
-        benefit: {
-            ko: "비타민 D의 활성화를 돕고 아연과 함께 면역 체계의 상호작용을 완성합니다.",
-            en: "Completes the immune system by aiding Vit D activation and Zinc synergy."
-        }
-    },
-    {
-        id: "bone",
-        ingredients: ["calcium", "vitamin d", "칼슘", "비타민 d"],
-        missing: { id: "vitamin k2", name: "비타민 K2", name_en: "Vitamin K2" },
-        benefit: {
-            ko: "칼슘이 혈관 대신 뼈로 직접 흡수되도록 돕는 결정적인 역할을 합니다.",
-            en: "Ensures calcium is directed to bones rather than arteries (Essential Triad)."
-        }
-    },
-    {
-        id: "eye",
-        ingredients: ["lutein", "zeaxanthin", "루테인", "지아잔틴"],
-        missing: { id: "omega-3", name: "오메가3", name_en: "Omega-3" },
-        benefit: {
-            ko: "망막 보호 성분들에 지질막 안정화를 더해 안구 건조와 피로를 동시에 해결합니다.",
-            en: "Adds lipid membrane stability to retinal protectors for a complete eye care solution."
-        }
-    },
-    {
-        id: "stress",
-        ingredients: ["magnesium", "b-vitamin", "b-complex", "마그네슘", "비타민 b"],
-        missing: { id: "coq10", name: "코엔자임 Q10", name_en: "CoQ10" },
-        benefit: {
-            ko: "신경 안정과 에너지 생성을 너머, 미토콘드리아 건강의 마지막 퍼즐을 맞춥니다.",
-            en: "Goes beyond nerve stability to complete the mitochondrial energy production cycle."
-        }
-    }
-];
+/* --- 시너지 완성 데이터는 이제 데이터베이스(result.potentialSynergy)에서 다이내믹하게 가져옵니다. --- */
+
 
 /** 점수 링 컴포넌트 - 미래형 AI HUD 버전 */
 function ScoreRing({ score }: { score: number }) {
@@ -615,24 +578,31 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                 {/* 메인 반투명 글래스 패널 컨테이너 */}
                 <div className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-6 md:p-12 lg:p-16 space-y-12 md:space-y-16">
                     {/* 0. 최상단 리포트 헤더 라벨 - 스크롤 타겟 */}
-                    <div id="analysis-report-top" className="flex flex-col items-center gap-2 pt-32 pb-0">
+                    <div id="analysis-report-top" className="flex flex-col items-center gap-2 pt-4 pb-0">
                         <motion.div
                             initial={{ y: -10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            className="flex items-center gap-3 px-6 py-2 rounded-2xl bg-white/50 border border-emerald-100 backdrop-blur-xl shadow-[0_8px_32px_rgba(16,185,129,0.05)]"
+                            className="flex items-center gap-2.5 md:gap-3 px-4 md:px-6 py-2 md:py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 backdrop-blur-xl shadow-[0_0_20px_rgba(16,185,129,0.2)] group/protocol max-w-[90vw]"
                         >
-                            <div className="relative">
+                            <div className="relative shrink-0">
                                 <motion.div
                                     animate={{ rotate: 360 }}
-                                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                                    className="absolute -inset-1 rounded-full border border-dashed border-emerald-400/30"
+                                    transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                                    className="absolute -inset-1 rounded-full border border-dashed border-emerald-400/40"
                                 />
-                                <Sparkles size={14} className="text-emerald-500 relative z-10" />
+                                <motion.div
+                                    animate={{ opacity: [0.5, 1, 0.5] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                >
+                                    <Sparkles size={12} className="md:size-[14px] text-emerald-400 relative z-10 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+                                </motion.div>
                             </div>
-                            <h2 className="text-[11px] font-[1000] uppercase tracking-[0.4em] text-emerald-700/70 pt-0.5">
+                            <h2 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-emerald-400 pt-0.5 drop-shadow-[0_0_10px_rgba(52,211,153,0.3)] whitespace-nowrap">
                                 {language === 'ko' ? 'Analysis Protocol' : 'Analysis Report'}
                             </h2>
                         </motion.div>
+
+
                         <motion.div
                             initial={{ height: 0 }}
                             animate={{ height: 8 }}
@@ -912,24 +882,11 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                     {(() => {
                         const currentIngNames = result.ingredients.map(ing => (ing.name_en || ing.name).toLowerCase().trim());
 
-                        // 부족한 성분 도출 (Dynamic Logic)
-                        const triad = SYNERGY_TRIADS.find(t => {
-                            const matchedCount = t.ingredients.filter(req =>
-                                currentIngNames.some(own => own.includes(req.toLowerCase()))
-                            ).length;
+                        // 1단계: DB에서 분석 단계에 미리 찾아둔 잠재적 시너지 활용 (Step 2)
+                        const potentialSynergy = result.potentialSynergy;
+                        const isTrueSynergy = !!potentialSynergy;
 
-                            const isMissingPresent = currentIngNames.some(own =>
-                                own.includes(t.missing.id.toLowerCase()) ||
-                                own.includes(t.missing.name_en.toLowerCase()) ||
-                                own.includes(t.missing.name.toLowerCase())
-                            );
-
-                            return matchedCount >= 1 && !isMissingPresent;
-                        });
-
-                        const isTrueSynergy = !!triad;
-
-                        // 기본 추천 후보군 (이미 선택한 성분은 제외하고 추천)
+                        // 2단계: 시너지 파트너가 없으면 선택되지 않은 기본 추천 영양제 중 하나 선택 (Step 3)
                         const fallbackCandidates = [
                             { ko: "비타민 C", en: "Vitamin C" },
                             { ko: "오메가3", en: "Omega-3" },
@@ -945,18 +902,25 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             )
                         ) || fallbackCandidates[0];
 
-                        const targetIngredient = isTrueSynergy
-                            ? { ko: triad.missing.name, en: triad.missing.name_en }
+                        // 3단계: 최종 추천 성분 결정 (Step 4)
+                        const targetPartner = potentialSynergy?.pair[1];
+                        const targetIngredient = isTrueSynergy && targetPartner
+                            ? { ko: targetPartner.name, en: targetPartner.name_en }
                             : bestFallback;
 
                         const recName = language === 'ko' ? targetIngredient.ko : targetIngredient.en;
 
+
                         // 동적 예상 점수 계산
-                        // 1. 트라이어드 발견 시: +12점 보너스
-                        // 2. 시너지는 없지만 성분 보충 시: +8점
-                        // 3. 이미 100점인 경우: +0점 (유지)
-                        const scoreBoost = isTrueSynergy ? 15 : (result.score >= 100 ? 0 : 8);
-                        const projectedScore = Math.max(result.score, Math.min(100, result.score + scoreBoost));
+                        // 1. 시너지 완성 시: +15점
+                        // 2. 기초 영양 보완(Foundation Bonus): 성분이 3개 이상이 될 때 +8점 추가
+                        // page.tsx의 scoring logic과 동기화
+                        const synergyBoost = isTrueSynergy ? 15 : 0;
+                        const foundationBoost = result.ingredients.length >= 2 ? 8 : 0; // 2개 -> 3개 이상이 될 때
+                        const totalBoost = synergyBoost + (synergyBoost === 0 && result.score >= 100 ? 0 : foundationBoost);
+
+                        const projectedScore = Math.max(result.score, Math.min(100, result.score + totalBoost));
+
 
                         const buyUrl = language === 'ko'
                             ? `https://www.coupang.com/np/search?q=${encodeURIComponent(targetIngredient.ko)}`
