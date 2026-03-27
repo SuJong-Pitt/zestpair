@@ -180,7 +180,7 @@ export default function FloatingBasketBar({
                         </button>
                       </div>
 
-                      <div className="flex flex-col gap-2 max-h-[35vh] overflow-y-auto scrollbar-hide">
+                      <div className="flex flex-wrap gap-2 max-h-[35vh] overflow-y-auto scrollbar-hide">
                         {isSearchActive && searchQuery ? (
                           filteredSearch.length > 0 ? (
                             filteredSearch.map((ing, i) => {
@@ -193,7 +193,7 @@ export default function FloatingBasketBar({
                                   animate={{ scale: 1, opacity: 1 }}
                                   transition={{ delay: i * 0.03 }}
                                   onClick={() => (sel ? removeIngredient(ing.id) : addIngredient(ing))}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shrink-0"
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap"
                                   style={
                                     sel
                                       ? { background: "rgba(16,185,129,0.2)", border: "1px solid rgba(16,185,129,0.4)", color: "#6ee7b7" }
@@ -222,7 +222,7 @@ export default function FloatingBasketBar({
                                 animate={{ scale: 1, opacity: 1, y: 0 }}
                                 exit={{ scale: 0.8, opacity: 0 }}
                                 transition={{ delay: i * 0.04 }}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap shrink-0"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap"
                                 style={{
                                   background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(6,182,212,0.15) 100%)",
                                   border: "1px solid rgba(52,211,153,0.3)",

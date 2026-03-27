@@ -716,7 +716,7 @@ export default function HomePage() {
                     }}
                   >
                     <div className="bg-[#0f172a]/95 rounded-[2.2rem] overflow-hidden shadow-2xl">
-                      <div className="max-h-[140px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-col gap-1.5">
+                      <div className="max-h-[140px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-wrap justify-center gap-1.5 md:gap-2">
                         {dropdownResults.map((ing, i) => {
                           const active = selectedIngredients.some(item => item.id === ing.id);
                           return (
@@ -732,10 +732,10 @@ export default function HomePage() {
                                 setIsDropdownOpen(false);
                               }}
                               className={cn(
-                                "group/item flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl transition-all duration-300 border font-bold text-[10px] md:text-xs whitespace-nowrap shrink-0",
+                                "group/item flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl transition-all duration-300 border font-bold text-[10px] md:text-xs whitespace-nowrap",
                                 active
-                                  ? "bg-emerald-500 text-white border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
-                                  : "bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white"
+                                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                                  : "bg-slate-900/60 text-white/70 border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white"
                               )}
                             >
                               <span className="text-sm group-hover/item:scale-110 transition-transform">
