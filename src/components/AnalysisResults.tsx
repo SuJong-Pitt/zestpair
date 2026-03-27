@@ -335,14 +335,22 @@ function ScoreRing({ score }: { score: number }) {
                     style={{ filter: `drop-shadow(0 0 8px ${colors.shadow})` }} />
             </svg>
 
-            {/* 텍스트 레이어 */}
+            {/* 텍스트 레이어 - 가독성 강화 버전 */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
+                {/* 내부 다크 배경 - 텍스트 대비 강화 */}
+                <div
+                    className="absolute rounded-full pointer-events-none"
+                    style={{
+                        width: "58%", height: "58%",
+                        background: "radial-gradient(circle, rgba(2,6,23,0.85) 60%, transparent 100%)",
+                    }}
+                />
                 {/* 상단 상태 뱃지 */}
                 <div className="absolute top-[28%] left-1/2 -translate-x-1/2 whitespace-nowrap">
                     <motion.div
-                        animate={{ opacity: [0.45, 1, 0.45] }} transition={{ duration: 2.5, repeat: Infinity }}
+                        animate={{ opacity: [0.7, 1, 0.7] }} transition={{ duration: 2.5, repeat: Infinity }}
                         className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full"
-                        style={{ background: `${colors.gradA}20`, border: `1px solid ${colors.gradA}50` }}
+                        style={{ background: `rgba(2,6,23,0.7)`, border: `1px solid ${colors.gradA}70`, backdropFilter: "blur(4px)" }}
                     >
                         <motion.div
                             animate={{ scale: [1, 1.6, 1], opacity: [0.8, 1, 0.8] }}
@@ -350,42 +358,42 @@ function ScoreRing({ score }: { score: number }) {
                             className="w-1.5 h-1.5 rounded-full"
                             style={{ background: colors.gradA, boxShadow: `0 0 8px ${colors.gradA}` }}
                         />
-                        <span className="text-[7px] font-mono tracking-widest uppercase" style={{ color: colors.labelColor }}>
+                        <span className="text-[7px] font-mono tracking-widest uppercase font-bold" style={{ color: colors.labelColor }}>
                             {colors.label}
                         </span>
                     </motion.div>
                 </div>
 
-                {/* 점수 숫자 (그라디언트 텍스트) */}
+                {/* 점수 숫자 - 강한 네온 글로우 + 선명한 대비 */}
                 <motion.div
-                    animate={{ opacity: [1, 0.85, 1] }} transition={{ duration: 2.2, repeat: Infinity }}
-                    className="flex items-baseline mt-7"
+                    animate={{ opacity: [1, 0.9, 1] }} transition={{ duration: 2.2, repeat: Infinity }}
+                    className="flex items-baseline mt-7 relative z-10"
                 >
                     <motion.span
                         className="font-[1000] tracking-tighter leading-none"
                         style={{
                             fontSize: "clamp(2.8rem, 5.5vw, 4rem)",
-                            background: `linear-gradient(135deg, ${colors.gradA}, ${colors.gradB}, ${colors.gradC})`,
+                            background: `linear-gradient(135deg, #ffffff 0%, ${colors.gradA} 35%, ${colors.gradB} 70%, ${colors.gradC} 100%)`,
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
-                            filter: `drop-shadow(0 0 18px ${colors.shadow})`
+                            filter: `drop-shadow(0 0 20px ${colors.shadow}) drop-shadow(0 2px 4px rgba(0,0,0,0.8))`
                         }}
                     >
                         {rounded}
                     </motion.span>
-                    <span className="ml-1 text-[10px] font-black italic tracking-widest uppercase" style={{ color: colors.accent, opacity: 0.7 }}>%</span>
+                    <span className="ml-1 text-[10px] font-black italic tracking-widest uppercase" style={{ color: colors.light, opacity: 0.9 }}>%</span>
                 </motion.div>
 
                 {/* 하단 데이터 라벨 */}
-                <div className="mt-3 flex flex-col items-center gap-1.5">
+                <div className="mt-3 flex flex-col items-center gap-1.5 relative z-10">
                     <motion.div initial={{ width: 0 }} animate={{ width: 56 }} transition={{ duration: 1.2, delay: 0.5 }}
                         className="h-px"
                         style={{ background: `linear-gradient(90deg, transparent, ${colors.gradB}, ${colors.gradC}, transparent)` }}
                     />
-                    <div className="flex items-center gap-2">
-                        <span className="text-[7px] font-mono tracking-[0.28em] uppercase" style={{ color: `${colors.gradA}90` }}>Core_V2.5</span>
-                        <div className="w-0.5 h-0.5 rounded-full" style={{ background: colors.gradB, opacity: 0.5 }} />
-                        <span className="text-[7px] font-mono tracking-[0.28em] uppercase" style={{ color: `${colors.gradC}90` }}>
+                    <div className="flex items-center gap-2 px-2 py-0.5 rounded-md" style={{ background: "rgba(2,6,23,0.5)" }}>
+                        <span className="text-[7px] font-mono tracking-[0.28em] uppercase font-semibold" style={{ color: colors.light }}>Core_V2.5</span>
+                        <div className="w-0.5 h-0.5 rounded-full" style={{ background: colors.gradB, opacity: 0.7 }} />
+                        <span className="text-[7px] font-mono tracking-[0.28em] uppercase font-semibold" style={{ color: colors.light }}>
                             {score >= 60 ? "HIGH_SYNC" : score >= 40 ? "CAUTION" : "CRITICAL"}
                         </span>
                     </div>
@@ -724,7 +732,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                     <div className="relative group">
                         <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-emerald-500 to-cyan-500 rounded-[3rem] blur opacity-15 group-hover:opacity-30 transition duration-1000"></div>
 
-                        <div className="relative rounded-[2.5rem] border-none text-white">
+                        <div className="relative rounded-[2.5rem] bg-slate-900/80 border border-white/10 backdrop-blur-2xl text-white overflow-hidden">
                             {/* 하이테크 애니메이션 배경 - 신경망/그리드 */}
                             <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
                                 <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]" />
@@ -761,13 +769,14 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.15),transparent_70%)] pointer-events-none opacity-50 md:opacity-100" />
 
                             <CardContent className="p-5 md:p-10 relative z-10 flex flex-col items-center text-center">
-                                {/* 0. 점수 링 섹션 (최상단) */}
+                                {/* 0. 점수 링 섹션 (최상단) - 다크 패널로 가독성 강화 */}
                                 <motion.div
                                     initial={{ scale: 0.8, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     className="relative mb-6"
                                 >
-                                    <div className="absolute inset-0 bg-emerald-500/10 blur-[30px] rounded-full scale-125 pointer-events-none" />
+                                    {/* 뚜렷한 다크 원형 배경 패널 */}
+                                    <div className="absolute inset-0 rounded-full bg-slate-950/70 pointer-events-none" style={{ transform: "scale(0.85)" }} />
                                     <ScoreRing score={result.score} />
                                 </motion.div>
 
