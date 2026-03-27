@@ -367,12 +367,12 @@ function ScoreRing({ score }: { score: number }) {
                 {/* 점수 숫자 - 강한 네온 글로우 + 선명한 대비 */}
                 <motion.div
                     animate={{ opacity: [1, 0.9, 1] }} transition={{ duration: 2.2, repeat: Infinity }}
-                    className="flex items-baseline mt-7 relative z-10"
+                    className="flex items-baseline mt-5 relative z-10"
                 >
                     <motion.span
                         className="font-[1000] tracking-tighter leading-none"
                         style={{
-                            fontSize: "clamp(2.8rem, 5.5vw, 4rem)",
+                            fontSize: "clamp(1.9rem, 4.5vw, 3.5rem)",
                             background: `linear-gradient(135deg, #ffffff 0%, ${colors.gradA} 35%, ${colors.gradB} 70%, ${colors.gradC} 100%)`,
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
@@ -381,7 +381,7 @@ function ScoreRing({ score }: { score: number }) {
                     >
                         {rounded}
                     </motion.span>
-                    <span className="ml-1 text-[10px] font-black italic tracking-widest uppercase" style={{ color: colors.light, opacity: 0.9 }}>%</span>
+                    <span className="ml-1 text-[9px] font-black italic tracking-widest uppercase" style={{ color: colors.light, opacity: 0.9 }}>%</span>
                 </motion.div>
 
                 {/* 하단 데이터 라벨 */}
