@@ -724,7 +724,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                     <div className="relative group">
                         <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-emerald-500 to-cyan-500 rounded-[3rem] blur opacity-15 group-hover:opacity-30 transition duration-1000"></div>
 
-                        <div className="relative rounded-[2.5rem] overflow-hidden border-none text-white">
+                        <div className="relative rounded-[2.5rem] border-none text-white">
                             {/* 하이테크 애니메이션 배경 - 신경망/그리드 */}
                             <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
                                 <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]" />
@@ -915,73 +915,207 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                             </div>
                         ) : (
                             <motion.div
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                className="relative overflow-hidden rounded-[3rem] p-16 md:p-24 text-center group"
+                                transition={{ duration: 0.7 }}
+                                className="relative rounded-[2.5rem] w-full mx-auto group"
                                 style={{
-                                    background: "linear-gradient(145deg, rgba(16,185,129,0.05) 0%, rgba(8,145,178,0.03) 100%)",
-                                    border: "1px solid rgba(16,185,129,0.1)",
-                                    boxShadow: "0 20px 60px -10px rgba(0,0,0,0.1), inset 0 0 30px rgba(16,185,129,0.02)"
+                                    background: "linear-gradient(145deg, rgba(4,20,16,0.97) 0%, rgba(4,12,24,0.97) 100%)",
+                                    border: "1px solid rgba(52,211,153,0.2)",
+                                    boxShadow: "0 0 0 1px rgba(52,211,153,0.05) inset, 0 40px 80px rgba(0,0,0,0.5)"
                                 }}
                             >
-                                {/* 배경 장식 HUD */}
-                                <div className="absolute inset-0 pointer-events-none opacity-20">
-                                    <div className="absolute top-0 left-0 w-24 h-24 border-t-2 border-l-2 border-emerald-500/30 rounded-tl-[2rem]" />
-                                    <div className="absolute bottom-0 right-0 w-24 h-24 border-b-2 border-r-2 border-emerald-500/30 rounded-br-[2rem]" />
-                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.1)_0%,transparent_70%)]" />
+                                {/* 배경 레이어들 — overflow-hidden은 여기에만 적용 */}
+                                <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2.5rem]">
+                                    {/* 메인 코어 오라 */}
+                                    <motion.div
+                                        animate={{ scale: [1, 1.3, 1], opacity: [0.12, 0.25, 0.12] }}
+                                        transition={{ duration: 5, repeat: Infinity }}
+                                        className="absolute inset-0"
+                                        style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(52,211,153,0.3) 0%, transparent 65%)" }}
+                                    />
+                                    <motion.div
+                                        animate={{ scale: [1.2, 1, 1.2], opacity: [0.08, 0.18, 0.08] }}
+                                        transition={{ duration: 7, repeat: Infinity, delay: 1 }}
+                                        className="absolute inset-0"
+                                        style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(6,182,212,0.2) 0%, transparent 60%)" }}
+                                    />
+                                    {/* 코너 HUD 브래킷 */}
+                                    <div className="absolute top-5 left-5 w-12 h-12 border-t-2 border-l-2 border-emerald-400/30 rounded-tl-2xl" />
+                                    <div className="absolute top-5 right-5 w-12 h-12 border-t-2 border-r-2 border-cyan-400/25 rounded-tr-2xl" />
+                                    <div className="absolute bottom-5 left-5 w-12 h-12 border-b-2 border-l-2 border-cyan-400/25 rounded-bl-2xl" />
+                                    <div className="absolute bottom-5 right-5 w-12 h-12 border-b-2 border-r-2 border-emerald-400/30 rounded-br-2xl" />
+                                    {/* 수평 스캔라인 */}
+                                    <motion.div
+                                        animate={{ y: ["-100%", "200%"] }}
+                                        transition={{ duration: 4, repeat: Infinity, ease: "linear", repeatDelay: 2 }}
+                                        className="absolute inset-x-0 h-px"
+                                        style={{ background: "linear-gradient(90deg, transparent, rgba(52,211,153,0.4), transparent)" }}
+                                    />
                                 </div>
 
-                                <div className="relative z-10 space-y-8 flex flex-col items-center">
-                                    {/* 초대형 시큐리티 실드 애니메이션 */}
-                                    <div className="relative w-28 h-28 md:w-36 md:h-36">
-                                        {/* 바깥 궤도 링 */}
-                                        <motion.div
-                                            animate={{ rotate: 360 }}
-                                            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                                            className="absolute inset-0 rounded-full border-2 border-dashed border-emerald-500/20"
-                                        />
+                                {/* 콘텐츠 — 좌우 분할 레이아웃 */}
+                                <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 p-8 md:p-12">
 
-                                        {/* 스캐너 빔 */}
-                                        <motion.div
-                                            animate={{ rotate: -360 }}
-                                            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                                            className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent_0deg,rgba(16,185,129,0.4)_20deg,transparent_40deg)]"
-                                        />
+                                    {/* 왼쪽: 홀로그래픽 실드 (고정 너비) */}
+                                    <div className="shrink-0 flex items-center justify-center">
+                                        <div className="relative w-40 h-40 md:w-44 md:h-44 flex items-center justify-center">
+                                            {/* 멀티 궤도 링 */}
+                                            {[
+                                                { size: "inset-0", dur: 12, color: "rgba(52,211,153,0.18)", dash: "border-dashed" },
+                                                { size: "inset-4", dur: 8, color: "rgba(6,182,212,0.15)", dash: "border-dotted" },
+                                                { size: "inset-8", dur: 5, color: "rgba(99,102,241,0.12)", dash: "border-dashed" },
+                                            ].map((ring, i) => (
+                                                <motion.div
+                                                    key={i}
+                                                    animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
+                                                    transition={{ duration: ring.dur, repeat: Infinity, ease: "linear" }}
+                                                    className={`absolute ${ring.size} rounded-full border-2 ${ring.dash}`}
+                                                    style={{ borderColor: ring.color }}
+                                                />
+                                            ))}
 
-                                        <div className="absolute inset-4 rounded-[1.8rem] bg-white shadow-xl flex items-center justify-center border border-emerald-50/50">
+                                            {/* 코닉 스캐너 빔 */}
                                             <motion.div
-                                                animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
+                                                animate={{ rotate: -360 }}
+                                                transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
+                                                className="absolute inset-0 rounded-full"
+                                                style={{ background: "conic-gradient(from 0deg, transparent 0deg, rgba(52,211,153,0.35) 25deg, transparent 50deg)" }}
+                                            />
+
+                                            {/* 글로우 코어 */}
+                                            <motion.div
+                                                animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.8, 0.4] }}
                                                 transition={{ duration: 3, repeat: Infinity }}
+                                                className="absolute w-24 h-24 md:w-32 md:h-32 rounded-full"
+                                                style={{ background: "radial-gradient(circle, rgba(52,211,153,0.3) 0%, transparent 70%)", filter: "blur(10px)" }}
+                                            />
+
+                                            {/* 실드 아이콘 카드 */}
+                                            <motion.div
+                                                animate={{ y: [0, -5, 0], scale: [1, 1.04, 1] }}
+                                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                                className="relative w-20 h-20 md:w-24 md:h-24 rounded-[1.6rem] flex items-center justify-center"
+                                                style={{
+                                                    background: "linear-gradient(145deg, rgba(6,20,16,0.95), rgba(4,30,22,0.95))",
+                                                    border: "1.5px solid rgba(52,211,153,0.4)",
+                                                    boxShadow: "0 0 30px rgba(52,211,153,0.2), inset 0 1px 0 rgba(52,211,153,0.1)"
+                                                }}
                                             >
-                                                <ShieldCheck size={56} className="text-emerald-500 drop-shadow-[0_0_15px_rgba(16,185,129,0.4)]" strokeWidth={1.5} />
+                                                <ShieldCheck
+                                                    size={42}
+                                                    strokeWidth={1.2}
+                                                    style={{ color: "#34d399", filter: "drop-shadow(0 0 16px rgba(52,211,153,0.7))" }}
+                                                />
                                             </motion.div>
+
+                                            {/* 궤도 파티클 3개 */}
+                                            {[
+                                                { color: "#34d399", dur: 3, offset: 0 },
+                                                { color: "#06b6d4", dur: 3, offset: 1 },
+                                                { color: "#818cf8", dur: 3, offset: 2 },
+                                            ].map((p, i) => (
+                                                <motion.div
+                                                    key={i}
+                                                    animate={{ rotate: 360 }}
+                                                    transition={{ duration: p.dur, repeat: Infinity, ease: "linear", delay: -(p.offset) }}
+                                                    className="absolute inset-0"
+                                                    style={{ transformOrigin: "center" }}
+                                                >
+                                                    <div
+                                                        className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full"
+                                                        style={{ background: p.color, boxShadow: `0 0 8px ${p.color}` }}
+                                                    />
+                                                </motion.div>
+                                            ))}
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3">
+                                    {/* 오른쪽: 텍스트 + 배지 */}
+                                    {/* 오른쪽: 텍스트 + 배지 — flex-1 min-w-0으로 overflow 방지 */}
+                                    <div className="flex flex-col gap-4 text-center md:text-left flex-1 min-w-0">
+                                        {/* 상태 레이블 */}
                                         <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[10px] font-black uppercase tracking-[0.3em]"
+                                            initial={{ opacity: 0, x: -10 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.2 }}
+                                            className="inline-flex items-center gap-2 self-center md:self-start"
                                         >
-                                            Security Status: Verified
+                                            <motion.div
+                                                animate={{ scale: [1, 1.5, 1], opacity: [0.7, 1, 0.7] }}
+                                                transition={{ duration: 1.5, repeat: Infinity }}
+                                                className="w-2 h-2 rounded-full bg-emerald-400"
+                                                style={{ boxShadow: "0 0 8px #34d399" }}
+                                            />
+                                            <span
+                                                className="text-[10px] font-black uppercase tracking-[0.3em]"
+                                                style={{ color: "#34d399" }}
+                                            >
+                                                Security Status — Verified
+                                            </span>
                                         </motion.div>
-                                        <h4 className="text-2xl md:text-3xl lg:text-4xl font-[1000] text-white tracking-tighter drop-shadow-lg">
-                                            {t.results.noInteraction}
-                                        </h4>
-                                        <p className="text-sm md:text-lg text-slate-300 font-bold max-w-sm mx-auto leading-relaxed opacity-90">
-                                            {t.results.noInteractionBody}
-                                        </p>
-                                    </div>
 
-                                    {/* 세이프티 배지 */}
-                                    <div className="flex gap-4 pt-4">
-                                        {['Zero Risk', 'Bio-Safe', '100% Synergy'].map((label, i) => (
-                                            <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20 glass-morphism">
-                                                <Zap size={10} className="text-emerald-400" />
-                                                <span className="text-[9px] font-black text-emerald-300 uppercase tracking-widest">{label}</span>
-                                            </div>
-                                        ))}
+                                        <motion.h4
+                                            initial={{ opacity: 0, y: 10 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.3 }}
+                                            className="text-2xl md:text-3xl font-[1000] tracking-tighter leading-[1.1]"
+                                            style={{
+                                                background: "linear-gradient(135deg, #ffffff 0%, #a7f3d0 50%, #6ee7b7 100%)",
+                                                WebkitBackgroundClip: "text",
+                                                WebkitTextFillColor: "transparent",
+                                                filter: "drop-shadow(0 0 20px rgba(52,211,153,0.25))"
+                                            }}
+                                        >
+                                            {t.results.noInteraction}
+                                        </motion.h4>
+
+                                        {/* 설명 텍스트 */}
+                                        <motion.p
+                                            initial={{ opacity: 0 }}
+                                            whileInView={{ opacity: 1 }}
+                                            transition={{ delay: 0.45 }}
+                                            className="text-xs md:text-sm leading-relaxed max-w-xs md:max-w-sm"
+                                            style={{ color: "rgba(203,213,225,0.8)" }}
+                                        >
+                                            {t.results.noInteractionBody}
+                                        </motion.p>
+
+                                        {/* 스탯 배지 3종 */}
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 8 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.55 }}
+                                            className="flex flex-row flex-wrap gap-2.5 justify-center md:justify-start pt-1"
+                                        >
+                                            {[
+                                                { label: "Zero Risk", icon: "🛡️", gradA: "#34d399", gradB: "#06b6d4", glow: "rgba(52,211,153,0.3)" },
+                                                { label: "Bio-Safe", icon: "🧬", gradA: "#818cf8", gradB: "#c084fc", glow: "rgba(129,140,248,0.3)" },
+                                                { label: "100% Synergy", icon: "⚡", gradA: "#fbbf24", gradB: "#f59e0b", glow: "rgba(251,191,36,0.3)" },
+                                            ].map((badge, i) => (
+                                                <motion.div
+                                                    key={i}
+                                                    initial={{ scale: 0.8, opacity: 0 }}
+                                                    whileInView={{ scale: 1, opacity: 1 }}
+                                                    transition={{ delay: 0.6 + i * 0.1, type: "spring", stiffness: 200 }}
+                                                    whileHover={{ scale: 1.06, y: -2 }}
+                                                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl font-black text-[11px] uppercase tracking-wider whitespace-nowrap"
+                                                    style={{
+                                                        background: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.3))`,
+                                                        border: `1px solid ${badge.gradA}40`,
+                                                        color: badge.gradA,
+                                                        boxShadow: `0 0 16px ${badge.glow}, inset 0 1px 0 rgba(255,255,255,0.04)`
+                                                    }}
+                                                >
+                                                    <span style={{ filter: `drop-shadow(0 0 4px ${badge.gradA})` }}>{badge.icon}</span>
+                                                    <span style={{
+                                                        background: `linear-gradient(90deg, ${badge.gradA}, ${badge.gradB})`,
+                                                        WebkitBackgroundClip: "text",
+                                                        WebkitTextFillColor: "transparent"
+                                                    }}>{badge.label}</span>
+                                                </motion.div>
+                                            ))}
+                                        </motion.div>
                                     </div>
                                 </div>
                             </motion.div>
