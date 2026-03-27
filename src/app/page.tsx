@@ -92,6 +92,9 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showAllPopular, setShowAllPopular] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
+  // 카테고리 전환 감지: 0=초기 로드(stagger 적용), >0=탭 전환(딜레이 없이 즉각 표시)
+  const categoryVersionRef = useRef(0);
+  const [, forceRender] = useState(0);
 
   const [dbIngredients, setDbIngredients] = useState<Ingredient[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(true);
@@ -137,6 +140,16 @@ export default function HomePage() {
     });
   }, [dbIngredients, selectedCategory]);
 
+  // 카테고리 변경 시 버전 증가 (최초 로드 제외)
+  const prevCategoryRef = useRef(selectedCategory);
+  const isFirstCategoryRender = useRef(true);
+  if (prevCategoryRef.current !== selectedCategory) {
+    prevCategoryRef.current = selectedCategory;
+    if (!isFirstCategoryRender.current) {
+      categoryVersionRef.current += 1;
+    }
+  }
+
   // 드롭다운 검색 결과용 필터링 - 성능 최적화: useMemo
   const dropdownResults = useMemo(() => {
     if (!searchQuery) return [];
@@ -153,6 +166,13 @@ export default function HomePage() {
   const popularIngredients = useMemo(() => {
     return dbIngredients.filter((i) => i.is_popular);
   }, [dbIngredients]);
+
+  // 데이터 로드 완료 후 첫 렌더 플래그 해제
+  useEffect(() => {
+    if (!isLoadingList && dbIngredients.length > 0) {
+      isFirstCategoryRender.current = false;
+    }
+  }, [isLoadingList, dbIngredients.length]);
 
   const handleAnalyze = useCallback(async () => {
     if (selectedIngredients.length < 2) return;
@@ -1106,17 +1126,12 @@ export default function HomePage() {
               ))}
             </div>
           ) : filteredIngredients.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1">
-              {filteredIngredients.map((ing, i) => (
-                <motion.div
-                  key={ing.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: (i % 4) * 0.1 }}
-                >
-                  <IngredientCard ingredient={ing} />
-                </motion.div>
+            <div
+              key={categoryVersionRef.current}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1 animate-fade-in"
+            >
+              {filteredIngredients.map((ing) => (
+                <IngredientCard key={ing.id} ingredient={ing} />
               ))}
             </div>
           ) : (

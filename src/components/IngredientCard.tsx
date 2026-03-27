@@ -1,12 +1,11 @@
 "use client";
 
-import { memo, useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { memo, useState, useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import type { Ingredient } from "@/types/database";
 import { useBasketStore } from "@/store/basketStore";
 import { cn } from "@/lib/utils";
 import { Check, Clock, Sparkles, Zap, Waves, Heart, ShieldCheck } from "lucide-react";
-import { useHasMounted } from "@/hooks/useHasMounted";
 import { UI_TRANSLATIONS } from "@/lib/i18n";
 
 interface IngredientCardProps {
@@ -14,28 +13,38 @@ interface IngredientCardProps {
   isFeatured?: boolean;
 }
 
-/* 카테고리별 컬러 테마 */
+/* ── 카테고리별 컬러 테마 (모듈 상수 — 렌더마다 재생성 방지) ──
+ * icon 을 JSX가 아닌 컴포넌트 레퍼런스로 저장해 불필요한 객체 생성을 없앱니다.
+ */
+const THEME_MAP = {
+  vitamin: { color: "#f59e0b", glow: "rgba(245,158,11,0.35)", Icon: Zap },
+  omega:   { color: "#06b6d4", glow: "rgba(6,182,212,0.35)",  Icon: Waves },
+  collagen:{ color: "#f43f5e", glow: "rgba(244,63,94,0.35)",  Icon: Heart },
+  default: { color: "#10b981", glow: "rgba(16,185,129,0.35)", Icon: ShieldCheck },
+} as const;
+
 function getCategoryTheme(name: string) {
   const n = name.toLowerCase();
-  if (n.includes("vitamin") || n.includes("비타민")) return { color: "#f59e0b", glow: "rgba(245,158,11,0.35)", icon: <Zap size={11} /> };
-  if (n.includes("omega") || n.includes("오메가")) return { color: "#06b6d4", glow: "rgba(6,182,212,0.35)", icon: <Waves size={11} /> };
-  if (n.includes("collagen") || n.includes("콜라겐")) return { color: "#f43f5e", glow: "rgba(244,63,94,0.35)", icon: <Heart size={11} /> };
-  return { color: "#10b981", glow: "rgba(16,185,129,0.35)", icon: <ShieldCheck size={11} /> };
+  if (n.includes("vitamin") || n.includes("비타민")) return THEME_MAP.vitamin;
+  if (n.includes("omega")   || n.includes("오메가"))   return THEME_MAP.omega;
+  if (n.includes("collagen")|| n.includes("콜라겐")) return THEME_MAP.collagen;
+  return THEME_MAP.default;
 }
 
 const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = false }: IngredientCardProps) {
-  const hasMounted = useHasMounted();
+  // ── useHasMounted 제거: Zustand isSelected는 클라이언트 전용이므로 직접 호출해도 안전
   const { isSelected, toggleIngredient, language } = useBasketStore();
-  const selected = hasMounted ? isSelected(ingredient.id) : false;
+  const selected = isSelected(ingredient.id);
   const [showTooltip, setShowTooltip] = useState(false);
 
   const t = UI_TRANSLATIONS[language];
-  const name = language === "ko" ? ingredient.name : ingredient.name_en;
-  const shortDesc = language === "ko" ? ingredient.short_description : (ingredient.short_description_en || ingredient.short_description);
-  const desc = language === "ko" ? ingredient.description : (ingredient.description_en || ingredient.description);
-  const theme = getCategoryTheme(ingredient.name);
+  const name     = language === "ko" ? ingredient.name     : ingredient.name_en;
+  const shortDesc= language === "ko" ? ingredient.short_description : (ingredient.short_description_en || ingredient.short_description);
+  const desc     = language === "ko" ? ingredient.description       : (ingredient.description_en       || ingredient.description);
+  const theme    = getCategoryTheme(ingredient.name);
+  const { Icon } = theme;
 
-  // 말풍선 자동 사라짐 타이머 (4초로 단축)
+  // 말풍선 자동 사라짐 타이머
   useEffect(() => {
     if (showTooltip) {
       const timer = setTimeout(() => setShowTooltip(false), 4000);
@@ -45,7 +54,6 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
 
   const handleToggle = () => {
     toggleIngredient(ingredient);
-    // 선택할 때마다 말풍선을 자연스럽게 보여줌
     setShowTooltip(true);
   };
 
@@ -74,14 +82,11 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
             : "0 4px 24px rgba(0,0,0,0.04)",
         }}
       >
-        {/* ── 쉬머 효과 (Premium Glossy Feel) ── */}
-        <motion.div
-          animate={{ x: ["-100%", "200%"] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
-          className="absolute inset-0 z-10 pointer-events-none opacity-[0.4]"
+        {/* ── Shimmer: CSS 애니메이션으로 교체 (JS motion 제거 → GPU 합성 레이어 처리) ── */}
+        <div
+          className="absolute inset-0 z-10 pointer-events-none opacity-[0.35] animate-shimmer"
           style={{
-            background: "linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%)",
-            backgroundSize: "200% 100%"
+            background: "linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.45) 50%, transparent 60%)",
           }}
         />
 
@@ -124,7 +129,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
             color: "#94a3b8"
           }}
         >
-          {theme.icon}
+          <Icon size={11} />
         </div>
 
         {/* ── 이모지 이미지 영역 ── */}
@@ -160,7 +165,6 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
             >
               {name}
             </h3>
-            {/* 선택 상태 도트 */}
             {selected && (
               <div className="shrink-0 mt-1">
                 <div className="w-2 h-2 rounded-full" style={{ background: theme.color, boxShadow: `0 0 8px ${theme.color}` }} />
@@ -220,7 +224,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
         </div>
       </div>
 
-      {/* ── 개선된 인라인 툴팁 (마이크로 말풍선) ── */}
+      {/* ── 인라인 툴팁 (마이크로 말풍선) ── */}
       <AnimatePresence>
         {showTooltip && (
           <motion.div
