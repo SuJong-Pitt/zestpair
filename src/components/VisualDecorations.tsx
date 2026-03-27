@@ -103,32 +103,32 @@ export default function VisualDecorations() {
         <motion.div
           animate={isInView ? { scale: [1, 1.25, 1], x: ["-2%", "5%", "-2%"], y: ["-2%", "3%", "-2%"] } : {}}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[10%] -left-[5%] w-[60%] h-[65%]"
+          className="absolute -top-[10%] -left-[5%] w-[60%] h-[65%] gpu-accelerated"
           style={{ 
             background: "radial-gradient(circle at 40% 40%, rgba(16,185,129,0.2) 0%, transparent 70%)", 
-            filter: isMobile ? "blur(30px)" : "blur(60px)",
-            willChange: "transform"
+            filter: isMobile ? "blur(20px)" : "blur(40px)",
+            willChange: "transform, opacity"
           }}
         />
         {/* 시안/퍼플 오브 – 우상단 */}
         <motion.div
           animate={isInView ? { scale: [1.1, 0.95, 1.1], x: ["3%", "-5%", "3%"], y: ["3%", "-3%", "3%"] } : {}}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[5%] -right-[10%] w-[65%] h-[70%]"
+          className="absolute -top-[5%] -right-[10%] w-[65%] h-[70%] gpu-accelerated"
           style={{ 
             background: "radial-gradient(circle at 60% 35%, rgba(139,92,246,0.18) 0%, rgba(6,182,212,0.12) 40%, transparent 70%)", 
-            filter: isMobile ? "blur(40px)" : "blur(70px)",
-            willChange: "transform"
+            filter: isMobile ? "blur(25px)" : "blur(50px)",
+            willChange: "transform, opacity"
           }}
         />
         {/* 골든 오브 – 가운데 하단 */}
         <motion.div
           animate={isInView ? { scale: [1, 1.2, 1], opacity: [0.06, 0.12, 0.06] } : {}}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-0 left-0 right-0 h-[35%]"
+          className="absolute bottom-0 left-0 right-0 h-[35%] gpu-accelerated"
           style={{ 
             background: "radial-gradient(circle at 50% 100%, rgba(16,185,129,0.12) 0%, transparent 70%)", 
-            filter: "blur(70px)",
+            filter: isMobile ? "blur(30px)" : "blur(50px)",
             willChange: "opacity, transform"
           }}
         />
@@ -147,14 +147,14 @@ export default function VisualDecorations() {
               scale: [0.5, 1.3, 0.8]
             } : { opacity: 0 }}
             transition={{ duration: 18 + i * 5, repeat: Infinity, ease: "linear", delay: i * 2 }}
-            className="absolute rounded-full"
+            className="absolute rounded-full gpu-accelerated"
             style={{ 
               width: 120 + i * 40, 
               height: 120 + i * 40, 
               left: `${(i * 20) % 100}%`, 
               top: '85%',
               background: `radial-gradient(circle, ${["#10b98110", "#06b6d410", "#8b5cf610"][i % 3]} 0%, transparent 70%)`,
-              filter: "blur(30px)",
+              filter: isMobile ? "blur(15px)" : "blur(30px)",
               willChange: "transform, opacity"
             }}
           />
@@ -170,7 +170,7 @@ export default function VisualDecorations() {
 
       {/* === 노이즈 텍스처 (로컬 인라인 CSS로 변경하여 외부 요청 제거) === */}
       <div 
-        className="absolute inset-0 opacity-[0.025] mix-blend-overlay pointer-events-none" 
+        className="absolute inset-0 opacity-[0.015] pointer-events-none" 
         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
       />
 

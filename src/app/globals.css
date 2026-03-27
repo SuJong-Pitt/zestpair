@@ -444,4 +444,12 @@
     background-size: 200% 100%;
     animation: shimmer 3s infinite linear;
   }
+
+  /* GPU Acceleration utility for mobile flickering */
+  .gpu-accelerated {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform, opacity, filter;
+  }
 }

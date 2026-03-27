@@ -430,8 +430,8 @@ export default function HomePage() {
               {/* 뒤 글로우 */}
               <span
                 aria-hidden
-                className="absolute -inset-2 rounded-[2.5rem] opacity-40 blur-2xl pointer-events-none"
-                style={{ background: "linear-gradient(135deg, #10b981 0%, #0891b2 50%, #7c3aed 100%)" }}
+                className="absolute -inset-2 rounded-[2.5rem] opacity-40 blur-xl md:blur-2xl pointer-events-none"
+                style={{ background: "linear-gradient(135deg, #10b981 0%, #0891b2 50%, #7c3aed 100%)", willChange: "filter" }}
               />
               {/* 홀로그램 박스 */}
               <motion.span
@@ -485,9 +485,10 @@ export default function HomePage() {
                             {char}
                           </span>
                           <motion.span
-                            animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.4, 1] }}
+                            animate={isMobile ? { opacity: [0.4, 0.6, 0.4] } : { opacity: [0.3, 0.7, 0.3], scale: [1, 1.4, 1] }}
                             transition={{ duration: 1.5, repeat: Infinity }}
-                            className="absolute -inset-4 bg-emerald-500/40 blur-2xl rounded-full -z-10"
+                            className="absolute -inset-4 bg-emerald-500/40 blur-xl md:blur-2xl rounded-full -z-10"
+                            style={{ willChange: "opacity, transform" }}
                           />
                         </motion.span>
                       ))}
@@ -634,8 +635,8 @@ export default function HomePage() {
             <motion.div
               animate={{ opacity: [0.2, 0.5, 0.2] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -inset-4 rounded-[4rem] blur-2xl pointer-events-none"
-              style={{ background: "radial-gradient(circle at 50% 50%, rgba(16,185,129,0.15) 0%, transparent 70%)" }}
+              className="absolute -inset-4 rounded-[4rem] blur-xl md:blur-2xl pointer-events-none"
+              style={{ background: "radial-gradient(circle at 50% 50%, rgba(16,185,129,0.15) 0%, transparent 70%)", willChange: "opacity" }}
             />
 
             {/* 마우스 트래킹 샤인 효과 */}
@@ -648,10 +649,11 @@ export default function HomePage() {
 
             {/* 포커스 시 배경 글로우 (강화됨) */}
             <div
-              className="absolute -inset-5 rounded-[4rem] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-3xl pointer-events-none"
+              className="absolute -inset-5 rounded-[4rem] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-2xl md:blur-3xl pointer-events-none"
               style={{
                 background: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(6,182,212,0.35), rgba(124,58,237,0.25))",
-                transform: "translateZ(0)"
+                transform: "translateZ(0)",
+                willChange: "opacity"
               }}
             />
             <div
