@@ -80,7 +80,7 @@ export default function HomePage() {
   const ingredientsRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const heroSearchContainerRef = useRef<HTMLDivElement>(null);
-  const isHeroSearchVisible = useInView(heroSearchContainerRef, { amount: 0.1 });
+  const isHeroSearchVisible = useInView(heroSearchContainerRef, { amount: 0.01 });
   const isIngredientsVisible = useInView(ingredientsRef, { amount: 0.01 }); // 더 민감하게 (1%만 보여도 감지)
 
 
@@ -570,50 +570,7 @@ export default function HomePage() {
           </motion.p>
 
 
-          {/* === 선택된 성분 목록 (검색바 위) - Pill Style === */}
-          <AnimatePresence>
-            {selectedIngredients.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                className="flex flex-wrap justify-center gap-2 mb-5 md:mb-10 px-4"
-              >
-                {selectedIngredients.map((ingredient, i) => {
-                  const isFirst = i === 0;
-                  return (
-                    <motion.div
-                      layout
-                      key={ingredient.id}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                      className="group relative flex items-center gap-1.5 px-2 py-0.5 md:px-3 md:py-1 rounded-xl transition-all duration-300"
-                      style={{
-                        background: "rgba(15, 23, 42, 0.85)",
-                        border: "1.5px solid rgba(16, 185, 129, 0.5)",
-                        boxShadow: "0 8px 20px rgba(16, 185, 129, 0.2)",
-                        backdropFilter: "blur(16px)"
-                      }}
-                    >
-                      <span className="text-sm group-hover:scale-110 transition-transform">
-                        {ingredient.icon_emoji}
-                      </span>
-                      <span className="text-[10px] md:text-[12px] font-[900] text-white tracking-tight">
-                        {language === 'ko' ? ingredient.name : ingredient.name_en}
-                      </span>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
-                        className="ml-1 p-0.5 text-white/30 hover:text-white/80 transition-colors"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
+
 
           {/* === 검색 바 === */}
           <motion.div
@@ -740,28 +697,26 @@ export default function HomePage() {
             <AnimatePresence>
               {isDropdownOpen && dropdownResults.length > 0 && (
                 <>
-                  {/* 배경 오버레이 (드롭다운 뒤쪽을 어둡게 처리) */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                  {/* 배경 오버레이 (클릭 시 닫기 용도, 시각적으로는 보이지 않게 처리) */}
+                  <div
                     onClick={() => setIsDropdownOpen(false)}
-                    className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[999]"
+                    className="fixed inset-0 z-[998]"
                   />
                   <motion.div
-                    initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    className="absolute bottom-full left-0 right-0 mb-3 z-[1000] overflow-hidden rounded-[2.5rem] p-1.5"
+                    initial={{ opacity: 0, height: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, height: "auto", scale: 1 }}
+                    exit={{ opacity: 0, height: 0, scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    className="relative w-full z-[1000] overflow-hidden rounded-[2.5rem] p-1.5 mt-2 mb-4"
                     style={{
-                      background: "linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)",
-                      backdropFilter: "blur(40px)",
-                      border: "1px solid rgba(255,255,255,0.3)",
-                      boxShadow: "0 -25px 50px -12px rgba(0,0,0,0.8), 0 0 30px rgba(16,185,129,0.3)"
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
+                      backdropFilter: "blur(20px)",
+                      border: "1.5px solid rgba(255,255,255,0.15)",
+                      boxShadow: "0 15px 35px -8px rgba(0,0,0,0.5), 0 0 20px rgba(16,185,129,0.15)"
                     }}
                   >
                     <div className="bg-[#0f172a]/95 rounded-[2.2rem] overflow-hidden shadow-2xl">
-                      <div className="max-h-[175px] md:max-h-[400px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-wrap gap-1.5 justify-center">
+                      <div className="max-h-[80px] md:max-h-[120px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-wrap gap-1.5 justify-center">
                         {dropdownResults.map((ing, i) => {
                           const active = selectedIngredients.some(item => item.id === ing.id);
                           return (
@@ -818,7 +773,6 @@ export default function HomePage() {
                       setInputValue(tag);
                       startTransition(() => setSearchQuery(tag));
                       setIsDropdownOpen(true);
-                      window.scrollTo({ top: 300, behavior: "smooth" }); // 검색 결과가 잘 보이도록 약간 스크롤
                     }}
                     className="group/tag relative text-[10px] md:text-xs font-black transition-all hover:scale-110 active:scale-95 px-2 py-0.5 rounded-lg overflow-hidden"
                     style={{ color: "#6ee7b7" }}
@@ -829,6 +783,48 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
+
+            {/* === 선택된 성분 목록 (위치 이동: 인기 태그 하단) === */}
+            <AnimatePresence>
+              {selectedIngredients.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                  className="flex flex-wrap justify-center gap-1.5 md:gap-2 mt-6 mb-2 px-4"
+                >
+                  {selectedIngredients.map((ingredient) => (
+                    <motion.div
+                      layout
+                      key={ingredient.id}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                      className="group relative flex items-center gap-1 px-1.5 py-0.5 md:px-3 md:py-1 rounded-xl transition-all duration-300"
+                      style={{
+                        background: "rgba(15, 23, 42, 0.85)",
+                        border: "1.5px solid rgba(16, 185, 129, 0.5)",
+                        boxShadow: "0 8px 20px rgba(16, 185, 129, 0.2)",
+                        backdropFilter: "blur(16px)"
+                      }}
+                    >
+                      <span className="text-xs md:text-sm group-hover:scale-110 transition-transform">
+                        {ingredient.icon_emoji}
+                      </span>
+                      <span className="text-[9px] md:text-[12px] font-[900] text-white tracking-tight">
+                        {language === 'ko' ? ingredient.name : ingredient.name_en}
+                      </span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
+                        className="ml-0.5 p-0.5 text-white/30 hover:text-white/80 transition-colors"
+                      >
+                        <X className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={3} />
+                      </button>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* === 소셜 프루프 배지 행 (검색바 하단으로 이동) === */}
             <motion.div
@@ -882,338 +878,338 @@ export default function HomePage() {
       <main className="mx-auto max-w-2xl px-4 py-8">
         <div ref={ingredientsRef}> {/* 영양제 선택 영역만 ref로 감싸기 */}
 
-        <div className="relative mb-10">
-          {/* 섹션 라벨 */}
-          <div className="flex items-center gap-2 mb-5 px-1">
-            <div className="flex items-center gap-1.5">
-              <div className="w-0.5 h-4 rounded-full" style={{ background: "linear-gradient(180deg, #10b981, #06b6d4)" }} />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "#94a3b8" }}>
-                {t.common.categoryTitle}
-              </span>
-            </div>
-          </div>
-
-          <HorizontalScroll className="gap-2 pt-1 pb-4">
-            {Object.entries(CATEGORIES_TRANSLATIONS).map(([key, data]) => {
-              const isActive = selectedCategory === key;
-              return (
-                <motion.button
-                  key={key}
-                  layout
-                  whileHover={{ y: -3, scale: 1.02 }}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => setSelectedCategory(key)}
-                  className="group relative flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-2xl text-[12px] font-black transition-all duration-300"
-                  style={isActive ? {
-                    background: "linear-gradient(135deg, #0a1a15 0%, #071210 100%)",
-                    border: "1.5px solid rgba(16,185,129,0.5)",
-                    color: "#34d399",
-                    boxShadow: "0 10px 25px rgba(0,0,0,0.3), 0 0 15px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.08)"
-                  } : {
-                    background: "rgba(255,255,255,0.45)",
-                    border: "1px solid rgba(0,0,0,0.04)",
-                    color: "#64748b",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
-                    backdropFilter: "blur(16px)"
-                  }}
-                >
-                  {/* 활성 배경 글로우 (Liquid Light 효과) */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeCategoryGlow"
-                      className="absolute inset-x-0 -bottom-1 h-3 blur-md opacity-60 z-0 pointer-events-none"
-                      style={{ background: "#10b981" }}
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
-                    />
-                  )}
-                  {/* 내부 광원 효과 (Active 전용) */}
-                  {isActive && (
-                    <motion.div
-                      animate={{ opacity: [0.1, 0.25, 0.1] }}
-                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute inset-0 bg-emerald-400/10 rounded-2xl pointer-events-none"
-                    />
-                  )}
-                  <span className="relative z-10 text-base leading-none group-hover:scale-110 transition-transform">{data.emoji}</span>
-                  <motion.span
-                    className="relative z-10 tracking-tight"
-                    animate={isActive ? { scale: 1.05 } : { scale: 1 }}
-                  >
-                    {data[language]}
-                  </motion.span>
-                  {/* 활성 하단 포인트 닷 */}
-                  {isActive && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0, y: 5 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-0.5 rounded-full"
-                      style={{
-                        background: "#10b981",
-                        boxShadow: "0 0 8px #10b981, 0 0 16px #10b981"
-                      }}
-                    />
-                  )}
-                </motion.button>
-              );
-            })}
-          </HorizontalScroll>
-        </div>
-
-        {searchQuery === "" && selectedCategory === "all" && (
-          <div
-            className="mb-16 -mx-4 px-5 py-8 rounded-[2rem]"
-            style={{
-              background: "linear-gradient(160deg, rgba(240,253,250,0.8) 0%, rgba(255,255,255,0.95) 40%, rgba(240,249,255,0.6) 100%)",
-              border: "1px solid rgba(16,185,129,0.1)",
-              boxShadow: "0 4px 30px rgba(16,185,129,0.06), inset 0 1px 0 rgba(255,255,255,0.8)"
-            }}
-          >
-            {/* 섹션 헤더 */}
-            <div className="flex items-center justify-between mb-7">
-              <div className="flex items-start gap-3">
-                {/* 아이콘 오브 */}
-                <motion.div
-                  animate={{ scale: [1, 1.12, 1], rotate: [0, 5, 0] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(251,191,36,0.08) 100%)",
-                    border: "1px solid rgba(245,158,11,0.2)",
-                    boxShadow: "0 0 20px rgba(245,158,11,0.15)"
-                  }}
-                >
-                  <Sparkles size={18} style={{ color: "#f59e0b" }} />
-                </motion.div>
-
-                <div>
-                  <h2 className="text-xl font-[900] tracking-tight" style={{ color: "#0f172a" }}>
-                    {t.common.popular}
-                  </h2>
-                  <p className="text-[10px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.18em" }}>
-                    Curated trending picks
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {/* 라이브 뱃지 */}
-                <div
-                  className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full"
-                  style={{
-                    background: "rgba(16,185,129,0.06)",
-                    border: "1px solid rgba(16,185,129,0.15)"
-                  }}
-                >
-                  <motion.div
-                    animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ background: "#10b981", boxShadow: "0 0 6px #10b981" }}
-                  />
-                  <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: "#10b981" }}>
-                    {t.common.popularPicks}
-                  </span>
-                </div>
-
-                {/* 전체보기 버튼 */}
-                {popularIngredients.length > 8 && (
-                  <motion.button
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => setShowAllPopular(!showAllPopular)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all"
-                    style={showAllPopular ? {
-                      background: "linear-gradient(135deg, #10b981, #06b6d4)",
-                      color: "white",
-                      boxShadow: "0 6px 20px rgba(16,185,129,0.35)"
-                    } : {
-                      background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-                      color: "white",
-                      boxShadow: "0 6px 20px rgba(0,0,0,0.25)"
-                    }}
-                  >
-                    <span>{showAllPopular ? t.common.hide : t.common.showAll}</span>
-                    <motion.div animate={{ rotate: showAllPopular ? 180 : 0 }} transition={{ duration: 0.3 }}>
-                      <ChevronDown size={13} strokeWidth={3} />
-                    </motion.div>
-                  </motion.button>
-                )}
-              </div>
-            </div>
-
-            <AnimatePresence mode="wait">
-              {isLoadingList ? (
-                <div key="skeleton" className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-4 px-1">
-                  {[...Array(4)].map((_, i) => (
-                    <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
-                  ))}
-                </div>
-              ) : showAllPopular ? (
-                <motion.div
-                  key="grid"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-4 px-1"
-                >
-                  {popularIngredients.map((ing) => (
-                    <IngredientCard key={ing.id} ingredient={ing} isFeatured={true} />
-                  ))}
-                </motion.div>
-              ) : (
-                <motion.div key="scroll" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <HorizontalScroll className="gap-4 pt-2 pb-4 px-1">
-                    {popularIngredients.slice(0, 8).map((ing) => (
-                      <div key={ing.id} className="w-[160px] md:w-[210px] flex-shrink-0">
-                        <IngredientCard ingredient={ing} isFeatured={true} />
-                      </div>
-                    ))}
-                  </HorizontalScroll>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
-
-        <div className="mb-8 relative pt-4">
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-emerald-500/50 to-transparent" />
-
-          {/* ── 전체 목록 헤더 ── */}
-          <div className="flex items-center justify-between mb-6 px-1">
-            <div className="flex items-center gap-3">
-              <div
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-                style={{
-                  background: "linear-gradient(135deg, rgba(15,23,42,0.06) 0%, rgba(15,23,42,0.03) 100%)",
-                  border: "1px solid rgba(0,0,0,0.06)"
-                }}
-              >
-                <Database size={12} style={{ color: "#10b981" }} />
-                <h2 className="font-[900] text-sm tracking-tight" style={{ color: "#0f172a" }}>
-                  {t.common.all}
-                </h2>
-                <span
-                  className="text-xs font-black px-1.5 py-0.5 rounded-lg"
-                  style={{
-                    background: "rgba(16,185,129,0.1)",
-                    color: "#10b981"
-                  }}
-                >
-                  {filteredIngredients.length}
+          <div className="relative mb-10">
+            {/* 섹션 라벨 */}
+            <div className="flex items-center gap-2 mb-5 px-1">
+              <div className="flex items-center gap-1.5">
+                <div className="w-0.5 h-4 rounded-full" style={{ background: "linear-gradient(180deg, #10b981, #06b6d4)" }} />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "#94a3b8" }}>
+                  {t.common.categoryTitle}
                 </span>
               </div>
             </div>
 
-            <div
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-              style={{
-                background: "rgba(16,185,129,0.05)",
-                border: "1px solid rgba(16,185,129,0.12)"
-              }}
-            >
-              <Info size={10} style={{ color: "#10b981" }} />
-              <span
-                className="text-[9px] font-black uppercase tracking-tight"
-                style={{ color: "#64748b" }}
-              >
-                {language === 'ko' ? '2개 이상 선택 시 분석 활성화' : 'Select 2+ to Analyze'}
-              </span>
-            </div>
+            <HorizontalScroll className="gap-2 pt-1 pb-4">
+              {Object.entries(CATEGORIES_TRANSLATIONS).map(([key, data]) => {
+                const isActive = selectedCategory === key;
+                return (
+                  <motion.button
+                    key={key}
+                    layout
+                    whileHover={{ y: -3, scale: 1.02 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => setSelectedCategory(key)}
+                    className="group relative flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-2xl text-[12px] font-black transition-all duration-300"
+                    style={isActive ? {
+                      background: "linear-gradient(135deg, #0a1a15 0%, #071210 100%)",
+                      border: "1.5px solid rgba(16,185,129,0.5)",
+                      color: "#34d399",
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.3), 0 0 15px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.08)"
+                    } : {
+                      background: "rgba(255,255,255,0.45)",
+                      border: "1px solid rgba(0,0,0,0.04)",
+                      color: "#64748b",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+                      backdropFilter: "blur(16px)"
+                    }}
+                  >
+                    {/* 활성 배경 글로우 (Liquid Light 효과) */}
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeCategoryGlow"
+                        className="absolute inset-x-0 -bottom-1 h-3 blur-md opacity-60 z-0 pointer-events-none"
+                        style={{ background: "#10b981" }}
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                      />
+                    )}
+                    {/* 내부 광원 효과 (Active 전용) */}
+                    {isActive && (
+                      <motion.div
+                        animate={{ opacity: [0.1, 0.25, 0.1] }}
+                        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute inset-0 bg-emerald-400/10 rounded-2xl pointer-events-none"
+                      />
+                    )}
+                    <span className="relative z-10 text-base leading-none group-hover:scale-110 transition-transform">{data.emoji}</span>
+                    <motion.span
+                      className="relative z-10 tracking-tight"
+                      animate={isActive ? { scale: 1.05 } : { scale: 1 }}
+                    >
+                      {data[language]}
+                    </motion.span>
+                    {/* 활성 하단 포인트 닷 */}
+                    {isActive && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0, y: 5 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-0.5 rounded-full"
+                        style={{
+                          background: "#10b981",
+                          boxShadow: "0 0 8px #10b981, 0 0 16px #10b981"
+                        }}
+                      />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </HorizontalScroll>
           </div>
 
-          {isLoadingList ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1">
-              {[...Array(8)].map((_, i) => (
-                <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
-              ))}
-            </div>
-          ) : filteredIngredients.length > 0 ? (
+          {searchQuery === "" && selectedCategory === "all" && (
             <div
-              key={categoryVersionRef.current}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1 animate-fade-in"
+              className="mb-16 -mx-4 px-5 py-8 rounded-[2rem]"
+              style={{
+                background: "linear-gradient(160deg, rgba(240,253,250,0.8) 0%, rgba(255,255,255,0.95) 40%, rgba(240,249,255,0.6) 100%)",
+                border: "1px solid rgba(16,185,129,0.1)",
+                boxShadow: "0 4px 30px rgba(16,185,129,0.06), inset 0 1px 0 rgba(255,255,255,0.8)"
+              }}
             >
-              {filteredIngredients.map((ing) => (
-                <IngredientCard key={ing.id} ingredient={ing} />
-              ))}
-            </div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="flex flex-col items-center justify-center py-20 px-8 text-center"
-            >
-              <div className="relative mb-10 group">
-                {/* 프리미엄 리어 글로우 (오로라 효과) - 일관성 유지 */}
-                <div className="absolute inset-0 bg-emerald-300 blur-[100px] opacity-30 rounded-full group-hover:scale-110 transition-transform duration-1000" />
-                <div className="absolute inset-0 bg-cyan-200 blur-[70px] opacity-20 rounded-full -translate-x-6 translate-y-6" />
+              {/* 섹션 헤더 */}
+              <div className="flex items-center justify-between mb-7">
+                <div className="flex items-start gap-3">
+                  {/* 아이콘 오브 */}
+                  <motion.div
+                    animate={{ scale: [1, 1.12, 1], rotate: [0, 5, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    className="relative shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(251,191,36,0.08) 100%)",
+                      border: "1px solid rgba(245,158,11,0.2)",
+                      boxShadow: "0 0 20px rgba(245,158,11,0.15)"
+                    }}
+                  >
+                    <Sparkles size={18} style={{ color: "#f59e0b" }} />
+                  </motion.div>
 
-                {/* 깜찍한 3D 포리 애니메이션 */}
-                <motion.div
-                  className="relative z-10 w-44 h-44 md:w-60 md:h-60 object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)]"
-                  animate={{
-                    y: [0, -15, 0],
-                    rotate: [0, 2, -1, 0]
-                  }}
-                  transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                >
-                  <Image
-                    src="/images/pori.png"
-                    alt="Pori Mascot"
-                    width={240}
-                    height={240}
-                    className="w-full h-full object-contain"
-                  />
-                </motion.div>
-
-                {/* 바닥 그림자 애니메이션 */}
-                <motion.div
-                  animate={{
-                    scaleX: [0.8, 1, 0.8],
-                    opacity: [0.1, 0.18, 0.1]
-                  }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-2.5 bg-black/30 blur-lg rounded-full"
-                />
-              </div>
-
-              <div className="space-y-4 max-w-sm">
-                <h3 className="text-2xl md:text-3xl font-[1000] text-slate-800 tracking-tighter leading-tight drop-shadow-sm">
-                  {t.common.poriNoResult}
-                </h3>
-                <p className="text-slate-400 font-bold text-sm md:text-base leading-relaxed opacity-90">
-                  {t.common.poriNoResultSub}
-                </p>
-              </div>
-
-              <div className="mt-12">
-                <button
-                  onClick={() => {
-                    setInputValue("");
-                    startTransition(() => setSearchQuery(""));
-                    setSelectedCategory("all");
-                  }}
-                  className="group/btn relative px-10 h-14 rounded-full font-black text-lg transition-all active:scale-95 shadow-xl hover:shadow-2xl overflow-hidden"
-                  style={{
-                    background: "linear-gradient(135deg, #10b981 0%, #0891b2 100%)",
-                    color: "white"
-                  }}
-                >
-                  {/* 내부 쉬머(Shimmer) 애니메이션 */}
-                  <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] animate-shimmer pointer-events-none" />
-
-                  <div className="relative flex items-center gap-3">
-                    <RefreshCcw className="h-5 w-5 group-hover/btn:rotate-180 transition-transform duration-700" />
-                    <span>{t.common.viewAllIngredients}</span>
+                  <div>
+                    <h2 className="text-xl font-[900] tracking-tight" style={{ color: "#0f172a" }}>
+                      {t.common.popular}
+                    </h2>
+                    <p className="text-[10px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.18em" }}>
+                      Curated trending picks
+                    </p>
                   </div>
-                </button>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {/* 라이브 뱃지 */}
+                  <div
+                    className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full"
+                    style={{
+                      background: "rgba(16,185,129,0.06)",
+                      border: "1px solid rgba(16,185,129,0.15)"
+                    }}
+                  >
+                    <motion.div
+                      animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="w-1.5 h-1.5 rounded-full"
+                      style={{ background: "#10b981", boxShadow: "0 0 6px #10b981" }}
+                    />
+                    <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: "#10b981" }}>
+                      {t.common.popularPicks}
+                    </span>
+                  </div>
+
+                  {/* 전체보기 버튼 */}
+                  {popularIngredients.length > 8 && (
+                    <motion.button
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => setShowAllPopular(!showAllPopular)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all"
+                      style={showAllPopular ? {
+                        background: "linear-gradient(135deg, #10b981, #06b6d4)",
+                        color: "white",
+                        boxShadow: "0 6px 20px rgba(16,185,129,0.35)"
+                      } : {
+                        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+                        color: "white",
+                        boxShadow: "0 6px 20px rgba(0,0,0,0.25)"
+                      }}
+                    >
+                      <span>{showAllPopular ? t.common.hide : t.common.showAll}</span>
+                      <motion.div animate={{ rotate: showAllPopular ? 180 : 0 }} transition={{ duration: 0.3 }}>
+                        <ChevronDown size={13} strokeWidth={3} />
+                      </motion.div>
+                    </motion.button>
+                  )}
+                </div>
               </div>
-            </motion.div>
+
+              <AnimatePresence mode="wait">
+                {isLoadingList ? (
+                  <div key="skeleton" className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-4 px-1">
+                    {[...Array(4)].map((_, i) => (
+                      <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
+                    ))}
+                  </div>
+                ) : showAllPopular ? (
+                  <motion.div
+                    key="grid"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-4 px-1"
+                  >
+                    {popularIngredients.map((ing) => (
+                      <IngredientCard key={ing.id} ingredient={ing} isFeatured={true} />
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div key="scroll" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                    <HorizontalScroll className="gap-4 pt-2 pb-4 px-1">
+                      {popularIngredients.slice(0, 8).map((ing) => (
+                        <div key={ing.id} className="w-[160px] md:w-[210px] flex-shrink-0">
+                          <IngredientCard ingredient={ing} isFeatured={true} />
+                        </div>
+                      ))}
+                    </HorizontalScroll>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           )}
-        </div>
+
+          <div className="mb-8 relative pt-4">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-emerald-500/50 to-transparent" />
+
+            {/* ── 전체 목록 헤더 ── */}
+            <div className="flex items-center justify-between mb-6 px-1">
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(15,23,42,0.06) 0%, rgba(15,23,42,0.03) 100%)",
+                    border: "1px solid rgba(0,0,0,0.06)"
+                  }}
+                >
+                  <Database size={12} style={{ color: "#10b981" }} />
+                  <h2 className="font-[900] text-sm tracking-tight" style={{ color: "#0f172a" }}>
+                    {t.common.all}
+                  </h2>
+                  <span
+                    className="text-xs font-black px-1.5 py-0.5 rounded-lg"
+                    style={{
+                      background: "rgba(16,185,129,0.1)",
+                      color: "#10b981"
+                    }}
+                  >
+                    {filteredIngredients.length}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                style={{
+                  background: "rgba(16,185,129,0.05)",
+                  border: "1px solid rgba(16,185,129,0.12)"
+                }}
+              >
+                <Info size={10} style={{ color: "#10b981" }} />
+                <span
+                  className="text-[9px] font-black uppercase tracking-tight"
+                  style={{ color: "#64748b" }}
+                >
+                  {language === 'ko' ? '2개 이상 선택 시 분석 활성화' : 'Select 2+ to Analyze'}
+                </span>
+              </div>
+            </div>
+
+            {isLoadingList ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1">
+                {[...Array(8)].map((_, i) => (
+                  <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
+                ))}
+              </div>
+            ) : filteredIngredients.length > 0 ? (
+              <div
+                key={categoryVersionRef.current}
+                className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1 animate-fade-in"
+              >
+                {filteredIngredients.map((ing) => (
+                  <IngredientCard key={ing.id} ingredient={ing} />
+                ))}
+              </div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="flex flex-col items-center justify-center py-20 px-8 text-center"
+              >
+                <div className="relative mb-10 group">
+                  {/* 프리미엄 리어 글로우 (오로라 효과) - 일관성 유지 */}
+                  <div className="absolute inset-0 bg-emerald-300 blur-[100px] opacity-30 rounded-full group-hover:scale-110 transition-transform duration-1000" />
+                  <div className="absolute inset-0 bg-cyan-200 blur-[70px] opacity-20 rounded-full -translate-x-6 translate-y-6" />
+
+                  {/* 깜찍한 3D 포리 애니메이션 */}
+                  <motion.div
+                    className="relative z-10 w-44 h-44 md:w-60 md:h-60 object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)]"
+                    animate={{
+                      y: [0, -15, 0],
+                      rotate: [0, 2, -1, 0]
+                    }}
+                    transition={{
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <Image
+                      src="/images/pori.png"
+                      alt="Pori Mascot"
+                      width={240}
+                      height={240}
+                      className="w-full h-full object-contain"
+                    />
+                  </motion.div>
+
+                  {/* 바닥 그림자 애니메이션 */}
+                  <motion.div
+                    animate={{
+                      scaleX: [0.8, 1, 0.8],
+                      opacity: [0.1, 0.18, 0.1]
+                    }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-2.5 bg-black/30 blur-lg rounded-full"
+                  />
+                </div>
+
+                <div className="space-y-4 max-w-sm">
+                  <h3 className="text-2xl md:text-3xl font-[1000] text-slate-800 tracking-tighter leading-tight drop-shadow-sm">
+                    {t.common.poriNoResult}
+                  </h3>
+                  <p className="text-slate-400 font-bold text-sm md:text-base leading-relaxed opacity-90">
+                    {t.common.poriNoResultSub}
+                  </p>
+                </div>
+
+                <div className="mt-12">
+                  <button
+                    onClick={() => {
+                      setInputValue("");
+                      startTransition(() => setSearchQuery(""));
+                      setSelectedCategory("all");
+                    }}
+                    className="group/btn relative px-10 h-14 rounded-full font-black text-lg transition-all active:scale-95 shadow-xl hover:shadow-2xl overflow-hidden"
+                    style={{
+                      background: "linear-gradient(135deg, #10b981 0%, #0891b2 100%)",
+                      color: "white"
+                    }}
+                  >
+                    {/* 내부 쉬머(Shimmer) 애니메이션 */}
+                    <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] animate-shimmer pointer-events-none" />
+
+                    <div className="relative flex items-center gap-3">
+                      <RefreshCcw className="h-5 w-5 group-hover/btn:rotate-180 transition-transform duration-700" />
+                      <span>{t.common.viewAllIngredients}</span>
+                    </div>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </div>
         </div> {/* ingredientsRef 닫기 */}
 
         <div ref={resultRef} id="analysis-results-section" className="mt-8 min-h-[50vh]">
@@ -1230,6 +1226,7 @@ export default function HomePage() {
         allIngredients={dbIngredients}
         isHeroSearchVisible={isHeroSearchVisible}
         isIngredientsVisible={isIngredientsVisible}
+        isHeroDropdownOpen={isDropdownOpen}
       />
 
 
@@ -1243,7 +1240,7 @@ export default function HomePage() {
             className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6"
           >
             {/* 어두운 배경 (클릭 시 닫힘) */}
-            <div 
+            <div
               className="absolute inset-0 bg-slate-950/80 backdrop-blur-md cursor-pointer"
               onClick={() => setIsGuideOpen(false)}
             />
@@ -1262,7 +1259,7 @@ export default function HomePage() {
               >
                 <X size={20} />
               </button>
-              
+
               {/* 이미지 영역 (스크롤 가능) */}
               <div className="overflow-y-auto scrollbar-hide flex-1">
                 <img

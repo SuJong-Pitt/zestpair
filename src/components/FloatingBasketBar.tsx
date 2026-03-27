@@ -15,6 +15,7 @@ interface FloatingBasketBarProps {
   allIngredients?: Ingredient[];
   isHeroSearchVisible?: boolean;
   isIngredientsVisible?: boolean;
+  isHeroDropdownOpen?: boolean;
 }
 
 export default function FloatingBasketBar({
@@ -22,6 +23,7 @@ export default function FloatingBasketBar({
   allIngredients = [],
   isHeroSearchVisible = false,
   isIngredientsVisible = false,
+  isHeroDropdownOpen = false,
 }: FloatingBasketBarProps) {
   const {
     selectedIngredients, addIngredient, removeIngredient, clearBasket,
@@ -44,12 +46,13 @@ export default function FloatingBasketBar({
       (count > 0 || isSearchActive) &&
       !isAnalyzing &&
       !isHeroSearchVisible &&
+      !isHeroDropdownOpen &&
       (!hasResult || isIngredientsVisible);
     setIsVisible(shouldShow);
-    if ((count === 0 || isHeroSearchVisible || (hasResult && !isIngredientsVisible)) && !isSearchActive) {
+    if ((count === 0 || isHeroSearchVisible || isHeroDropdownOpen || (hasResult && !isIngredientsVisible)) && !isSearchActive) {
       setIsExpanded(false);
     }
-  }, [count, isSearchActive, hasResult, isAnalyzing, isHeroSearchVisible, isIngredientsVisible]);
+  }, [count, isSearchActive, hasResult, isAnalyzing, isHeroSearchVisible, isIngredientsVisible, isHeroDropdownOpen]);
 
   const filteredSearch = allIngredients.filter((ing) => {
     if (!searchQuery) return false;
