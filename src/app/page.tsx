@@ -703,20 +703,20 @@ export default function HomePage() {
                     className="fixed inset-0 z-[998]"
                   />
                   <motion.div
-                    initial={{ opacity: 0, height: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, height: "auto", scale: 1 }}
-                    exit={{ opacity: 0, height: 0, scale: 0.98 }}
+                    initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                    className="relative w-full z-[1000] overflow-hidden rounded-[2.5rem] p-1.5 mt-2 mb-4"
+                    className="absolute bottom-full left-0 right-0 z-[1000] overflow-hidden rounded-[2.5rem] p-1.5 mb-3 shadow-2xl"
                     style={{
-                      background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
-                      backdropFilter: "blur(20px)",
-                      border: "1.5px solid rgba(255,255,255,0.15)",
-                      boxShadow: "0 15px 35px -8px rgba(0,0,0,0.5), 0 0 20px rgba(16,185,129,0.15)"
+                      background: "linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(10,15,30,0.98) 100%)",
+                      backdropFilter: "blur(40px)",
+                      border: "1.5px solid rgba(16,185,129,0.3)",
+                      boxShadow: "0 -25px 50px -12px rgba(0,0,0,0.8), 0 0 30px rgba(16,185,129,0.25)"
                     }}
                   >
                     <div className="bg-[#0f172a]/95 rounded-[2.2rem] overflow-hidden shadow-2xl">
-                      <div className="max-h-[80px] md:max-h-[120px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-wrap gap-1.5 justify-center">
+                      <div className="max-h-[140px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-wrap gap-1.5 justify-center">
                         {dropdownResults.map((ing, i) => {
                           const active = selectedIngredients.some(item => item.id === ing.id);
                           return (
