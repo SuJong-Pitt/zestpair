@@ -162,7 +162,7 @@ export default function HomePage() {
       );
     });
   }, [dbIngredients, searchQuery, language]);
- 
+
   const isBlur = isDropdownOpen && dropdownResults.length > 0;
 
   const popularIngredients = useMemo(() => {
@@ -799,9 +799,9 @@ export default function HomePage() {
               {selectedIngredients.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ 
-                    opacity: isBlur ? 0.3 : 1, 
-                    y: 0, 
+                  animate={{
+                    opacity: isBlur ? 0.3 : 1,
+                    y: 0,
                     scale: 1,
                     filter: isBlur ? "blur(5px)" : "blur(0px)"
                   }}
@@ -844,10 +844,10 @@ export default function HomePage() {
             {/* === 소셜 프루프 배지 행 (검색바 하단으로 이동) === */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
-              animate={{ 
-                opacity: isBlur ? 0.2 : 1, 
+              animate={{
+                opacity: isBlur ? 0.2 : 1,
                 y: 0,
-                filter: isBlur ? "blur(8px)" : "blur(0px)" 
+                filter: isBlur ? "blur(8px)" : "blur(0px)"
               }}
               transition={{ duration: 0.6, delay: isBlur ? 0 : 1.5 }}
               className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2.5 mt-8 md:mt-12 mb-4 max-w-4xl mx-auto gpu-accelerated"
