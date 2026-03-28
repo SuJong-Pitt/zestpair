@@ -43,21 +43,21 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "ZestPair",
-    title: "ZestPair | AI Supplement Synergy & Interaction Checker",
-    description: "Analyze your supplements for synergy and safety with ZestPair AI. 영양제 궁합과 비타민 상호작용을 전문적으로 분석하세요.",
+    title: "ZestPair | AI 영양제 궁합 분석 & 추천 가이드",
+    description: "AI로 분석하는 내 영양제 궁합과 비타민 상호작용. 제스트페어에서 최적의 조합을 영양제 시너지 가이드와 함께 확인하세요.",
     images: [
       {
         url: "/hero-illustration-v3.webp",
         width: 1200,
         height: 630,
-        alt: "ZestPair AI Supplement Synergy & Synergy Guide",
+        alt: "제스트페어 AI 영양제 궁합 & 비타민 조합 가이드",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ZestPair | AI Supplement Synergy & Interaction Checker",
-    description: "Analyze your vitamins for safety and effectiveness with ZestPair AI.",
+    title: "ZestPair | AI 영양제 궁합 분석 & 추천 가이드",
+    description: "AI로 분석하는 내 영양제 궁합과 비타민 상호작용. 제스트페어에서 나에게 딱 맞는 영양제 조합을 확인하세요.",
     images: ["/hero-illustration-v3.webp"],
   },
   icons: {
