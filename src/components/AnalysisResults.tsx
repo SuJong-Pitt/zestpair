@@ -314,7 +314,8 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         const synergyBoost = isTrueSynergy ? 15 : 0;
                         const foundationBoost = result.ingredients.length >= 2 ? 8 : 0;
                         const totalBoost = synergyBoost + (synergyBoost === 0 && result.score >= 100 ? 0 : foundationBoost);
-                        const projectedScore = Math.max(result.score, Math.min(100, result.score + totalBoost));
+                        // Use accurate projectedScore from calculation if available, otherwise fallback to simple boost
+                        const projectedScore = result.projectedScore ?? Math.max(result.score, Math.min(100, result.score + totalBoost));
                         const buyUrl = language === 'ko'
                             ? `https://www.coupang.com/np/search?q=${encodeURIComponent(targetIngredient.ko)}`
                             : `https://www.amazon.com/s?k=${encodeURIComponent(targetIngredient.en)}`;

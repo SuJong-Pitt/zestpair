@@ -15,7 +15,7 @@ export const UI_TRANSLATIONS = {
                 unlimited: "무제한 분석",
                 instant: "0.5초 이내"
             },
-            popularTags: ["비타민", "미네랄", "오메가", "유산균"]
+            popularTags: ["비타민", "미네랄", "오메가", "유산균", "항산화", "아미노산"]
         },
         howItWorks: {
             title: "ZestPair 이용 가이드",
@@ -128,7 +128,7 @@ export const UI_TRANSLATIONS = {
                 unlimited: "Unlimited Analysis",
                 instant: "Under 0.5s"
             },
-            popularTags: ["Vitamin", "Mineral", "Omega", "Probiotics"]
+            popularTags: ["Vitamin", "Mineral", "Omega", "Probiotics", "Antioxidants", "Amino Acids"]
         },
         howItWorks: {
             title: "How ZestPair Works",

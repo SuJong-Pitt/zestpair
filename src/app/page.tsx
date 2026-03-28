@@ -150,17 +150,39 @@ export default function HomePage() {
     }
   }
 
-  // 드롭다운 검색 결과용 필터링 - 성능 최적화: useMemo
+  // 드롭다운 검색 결과용 필터링 - 성분 및 카테고리 통합 매칭
   const dropdownResults = useMemo(() => {
     if (!searchQuery) return [];
-    return dbIngredients.filter((ing) => {
-      const name = language === "ko" ? ing.name : ing.name_en;
-      const desc = language === "ko" ? ing.short_description : (ing.short_description_en || ing.short_description);
-      return (
-        name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        desc.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+
+    // 1. 카테고리 매칭 확인
+    const matchedCategories = Object.entries(CATEGORIES_TRANSLATIONS)
+      .filter(([key, data]) => {
+        if (key === 'all') return false;
+        const catName = language === 'ko' ? data.ko : data.en;
+        return catName.toLowerCase().includes(searchQuery.toLowerCase());
+      })
+      .map(([key, data]) => ({ 
+        id: key, 
+        name: data.ko, 
+        name_en: data.en, 
+        emoji: data.emoji, 
+        isCategory: true 
+      }));
+
+    // 2. 성분 매칭 (이름, 설명, 또는 매칭된 카테고리 소속)
+    const matchedIngredients = dbIngredients.filter((ing) => {
+      const name = (language === "ko" ? ing.name : ing.name_en).toLowerCase();
+      const desc = (language === "ko" ? ing.short_description : (ing.short_description_en || ing.short_description)).toLowerCase();
+      const query = searchQuery.toLowerCase();
+      
+      const isTextMatch = name.includes(query) || desc.includes(query);
+      const isInMatchedCategory = matchedCategories.some(cat => cat.id === ing.category);
+      
+      return isTextMatch || isInMatchedCategory;
     });
+
+    // 카테고리 결과를 상단에 배치하고 성분을 뒤에 배치
+    return [...matchedCategories, ...matchedIngredients] as any[];
   }, [dbIngredients, searchQuery, language]);
 
   const isBlur = isDropdownOpen && dropdownResults.length > 0;
@@ -274,10 +296,40 @@ export default function HomePage() {
       else summary = "Neutral combination.";
     }
 
+    // --- 5단계 정확한 예상 점수 계산 (다중 시너지 고려) ---
+    let projectedScore = score;
+    if (potentialSynergy) {
+      const partner = potentialSynergy.pair[1];
+      const { data: allPartnerInteractions } = await supabase
+        .from("interactions")
+        .select("*")
+        .or(`ingredient_a_id.eq.${partner.id},ingredient_b_id.eq.${partner.id}`);
+
+      const relevantInteractions = (allPartnerInteractions as any[])?.filter(int => {
+        const otherId = int.ingredient_a_id === partner.id ? int.ingredient_b_id : int.ingredient_a_id;
+        return ingredientIds.includes(otherId);
+      }) || [];
+
+      let newSynerCount = 0;
+      let newCautCount = 0;
+      let newConfCount = 0;
+
+      relevantInteractions.forEach(int => {
+        if (int.type === "SYNERGY") newSynerCount++;
+        else if (int.type === "CAUTION") newCautCount++;
+        else if (int.type === "CONFLICT") newConfCount++;
+      });
+
+      // 기존 점수에서의 변화량: 시너지 보너스 + 기초 보완 보너스(+8) - 감점 요소
+      const boost = (newSynerCount * 15) + 8 - (newCautCount * 5) - (newConfCount * 25);
+      projectedScore = Math.max(10, Math.min(100, score + boost));
+    }
+
     setAnalysisResult({
       ingredients: [...selectedIngredients],
       synergies, cautions, conflicts, score, summary,
       potentialSynergy,
+      projectedScore,
       analyzed_at: new Date().toISOString()
     });
   }, [selectedIngredients, language, dbIngredients, setHasResult, setAnalysisResult, setAnalyzing]);
@@ -713,34 +765,52 @@ export default function HomePage() {
                 >
                   <div className="bg-[#0f172a]/95 rounded-[2.2rem] overflow-hidden shadow-2xl">
                     <div className="max-h-[140px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-wrap justify-center gap-1.5 md:gap-2">
-                      {dropdownResults.map((ing, i) => {
-                        const active = selectedIngredients.some(item => item.id === ing.id);
+                      {dropdownResults.map((item: any, i) => {
+                        const isCategory = item.isCategory;
+                        const active = !isCategory && selectedIngredients.some(sel => sel.id === item.id);
                         return (
                           <motion.button
-                            key={ing.id}
+                            key={isCategory ? `cat-${item.id}` : item.id}
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: Math.min(i * 0.01, 0.2) }}
                             onClick={() => {
-                              if (!active) addIngredient(ing);
-                              setInputValue("");
-                              startTransition(() => setSearchQuery(""));
-                              setIsDropdownOpen(false);
+                              if (isCategory) {
+                                setSelectedCategory(item.id);
+                                setInputValue("");
+                                startTransition(() => setSearchQuery(""));
+                                setIsDropdownOpen(false);
+                                if (ingredientsRef.current) {
+                                  ingredientsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }
+                              } else if (!active) {
+                                addIngredient(item);
+                                setInputValue("");
+                                startTransition(() => setSearchQuery(""));
+                                setIsDropdownOpen(false);
+                              }
                             }}
                             className={cn(
                               "group/item flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl transition-all duration-300 border font-bold text-[10px] md:text-xs whitespace-nowrap",
-                              active
-                                ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
-                                : "bg-slate-900/60 text-white/70 border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white"
+                              isCategory
+                                ? "bg-amber-400/15 text-amber-200 border-amber-400/30 hover:bg-amber-400/25 hover:border-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.1)]"
+                                : (active
+                                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                                  : "bg-slate-930/60 text-white/70 border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white"
+                                )
                             )}
                           >
                             <span className="text-sm group-hover/item:scale-110 transition-transform">
-                              {ing.icon_emoji}
+                              {isCategory ? item.emoji : item.icon_emoji}
                             </span>
                             <span className="tracking-tighter">
-                              {language === 'ko' ? ing.name : ing.name_en}
+                              {language === 'ko' ? item.name : item.name_en}
                             </span>
-                            {active && <Zap size={8} className="text-white fill-current animate-pulse ml-0.5" />}
+                            {isCategory ? (
+                              <span className="text-[7px] text-amber-400/80 font-black uppercase tracking-widest pl-1 border-l border-amber-400/20 ml-1">Cat</span>
+                            ) : (
+                              active && <Zap size={8} className="text-white fill-current animate-pulse ml-0.5" />
+                            )}
                           </motion.button>
                         );
                       })}
@@ -765,21 +835,25 @@ export default function HomePage() {
                 {language === 'ko' ? '인기' : 'POPULAR'}:
               </span>
               <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
-                {t.hero.popularTags.map(tag => (
-                  <button
-                    key={tag}
-                    onClick={() => {
-                      setInputValue(tag);
-                      startTransition(() => setSearchQuery(tag));
-                      setIsDropdownOpen(true);
-                    }}
-                    className="group/tag relative text-[10px] md:text-xs font-black transition-all hover:scale-110 active:scale-95 px-2 py-0.5 rounded-lg overflow-hidden"
-                    style={{ color: "#6ee7b7" }}
-                  >
-                    <span className="relative z-10">#{tag}</span>
-                    <span className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover/tag:opacity-100 transition-opacity rounded-lg" />
-                  </button>
-                ))}
+                {t.hero.popularTags.map(tag => {
+                  const matchingCategory = Object.values(CATEGORIES_TRANSLATIONS).find(c => c.ko === tag || c.en === tag);
+                  return (
+                    <button
+                      key={tag}
+                      onClick={() => {
+                        setInputValue(tag);
+                        startTransition(() => setSearchQuery(tag));
+                        setIsDropdownOpen(true);
+                      }}
+                      className="group/tag relative text-[10px] md:text-xs font-black transition-all hover:scale-110 active:scale-95 px-2.5 py-1 rounded-lg overflow-hidden flex items-center gap-1"
+                      style={{ color: "#6ee7b7" }}
+                    >
+                      <span className="relative z-10 opacity-70 group-hover/tag:scale-125 transition-transform">{matchingCategory?.emoji}</span>
+                      <span className="relative z-10">#{tag}</span>
+                      <span className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover/tag:opacity-100 transition-opacity rounded-lg" />
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
 

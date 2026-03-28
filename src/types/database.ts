@@ -105,6 +105,7 @@ export interface AnalysisResult {
   score: number; // 전체 궁합 점수 0~100
   summary: string; // AI 생성 종합 요약
   potentialSynergy?: InteractionResult | null; // 추천용 잠재적 시너지 (데이터베이스 기반)
+  projectedScore?: number; // 추천 성분 추가 시의 예상 점수
   analyzed_at: string; // 분석 시각 ISO 8601
 }
 
