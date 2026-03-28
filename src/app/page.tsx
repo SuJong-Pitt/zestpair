@@ -623,7 +623,7 @@ export default function HomePage() {
               style={{
                 background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%)",
                 border: "1.5px solid rgba(255,255,255,0.18)",
-                backdropFilter: "blur(24px)",
+                backdropFilter: "blur(16px)",
                 boxShadow: "0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15)",
                 transform: "translateZ(0)"
               }}
@@ -831,7 +831,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 1.5 }}
-              className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2.5 mt-8 md:mt-12 mb-4 max-w-4xl mx-auto"
+              className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2.5 mt-8 md:mt-12 mb-4 max-w-4xl mx-auto gpu-accelerated"
             >
               {[
                 { icon: "⚡", text: language === 'ko' ? '0.5초 분석' : '0.5s Analysis', color: "#fbbf24" },
@@ -847,11 +847,11 @@ export default function HomePage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.6 + i * 0.05 }}
                   whileHover={{ y: -2, backgroundColor: "rgba(255,255,255,0.08)" }}
-                  className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[9px] md:text-[11px] font-[900] transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[9px] md:text-[11px] font-[900] transition-colors whitespace-nowrap gpu-accelerated"
                   style={{
                     background: "rgba(255,255,255,0.03)",
                     border: "1px solid rgba(255,255,255,0.12)",
-                    backdropFilter: "blur(12px)",
+                    backdropFilter: "blur(8px)",
                     color: badge.color,
                     boxShadow: "0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)"
                   }}
