@@ -593,13 +593,6 @@ export default function HomePage() {
             whileHover={{ scale: 1.015 }}
             transition={{ duration: 0.7, delay: 1.25, ease: [0.22, 1, 0.36, 1] }}
             className="relative max-w-2xl mx-auto group z-[200]"
-            onMouseMove={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const x = e.clientX - rect.left;
-              const y = e.clientY - rect.top;
-              e.currentTarget.style.setProperty("--mouse-x", `${x}px`);
-              e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
-            }}
           >
             {/* 메인 펄스 글로우 (항상 부드럽게 깜빡임) */}
             <motion.div
@@ -609,27 +602,22 @@ export default function HomePage() {
               style={{ background: "radial-gradient(circle at 50% 50%, rgba(16,185,129,0.15) 0%, transparent 70%)", willChange: "opacity" }}
             />
 
-            {/* 마우스 트래킹 샤인 효과 */}
-            <div
-              className="absolute inset-0 rounded-[4rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10"
-              style={{
-                background: "radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 80%)",
-              }}
-            />
+            {/* === 독립적인 분석바(검색바) 그룹 (포커스 효과 한정) === */}
+            <div className="relative group/bar mb-10">
+              {/* 포커스 시 배경 글로우 (분석바 본체에만 집중) */}
+              <div
+                className="absolute -inset-5 rounded-[4rem] opacity-0 group-focus-within/bar:opacity-100 transition-all duration-700 blur-2xl md:blur-3xl pointer-events-none"
+                style={{
+                  background: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(6,182,212,0.35), rgba(124,58,237,0.25))",
+                  transform: "translateZ(0)",
+                  willChange: "opacity"
+                }}
+              />
+              <div
+                className="absolute -inset-1 rounded-[4rem] opacity-0 group-focus-within/bar:opacity-40 transition-all duration-700 blur-xl md:blur-2xl pointer-events-none"
+                style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.4), rgba(6,182,212,0.25))" }}
+              />
 
-            {/* 포커스 시 배경 글로우 (강화됨) */}
-            <div
-              className="absolute -inset-5 rounded-[4rem] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-2xl md:blur-3xl pointer-events-none"
-              style={{
-                background: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(6,182,212,0.35), rgba(124,58,237,0.25))",
-                transform: "translateZ(0)",
-                willChange: "opacity"
-              }}
-            />
-            <div
-              className="absolute -inset-1 rounded-[4rem] opacity-40 blur-xl"
-              style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.4), rgba(6,182,212,0.25))" }}
-            />
 
             <div
               className="relative flex items-center rounded-[4rem] p-1 md:p-1.5 transition-all duration-500 overflow-hidden"
@@ -705,6 +693,7 @@ export default function HomePage() {
                 </button>
               </div>
             </div>
+          </div>
 
             {/* === 검색 드롭다운 === */}
             <AnimatePresence>
