@@ -162,6 +162,8 @@ export default function HomePage() {
       );
     });
   }, [dbIngredients, searchQuery, language]);
+ 
+  const isBlur = isDropdownOpen && dropdownResults.length > 0;
 
   const popularIngredients = useMemo(() => {
     return dbIngredients.filter((i) => i.is_popular);
@@ -765,7 +767,11 @@ export default function HomePage() {
             </AnimatePresence>
 
             {/* 인기 태그 */}
-            <div className="mt-4 md:mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2" style={{ opacity: 0.75 }}>
+            <motion.div
+              animate={{ filter: isBlur ? "blur(5px)" : "blur(0px)", opacity: isBlur ? 0.3 : 0.75 }}
+              transition={{ duration: 0.4 }}
+              className="mt-4 md:mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2"
+            >
               <span className="text-[9px] text-white/50 font-black uppercase tracking-[0.25em] whitespace-nowrap">
                 {language === 'ko' ? '인기' : 'POPULAR'}:
               </span>
@@ -786,14 +792,19 @@ export default function HomePage() {
                   </button>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* === 선택된 성분 목록 (위치 이동: 인기 태그 하단) === */}
             <AnimatePresence>
               {selectedIngredients.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  animate={{ 
+                    opacity: isBlur ? 0.3 : 1, 
+                    y: 0, 
+                    scale: 1,
+                    filter: isBlur ? "blur(5px)" : "blur(0px)"
+                  }}
                   exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                   className="flex flex-wrap justify-center gap-1.5 md:gap-2 mt-6 mb-2 px-4"
                 >
@@ -833,8 +844,12 @@ export default function HomePage() {
             {/* === 소셜 프루프 배지 행 (검색바 하단으로 이동) === */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.5 }}
+              animate={{ 
+                opacity: isBlur ? 0.2 : 1, 
+                y: 0,
+                filter: isBlur ? "blur(8px)" : "blur(0px)" 
+              }}
+              transition={{ duration: 0.6, delay: isBlur ? 0 : 1.5 }}
               className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2.5 mt-8 md:mt-12 mb-4 max-w-4xl mx-auto gpu-accelerated"
             >
               {[
