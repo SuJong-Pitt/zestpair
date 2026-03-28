@@ -573,6 +573,17 @@ export default function HomePage() {
 
 
           {/* === 검색 바 === */}
+          <AnimatePresence>
+            {isDropdownOpen && dropdownResults.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsDropdownOpen(false)}
+                className="fixed inset-0 z-[190] bg-black/15 backdrop-blur-md"
+              />
+            )}
+          </AnimatePresence>
           <motion.div
             ref={heroSearchContainerRef}
             initial={{ opacity: 0, y: 20, scale: 0.97 }}
@@ -696,67 +707,60 @@ export default function HomePage() {
             {/* === 검색 드롭다운 === */}
             <AnimatePresence>
               {isDropdownOpen && dropdownResults.length > 0 && (
-                <>
-                  {/* 배경 오버레이 (클릭 시 닫기 용도, 시각적으로는 보이지 않게 처리) */}
-                  <div
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="fixed inset-0 z-[998]"
-                  />
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                    className="absolute bottom-full left-0 right-0 z-[1000] overflow-hidden rounded-[2.5rem] p-1.5 mb-3 shadow-2xl"
-                    style={{
-                      background: "linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(10,15,30,0.98) 100%)",
-                      backdropFilter: "blur(40px)",
-                      border: "1.5px solid rgba(16,185,129,0.3)",
-                      boxShadow: "0 -25px 50px -12px rgba(0,0,0,0.8), 0 0 30px rgba(16,185,129,0.25)"
-                    }}
-                  >
-                    <div className="bg-[#0f172a]/95 rounded-[2.2rem] overflow-hidden shadow-2xl">
-                      <div className="max-h-[140px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-wrap justify-center gap-1.5 md:gap-2">
-                        {dropdownResults.map((ing, i) => {
-                          const active = selectedIngredients.some(item => item.id === ing.id);
-                          return (
-                            <motion.button
-                              key={ing.id}
-                              initial={{ opacity: 0, scale: 0.9 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: Math.min(i * 0.01, 0.2) }}
-                              onClick={() => {
-                                if (!active) addIngredient(ing);
-                                setInputValue("");
-                                startTransition(() => setSearchQuery(""));
-                                setIsDropdownOpen(false);
-                              }}
-                              className={cn(
-                                "group/item flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl transition-all duration-300 border font-bold text-[10px] md:text-xs whitespace-nowrap",
-                                active
-                                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
-                                  : "bg-slate-900/60 text-white/70 border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white"
-                              )}
-                            >
-                              <span className="text-sm group-hover/item:scale-110 transition-transform">
-                                {ing.icon_emoji}
-                              </span>
-                              <span className="tracking-tighter">
-                                {language === 'ko' ? ing.name : ing.name_en}
-                              </span>
-                              {active && <Zap size={8} className="text-white fill-current animate-pulse ml-0.5" />}
-                            </motion.button>
-                          );
-                        })}
-                      </div>
-                      {/* 드롭다운 푸터 */}
-                      <div className="px-6 py-3 bg-white/[0.02] border-t border-white/[0.05] flex justify-between items-center">
-                        <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Select to add</span>
-                        <span className="text-[9px] font-bold text-emerald-400/50 italic">Pori AI Search</span>
-                      </div>
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  className="absolute bottom-full left-0 right-0 z-[1000] overflow-hidden rounded-[2.5rem] p-1.5 mb-3 shadow-2xl"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(10,15,30,0.98) 100%)",
+                    backdropFilter: "blur(40px)",
+                    border: "1.5px solid rgba(16,185,129,0.3)",
+                    boxShadow: "0 -25px 50px -12px rgba(0,0,0,0.8), 0 0 30px rgba(16,185,129,0.25)"
+                  }}
+                >
+                  <div className="bg-[#0f172a]/95 rounded-[2.2rem] overflow-hidden shadow-2xl">
+                    <div className="max-h-[140px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-wrap justify-center gap-1.5 md:gap-2">
+                      {dropdownResults.map((ing, i) => {
+                        const active = selectedIngredients.some(item => item.id === ing.id);
+                        return (
+                          <motion.button
+                            key={ing.id}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: Math.min(i * 0.01, 0.2) }}
+                            onClick={() => {
+                              if (!active) addIngredient(ing);
+                              setInputValue("");
+                              startTransition(() => setSearchQuery(""));
+                              setIsDropdownOpen(false);
+                            }}
+                            className={cn(
+                              "group/item flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl transition-all duration-300 border font-bold text-[10px] md:text-xs whitespace-nowrap",
+                              active
+                                ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                                : "bg-slate-900/60 text-white/70 border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white"
+                            )}
+                          >
+                            <span className="text-sm group-hover/item:scale-110 transition-transform">
+                              {ing.icon_emoji}
+                            </span>
+                            <span className="tracking-tighter">
+                              {language === 'ko' ? ing.name : ing.name_en}
+                            </span>
+                            {active && <Zap size={8} className="text-white fill-current animate-pulse ml-0.5" />}
+                          </motion.button>
+                        );
+                      })}
                     </div>
-                  </motion.div>
-                </>
+                    {/* 드롭다운 푸터 */}
+                    <div className="px-6 py-3 bg-white/[0.02] border-t border-white/[0.05] flex justify-between items-center">
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Select to add</span>
+                      <span className="text-[9px] font-bold text-emerald-400/50 italic">Pori AI Search</span>
+                    </div>
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
 
