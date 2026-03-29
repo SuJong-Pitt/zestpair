@@ -161,12 +161,12 @@ export default function HomePage() {
         const catName = language === 'ko' ? data.ko : data.en;
         return catName.toLowerCase().includes(searchQuery.toLowerCase());
       })
-      .map(([key, data]) => ({ 
-        id: key, 
-        name: data.ko, 
-        name_en: data.en, 
-        emoji: data.emoji, 
-        isCategory: true 
+      .map(([key, data]) => ({
+        id: key,
+        name: data.ko,
+        name_en: data.en,
+        emoji: data.emoji,
+        isCategory: true
       }));
 
     // 2. 성분 매칭 (이름, 설명, 또는 매칭된 카테고리 소속)
@@ -174,10 +174,10 @@ export default function HomePage() {
       const name = (language === "ko" ? ing.name : ing.name_en).toLowerCase();
       const desc = (language === "ko" ? ing.short_description : (ing.short_description_en || ing.short_description)).toLowerCase();
       const query = searchQuery.toLowerCase();
-      
+
       const isTextMatch = name.includes(query) || desc.includes(query);
       const isInMatchedCategory = matchedCategories.some(cat => cat.id === ing.category);
-      
+
       return isTextMatch || isInMatchedCategory;
     });
 
@@ -430,8 +430,8 @@ export default function HomePage() {
               <div className="relative flex items-center justify-center">
                 <div className="relative w-8 h-8 md:w-9 md:h-9 rounded-xl bg-slate-900/50 border border-emerald-500/20 p-1.5 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
                   <Image
-                    src="/icon.png"
-                    alt="ZestPair Icon"
+                    src="/logo.svg"
+                    alt="ZestPair Logo"
                     width={36}
                     height={36}
                     className="w-full h-full object-contain"
@@ -671,81 +671,81 @@ export default function HomePage() {
               />
 
 
-            <div
-              className="relative flex items-center rounded-[4rem] p-1 md:p-1.5 transition-all duration-500 overflow-hidden"
-              style={{
-                background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%)",
-                border: "1.5px solid rgba(255,255,255,0.18)",
-                backdropFilter: "blur(16px)",
-                boxShadow: "0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15)",
-                transform: "translateZ(0)"
-              }}
-            >
-              {/* 테두리 애니메이션 효과 */}
-              <motion.div
-                className="absolute inset-0 rounded-[4rem] pointer-events-none"
+              <div
+                className="relative flex items-center rounded-[4rem] p-1 md:p-1.5 transition-all duration-500 overflow-hidden"
                 style={{
-                  boxShadow: "inset 0 0 0 1px rgba(16,185,129,0.1)"
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%)",
+                  border: "1.5px solid rgba(255,255,255,0.18)",
+                  backdropFilter: "blur(16px)",
+                  boxShadow: "0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15)",
+                  transform: "translateZ(0)"
                 }}
-                animate={{ opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              />
-
-              <div className="pl-4 md:pl-6 text-emerald-400 relative z-20">
+              >
+                {/* 테두리 애니메이션 효과 */}
                 <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <Search size={18} className="md:size-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                </motion.div>
-              </div>
-              <Input
-                ref={searchRef}
-                type="text"
-                placeholder={t.hero.searchPlaceholder}
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                  setIsDropdownOpen(true);
-                  startTransition(() => {
-                    setSearchQuery(e.target.value);
-                  });
-                }}
-                onFocus={() => setIsDropdownOpen(true)}
-                className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-xs md:text-lg h-9 md:h-12 flex-1 font-bold px-2 md:px-4 tracking-tight relative z-20"
-              />
-              <div className="flex items-center gap-2 pr-1.5 md:pr-2">
-                {selectedIngredients.length > 0 && (
-                  <button
-                    onClick={clearBasket}
-                    title={language === 'ko' ? '초기화' : 'Reset'}
-                    className="p-1.5 md:p-2 text-white/25 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-full transition-all active:scale-90 group/reset border border-white/5 hover:border-emerald-500/20 shadow-sm"
-                  >
-                    <RotateCcw size={14} className="group-hover/reset:rotate-[-180deg] transition-transform duration-500" />
-                  </button>
-                )}
-                <button
-                  onClick={handleAnalyze}
-                  className="relative flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-full font-[900] text-[10px] md:text-xs transition-all active:scale-95 whitespace-nowrap group/btn overflow-hidden"
+                  className="absolute inset-0 rounded-[4rem] pointer-events-none"
                   style={{
-                    background: "linear-gradient(135deg, #10b981 0%, #0891b2 60%, #7c3aed 100%)",
-                    color: "white",
-                    boxShadow: "0 8px 32px rgba(16,185,129,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
-                    letterSpacing: "0.08em"
+                    boxShadow: "inset 0 0 0 1px rgba(16,185,129,0.1)"
                   }}
-                >
-                  <motion.span
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    animate={{ x: ["-100%", "100%"] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                    style={{ transform: "skewX(-20deg)" }}
-                  />
-                  <span className="relative z-10 uppercase">{language === 'ko' ? '분석하기' : 'ANALYZE'}</span>
-                  <ChevronRight size={16} className="relative z-10 group-hover/btn:translate-x-0.5 transition-transform" />
-                </button>
+                  animate={{ opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+
+                <div className="pl-4 md:pl-6 text-emerald-400 relative z-20">
+                  <motion.div
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Search size={18} className="md:size-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                  </motion.div>
+                </div>
+                <Input
+                  ref={searchRef}
+                  type="text"
+                  placeholder={t.hero.searchPlaceholder}
+                  value={inputValue}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    setIsDropdownOpen(true);
+                    startTransition(() => {
+                      setSearchQuery(e.target.value);
+                    });
+                  }}
+                  onFocus={() => setIsDropdownOpen(true)}
+                  className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-xs md:text-lg h-9 md:h-12 flex-1 font-bold px-2 md:px-4 tracking-tight relative z-20"
+                />
+                <div className="flex items-center gap-2 pr-1.5 md:pr-2">
+                  {selectedIngredients.length > 0 && (
+                    <button
+                      onClick={clearBasket}
+                      title={language === 'ko' ? '초기화' : 'Reset'}
+                      className="p-1.5 md:p-2 text-white/25 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-full transition-all active:scale-90 group/reset border border-white/5 hover:border-emerald-500/20 shadow-sm"
+                    >
+                      <RotateCcw size={14} className="group-hover/reset:rotate-[-180deg] transition-transform duration-500" />
+                    </button>
+                  )}
+                  <button
+                    onClick={handleAnalyze}
+                    className="relative flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-full font-[900] text-[10px] md:text-xs transition-all active:scale-95 whitespace-nowrap group/btn overflow-hidden"
+                    style={{
+                      background: "linear-gradient(135deg, #10b981 0%, #0891b2 60%, #7c3aed 100%)",
+                      color: "white",
+                      boxShadow: "0 8px 32px rgba(16,185,129,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+                      letterSpacing: "0.08em"
+                    }}
+                  >
+                    <motion.span
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                      animate={{ x: ["-100%", "100%"] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                      style={{ transform: "skewX(-20deg)" }}
+                    />
+                    <span className="relative z-10 uppercase">{language === 'ko' ? '분석하기' : 'ANALYZE'}</span>
+                    <ChevronRight size={16} className="relative z-10 group-hover/btn:translate-x-0.5 transition-transform" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
             {/* === 검색 드롭다운 === */}
             <AnimatePresence>

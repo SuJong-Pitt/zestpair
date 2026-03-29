@@ -44,8 +44,8 @@ export default function HowItWorks({ onStart }: { onStart?: () => void }) {
     <section className="relative py-20 px-4 mt-[-4rem] z-30 overflow-hidden">
       {/* 배경 장식 (Liquid Light) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl h-[500px] pointer-events-none opacity-40">
-        <motion.div 
-          animate={{ 
+        <motion.div
+          animate={{
             scale: [1, 1.2, 1],
             rotate: [0, 90, 180, 270, 360],
           }}
@@ -73,11 +73,11 @@ export default function HowItWorks({ onStart }: { onStart?: () => void }) {
           className="relative rounded-[2.5rem] bg-white border border-emerald-500/10 shadow-[0_40px_100px_rgba(0,0,0,0.08)] group overflow-hidden"
         >
           {/* 하이테크 스캐너 효과 (주기적) */}
-          <motion.div 
+          <motion.div
             animate={{ x: ["-100%", "200%"] }}
             transition={{ duration: 4, repeat: Infinity, repeatDelay: 6, ease: "easeInOut" }}
             className="absolute inset-0 pointer-events-none z-20 opacity-[0.03]"
-            style={{ 
+            style={{
               background: "linear-gradient(90deg, transparent, #10b981, transparent)",
               transform: "skewX(-15deg)"
             }}
@@ -85,24 +85,24 @@ export default function HowItWorks({ onStart }: { onStart?: () => void }) {
 
           {/* 콘텐츠 영역 */}
           <div className="relative z-30 p-1 md:p-1.5 flex flex-col h-full bg-white/40">
-            
+
             {/* 상단바 (가상 브라우저 스타일) */}
             <div className="flex items-center justify-between px-8 py-6">
               <div className="flex flex-col items-start gap-1">
-                 <motion.div 
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100"
-                 >
-                    <Sparkles size={12} className="text-emerald-500 animate-pulse" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600">Smart Protocol</span>
-                 </motion.div>
-                 <h2 className="text-2xl md:text-4xl font-[1000] text-slate-900 tracking-tighter">
-                   {t.howItWorks.title}
-                 </h2>
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100"
+                >
+                  <Sparkles size={12} className="text-emerald-500 animate-pulse" />
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600">Smart Protocol</span>
+                </motion.div>
+                <h2 className="text-2xl md:text-4xl font-[1000] text-slate-900 tracking-tighter">
+                  {t.howItWorks.title}
+                </h2>
               </div>
-              
+
               <div className="hidden sm:flex items-center gap-2">
                 <div className="flex gap-1.5 mr-4">
                   {[1, 2, 3].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full bg-slate-200" />)}
@@ -115,21 +115,21 @@ export default function HowItWorks({ onStart }: { onStart?: () => void }) {
 
             {/* 메인 비주얼 박스 */}
             <div className="px-6 md:px-10 pb-4">
-               <motion.div 
-                 className="relative rounded-[1.5rem] overflow-hidden border border-slate-200/50 shadow-2xl shadow-emerald-500/5 group-hover:shadow-emerald-500/10 transition-shadow duration-500"
-                 style={{ transform: "translateZ(40px)" }} // 3D 효과 강화
-               >
-                 <Image 
-                   src="/hero-illustration-guide.webp" 
-                   alt="ZestPair Process Guide" 
-                   width={1200}
-                   height={1000}
-                   className="w-full h-auto transform transition-all duration-1000 group-hover:scale-[1.03]"
-                   sizes="(max-width: 768px) 100vw, 896px"
+              <motion.div
+                className="relative rounded-[1.5rem] overflow-hidden border border-slate-200/50 shadow-2xl shadow-emerald-500/5 group-hover:shadow-emerald-500/10 transition-shadow duration-500"
+                style={{ transform: "translateZ(40px)" }} // 3D 효과 강화
+              >
+                <Image
+                  src="/hero-illustration-guide.webp"
+                  alt="ZestPair Process Guide"
+                  width={1200}
+                  height={1000}
+                  className="w-full h-auto transform transition-all duration-1000 group-hover:scale-[1.03]"
+                  sizes="(max-width: 768px) 100vw, 896px"
                 />
-                 
 
-               </motion.div>
+
+              </motion.div>
             </div>
 
             {/* 하단 단계 요약 (리치 그리드) */}
@@ -140,8 +140,8 @@ export default function HowItWorks({ onStart }: { onStart?: () => void }) {
                 { step: "03", title: t.howItWorks.step3, icon: <Database size={18} />, color: "indigo" },
                 { step: "04", title: t.howItWorks.step4, icon: <Smartphone size={18} />, color: "amber" },
               ].map((item, i) => (
-                <motion.div 
-                  key={i} 
+                <motion.div
+                  key={i}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -152,21 +152,21 @@ export default function HowItWorks({ onStart }: { onStart?: () => void }) {
                   <div className="absolute top-3 right-3 text-[10px] font-[1000] text-slate-200 group-hover/item:text-emerald-100 transition-colors">
                     {item.step}
                   </div>
-                  
+
                   {/* 아이콘 컨테이너 */}
                   <div className={`w-12 h-12 rounded-2xl mb-3 flex items-center justify-center transition-all bg-slate-50 group-hover/item:scale-110 group-hover/item:bg-emerald-50 group-hover/item:text-emerald-500 text-slate-400`}>
                     {item.icon}
                   </div>
-                  
+
                   <span className="text-xs md:text-sm font-black text-slate-700 group-hover/item:text-emerald-900 transition-colors tracking-tight text-center px-1">
                     {item.title}
                   </span>
 
                   {/* 하단 포인트 닷 */}
-                  <motion.div 
+                  <motion.div
                     animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
                     transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
-                    className="mt-3 w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/item:bg-emerald-400 group-hover/item:shadow-[0_0_8px_#10b981]" 
+                    className="mt-3 w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/item:bg-emerald-400 group-hover/item:shadow-[0_0_8px_#10b981]"
                   />
                 </motion.div>
               ))}
@@ -174,50 +174,50 @@ export default function HowItWorks({ onStart }: { onStart?: () => void }) {
 
             {/* 장식용 버튼 */}
             <div className="px-8 pb-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-               <p className="text-xs text-slate-400 font-bold max-w-[240px] text-center sm:text-left">
-                  {language === 'ko' 
-                    ? '* 포리의 AI 코어 v2.5 기반 실시간 분석 가이드입니다.' 
-                    : '* Real-time analysis guide based on Pori AI Core v2.5.'}
-               </p>
-               <motion.button 
-                 onClick={() => onStart?.()}
-                 whileHover={{ scale: 1.05, x: 5 }}
-                 whileTap={{ scale: 0.95 }}
-                 className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-slate-900 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-900/10 cursor-pointer"
-               >
-                 <span>{language === 'ko' ? '포리와 시작하기' : 'Start with Pori'}</span>
-                 <ChevronRight size={14} strokeWidth={3} />
-               </motion.button>
+              <p className="text-xs text-slate-400 font-bold max-w-[240px] text-center sm:text-left">
+                {language === 'ko'
+                  ? '* 포리의 AI 코어 v2.5 기반 실시간 분석 가이드입니다.'
+                  : '* Real-time analysis guide based on Pori AI Core v2.5.'}
+              </p>
+              <motion.button
+                onClick={() => onStart?.()}
+                whileHover={{ scale: 1.05, x: 5 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-slate-900 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-900/10 cursor-pointer"
+              >
+                <span>{language === 'ko' ? '포리와 시작하기' : 'Start with Pori'}</span>
+                <ChevronRight size={14} strokeWidth={3} />
+              </motion.button>
             </div>
           </div>
 
           {/* 코너 데코 배경 아이콘 */}
           <div className="absolute -bottom-10 -right-10 opacity-[0.03] select-none pointer-events-none group-hover:rotate-12 transition-transform duration-1000">
-             <Image
-                src="/icon.png"
-                alt=""
-                width={256}
-                height={256}
-                className="w-64 h-64 grayscale"
-             />
+            <Image
+              src="/icon.png"
+              alt=""
+              width={256}
+              height={256}
+              className="w-64 h-64 grayscale"
+            />
           </div>
         </motion.div>
       </div>
 
       {/* 부유 파티클 (배경용) */}
       {[...Array(6)].map((_, i) => (
-        <motion.div 
+        <motion.div
           key={i}
-          animate={{ 
+          animate={{
             y: [0, -40, 0],
             x: [0, (i % 2 === 0 ? 20 : -20), 0],
             opacity: [0.1, 0.2, 0.1]
           }}
           transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut", delay: i }}
           className="absolute w-2 h-2 rounded-full bg-emerald-400 blur-[1px] pointer-events-none"
-          style={{ 
-            left: `${15 + i * 15}%`, 
-            top: `${20 + (i * 12)}%` 
+          style={{
+            left: `${15 + i * 15}%`,
+            top: `${20 + (i * 12)}%`
           }}
         />
       ))}
