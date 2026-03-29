@@ -655,7 +655,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                         </div>
                                         <div className="flex items-start gap-3 md:gap-4 bg-white/[0.03] p-5 md:p-6 rounded-[2rem] border border-white/5 backdrop-blur-xl relative group/pori overflow-hidden">
                                             {/* Decorative corner glow */}
-                                            <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover/pori:bg-emerald-500/20 transition-all duration-700" />
+                                            <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover/pori:bg-emerald-500/20 transition-all duration-700 pointer-events-none" />
 
                                             <div className="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-emerald-400/50 bg-slate-900/50 overflow-hidden shadow-[0_0_15px_rgba(52,211,153,0.3)]">
                                                 <img src="/hero-pori.png" alt="Pori" className="w-full h-full object-cover" />
@@ -703,7 +703,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
 
                                     <div className="flex-[1_1_300px] flex justify-center">
                                         <div className="w-full max-w-[340px] bg-[#0d1117] rounded-[2.5rem] border border-white/10 p-8 flex flex-col items-center gap-6 shadow-2xl relative group/prod">
-                                            <div className="absolute inset-0 bg-emerald-500/5 rounded-[2.5rem] opacity-0 group-hover/prod:opacity-100 transition-opacity" />
+                                            <div className="absolute inset-0 bg-emerald-500/5 rounded-[2.5rem] opacity-0 group-hover/prod:opacity-100 transition-opacity pointer-events-none" />
                                             <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-black text-emerald-400 uppercase tracking-widest">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                                                 AI Top Pick
@@ -717,7 +717,7 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                                 href={buyUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-white flex items-center justify-between px-6 hover:scale-[1.02] transition-transform shadow-lg"
+                                                className="relative z-10 w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-white flex items-center justify-between px-6 hover:scale-[1.05] active:scale-[0.98] transition-all duration-300 shadow-[0_10px_30px_rgba(16,185,129,0.3)]"
                                             >
                                                 <div className="flex flex-col text-left">
                                                     <span className="text-[10px] font-black opacity-70 uppercase tracking-widest">Buy Now</span>
