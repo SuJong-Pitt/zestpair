@@ -349,17 +349,15 @@ export default function HomePage() {
     setHasResult(true);
   }, [setAnalyzing, setHasResult]);
 
-  // 분석 완료 후 스크롤 로직 (useEffect로 분리하여 렌더링 후 실행 보장)
+  // 분석 완료 후 스크롤 로직 (페이지 전환 트릭: Smooth 대신 Auto로 즉성성 부여)
   useEffect(() => {
     if (hasResult && !isAnalyzing) {
-      const timer = setTimeout(() => {
-        // 1순위: 리포트 최상단 ID, 2순위: 결과 섹션 컨테이너 ID
-        const target = document.getElementById("analysis-report-top") || document.getElementById("analysis-results-section");
-        if (target) {
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 200); // 컴포넌트 마운트 시간을 고려해 약간 더 여유있게 조정
-      return () => clearTimeout(timer);
+      // 렌더링 완료 직후 즉시 타겟 위치로 점프하여 페이지가 바뀐 것처럼 연출
+      const target = document.getElementById("analysis-report-top") || document.getElementById("analysis-results-section");
+      if (target) {
+        // 부드러운 스크롤(smooth) 대신 즉시 이동(auto)하여 '트릭' 완성
+        target.scrollIntoView({ behavior: "auto", block: "start" });
+      }
     }
   }, [hasResult, isAnalyzing]);
 
@@ -1290,7 +1288,7 @@ export default function HomePage() {
           </div>
         </div> {/* ingredientsRef 닫기 */}
 
-        <div ref={resultRef} id="analysis-results-section" className="mt-8 min-h-[50vh] scroll-mt-24">
+        <div ref={resultRef} id="analysis-results-section" className="mt-8 min-h-[50vh] scroll-mt-0">
 
           {isAnalyzing && <AnalyzingAnimation onComplete={handleAnimationComplete} />}
           {!isAnalyzing && hasResult && analysisResult && isMounted && (
