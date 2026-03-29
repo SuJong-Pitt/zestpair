@@ -132,9 +132,9 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
           <Icon size={11} />
         </div>
 
-        {/* ── 이모지 이미지 영역 ── */}
+        {/* ── 이모지 이미지 영역 (세로폭 축소 및 크기 조정) ── */}
         <div
-          className="relative w-full h-28 md:h-32 flex items-center justify-center overflow-hidden"
+          className="relative w-full h-20 md:h-24 flex items-center justify-center overflow-hidden"
           style={selected ? {
             background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.15) 100%)",
           } : {
@@ -144,7 +144,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
           }}
         >
           <span
-            className="relative z-10 text-4xl md:text-5xl transition-transform duration-500"
+            className="relative z-10 text-3xl md:text-4xl transition-transform duration-500"
             style={selected ? {
               transform: "scale(1.1)",
               filter: `drop-shadow(0 0 12px ${theme.glow})`
@@ -156,33 +156,33 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
           </span>
         </div>
 
-        {/* ── 텍스트 영역 ── */}
-        <div className="px-4 pt-3 pb-1">
-          <div className="flex items-start justify-between gap-1 mb-1">
+        {/* ── 텍스트 영역 (간격 조정) ── */}
+        <div className="px-4 pt-2.5 pb-0.5">
+          <div className="flex items-start justify-between gap-1 mb-0.5">
             <h3
-              className="font-black text-[14px] md:text-[15px] tracking-tight leading-tight line-clamp-1 transition-colors duration-300"
+              className="font-black text-[13px] md:text-[14px] tracking-tight leading-tight line-clamp-1 transition-colors duration-300"
               style={selected ? { color: theme.color } : { color: "#0f172a" }}
             >
               {name}
             </h3>
             {selected && (
-              <div className="shrink-0 mt-1">
-                <div className="w-2 h-2 rounded-full" style={{ background: theme.color, boxShadow: `0 0 8px ${theme.color}` }} />
+              <div className="shrink-0 mt-0.5">
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: theme.color, boxShadow: `0 0 8px ${theme.color}` }} />
               </div>
             )}
           </div>
 
           <p
-            className="text-[11px] leading-relaxed line-clamp-2 transition-colors duration-300"
+            className="text-[10px] md:text-[11px] leading-snug line-clamp-2 transition-colors duration-300"
             style={selected ? { color: "rgba(255,255,255,0.4)", fontWeight: 500 } : { color: "#94a3b8", fontWeight: 500 }}
           >
             {shortDesc}
           </p>
         </div>
 
-        {/* ── 하단 바 ── */}
+        {/* ── 하단 바 (높이 및 간격 축소) ── */}
         <div
-          className="flex items-center justify-between px-4 py-3 mt-1 transition-colors duration-300"
+          className="flex items-center justify-between px-4 py-2 mt-0.5 transition-colors duration-300"
           style={selected
             ? { borderTop: `1px solid ${theme.color}20` }
             : { borderTop: "1px solid rgba(0,0,0,0.05)" }

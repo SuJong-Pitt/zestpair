@@ -68,9 +68,9 @@ export default function FloatingBasketBar({
         <motion.div
           className={cn(
             "fixed left-0 right-0 z-50 pointer-events-none flex justify-center px-4",
-            hasResult ? "top-8 md:top-12" : "bottom-0"
+            "top-0"
           )}
-          style={!hasResult ? { paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 2rem)" } : {}}
+          style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 1.5rem)" }}
         >
           {/* 배경 블러 오버레이 */}
           <AnimatePresence>
@@ -87,9 +87,9 @@ export default function FloatingBasketBar({
 
           {/* ✦ 메인 바 컨테이너 */}
           <motion.div
-            initial={{ y: 80, opacity: 0, scale: 0.95 }}
+            initial={{ y: -80, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 80, opacity: 0, scale: 0.95 }}
+            exit={{ y: -80, opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="w-full max-w-lg relative pointer-events-auto"
           >
@@ -134,9 +134,9 @@ export default function FloatingBasketBar({
                   className="absolute -top-4 -right-4 w-28 h-28 rounded-full"
                   style={{ background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)", filter: "blur(25px)" }}
                 />
-                {/* 상단 하이라이트 라인 */}
+                {/* 하단 하이라이트 라인 (상단에 위치할 때 하단에 배치) */}
                 <div
-                  className="absolute top-0 left-8 right-8 h-px"
+                  className="absolute bottom-0 left-8 right-8 h-px"
                   style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent)" }}
                 />
               </div>
@@ -144,13 +144,13 @@ export default function FloatingBasketBar({
               {/* 확장 패널: 선택 목록 */}
               <AnimatePresence>
                 {isExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                    className="overflow-hidden"
-                  >
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      className="overflow-hidden order-2"
+                    >
                     <div
                       className="px-5 pt-5 pb-4"
                       style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
@@ -356,9 +356,9 @@ export default function FloatingBasketBar({
                           </motion.span>
                         </div>
 
-                        {/* 화살표 */}
+                        {/* 화살표 (상단 고정이므로 방향 반전) */}
                         <motion.div
-                          animate={{ rotate: isExpanded ? 180 : 0, y: isExpanded ? 0 : [0, -3, 0] }}
+                          animate={{ rotate: isExpanded ? 0 : 180, y: isExpanded ? 0 : [0, 3, 0] }}
                           transition={isExpanded ? { duration: 0.3 } : { duration: 2, repeat: Infinity }}
                           className="ml-auto shrink-0 text-white/25 group-hover/info:text-emerald-400 transition-colors"
                         >

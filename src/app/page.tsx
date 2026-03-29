@@ -1134,9 +1134,9 @@ export default function HomePage() {
                   </motion.div>
                 ) : (
                   <motion.div key="scroll" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <HorizontalScroll className="gap-4 pt-2 pb-4 px-1">
+                    <HorizontalScroll className="gap-3 pt-2 pb-4 px-1">
                       {popularIngredients.slice(0, 8).map((ing) => (
-                        <div key={ing.id} className="w-[160px] md:w-[210px] flex-shrink-0">
+                        <div key={ing.id} className="w-[135px] md:w-[175px] flex-shrink-0">
                           <IngredientCard ingredient={ing} isFeatured={true} />
                         </div>
                       ))}
