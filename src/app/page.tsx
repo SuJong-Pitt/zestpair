@@ -34,25 +34,32 @@ function HorizontalScroll({ children, className }: { children: React.ReactNode; 
   const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
 
   useEffect(() => {
+    if (!containerRef.current || !contentRef.current) return;
+
     const updateConstraints = () => {
       if (containerRef.current && contentRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
         const contentWidth = contentRef.current.scrollWidth;
-        // 드레그 여유 공간 32px 추가
         setDragConstraints({ left: Math.min(0, -(contentWidth - containerWidth + 32)), right: 0 });
       }
     };
 
     updateConstraints();
+
+    // ResizeObserver를 사용하여 내용물 크기 변화 감지 (카테고리 필터링 등)
+    const resizeObserver = new ResizeObserver(() => {
+      updateConstraints();
+    });
+
+    resizeObserver.observe(contentRef.current);
+    resizeObserver.observe(containerRef.current);
     window.addEventListener('resize', updateConstraints);
-    // 이미지나 내용 로드가 늦어질 수 있으므로 추가 체크
-    const timer = setTimeout(updateConstraints, 500);
 
     return () => {
+      resizeObserver.disconnect();
       window.removeEventListener('resize', updateConstraints);
-      clearTimeout(timer);
     };
-  }, [children]);
+  }, []);
 
   return (
     <div ref={containerRef} className="relative group/hscroll w-full overflow-hidden">
@@ -86,6 +93,7 @@ export default function HomePage() {
 
 
 
+  const [isMounted, setIsMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -94,7 +102,11 @@ export default function HomePage() {
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   // 카테고리 전환 감지: 0=초기 로드(stagger 적용), >0=탭 전환(딜레이 없이 즉각 표시)
   const categoryVersionRef = useRef(0);
-  const [, forceRender] = useState(0);
+
+  // 마운트 직후 hydration mismatch 방지
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const [dbIngredients, setDbIngredients] = useState<Ingredient[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(true);
@@ -201,17 +213,10 @@ export default function HomePage() {
   const handleAnalyze = useCallback(async () => {
     if (selectedIngredients.length < 2) return;
 
+    setIsDropdownOpen(false); // 분석 시작 시 드롭다운 닫기
     setHasResult(false);
     setAnalysisResult(null);
     setAnalyzing(true);
-
-    setTimeout(() => {
-      if (resultRef.current) {
-        resultRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-      } else {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-      }
-    }, 100);
 
     const ingredientIds = selectedIngredients.map((i) => i.id);
     const { data: dbInteractions } = await supabase
@@ -338,42 +343,20 @@ export default function HomePage() {
   const handleAnimationComplete = useCallback(() => {
     setAnalyzing(false);
     setHasResult(true);
-
-    const performScroll = () => {
-      const target = document.getElementById("analysis-report-top");
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        return true;
-      }
-      return false;
-    };
-
-    if (performScroll()) return;
-
-    const observer = new MutationObserver((_mutations, obs) => {
-      const target = document.getElementById("analysis-report-top");
-      if (target) {
-        const resizeObserver = new ResizeObserver(() => {
-          performScroll();
-          resizeObserver.disconnect();
-        });
-        resizeObserver.observe(target);
-
-        performScroll();
-        obs.disconnect();
-      }
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-
-    setTimeout(() => {
-      performScroll();
-      observer.disconnect();
-    }, 1500);
   }, [setAnalyzing, setHasResult]);
+
+  // 분석 완료 후 스크롤 로직 (useEffect로 분리하여 렌더링 후 실행 보장)
+  useEffect(() => {
+    if (hasResult && !isAnalyzing) {
+      const timer = setTimeout(() => {
+        const target = document.getElementById("analysis-report-top");
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [hasResult, isAnalyzing]);
 
   return (
     <div className="min-h-screen bg-slate-50/50">
@@ -634,7 +617,7 @@ export default function HomePage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsDropdownOpen(false)}
-                className="fixed inset-0 z-[190] bg-black/15 backdrop-blur-md"
+                className="fixed inset-0 z-[700] bg-black/15 backdrop-blur-md"
               />
             )}
           </AnimatePresence>
@@ -644,7 +627,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             whileHover={{ scale: 1.015 }}
             transition={{ duration: 0.7, delay: 1.25, ease: [0.22, 1, 0.36, 1] }}
-            className="relative max-w-2xl mx-auto group z-[200]"
+            className="relative max-w-2xl mx-auto group z-[800]"
           >
             {/* 메인 펄스 글로우 (항상 부드럽게 깜빡임) */}
             <motion.div
@@ -755,7 +738,7 @@ export default function HomePage() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                  className="absolute bottom-full left-0 right-0 z-[1000] overflow-hidden rounded-[2.5rem] p-1.5 mb-3 shadow-2xl"
+                  className="absolute bottom-full left-0 right-0 z-[900] overflow-hidden rounded-[2.5rem] p-1.5 mb-3 shadow-2xl"
                   style={{
                     background: "linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(10,15,30,0.98) 100%)",
                     backdropFilter: "blur(40px)",
@@ -871,7 +854,7 @@ export default function HomePage() {
                   exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                   className="flex flex-wrap justify-center gap-1.5 md:gap-2 mt-6 mb-2 px-4"
                 >
-                  {selectedIngredients.map((ingredient) => (
+                  {isMounted && selectedIngredients.map((ingredient) => (
                     <motion.div
                       layout
                       key={ingredient.id}
@@ -1297,19 +1280,21 @@ export default function HomePage() {
         <div ref={resultRef} id="analysis-results-section" className="mt-8 min-h-[50vh]">
 
           {isAnalyzing && <AnalyzingAnimation onComplete={handleAnimationComplete} />}
-          {!isAnalyzing && hasResult && analysisResult && (
+          {!isAnalyzing && hasResult && analysisResult && isMounted && (
             <AnalysisResults result={analysisResult} />
           )}
         </div>
       </main>
 
-      <FloatingBasketBar
-        onAnalyze={handleAnalyze}
-        allIngredients={dbIngredients}
-        isHeroSearchVisible={isHeroSearchVisible}
-        isIngredientsVisible={isIngredientsVisible}
-        isHeroDropdownOpen={isDropdownOpen}
-      />
+      {isMounted && (
+        <FloatingBasketBar
+          onAnalyze={handleAnalyze}
+          allIngredients={dbIngredients}
+          isHeroSearchVisible={isHeroSearchVisible}
+          isIngredientsVisible={isIngredientsVisible}
+          isHeroDropdownOpen={isDropdownOpen}
+        />
+      )}
 
 
       {/* 가이드 팝업 */}
