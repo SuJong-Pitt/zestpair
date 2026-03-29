@@ -462,13 +462,13 @@ export default function HomePage() {
           </motion.div>
 
           {/* === 메인 헤드라인 === */}
-          <h1 className="mb-3 md:mb-6 tracking-tight">
+          <h1 className="mb-2 md:mb-4 tracking-tight">
             {/* 라인 1: 작은 선행 텍스트 */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-base md:text-2xl font-bold mb-1 md:mb-2"
+              className="text-base md:text-2xl mb-1 md:mb-2"
               style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "0.05em" }}
             >
               {language === 'ko' ? '복잡한 영양제 조합,' : 'Your daily supplements,'}
@@ -512,7 +512,7 @@ export default function HomePage() {
                 />
               </motion.span>
 
-              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1.5 md:gap-x-3 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-[1000] px-4 md:px-10 py-3 md:py-4 leading-tight tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1.5 md:gap-x-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-[1000] px-4 md:px-10 py-2 md:py-3 leading-tight tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 {language === 'ko' ? (
                   <div className="flex flex-wrap justify-center items-center gap-x-2 md:gap-x-3">
                     <span className="opacity-90">단</span>
@@ -608,7 +608,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.85 }}
-            className="text-sm md:text-lg mb-3 md:mb-5 leading-relaxed max-w-md mx-auto px-2"
+            className="text-[13px] md:text-base mb-3 md:mb-5 leading-relaxed max-w-md mx-auto px-2"
             style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500 }}
           >
             {t.hero.subtitle1}{" "}
@@ -655,7 +655,7 @@ export default function HomePage() {
             />
 
             {/* === 독립적인 분석바(검색바) 그룹 (포커스 효과 한정) === */}
-            <div className="relative group/bar mb-10">
+            <div className="relative group/bar mb-4 md:mb-10">
               {/* 포커스 시 배경 글로우 (분석바 본체에만 집중) */}
               <div
                 className="absolute -inset-5 rounded-[4rem] opacity-0 group-focus-within/bar:opacity-100 transition-all duration-700 blur-2xl md:blur-3xl pointer-events-none"
@@ -827,9 +827,9 @@ export default function HomePage() {
 
             {/* 인기 태그 */}
             <motion.div
-              animate={{ filter: isBlur ? "blur(5px)" : "blur(0px)", opacity: isBlur ? 0.3 : 0.75 }}
+              animate={{ filter: "blur(0px)", opacity: 0.75 }}
               transition={{ duration: 0.4 }}
-              className="mt-4 md:mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2"
+              className="mt-0 md:mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2"
             >
               <span className="text-[9px] text-white/50 font-black uppercase tracking-[0.25em] whitespace-nowrap">
                 {language === 'ko' ? '인기' : 'POPULAR'}:
