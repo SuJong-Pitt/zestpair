@@ -353,11 +353,12 @@ export default function HomePage() {
   useEffect(() => {
     if (hasResult && !isAnalyzing) {
       const timer = setTimeout(() => {
-        const target = document.getElementById("analysis-report-top");
+        // 1순위: 리포트 최상단 ID, 2순위: 결과 섹션 컨테이너 ID
+        const target = document.getElementById("analysis-report-top") || document.getElementById("analysis-results-section");
         if (target) {
           target.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-      }, 100);
+      }, 200); // 컴포넌트 마운트 시간을 고려해 약간 더 여유있게 조정
       return () => clearTimeout(timer);
     }
   }, [hasResult, isAnalyzing]);
@@ -1289,7 +1290,7 @@ export default function HomePage() {
           </div>
         </div> {/* ingredientsRef 닫기 */}
 
-        <div ref={resultRef} id="analysis-results-section" className="mt-8 min-h-[50vh]">
+        <div ref={resultRef} id="analysis-results-section" className="mt-8 min-h-[50vh] scroll-mt-24">
 
           {isAnalyzing && <AnalyzingAnimation onComplete={handleAnimationComplete} />}
           {!isAnalyzing && hasResult && analysisResult && isMounted && (
