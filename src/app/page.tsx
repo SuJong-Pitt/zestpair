@@ -102,10 +102,14 @@ export default function HomePage() {
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   // 카테고리 전환 감지: 0=초기 로드(stagger 적용), >0=탭 전환(딜레이 없이 즉각 표시)
   const categoryVersionRef = useRef(0);
+  const [hasInitialLoaded, setHasInitialLoaded] = useState(false);
 
   // 마운트 직후 hydration mismatch 방지
   useEffect(() => {
     setIsMounted(true);
+    // 초기 로딩 애니메이션 완료 후 플래그 설정 (약 2.5초 후)
+    const timer = setTimeout(() => setHasInitialLoaded(true), 2500);
+    return () => clearTimeout(timer);
   }, []);
 
   const [dbIngredients, setDbIngredients] = useState<Ingredient[]>([]);
@@ -887,15 +891,20 @@ export default function HomePage() {
               )}
             </AnimatePresence>
 
-            {/* === 소셜 프루프 배지 행 (검색바 하단으로 이동) === */}
+            {/* === 소셜 프루프 배지 행 (상태 가속화) === */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{
-                opacity: isBlur ? 0.2 : 1,
+                opacity: isBlur ? 0.3 : 1,
                 y: 0,
-                filter: isBlur ? "blur(8px)" : "blur(0px)"
+                filter: isBlur ? "blur(8px)" : "blur(0px)",
+                scale: isBlur ? 0.98 : 1
               }}
-              transition={{ duration: 0.6, delay: isBlur ? 0 : 1.5 }}
+              transition={{ 
+                duration: 0.5, 
+                delay: !hasInitialLoaded ? 1.5 : 0,
+                ease: "easeOut" 
+              }}
               className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2.5 mt-8 md:mt-12 mb-4 max-w-4xl mx-auto gpu-accelerated"
             >
               {[
@@ -910,7 +919,10 @@ export default function HomePage() {
                   key={i}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1.6 + i * 0.05 }}
+                  transition={{ 
+                    delay: !hasInitialLoaded ? (1.6 + i * 0.05) : 0,
+                    duration: 0.3 
+                  }}
                   whileHover={{ y: -2, backgroundColor: "rgba(255,255,255,0.08)" }}
                   className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[9px] md:text-[11px] font-[900] transition-colors whitespace-nowrap gpu-accelerated"
                   style={{
