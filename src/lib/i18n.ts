@@ -58,6 +58,7 @@ export const UI_TRANSLATIONS = {
             poriNoResultSub: "다른 검색어나 카테고리로 찾아보는 건 어떨까요? ✨",
             viewAllIngredients: "모든 성분 보기",
             notEnoughIngredients: "최소 2개 이상의 성분을 선택해주세요! ✨",
+            inquiry: "문의사항: ",
         },
         results: {
             synergy: "시너지 폭발!",
@@ -172,6 +173,7 @@ export const UI_TRANSLATIONS = {
             poriNoResultSub: "How about searching with a different keyword or category? ✨",
             viewAllIngredients: "View All Ingredients",
             notEnoughIngredients: "Please select 2 or more ingredients! ✨",
+            inquiry: "Inquiry: ",
         },
         results: {
             synergy: "Synergy Explosion!",

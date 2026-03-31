@@ -1342,6 +1342,42 @@ export default function HomePage() {
         </div>
       </main>
 
+      <footer className="py-12 px-4 border-t border-slate-200/50 bg-white/30 backdrop-blur-sm">
+        <div className="max-w-2xl mx-auto text-center space-y-4">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-1.5 flex items-center justify-center">
+              <Image
+                src="/logo.svg"
+                alt="ZestPair Logo"
+                width={24}
+                height={24}
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <span className="text-lg font-black tracking-tight flex items-center">
+              <span className="text-[#10b981]">Zest</span>
+              <span className="text-slate-800">Pair</span>
+            </span>
+          </div>
+          
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest">
+              {t.common.inquiry}
+            </p>
+            <a 
+              href="mailto:admin@zestpair.com"
+              className="text-emerald-600 font-black text-sm hover:text-emerald-500 transition-colors hover:underline decoration-2 underline-offset-4"
+            >
+              admin@zestpair.com
+            </a>
+          </div>
+          
+          <p className="text-slate-400 text-[10px] font-medium pt-4">
+            &copy; {new Date().getFullYear()} ZestPair. All rights reserved.
+          </p>
+        </div>
+      </footer>
+
       {isMounted && (
         <FloatingBasketBar
           onAnalyze={handleAnalyze}
