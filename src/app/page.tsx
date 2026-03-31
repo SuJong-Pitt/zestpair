@@ -103,6 +103,7 @@ export default function HomePage() {
   // 카테고리 전환 감지: 0=초기 로드(stagger 적용), >0=탭 전환(딜레이 없이 즉각 표시)
   const categoryVersionRef = useRef(0);
   const [hasInitialLoaded, setHasInitialLoaded] = useState(false);
+  const [showTopAlert, setShowTopAlert] = useState(false);
 
   // 마운트 직후 hydration mismatch 방지
   useEffect(() => {
@@ -283,14 +284,37 @@ export default function HomePage() {
       }
     }
 
-    const synergyWeight = synergies.length * 15;
-    const cautionPenalty = cautions.length * 5;
-    const conflictPenalty = conflicts.length * 25;
+    // 상호작용 점수 계산 (Drug 카테고리 포함 시 더 강한 페널티 적용)
+    let synergyWeight = 0;
+    let cautionPenalty = 0;
+    let conflictPenalty = 0;
+    let drugCount = selectedIngredients.filter(i => i.category === 'drugs').length;
+
+    synergies.forEach(() => { synergyWeight += 20; });
+    cautions.forEach(c => {
+      if (!c.interaction) return;
+      // 약물 관련 주의사항은 가중치 2배
+      const isDrugRelated = selectedIngredients.find(i => 
+        (i.id === c.interaction!.ingredient_a_id || i.id === c.interaction!.ingredient_b_id) && i.category === 'drugs'
+      );
+      cautionPenalty += isDrugRelated ? 15 : 5;
+    });
+    conflicts.forEach(c => {
+      if (!c.interaction) return;
+      // 약물 관련 충돌은 가중치 1.5배 (기존 20 -> 35)
+      const isDrugRelated = selectedIngredients.find(i => 
+        (i.id === c.interaction!.ingredient_a_id || i.id === c.interaction!.ingredient_b_id) && i.category === 'drugs'
+      );
+      conflictPenalty += isDrugRelated ? 35 : 20;
+    });
 
     // 기초 영양 보완 점수 (성분 개수 증가에 따른 밸런스 점수 상향)
-    const foundationBonus = Math.max(0, (selectedIngredients.length - 2) * 8);
+    // 단, 약물(Drugs)이 많아질수록 복용 부담 점수로 인해 보너스가 삭감됨
+    const rawFoundationBonus = Math.max(0, (selectedIngredients.length - 2) * 10);
+    const drugBurden = drugCount * 8; // 약물 1개당 8점 감점 (시너지 없는 단순 추가 억제)
+    const foundationBonus = Math.max(0, rawFoundationBonus - drugBurden);
 
-    const score = Math.max(10, Math.min(100, 70 + synergyWeight + foundationBonus - cautionPenalty - conflictPenalty));
+    const score = Math.max(5, Math.min(100, 70 + synergyWeight + foundationBonus - cautionPenalty - conflictPenalty));
 
     let summary = "";
     if (language === "ko") {
@@ -329,8 +353,8 @@ export default function HomePage() {
         else if (int.type === "CONFLICT") newConfCount++;
       });
 
-      // 기존 점수에서의 변화량: 시너지 보너스 + 기초 보완 보너스(+8) - 감점 요소
-      const boost = (newSynerCount * 15) + 8 - (newCautCount * 5) - (newConfCount * 25);
+      // 기존 점수에서의 변화량: 시너지 보너스 + 기초 보완 보너스(+10) - 감점 요소
+      const boost = (newSynerCount * 20) + 10 - (newCautCount * 5) - (newConfCount * 20);
       projectedScore = Math.max(10, Math.min(100, score + boost));
     }
 
@@ -710,25 +734,46 @@ export default function HomePage() {
                       <RotateCcw size={14} className="group-hover/reset:rotate-[-180deg] transition-transform duration-500" />
                     </button>
                   )}
-                  <button
-                    onClick={handleAnalyze}
+                  <motion.button
+                    initial={{ x: 0 }}
+                    animate={showTopAlert && selectedIngredients.length < 2 ? { x: [-4, 4, -4, 4, 0] } : {}}
+                    transition={{ duration: 0.4 }}
+                    onClick={() => {
+                      if (selectedIngredients.length < 2) {
+                        setShowTopAlert(true);
+                        setTimeout(() => setShowTopAlert(false), 2000);
+                        return;
+                      }
+                      handleAnalyze();
+                    }}
                     className="relative flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-full font-[900] text-[10px] md:text-xs transition-all active:scale-95 whitespace-nowrap group/btn overflow-hidden"
                     style={{
-                      background: "linear-gradient(135deg, #10b981 0%, #0891b2 60%, #7c3aed 100%)",
-                      color: "white",
-                      boxShadow: "0 8px 32px rgba(16,185,129,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
-                      letterSpacing: "0.08em"
+                      background: (selectedIngredients.length < 2 && !showTopAlert) 
+                        ? "rgba(255,255,255,0.05)" 
+                        : (showTopAlert && selectedIngredients.length < 2)
+                          ? "linear-gradient(135deg, #f87171 0%, #ef4444 100%)"
+                          : "linear-gradient(135deg, #10b981 0%, #0891b2 60%, #7c3aed 100%)",
+                      color: (selectedIngredients.length < 2 && !showTopAlert) ? "rgba(255,255,255,0.2)" : "white",
+                      boxShadow: (selectedIngredients.length < 2) ? "none" : "0 8px 32px rgba(16,185,129,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+                      letterSpacing: "0.08em",
+                      border: (selectedIngredients.length < 2 && !showTopAlert) ? "1px solid rgba(255,255,255,0.1)" : "none"
                     }}
                   >
-                    <motion.span
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                      animate={{ x: ["-100%", "100%"] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                      style={{ transform: "skewX(-20deg)" }}
-                    />
-                    <span className="relative z-10 uppercase">{language === 'ko' ? '분석하기' : 'ANALYZE'}</span>
+                    {selectedIngredients.length >= 2 && (
+                      <motion.span
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        animate={{ x: ["-100%", "100%"] }}
+                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                        style={{ transform: "skewX(-20deg)" }}
+                      />
+                    )}
+                    <span className="relative z-10 uppercase">
+                      {showTopAlert && selectedIngredients.length < 2 
+                        ? (language === 'ko' ? '2개 이상 선택!' : 'MIN 2 ITEMS!')
+                        : (language === 'ko' ? '분석하기' : 'ANALYZE')}
+                    </span>
                     <ChevronRight size={16} className="relative z-10 group-hover/btn:translate-x-0.5 transition-transform" />
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             </div>

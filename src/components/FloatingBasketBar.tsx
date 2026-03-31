@@ -35,6 +35,7 @@ export default function FloatingBasketBar({
   const setIsExpanded = setBasketExpanded;
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
 
   const isMobile = useMediaQuery("(max-width: 768px)");
   const t = UI_TRANSLATIONS[language];
@@ -332,16 +333,23 @@ export default function FloatingBasketBar({
                             {language === "ko" ? `${count}개 선택됨` : `${count} selected`}
                           </span>
                           <motion.span
+                            initial={{ x: 0 }}
                             animate={
-                              canAnalyze
-                                ? { opacity: [0.7, 1, 0.7], color: ["rgba(52,211,153,0.8)", "rgba(110,231,183,1)", "rgba(52,211,153,0.8)"] }
-                                : { opacity: 0.4, color: "rgba(255,255,255,0.3)" }
+                              showAlert && count < 2 
+                                ? { x: [-4, 4, -4, 4, 0], color: ["#f87171", "#ef4444", "#f87171"] }
+                                : canAnalyze
+                                  ? { opacity: [0.7, 1, 0.7], color: ["rgba(52,211,153,0.8)", "rgba(110,231,183,1)", "rgba(52,211,153,0.8)"] }
+                                  : { opacity: 0.4, color: "rgba(255,255,255,0.3)" }
                             }
-                            transition={{ duration: 2.5, repeat: Infinity }}
+                            transition={showAlert && count < 2 ? { duration: 0.4 } : { duration: 2.5, repeat: Infinity }}
                             className="text-[10px] font-bold flex items-center gap-1 whitespace-nowrap"
                           >
                             {count < 2 ? (
-                              language === "ko" ? "1개 더 추가하세요" : "Add 1 more"
+                              showAlert ? (
+                                <span>{t.common.notEnoughIngredients}</span>
+                              ) : (
+                                language === "ko" ? "1개 더 추가하세요" : "Add 1 more"
+                              )
                             ) : (
                               <>
                                 {language === "ko" ? "분석 준비 완료!" : "Ready to analyze!"}
@@ -384,7 +392,16 @@ export default function FloatingBasketBar({
                       exit={isMobile ? { opacity: 0, x: 20 } : undefined}
                       whileHover={canAnalyze ? { scale: 1.05 } : {}}
                       whileTap={canAnalyze ? { scale: 0.93 } : {}}
-                      onClick={() => { setIsExpanded(false); setIsSearchActive(false); onAnalyze(); }}
+                      onClick={() => {
+                        if (!canAnalyze) {
+                          setShowAlert(true);
+                          setTimeout(() => setShowAlert(false), 2000);
+                          return;
+                        }
+                        setIsExpanded(false);
+                        setIsSearchActive(false);
+                        onAnalyze();
+                      }}
                       disabled={!canAnalyze || isAnalyzing}
                       className="relative shrink-0 overflow-hidden rounded-[1.1rem] font-[900] text-xs tracking-wider h-11 px-5 transition-all duration-300"
                       style={
