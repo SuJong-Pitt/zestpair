@@ -57,7 +57,7 @@ function AnalysisContent() {
                     if (!allIngs) throw new Error("Failed to fetch ingredients");
 
                     // 링크에 포함된 성분들 필터링
-                    const selectedIngs = allIngs.filter(ing => ids.includes(ing.id));
+                    const selectedIngs = (allIngs as Ingredient[]).filter(ing => ids.includes(ing.id));
                     
                     if (selectedIngs.length >= 2) {
                         // 바구니 업데이트 (공유받은 리스트로 교체)
@@ -65,7 +65,7 @@ function AnalysisContent() {
                         selectedIngs.forEach(ing => addIngredient(ing));
 
                         // 분석 실행
-                        const result = await performAnalysis(selectedIngs, language, allIngs);
+                        const result = await performAnalysis(selectedIngs, language, allIngs as Ingredient[]);
                         if (result) {
                             setAnalysisResult(result);
                             setHasResult(true);
