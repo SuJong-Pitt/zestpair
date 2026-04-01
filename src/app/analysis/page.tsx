@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { performAnalysis } from "@/lib/analysis";
 import type { Ingredient } from "@/types/database";
+import { decodeShareParams } from "@/lib/utils";
 
 /**
  * 분석 결과 페이지 본체 (Suspense 대응을 위해 분리)
@@ -32,8 +33,6 @@ function AnalysisContent() {
 
     useEffect(() => {
         const handleSharedLink = async () => {
-            const idsParam = searchParams.get("ids");
-            
             // 1. 이미 결과가 있는 경우 (정상 진입)
             if (analysisResult) {
                 setAnalyzing(false);
@@ -42,10 +41,20 @@ function AnalysisContent() {
                 return;
             }
 
-            // 2. 공유 링크를 통해 들어온 경우 (?ids=...)
-            if (idsParam) {
-                const ids = idsParam.split(",");
+            // 2. 공유 링크를 통해 들어온 경우 (?v=... 또는 ?ids=...)
+            const vParam = searchParams.get("v");
+            const idsParam = searchParams.get("ids");
+            
+            if (vParam || idsParam) {
                 setIsLoading(true);
+                let selectedSlugs: string[] = [];
+                let selectedIds: string[] = [];
+
+                if (vParam) {
+                    selectedSlugs = decodeShareParams(vParam);
+                } else if (idsParam) {
+                    selectedIds = idsParam.split(",");
+                }
 
                 try {
                     // 모든 성분 데이터 가져오기 (추천 로직용)
@@ -56,8 +65,12 @@ function AnalysisContent() {
 
                     if (!allIngs) throw new Error("Failed to fetch ingredients");
 
-                    // 링크에 포함된 성분들 필터링
-                    const selectedIngs = (allIngs as Ingredient[]).filter(ing => ids.includes(ing.id));
+                    // 링크에 포함된 성분들 필터링 (슬러그 또는 ID 기준)
+                    const selectedIngs = (allIngs as Ingredient[]).filter(ing => {
+                        if (selectedSlugs.length > 0) return selectedSlugs.includes(ing.slug);
+                        if (selectedIds.length > 0) return selectedIds.includes(ing.id);
+                        return false;
+                    });
                     
                     if (selectedIngs.length >= 2) {
                         // 바구니 업데이트 (공유받은 리스트로 교체)

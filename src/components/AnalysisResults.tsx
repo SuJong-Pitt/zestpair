@@ -12,7 +12,7 @@ import {
     ShoppingCart,
     RefreshCcw
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, encodeShareParams } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -44,9 +44,10 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     }
 
     const handleShare = async () => {
-        // IDs를 콤마로 연결해 URL 파라미터 생성
-        const ids = result.ingredients.map(ing => ing.id).join(',');
-        const shareUrl = `${window.location.origin}/analysis?ids=${ids}`;
+        // IDs 대신 슬러그를 인코딩하여 URL 길이를 줄임 (대표님 제안 반영 ✨)
+        const slugs = result.ingredients.map(ing => ing.slug);
+        const encoded = encodeShareParams(slugs);
+        const shareUrl = `${window.location.origin}/analysis?v=${encoded}`;
 
         const shareData = {
             title: language === 'ko' ? "ZestPair | 영양제 궁합 분석 결과" : "ZestPair | Supplement Synergy Analysis",

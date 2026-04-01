@@ -9,6 +9,7 @@ import { BrandLogo, BrandName } from "@/components/BrandAssets";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useState } from "react";
 import Toast from "@/components/ui/Toast";
+import { encodeShareParams } from "@/lib/utils";
 
 /**
  * 분석 리포트 전용 헤더 (AI 디자인실장 영자 스타일 🎨)
@@ -24,9 +25,10 @@ export default function ReportHeader() {
     const [toast, setToast] = useState({ show: false, message: "" });
 
     const handleShare = async () => {
-        // IDs를 콤마로 연결해 URL 파라미터 생성
-        const ids = selectedIngredients.map(ing => ing.id).join(',');
-        const shareUrl = `${window.location.origin}/analysis?ids=${ids}`;
+        // IDs 대신 슬러그를 인코딩하여 URL 길이를 줄임 (대표님 제안 반영 ✨)
+        const slugs = selectedIngredients.map(ing => ing.slug);
+        const encoded = encodeShareParams(slugs);
+        const shareUrl = `${window.location.origin}/analysis?v=${encoded}`;
         
         const shareData = {
             title: language === 'ko' ? "ZestPair | 영양제 궁합 분석 결과" : "ZestPair | Supplement Synergy Analysis",

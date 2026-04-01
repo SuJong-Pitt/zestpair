@@ -375,11 +375,11 @@ export default function HomePage() {
               <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-2xl sm:text-3xl md:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-tight tracking-tighter text-center text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 {language === 'ko' ? (
                   <>
-                    지금 드시는 영양제, <span className="text-rose-500 underline decoration-rose-500/30 underline-offset-8 decoration-4">'독'</span>이 되고 있습니까?
+                    지금 드시는 영양제, <span className="text-rose-500 underline decoration-rose-500/30 underline-offset-8 decoration-4">'독'</span>이 될지도 모른다면?
                   </>
                 ) : (
                   <>
-                    Are the supplements you take daily actually <span className="text-rose-500 underline decoration-rose-500/30 underline-offset-8 decoration-4">'POISON'</span>?
+                    What if the supplements you take daily are actually <span className="text-rose-500 underline decoration-rose-500/30 underline-offset-8 decoration-4">'POISON'</span>?
                   </>
                 )}
               </span>

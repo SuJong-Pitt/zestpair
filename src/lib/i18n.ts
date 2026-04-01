@@ -3,7 +3,7 @@ export const UI_TRANSLATIONS = {
     ko: {
         hero: {
             title1: "🚨 1,300개 데이터 기반 긴급 점검",
-            title2: "당신이 먹는 영양제, 지금 '독'이 되고 있습니까?",
+            title2: "지금 드시는 영양제, '독'이 될지도 모른다면?",
             subtitle1: "잘못된 조합은 간과 신장을 소리 없이 망가뜨립니다.",
             subtitle2: "3초 만에 독성 검증",
             subtitle3: "받고 건강을 지키세요. (무료 분석)",
@@ -118,7 +118,7 @@ export const UI_TRANSLATIONS = {
     en: {
         hero: {
             title1: "🚨 EMERGENCY: SUPPLEMENT CHECK",
-            title2: "Are the supplements you take daily actually 'POISON'?",
+            title2: "What if the supplements you take daily are actually 'POISON'?",
             subtitle1: "Wrong combinations silently damage your liver and kidneys.",
             subtitle2: "Get 3-Second TOXICITY Check",
             subtitle3: "and protect your health. (Free Analysis)",
