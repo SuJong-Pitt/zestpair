@@ -2,12 +2,12 @@
 export const UI_TRANSLATIONS = {
     ko: {
         hero: {
-            title1: "복잡한 영양제 조합,",
-            title2: "포리가 딱 정해줄게요!",
-            subtitle1: "매일 먹는 영양제, AI 어시스턴트 포리가 성분 간의 충돌과",
-            subtitle2: "시너지를 실시간으로 분석",
-            subtitle3: "해드릴게요! ✨",
-            searchPlaceholder: "궁금한 성분이나 효능을 입력해보세요! ✨",
+            title1: "🚨 1,300개 데이터 기반 긴급 점검",
+            title2: "당신이 먹는 영양제, 지금 '독'이 되고 있습니까?",
+            subtitle1: "잘못된 조합은 간과 신장을 소리 없이 망가뜨립니다.",
+            subtitle2: "3초 만에 독성 검증",
+            subtitle3: "받고 건강을 지키세요. (무료 분석)",
+            searchPlaceholder: "🔍 지금 드시는 영양제를 입력해 보세요.",
             stats: {
                 library: "분석 라이브러리",
                 free: "무료 서비스",
@@ -117,12 +117,12 @@ export const UI_TRANSLATIONS = {
     },
     en: {
         hero: {
-            title1: "Complex Supplements,",
-            title2: "Let Pori decide for you!",
-            subtitle1: "Supplements you take daily, AI Assistant Pori will analyze",
-            subtitle2: "synergies and conflicts in real-time",
-            subtitle3: "for you! ✨",
-            searchPlaceholder: "Search for ingredients or benefits! ✨",
+            title1: "🚨 EMERGENCY: SUPPLEMENT CHECK",
+            title2: "Are the supplements you take daily actually 'POISON'?",
+            subtitle1: "Wrong combinations silently damage your liver and kidneys.",
+            subtitle2: "Get 3-Second TOXICITY Check",
+            subtitle3: "and protect your health. (Free Analysis)",
+            searchPlaceholder: "🔍 Search for supplements you take right now.",
             stats: {
                 library: "Analysis Library",
                 free: "Free Service",

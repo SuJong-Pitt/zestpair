@@ -308,7 +308,7 @@ export default function HomePage() {
     cautions.forEach(c => {
       if (!c.interaction) return;
       // 약물 관련 주의사항은 가중치 2배
-      const isDrugRelated = selectedIngredients.find(i => 
+      const isDrugRelated = selectedIngredients.find(i =>
         (i.id === c.interaction!.ingredient_a_id || i.id === c.interaction!.ingredient_b_id) && i.category === 'drugs'
       );
       cautionPenalty += isDrugRelated ? 15 : 5;
@@ -316,7 +316,7 @@ export default function HomePage() {
     conflicts.forEach(c => {
       if (!c.interaction) return;
       // 약물 관련 충돌은 가중치 1.5배 (기존 20 -> 35)
-      const isDrugRelated = selectedIngredients.find(i => 
+      const isDrugRelated = selectedIngredients.find(i =>
         (i.id === c.interaction!.ingredient_a_id || i.id === c.interaction!.ingredient_b_id) && i.category === 'drugs'
       );
       conflictPenalty += isDrugRelated ? 35 : 20;
@@ -452,7 +452,7 @@ export default function HomePage() {
 
             <div className="relative flex items-center gap-2.5 md:gap-3 px-3.5 md:px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
               <div className="relative flex items-center justify-center">
-            <div className="relative w-7 h-7 md:w-9 md:h-9 rounded-xl bg-slate-900/50 border border-emerald-500/20 p-1.5 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                <div className="relative w-7 h-7 md:w-9 md:h-9 rounded-xl bg-slate-900/50 border border-emerald-500/20 p-1.5 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
                   <Image
                     src="/logo.svg"
                     alt="ZestPair Logo"
@@ -492,10 +492,9 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-sm md:text-2xl mb-1 md:mb-2"
-              style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "0.05em" }}
+              className="text-xs md:text-xl font-black uppercase mb-1 md:mb-2 text-emerald-400 tracking-[0.2em]"
             >
-              {language === 'ko' ? '복잡한 영양제 조합,' : 'Your daily supplements,'}
+              {t.hero.title1}
             </motion.div>
 
             {/* 라인 2: 핵심 임팩트 문구 */}
@@ -527,81 +526,17 @@ export default function HomePage() {
                     boxShadow: "0 0 50px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.07)",
                   }}
                 />
-                {/* 스캐너 */}
-                <motion.span
-                  animate={{ x: ["-110%", "210%"] }}
-                  transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
-                  className="absolute inset-y-0 left-0 w-1/3 pointer-events-none"
-                  style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)", transform: "skewX(-12deg)" }}
-                />
               </motion.span>
 
-              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-xl sm:text-3xl md:text-4xl lg:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-tight tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-2xl sm:text-3xl md:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-tight tracking-tighter text-center text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 {language === 'ko' ? (
-                  <div className="flex flex-wrap justify-center items-center gap-x-1.5 md:gap-x-3">
-                    <span className="opacity-90">단</span>
-                    <div className="flex items-center">
-                      {"1초".split("").map((char, i) => (
-                        <motion.span
-                          key={i}
-                          initial={{ y: 20, opacity: 0 }}
-                          animate={{
-                            y: [0, -15, 0],
-                            scale: [1, 1.3, 1],
-                            rotate: [0, -8, 8, 0],
-                            opacity: 1
-                          }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            delay: i * 0.1,
-                            ease: "easeInOut"
-                          }}
-                          className="relative inline-block"
-                        >
-                          <span className="relative z-10 bg-gradient-to-br from-emerald-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(52,211,153,0.7)]">
-                            {char}
-                          </span>
-                          <motion.span
-                            animate={isMobile ? { opacity: [0.4, 0.6, 0.4] } : { opacity: [0.3, 0.7, 0.3], scale: [1, 1.4, 1] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="absolute -inset-4 bg-emerald-500/40 blur-xl md:blur-2xl rounded-full -z-10"
-                            style={{ willChange: "opacity, transform" }}
-                          />
-                        </motion.span>
-                      ))}
-                    </div>
-                    <span className="opacity-90">만에 궁합 체크 끝!</span>
-                  </div>
+                  <>
+                    지금 드시는 영양제, <span className="text-rose-500 underline decoration-rose-500/30 underline-offset-8 decoration-4">'독'</span>이 되고 있습니까?
+                  </>
                 ) : (
-                  <div className="flex flex-wrap justify-center items-center gap-x-2 md:gap-x-3">
-                    <span className="opacity-90">Instant</span>
-                    <div className="flex items-center mx-1 md:mx-2">
-                      {"Synergy".split("").map((char, i) => (
-                        <motion.span
-                          key={i}
-                          initial={{ y: 15, opacity: 0 }}
-                          animate={{
-                            y: [0, -10, 0],
-                            scale: [1, 1.2, 1],
-                            opacity: 1
-                          }}
-                          transition={{
-                            duration: 2.5,
-                            repeat: Infinity,
-                            delay: i * 0.08,
-                            ease: "easeInOut"
-                          }}
-                          className="relative inline-block"
-                        >
-                          <span className="relative z-10 bg-gradient-to-br from-emerald-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]">
-                            {char}
-                          </span>
-                        </motion.span>
-                      ))}
-                    </div>
-                    <span className="opacity-90">Check!</span>
-                  </div>
+                  <>
+                    Are the supplements you take daily actually <span className="text-rose-500 underline decoration-rose-500/30 underline-offset-8 decoration-4">'POISON'</span>?
+                  </>
                 )}
               </span>
 
@@ -762,8 +697,8 @@ export default function HomePage() {
                     }}
                     className="relative flex items-center gap-1.5 md:gap-2 px-3 md:px-6 py-2 md:py-2.5 rounded-full font-[900] text-[9px] md:text-xs transition-all active:scale-95 whitespace-nowrap group/btn overflow-hidden"
                     style={{
-                      background: (selectedIngredients.length < 2 && !showTopAlert) 
-                        ? "rgba(255,255,255,0.05)" 
+                      background: (selectedIngredients.length < 2 && !showTopAlert)
+                        ? "rgba(255,255,255,0.05)"
                         : (showTopAlert && selectedIngredients.length < 2)
                           ? "linear-gradient(135deg, #f87171 0%, #ef4444 100%)"
                           : "linear-gradient(135deg, #10b981 0%, #0891b2 60%, #7c3aed 100%)",
@@ -782,7 +717,7 @@ export default function HomePage() {
                       />
                     )}
                     <span className="relative z-10 uppercase">
-                      {showTopAlert && selectedIngredients.length < 2 
+                      {showTopAlert && selectedIngredients.length < 2
                         ? (language === 'ko' ? '2개 이상 선택!' : 'MIN 2 ITEMS!')
                         : (language === 'ko' ? '분석하기' : 'ANALYZE')}
                     </span>
@@ -958,10 +893,10 @@ export default function HomePage() {
                 filter: isBlur ? "blur(8px)" : "blur(0px)",
                 scale: isBlur ? 0.98 : 1
               }}
-              transition={{ 
-                duration: 0.5, 
+              transition={{
+                duration: 0.5,
                 delay: !hasInitialLoaded ? 1.5 : 0,
-                ease: "easeOut" 
+                ease: "easeOut"
               }}
               className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2.5 mt-8 md:mt-12 mb-4 max-w-4xl mx-auto gpu-accelerated"
             >
@@ -977,9 +912,9 @@ export default function HomePage() {
                   key={i}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ 
+                  transition={{
                     delay: !hasInitialLoaded ? (1.6 + i * 0.05) : 0,
-                    duration: 0.3 
+                    duration: 0.3
                   }}
                   whileHover={{ y: -2, backgroundColor: "rgba(255,255,255,0.08)" }}
                   className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[8.5px] md:text-[11px] font-[900] transition-colors whitespace-nowrap gpu-accelerated"
@@ -1351,7 +1286,7 @@ export default function HomePage() {
 
           {isAnalyzing && <AnalyzingAnimation onComplete={handleAnimationComplete} />}
           {!isAnalyzing && hasResult && analysisResult && isMounted && (
-            <AnalysisResults result={analysisResult} />
+            <AnalysisResults result={analysisResult!} />
           )}
         </div>
       </main>
@@ -1373,19 +1308,19 @@ export default function HomePage() {
               <span className="text-slate-800">Pair</span>
             </span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-1">
             <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest">
               {t.common.inquiry}
             </p>
-            <a 
+            <a
               href="mailto:admin@zestpair.com"
               className="text-emerald-600 font-black text-sm hover:text-emerald-500 transition-colors hover:underline decoration-2 underline-offset-4"
             >
               admin@zestpair.com
             </a>
           </div>
-          
+
           <p className="text-slate-400 text-[10px] font-medium pt-4">
             &copy; {new Date().getFullYear()} ZestPair. All rights reserved.
           </p>
