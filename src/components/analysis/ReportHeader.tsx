@@ -22,7 +22,7 @@ export default function ReportHeader() {
 
     return (
         <header className="fixed top-0 left-0 right-0 z-[100] px-4 py-3 md:py-4 transition-all duration-300 bg-slate-950/40 backdrop-blur-md border-b border-white/5">
-            <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+            <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 md:gap-4">
                 
                 {/* 🎨 1. 브랜드 로고 (Home 이동) */}
                 <motion.div
@@ -32,12 +32,12 @@ export default function ReportHeader() {
                     onClick={() => router.push("/")}
                 >
                     <div className="relative flex items-center gap-3 px-3.5 md:px-5 py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
-                        <BrandLogo size={isMobile ? 28 : 36} />
-                        <BrandName size="text-[17px] md:text-[20px]" />
-                        <div className="w-px h-3 md:h-4 bg-white/20 mx-1" />
+                        <BrandLogo size={isMobile ? 24 : 36} />
+                        <BrandName size="text-[15px] md:text-[20px]" />
+                        <div className="hidden md:block w-px h-4 bg-white/20 mx-1" />
                         <Link
                             href="/about"
-                            className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#6ee7b7]/80 flex items-center gap-1.5 hover:text-[#6ee7b7] transition-all group/core"
+                            className="hidden md:flex text-[9px] font-black uppercase tracking-widest text-[#6ee7b7]/80 items-center gap-1.5 hover:text-[#6ee7b7] transition-all group/core"
                         >
                             <div className="flex items-center gap-1">
                                 <motion.div
@@ -63,8 +63,11 @@ export default function ReportHeader() {
                         className="flex items-center gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 group"
                     >
                         <ArrowLeft size={16} className="text-slate-400 group-hover:text-emerald-400 group-hover:-translate-x-0.5 transition-all" />
-                        <span className="text-[11px] md:text-xs font-black text-slate-300 group-hover:text-white uppercase tracking-widest whitespace-nowrap">
+                        <span className="hidden sm:inline-block text-[11px] md:text-xs font-black text-slate-300 group-hover:text-white uppercase tracking-widest whitespace-nowrap">
                             {language === 'ko' ? '선택 수정하기' : 'Edit Selection'}
+                        </span>
+                        <span className="sm:hidden text-[10px] font-black text-slate-300 group-hover:text-white uppercase tracking-widest whitespace-nowrap">
+                            {language === 'ko' ? '수정' : 'Edit'}
                         </span>
                     </motion.button>
 

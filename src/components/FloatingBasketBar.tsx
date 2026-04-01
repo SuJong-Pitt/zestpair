@@ -69,9 +69,9 @@ export default function FloatingBasketBar({
         <motion.div
           className={cn(
             "fixed left-0 right-0 z-50 pointer-events-none flex justify-center px-4",
-            "top-0"
+            "bottom-0"
           )}
-          style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 1.5rem)" }}
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 1.5rem)" }}
         >
           {/* 배경 블러 오버레이 */}
           <AnimatePresence>
@@ -88,11 +88,11 @@ export default function FloatingBasketBar({
 
           {/* ✦ 메인 바 컨테이너 */}
           <motion.div
-            initial={{ y: -80, opacity: 0, scale: 0.95 }}
+            initial={{ y: 80, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: -80, opacity: 0, scale: 0.95 }}
+            exit={{ y: 80, opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="w-full max-w-lg relative pointer-events-auto"
+            className="w-full max-w-lg relative pointer-events-auto flex flex-col-reverse"
           >
             {/* 무지개 외곽 글로우 (canAnalyze) */}
             {canAnalyze && (
@@ -135,9 +135,9 @@ export default function FloatingBasketBar({
                   className="absolute -top-4 -right-4 w-28 h-28 rounded-full"
                   style={{ background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)", filter: "blur(25px)" }}
                 />
-                {/* 하단 하이라이트 라인 (상단에 위치할 때 하단에 배치) */}
+                  {/* 상단 하이라이트 라인 (하단에 위치할 때 상단에 배치) */}
                 <div
-                  className="absolute bottom-0 left-8 right-8 h-px"
+                  className="absolute top-0 left-8 right-8 h-px"
                   style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent)" }}
                 />
               </div>
@@ -364,9 +364,9 @@ export default function FloatingBasketBar({
                           </motion.span>
                         </div>
 
-                        {/* 화살표 (상단 고정이므로 방향 반전) */}
+                        {/* 화살표 (하단 고정이므로 회전 방향 조정) */}
                         <motion.div
-                          animate={{ rotate: isExpanded ? 0 : 180, y: isExpanded ? 0 : [0, 3, 0] }}
+                          animate={{ rotate: isExpanded ? 180 : 0, y: isExpanded ? 0 : [0, -3, 0] }}
                           transition={isExpanded ? { duration: 0.3 } : { duration: 2, repeat: Infinity }}
                           className="ml-auto shrink-0 text-white/25 group-hover/info:text-emerald-400 transition-colors"
                         >
