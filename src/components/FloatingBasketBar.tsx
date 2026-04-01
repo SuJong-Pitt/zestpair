@@ -272,14 +272,14 @@ export default function FloatingBasketBar({
                       setTimeout(() => document.getElementById("bar-search")?.focus(), 100);
                     }
                   }}
-                  className="shrink-0 w-11 h-11 rounded-[1.1rem] flex items-center justify-center transition-all"
+                  className="shrink-0 w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-[1.1rem] flex items-center justify-center transition-all"
                   style={
                     isSearchActive
                       ? { background: "linear-gradient(135deg, #10b981, #059669)", boxShadow: "0 0 18px rgba(16,185,129,0.5)" }
                       : { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }
                   }
                 >
-                  {isSearchActive ? <X size={18} className="text-white" /> : <SearchIcon size={18} className="text-white/50" />}
+                  {isSearchActive ? <X size={16} className="text-white" /> : <SearchIcon size={16} className="text-white/50" />}
                 </motion.button>
 
                 {/* 중앙 정보 / 검색 입력 */}
@@ -299,8 +299,8 @@ export default function FloatingBasketBar({
                           type="text"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          placeholder={language === "ko" ? "성분 검색..." : "Search ingredient..."}
-                          className="w-full bg-transparent border-none focus:ring-0 text-sm text-white font-bold p-0 placeholder:text-white/25"
+                          placeholder={language === "ko" ? "성분 검색..." : "Search..."}
+                          className="w-full bg-transparent border-none focus:ring-0 text-[13px] md:text-sm text-white font-bold p-0 placeholder:text-white/25"
                         />
                       </motion.div>
                     ) : (
@@ -316,7 +316,7 @@ export default function FloatingBasketBar({
                         <motion.div
                           animate={{ scale: [1, 1.1, 1] }}
                           transition={{ duration: 2.2, repeat: Infinity }}
-                          className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-[900] text-sm"
+                          className="shrink-0 w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center font-[900] text-xs md:text-sm"
                           style={{
                             background: "linear-gradient(135deg, rgba(16,185,129,0.22), rgba(6,182,212,0.18))",
                             border: "1.5px solid rgba(52,211,153,0.45)",
@@ -429,16 +429,16 @@ export default function FloatingBasketBar({
                           style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent)", transform: "skewX(-15deg)" }}
                         />
                       )}
-                      <span className="relative z-10 flex items-center gap-1.5">
+                      <span className="relative z-10 flex items-center gap-1 md:gap-1.5">
                         {isAnalyzing ? (
                           <>
-                            <FlaskConical size={14} className="animate-spin" />
+                            <FlaskConical size={12} className="animate-spin" />
                             <span className="hidden sm:inline uppercase">{t.basket.analyzing}</span>
                             <span className="sm:hidden">···</span>
                           </>
                         ) : (
                           <>
-                            <Zap size={14} className={canAnalyze ? "text-yellow-200" : ""} />
+                            <Zap size={12} className={canAnalyze ? "text-yellow-200" : ""} />
                             <span className="uppercase">{language === "ko" ? "분석" : "SCAN"}</span>
                           </>
                         )}

@@ -94,11 +94,13 @@
     /* 한글 가독성 향상 */
     overflow-x: hidden;
     width: 100%;
+    position: relative; /* Fixed children positioning */
   }
 
   html {
     overflow-x: hidden;
-    width: 100%;
+    width: 100vw; /* Avoid scrollbar induced overflow */
+    -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape */
   }
 
   *::selection {

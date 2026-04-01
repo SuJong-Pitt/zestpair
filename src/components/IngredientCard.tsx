@@ -134,7 +134,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
 
         {/* ── 이모지 이미지 영역 (세로폭 축소 및 크기 조정) ── */}
         <div
-          className="relative w-full h-20 md:h-24 flex items-center justify-center overflow-hidden"
+          className="relative w-full h-16 md:h-24 flex items-center justify-center overflow-hidden"
           style={selected ? {
             background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.15) 100%)",
           } : {
@@ -144,7 +144,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
           }}
         >
           <span
-            className="relative z-10 text-3xl md:text-4xl transition-transform duration-500"
+            className="relative z-10 text-2xl md:text-4xl transition-transform duration-500"
             style={selected ? {
               transform: "scale(1.1)",
               filter: `drop-shadow(0 0 12px ${theme.glow})`
@@ -160,7 +160,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
         <div className="px-4 pt-2.5 pb-0.5">
           <div className="flex items-start justify-between gap-1 mb-0.5">
             <h3
-              className="font-black text-[13px] md:text-[14px] tracking-tight leading-tight line-clamp-1 transition-colors duration-300"
+              className="font-black text-[11px] md:text-[14px] tracking-tight leading-tight line-clamp-1 transition-colors duration-300"
               style={selected ? { color: theme.color } : { color: "#0f172a" }}
             >
               {name}
@@ -173,7 +173,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
           </div>
 
           <p
-            className="text-[10px] md:text-[11px] leading-snug line-clamp-2 transition-colors duration-300"
+            className="text-[9px] md:text-[11px] leading-snug line-clamp-2 transition-colors duration-300 h-6 md:h-auto"
             style={selected ? { color: "rgba(255,255,255,0.4)", fontWeight: 500 } : { color: "#94a3b8", fontWeight: 500 }}
           >
             {shortDesc}
@@ -190,7 +190,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
         >
           {/* 복용 시간 태그 */}
           <div
-            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider"
+            className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg text-[8px] md:text-[9px] font-black uppercase tracking-wider"
             style={selected ? {
               background: `${theme.color}18`,
               border: `1px solid ${theme.color}30`,
@@ -235,7 +235,7 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
             className="absolute -top-3 left-1/2 z-[40] pointer-events-none"
           >
             <div
-              className="relative rounded-[1.25rem] p-2.5 md:p-3.5 bg-slate-950/98 border backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] w-[175px] md:w-[240px]"
+              className="relative rounded-[1.25rem] p-2 bg-slate-950/98 border backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] w-[140px] md:w-[240px]"
               style={{ borderColor: `${theme.color}50`, borderTop: `2px solid ${theme.color}a0` }}
             >
               <div className="flex items-center gap-1.5 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${theme.color}25` }}>

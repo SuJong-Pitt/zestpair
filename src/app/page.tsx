@@ -438,12 +438,12 @@ export default function HomePage() {
 
             <div className="relative flex items-center gap-2.5 md:gap-3 px-3.5 md:px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
               <div className="relative flex items-center justify-center">
-                <div className="relative w-8 h-8 md:w-9 md:h-9 rounded-xl bg-slate-900/50 border border-emerald-500/20 p-1.5 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+            <div className="relative w-7 h-7 md:w-9 md:h-9 rounded-xl bg-slate-900/50 border border-emerald-500/20 p-1.5 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
                   <Image
                     src="/logo.svg"
                     alt="ZestPair Logo"
-                    width={36}
-                    height={36}
+                    width={32}
+                    height={32}
                     className="w-full h-full object-contain"
                     priority
                   />
@@ -478,7 +478,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-base md:text-2xl mb-1 md:mb-2"
+              className="text-sm md:text-2xl mb-1 md:mb-2"
               style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "0.05em" }}
             >
               {language === 'ko' ? '복잡한 영양제 조합,' : 'Your daily supplements,'}
@@ -522,9 +522,9 @@ export default function HomePage() {
                 />
               </motion.span>
 
-              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1.5 md:gap-x-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-[1000] px-4 md:px-10 py-2 md:py-3 leading-tight tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-xl sm:text-3xl md:text-4xl lg:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-tight tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 {language === 'ko' ? (
-                  <div className="flex flex-wrap justify-center items-center gap-x-2 md:gap-x-3">
+                  <div className="flex flex-wrap justify-center items-center gap-x-1.5 md:gap-x-3">
                     <span className="opacity-90">단</span>
                     <div className="flex items-center">
                       {"1초".split("").map((char, i) => (
@@ -722,7 +722,7 @@ export default function HomePage() {
                     });
                   }}
                   onFocus={() => setIsDropdownOpen(true)}
-                  className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-xs md:text-lg h-9 md:h-12 flex-1 font-bold px-2 md:px-4 tracking-tight relative z-20"
+                  className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-[11px] md:text-lg h-8 md:h-12 flex-1 font-bold px-1 md:px-4 tracking-tight relative z-20"
                 />
                 <div className="flex items-center gap-2 pr-1.5 md:pr-2">
                   {selectedIngredients.length > 0 && (
@@ -746,7 +746,7 @@ export default function HomePage() {
                       }
                       handleAnalyze();
                     }}
-                    className="relative flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-full font-[900] text-[10px] md:text-xs transition-all active:scale-95 whitespace-nowrap group/btn overflow-hidden"
+                    className="relative flex items-center gap-1.5 md:gap-2 px-3 md:px-6 py-2 md:py-2.5 rounded-full font-[900] text-[9px] md:text-xs transition-all active:scale-95 whitespace-nowrap group/btn overflow-hidden"
                     style={{
                       background: (selectedIngredients.length < 2 && !showTopAlert) 
                         ? "rgba(255,255,255,0.05)" 
@@ -968,7 +968,7 @@ export default function HomePage() {
                     duration: 0.3 
                   }}
                   whileHover={{ y: -2, backgroundColor: "rgba(255,255,255,0.08)" }}
-                  className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[9px] md:text-[11px] font-[900] transition-colors whitespace-nowrap gpu-accelerated"
+                  className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[8.5px] md:text-[11px] font-[900] transition-colors whitespace-nowrap gpu-accelerated"
                   style={{
                     background: "rgba(255,255,255,0.03)",
                     border: "1px solid rgba(255,255,255,0.12)",
@@ -1160,7 +1160,7 @@ export default function HomePage() {
 
               <AnimatePresence mode="wait">
                 {isLoadingList ? (
-                  <div key="skeleton" className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-4 px-1">
+                  <div key="skeleton" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 pt-2 pb-4 px-1">
                     {[...Array(4)].map((_, i) => (
                       <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
                     ))}
@@ -1239,7 +1239,7 @@ export default function HomePage() {
             </div>
 
             {isLoadingList ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 px-1">
                 {[...Array(8)].map((_, i) => (
                   <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
                 ))}
@@ -1247,7 +1247,7 @@ export default function HomePage() {
             ) : filteredIngredients.length > 0 ? (
               <div
                 key={categoryVersionRef.current}
-                className="grid grid-cols-2 md:grid-cols-4 gap-4 px-1 animate-fade-in"
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 px-1 animate-fade-in"
               >
                 {filteredIngredients.map((ing) => (
                   <IngredientCard key={ing.id} ingredient={ing} />

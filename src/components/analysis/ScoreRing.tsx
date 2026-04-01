@@ -5,13 +5,14 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 
 interface ScoreRingProps {
     score: number;
+    size?: number;
 }
 
 /** 
  * 점수 링 컴포넌트 - 풀 컬러 네온 HUD 버전
  * React.memo를 통해 부모 리렌더링 시에도 불필요한 계산을 방지합니다.
  */
-const ScoreRing = memo(function ScoreRing({ score }: ScoreRingProps) {
+const ScoreRing = memo(function ScoreRing({ score, size }: ScoreRingProps) {
     const radius = 72;
     const strokeWidth = 8;
     const circumference = 2 * Math.PI * radius;
@@ -77,7 +78,10 @@ const ScoreRing = memo(function ScoreRing({ score }: ScoreRingProps) {
     const isMaxScore = score === 100;
 
     return (
-        <div className="relative flex items-center justify-center w-52 h-52 md:w-60 md:h-60 select-none group/score">
+        <div 
+            className="relative flex items-center justify-center select-none group/score w-52 h-52 md:w-60 md:h-60"
+            style={size ? { width: size, height: size } : {}}
+        >
             {/* 100점 전용: 스피닝 홀로그래픽 코닉 오라 */}
             {isMaxScore && (
                 <motion.div
