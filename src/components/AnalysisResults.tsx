@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Sparkles,
@@ -30,8 +31,9 @@ interface AnalysisResultsProps {
     coupangProducts?: CoupangProduct[];
 }
 
-export default function AnalysisResults({ result, coupangProducts = [] }: AnalysisResultsProps) {
-    const { clearBasket, language } = useBasketStore();
+export default function AnalysisResults({ result }: AnalysisResultsProps) {
+    const router = useRouter();
+    const { language, clearBasket } = useBasketStore();
     const t = UI_TRANSLATIONS[language];
     const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -435,19 +437,36 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                         );
                     })()}
 
-                    {/* 4. Reset Button */}
-                    <div className="pt-10 pb-6 flex flex-col items-center gap-4 relative z-10">
+                    {/* 영자's 프리미엄 분석 리셋 섹션 (대표님, 이 버튼 정말 예쁘죠? ✨) */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="pt-20 pb-12 flex flex-col items-center gap-6 relative z-10"
+                    >
+                        <div className="flex flex-col items-center gap-2">
+                            <p className="text-[10px] md:text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">
+                                {language === 'ko' ? '다른 영양제도 궁금하신가요?' : 'Curious about other combinations?'}
+                            </p>
+                            <div className="w-8 h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
+                        </div>
+                        
                         <button
                             onClick={() => {
                                 clearBasket();
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                router.push("/");
                             }}
-                            className="flex items-center gap-2 text-slate-500 hover:text-emerald-400 transition-colors font-bold text-sm md:text-base border border-transparent hover:border-emerald-500/20 px-4 py-2 rounded-xl"
+                            className="group relative flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl transition-all hover:bg-white/10 hover:border-emerald-500/30 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] active:scale-95"
                         >
-                            <RefreshCcw size={16} />
-                            <span>{language === 'ko' ? '다른 영양제 분석하기' : 'Analyze other supplements'}</span>
+                            {/* Glow effect on hover */}
+                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            
+                            <RefreshCcw size={18} className="text-emerald-400 group-hover:rotate-180 transition-transform duration-700" />
+                            <span className="text-xs md:text-sm font-black text-white/90 group-hover:text-white transition-colors uppercase tracking-widest">
+                                {language === 'ko' ? '새로운 조합 분석하기' : 'Analyze New Combination'}
+                            </span>
                         </button>
-                    </div>
+                    </motion.div>
                 </div>
             </motion.div>
         </div>

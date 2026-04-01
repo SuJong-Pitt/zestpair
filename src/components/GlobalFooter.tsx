@@ -2,38 +2,80 @@
 
 import { useBasketStore } from "@/store/basketStore";
 import { UI_TRANSLATIONS } from "@/lib/i18n";
+import { BrandLogo, BrandName } from "@/components/BrandAssets";
+import { Mail, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function GlobalFooter() {
   const { language } = useBasketStore();
   const t = UI_TRANSLATIONS[language];
 
   return (
-    <footer className="py-24 border-t border-slate-100 bg-white/80 backdrop-blur-sm">
-      <div className="max-w-4xl mx-auto px-4 text-center">
-        {/* 강조된 면책 조항 박스 */}
-        <div className="inline-block p-8 md:p-10 rounded-[2.5rem] bg-amber-50/40 border border-amber-100 mb-12 max-w-3xl">
-          <div className="flex flex-col items-center gap-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/50 border border-amber-200 mb-2">
-              <span className="text-[10px] font-black text-amber-700 uppercase tracking-[0.2em]">Medical Disclaimer</span>
+    <footer className="relative pt-24 pb-12 border-t border-white/5 bg-[#030712] overflow-hidden">
+      {/* 🔮 배경 장식 (Subtle Glow & Divider) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+      <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start mb-20 text-center lg:text-left">
+          
+          {/* 🦾 1. 브랜드 정체성 영역 (4/12) */}
+          <div className="lg:col-span-4 flex flex-col items-center lg:items-start gap-5">
+            <div className="flex items-center gap-3">
+              <BrandLogo size={42} />
+              <BrandName size="text-2xl" />
             </div>
-            <h3 className="text-slate-900 font-extrabold text-lg md:text-xl tracking-tight">
-              {t.common.medicalDisclaimerTitle}
-            </h3>
-            <p className="text-slate-500 text-sm md:text-base leading-relaxed font-medium">
-              {t.common.medicalDisclaimerBody}
+            <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-xs">
+              {language === 'ko' 
+                ? 'AI 기술을 통해 당신의 건강한 영양제 생활을 돕는 고감도 시너지 가이드.' 
+                : 'A high-sensitivity synergy guide helping your healthy supplement life through AI technology.'}
             </p>
-            {language === 'ko' && (
-              <p className="text-slate-400 text-xs mt-2 italic">
-                ZestPair is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.
-              </p>
-            )}
+          </div>
+
+          {/* 💌 2. 프리미엄 커넥션 카드 (문의하기) (4/12) */}
+          <div className="lg:col-span-4 flex flex-col items-center lg:items-start gap-4">
+            <span className="text-[10px] font-black text-emerald-500/80 uppercase tracking-[0.3em]">
+              {language === 'ko' ? '문의 사항' : 'Inquiry'}
+            </span>
+            <motion.a
+                href="mailto:admin@zestpair.com"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative flex items-center gap-3 px-6 py-4 rounded-[2rem] bg-white/[0.03] border border-white/10 backdrop-blur-2xl transition-all hover:bg-white/5 hover:border-white/20 shadow-2xl"
+            >
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500/20 transition-colors">
+                    <Mail size={18} />
+                </div>
+                <div className="flex flex-col items-start pr-4">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">{t.common.inquiry}</span>
+                    <span className="text-sm font-black text-white group-hover:text-emerald-400 transition-colors tracking-tight">admin@zestpair.com</span>
+                </div>
+                <ArrowRight size={16} className="text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+            </motion.a>
+          </div>
+
+          {/* 🛡️ 3. 면책조항 아카이브 (4/12) */}
+          <div className="lg:col-span-4 flex flex-col items-center lg:items-start gap-4">
+            <span className="text-[10px] font-black text-amber-500/80 uppercase tracking-[0.3em]">
+                {language === 'ko' ? '안내 사항' : 'Notice'}
+            </span>
+            <div className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 text-slate-500 text-[11px] leading-relaxed font-medium">
+                <strong className="text-slate-400 block mb-1.5 font-black">{t.common.medicalDisclaimerTitle}</strong>
+                {t.common.medicalDisclaimerBody}
+            </div>
           </div>
         </div>
 
-        <div className="pt-10 border-t border-slate-100">
-          <p className="text-[10px] text-slate-300 font-black tracking-[0.3em] uppercase">
+        {/* 📋 하단 저작권 및 법적 공지 영역 */}
+        <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 opacity-60">
+          <p className="text-[10px] text-slate-500 font-bold tracking-[0.2em] uppercase">
             © 2026 ZESTPAIR. ALL RIGHTS RESERVED.
           </p>
+          <div className="flex gap-8 text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+            <span className="hover:text-slate-400 cursor-pointer transition-colors">Privacy Policy</span>
+            <span className="hover:text-slate-400 cursor-pointer transition-colors">Terms of Service</span>
+          </div>
         </div>
       </div>
     </footer>

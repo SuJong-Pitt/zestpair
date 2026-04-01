@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, Suspense, useMemo, useCallback, useTransit
 import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database, Smartphone, X, Zap, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
 const IngredientCard = dynamic(() => import("@/components/IngredientCard"), {
@@ -19,6 +20,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { UI_TRANSLATIONS, CATEGORIES_TRANSLATIONS } from "@/lib/i18n";
+import { BrandLogo, BrandName } from "@/components/BrandAssets";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import Image from "next/image";
 
@@ -95,6 +97,7 @@ function HorizontalScroll({ children, className }: { children: React.ReactNode; 
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const resultRef = useRef<HTMLDivElement>(null);
   const ingredientsRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -383,21 +386,12 @@ export default function HomePage() {
 
 
   const handleAnimationComplete = useCallback(() => {
-    setAnalyzing(false);
-    setHasResult(true);
-  }, [setAnalyzing, setHasResult]);
+    // 분석이 끝났다고 바로 꺼버리면 홈 화면이 비춰서 안 예뻐요! (영자 실장 생각 ✨)
+    // router.push가 완료될 때까지 오버레이를 유지합니다.
+    router.push("/analysis");
+  }, [router]);
 
-  // 분석 완료 후 스크롤 로직 (페이지 전환 트릭: Smooth 대신 Auto로 즉성성 부여)
-  useEffect(() => {
-    if (hasResult && !isAnalyzing) {
-      // 렌더링 완료 직후 즉시 타겟 위치로 점프하여 페이지가 바뀐 것처럼 연출
-      const target = document.getElementById("analysis-report-top") || document.getElementById("analysis-results-section");
-      if (target) {
-        // 부드러운 스크롤(smooth) 대신 즉시 이동(auto)하여 '트릭' 완성
-        target.scrollIntoView({ behavior: "auto", block: "start" });
-      }
-    }
-  }, [hasResult, isAnalyzing]);
+  // (페이지 전환 방식으로 변경되어 기존 스크롤 로직은 제거합니다)
 
   return (
     <div className="min-h-screen bg-slate-50/50">
@@ -449,24 +443,9 @@ export default function HomePage() {
           >
             {/* 뒤 배경 글로우 */}
             <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
-
-            <div className="relative flex items-center gap-2.5 md:gap-3 px-3.5 md:px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
-              <div className="relative flex items-center justify-center">
-                <div className="relative w-7 h-7 md:w-9 md:h-9 rounded-xl bg-slate-900/50 border border-emerald-500/20 p-1.5 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                  <Image
-                    src="/logo.svg"
-                    alt="ZestPair Logo"
-                    width={32}
-                    height={32}
-                    className="w-full h-full object-contain"
-                    priority
-                  />
-                </div>
-              </div>
-              <div className="flex items-center text-[15px] md:text-[18px] font-black tracking-tight cursor-default">
-                <span className="text-[#10b981]">Zest</span>
-                <span className="text-white">Pair</span>
-              </div>
+            <div className="relative flex items-center gap-2.5 md:gap-3 px-3.5 md:px-5 py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
+              <BrandLogo size={isMobile ? 28 : 36} />
+              <BrandName size="text-[17px] md:text-[20px]" />
               <div className="w-px h-3 md:h-4 bg-white/20 mx-1" />
               <Link
                 href="/about"
@@ -1285,47 +1264,9 @@ export default function HomePage() {
         <div ref={resultRef} id="analysis-results-section" className="mt-8 min-h-[50vh] scroll-mt-0">
 
           {isAnalyzing && <AnalyzingAnimation onComplete={handleAnimationComplete} />}
-          {!isAnalyzing && hasResult && analysisResult && isMounted && (
-            <AnalysisResults result={analysisResult!} />
-          )}
         </div>
       </main>
 
-      <footer className="py-12 px-4 border-t border-slate-200/50 bg-white/30 backdrop-blur-sm">
-        <div className="max-w-2xl mx-auto text-center space-y-4">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-1.5 flex items-center justify-center">
-              <Image
-                src="/logo.svg"
-                alt="ZestPair Logo"
-                width={24}
-                height={24}
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <span className="text-lg font-black tracking-tight flex items-center">
-              <span className="text-[#10b981]">Zest</span>
-              <span className="text-slate-800">Pair</span>
-            </span>
-          </div>
-
-          <div className="flex flex-col items-center gap-1">
-            <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest">
-              {t.common.inquiry}
-            </p>
-            <a
-              href="mailto:admin@zestpair.com"
-              className="text-emerald-600 font-black text-sm hover:text-emerald-500 transition-colors hover:underline decoration-2 underline-offset-4"
-            >
-              admin@zestpair.com
-            </a>
-          </div>
-
-          <p className="text-slate-400 text-[10px] font-medium pt-4">
-            &copy; {new Date().getFullYear()} ZestPair. All rights reserved.
-          </p>
-        </div>
-      </footer>
 
       {isMounted && (
         <FloatingBasketBar

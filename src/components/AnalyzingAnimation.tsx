@@ -54,7 +54,8 @@ export default function AnalyzingAnimation({ onComplete }: Props) {
         if (prev >= 100) {
           clearInterval(progressInterval);
           setIsFinished(true);
-          setTimeout(() => onComplete?.(), 500);
+          // 대표님, 체크마크 보실 시간 1초 더 드릴게요! ✨
+          setTimeout(() => onComplete?.(), 1000);
           return 100;
         }
         const remaining = 100 - prev;
