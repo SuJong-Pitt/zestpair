@@ -3,10 +3,11 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
+import { I18nContent } from "@/lib/i18n";
 
 interface NoInteractionCardProps {
     language: string;
-    t: any;
+    t: I18nContent;
 }
 
 const NoInteractionCard = memo(function NoInteractionCard({ language, t }: NoInteractionCardProps) {

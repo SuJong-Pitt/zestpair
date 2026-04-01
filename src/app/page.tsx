@@ -25,6 +25,18 @@ import Image from "next/image";
 const AnalyzingAnimation = dynamic(() => import("@/components/AnalyzingAnimation"), { ssr: false });
 const AnalysisResults = dynamic(() => import("@/components/AnalysisResults"), { ssr: false });
 const VisualDecorations = dynamic(() => import("@/components/VisualDecorations"), { ssr: false });
+import type { Interaction } from "@/types/database";
+
+// 검색 결과 타입을 위한 인터페이스
+interface SearchCategory {
+  id: string;
+  name: string;
+  name_en: string;
+  emoji: string;
+  isCategory: true;
+}
+
+type SearchResult = Ingredient | SearchCategory;
 
 
 // 헬퍼 컴포넌트: 가로 스크롤 컨테이너 (관성 드래그 지원)
@@ -199,7 +211,7 @@ export default function HomePage() {
     });
 
     // 카테고리 결과를 상단에 배치하고 성분을 뒤에 배치
-    return [...matchedCategories, ...matchedIngredients] as any[];
+    return [...matchedCategories, ...matchedIngredients] as SearchResult[];
   }, [dbIngredients, searchQuery, language]);
 
   const isBlur = isDropdownOpen && dropdownResults.length > 0;
@@ -231,7 +243,7 @@ export default function HomePage() {
       .in("ingredient_b_id", ingredientIds);
 
     const findInteraction = (idA: string, idB: string) => {
-      const dbInts = (dbInteractions as any[]) || [];
+      const dbInts = (dbInteractions as Interaction[]) || [];
       return dbInts.find(i =>
         (i.ingredient_a_id === idA && i.ingredient_b_id === idB) ||
         (i.ingredient_a_id === idB && i.ingredient_b_id === idA)
@@ -246,7 +258,7 @@ export default function HomePage() {
       for (let j = i + 1; j < selectedIngredients.length; j++) {
         const ing1 = selectedIngredients[i];
         const ing2 = selectedIngredients[j];
-        const interaction = findInteraction(ing1.id, ing2.id) as any;
+        const interaction = findInteraction(ing1.id, ing2.id);
         const res: InteractionResult = { pair: [ing1, ing2], interaction };
         if (!interaction) continue;
         if (interaction.type === "SYNERGY") synergies.push(res);
@@ -265,10 +277,12 @@ export default function HomePage() {
         .or(`ingredient_a_id.eq.${ing.id},ingredient_b_id.eq.${ing.id}`)
         .eq("type", "SYNERGY");
 
-      const potentialMatch = (dbPotential as any[])?.find(int => {
+      const potentialMatch = (dbPotential as Interaction[])?.find(int => {
         const partnerId = int.ingredient_a_id === ing.id ? int.ingredient_b_id : int.ingredient_a_id;
         // 파트너가 현재 선택된 성분 목록에 없는 경우 추천 대상으로 선정
-        return !ingredientIds.includes(partnerId);
+        const partner = dbIngredients.find(i => i.id === partnerId);
+        // [IMPORTANT] 의약품 카테고리는 추천에서 원천 배제
+        return !ingredientIds.includes(partnerId) && partner?.category !== 'drugs';
       });
 
       if (potentialMatch) {
@@ -338,7 +352,7 @@ export default function HomePage() {
         .select("*")
         .or(`ingredient_a_id.eq.${partner.id},ingredient_b_id.eq.${partner.id}`);
 
-      const relevantInteractions = (allPartnerInteractions as any[])?.filter(int => {
+      const relevantInteractions = (allPartnerInteractions as Interaction[])?.filter(int => {
         const otherId = int.ingredient_a_id === partner.id ? int.ingredient_b_id : int.ingredient_a_id;
         return ingredientIds.includes(otherId);
       }) || [];
@@ -796,12 +810,12 @@ export default function HomePage() {
                 >
                   <div className="bg-[#0f172a]/95 rounded-[2.2rem] overflow-hidden shadow-2xl">
                     <div className="max-h-[140px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-3 px-3 flex flex-wrap justify-center gap-1.5 md:gap-2">
-                      {dropdownResults.map((item: any, i) => {
-                        const isCategory = item.isCategory;
-                        const active = !isCategory && selectedIngredients.some(sel => sel.id === item.id);
+                      {dropdownResults.map((item: SearchResult, i) => {
+                        const isCategory = "isCategory" in item;
+                        const active = !isCategory && selectedIngredients.some(sel => sel.id === (item as Ingredient).id);
                         return (
                           <motion.button
-                            key={isCategory ? `cat-${item.id}` : item.id}
+                            key={isCategory ? `cat-${item.id}` : (item as Ingredient).id}
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: Math.min(i * 0.01, 0.2) }}
@@ -815,7 +829,7 @@ export default function HomePage() {
                                   ingredientsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                 }
                               } else if (!active) {
-                                addIngredient(item);
+                                addIngredient(item as Ingredient);
                                 setInputValue("");
                                 startTransition(() => setSearchQuery(""));
                                 setIsDropdownOpen(false);
@@ -832,7 +846,7 @@ export default function HomePage() {
                             )}
                           >
                             <span className="text-sm group-hover/item:scale-110 transition-transform">
-                              {isCategory ? item.emoji : item.icon_emoji}
+                              {isCategory ? (item as SearchCategory).emoji : (item as Ingredient).icon_emoji}
                             </span>
                             <span className="tracking-tighter">
                               {language === 'ko' ? item.name : item.name_en}

@@ -232,6 +232,10 @@ export const UI_TRANSLATIONS = {
     }
 } as const;
 
+export type TranslationType = typeof UI_TRANSLATIONS['ko']; // 기본 구조로 사용
+// 실제 사용 시 유연성을 위해 union으로 정의하거나, 구조만 추출
+export type I18nContent = typeof UI_TRANSLATIONS['ko'] | typeof UI_TRANSLATIONS['en'];
+
 export const CATEGORIES_TRANSLATIONS = {
     all: { ko: "전체", en: "All", emoji: "✨" },
     drugs: { ko: "의약품", en: "Medicines", emoji: "💊" },

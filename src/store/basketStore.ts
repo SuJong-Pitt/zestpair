@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { Ingredient } from "@/types/database";
+import type { Ingredient, AnalysisResult } from "@/types/database";
 
 const MAX_BASKET_SIZE = 10;
 
@@ -14,7 +14,7 @@ interface BasketState {
 
     language: "ko" | "en";
     isBasketExpanded: boolean;
-    analysisResult: any | null;
+    analysisResult: AnalysisResult | null;
 
     // Actions
     addIngredient: (ingredient: Ingredient) => void;
@@ -26,7 +26,7 @@ interface BasketState {
     isSelected: (id: string) => boolean;
     setLanguage: (lang: "ko" | "en") => void;
     setBasketExpanded: (value: boolean) => void;
-    setAnalysisResult: (result: any | null) => void;
+    setAnalysisResult: (result: AnalysisResult | null) => void;
 }
 
 /**

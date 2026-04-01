@@ -17,7 +17,7 @@ import { CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useBasketStore } from "@/store/basketStore";
 import { UI_TRANSLATIONS } from "@/lib/i18n";
-import type { AnalysisResult } from "@/types/database";
+import type { AnalysisResult, CoupangProduct } from "@/types/database";
 import SynergyCard from "./SynergyCard";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -27,7 +27,7 @@ import InteractionCard from "./analysis/InteractionCard";
 
 interface AnalysisResultsProps {
     result: AnalysisResult;
-    coupangProducts?: any[];
+    coupangProducts?: CoupangProduct[];
 }
 
 export default function AnalysisResults({ result, coupangProducts = [] }: AnalysisResultsProps) {
@@ -387,12 +387,12 @@ export default function AnalysisResults({ result, coupangProducts = [] }: Analys
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    className="relative w-full max-w-4xl mx-auto rounded-[2.5rem] overflow-hidden bg-slate-900 border border-white/10 p-6 md:p-10 flex flex-wrap items-center justify-center gap-8 md:gap-12"
+                                    className="relative w-full max-w-4xl mx-auto rounded-[2rem] md:rounded-[2.5rem] overflow-hidden bg-slate-900 border border-white/10 p-5 md:p-10 flex flex-wrap items-center justify-center gap-8 md:gap-12"
                                 >
-                                    <div className="flex-1 min-w-[280px] space-y-6">
+                                    <div className="w-full md:flex-1 md:min-w-[280px] space-y-6">
                                         <div className="space-y-2">
                                             <span className="text-xs font-black text-emerald-500 tracking-widest uppercase">AI Recommendation</span>
-                                            <h4 className="text-2xl md:text-4xl font-[1000] text-white tracking-tight">
+                                            <h4 className="text-xl sm:text-2xl md:text-4xl font-[1000] text-white tracking-tight break-words">
                                                 Pori’s <span className="text-emerald-400">Synergy Pick</span>
                                             </h4>
                                         </div>
