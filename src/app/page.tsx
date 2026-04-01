@@ -28,6 +28,7 @@ const AnalyzingAnimation = dynamic(() => import("@/components/AnalyzingAnimation
 const AnalysisResults = dynamic(() => import("@/components/AnalysisResults"), { ssr: false });
 const VisualDecorations = dynamic(() => import("@/components/VisualDecorations"), { ssr: false });
 import type { Interaction } from "@/types/database";
+import { performAnalysis } from "@/lib/analysis";
 
 // 검색 결과 타입을 위한 인터페이스
 interface SearchCategory {
@@ -238,150 +239,14 @@ export default function HomePage() {
     setAnalysisResult(null);
     setAnalyzing(true);
 
-    const ingredientIds = selectedIngredients.map((i) => i.id);
-    const { data: dbInteractions } = await supabase
-      .from("interactions")
-      .select("*")
-      .in("ingredient_a_id", ingredientIds)
-      .in("ingredient_b_id", ingredientIds);
-
-    const findInteraction = (idA: string, idB: string) => {
-      const dbInts = (dbInteractions as Interaction[]) || [];
-      return dbInts.find(i =>
-        (i.ingredient_a_id === idA && i.ingredient_b_id === idB) ||
-        (i.ingredient_a_id === idB && i.ingredient_b_id === idA)
-      ) ?? null;
-    };
-
-    const synergies: InteractionResult[] = [];
-    const cautions: InteractionResult[] = [];
-    const conflicts: InteractionResult[] = [];
-
-    for (let i = 0; i < selectedIngredients.length; i++) {
-      for (let j = i + 1; j < selectedIngredients.length; j++) {
-        const ing1 = selectedIngredients[i];
-        const ing2 = selectedIngredients[j];
-        const interaction = findInteraction(ing1.id, ing2.id);
-        const res: InteractionResult = { pair: [ing1, ing2], interaction };
-        if (!interaction) continue;
-        if (interaction.type === "SYNERGY") synergies.push(res);
-        else if (interaction.type === "CAUTION") cautions.push(res);
-        else if (interaction.type === "CONFLICT") conflicts.push(res);
-      }
-    }
-
-    // --- 4단계 다이내믹 시너지 추천 로직 (Step 2 & 3) ---
-    let potentialSynergy: InteractionResult | null = null;
-    for (const ing of selectedIngredients) {
-      // 해당 성분이 포함된 모든 시너지 조합 검색
-      const { data: dbPotential } = await supabase
-        .from("interactions")
-        .select("*")
-        .or(`ingredient_a_id.eq.${ing.id},ingredient_b_id.eq.${ing.id}`)
-        .eq("type", "SYNERGY");
-
-      const potentialMatch = (dbPotential as Interaction[])?.find(int => {
-        const partnerId = int.ingredient_a_id === ing.id ? int.ingredient_b_id : int.ingredient_a_id;
-        // 파트너가 현재 선택된 성분 목록에 없는 경우 추천 대상으로 선정
-        const partner = dbIngredients.find(i => i.id === partnerId);
-        // [IMPORTANT] 의약품 카테고리는 추천에서 원천 배제
-        return !ingredientIds.includes(partnerId) && partner?.category !== 'drugs';
-      });
-
-      if (potentialMatch) {
-        const partnerId = potentialMatch.ingredient_a_id === ing.id ? potentialMatch.ingredient_b_id : potentialMatch.ingredient_a_id;
-        const partner = dbIngredients.find(i => i.id === partnerId);
-        if (partner) {
-          potentialSynergy = {
-            pair: [ing, partner],
-            interaction: potentialMatch
-          };
-          break; // 1개만 찾으면 중단 (요청사항)
-        }
-      }
-    }
-
-    // 상호작용 점수 계산 (Drug 카테고리 포함 시 더 강한 페널티 적용)
-    let synergyWeight = 0;
-    let cautionPenalty = 0;
-    let conflictPenalty = 0;
-    let drugCount = selectedIngredients.filter(i => i.category === 'drugs').length;
-
-    synergies.forEach(() => { synergyWeight += 20; });
-    cautions.forEach(c => {
-      if (!c.interaction) return;
-      // 약물 관련 주의사항은 가중치 2배
-      const isDrugRelated = selectedIngredients.find(i =>
-        (i.id === c.interaction!.ingredient_a_id || i.id === c.interaction!.ingredient_b_id) && i.category === 'drugs'
-      );
-      cautionPenalty += isDrugRelated ? 15 : 5;
-    });
-    conflicts.forEach(c => {
-      if (!c.interaction) return;
-      // 약물 관련 충돌은 가중치 1.5배 (기존 20 -> 35)
-      const isDrugRelated = selectedIngredients.find(i =>
-        (i.id === c.interaction!.ingredient_a_id || i.id === c.interaction!.ingredient_b_id) && i.category === 'drugs'
-      );
-      conflictPenalty += isDrugRelated ? 35 : 20;
-    });
-
-    // 기초 영양 보완 점수 (성분 개수 증가에 따른 밸런스 점수 상향)
-    // 단, 약물(Drugs)이 많아질수록 복용 부담 점수로 인해 보너스가 삭감됨
-    const rawFoundationBonus = Math.max(0, (selectedIngredients.length - 2) * 10);
-    const drugBurden = drugCount * 8; // 약물 1개당 8점 감점 (시너지 없는 단순 추가 억제)
-    const foundationBonus = Math.max(0, rawFoundationBonus - drugBurden);
-
-    const score = Math.max(5, Math.min(100, 70 + synergyWeight + foundationBonus - cautionPenalty - conflictPenalty));
-
-    let summary = "";
-    if (language === "ko") {
-      if (conflicts.length > 0) summary = `⚠️ ${conflicts.length}가지 충돌 조합이 발견되었습니다...`;
-      else if (synergies.length > 0) summary = `✅ ${synergies.length}가지 시너지 조합이 발견되었습니다!`;
-      else if (cautions.length > 0) summary = `🔶 ${cautions.length}가지 주의 조합이 발견되었습니다...`;
-      else summary = "중립적인 조합입니다.";
+    // 공통 분석 로직 호출 (lib/analysis.ts)
+    const result = await performAnalysis(selectedIngredients, language, dbIngredients);
+    
+    if (result) {
+      setAnalysisResult(result);
     } else {
-      if (conflicts.length > 0) summary = `⚠️ ${conflicts.length} conflicts detected...`;
-      else if (synergies.length > 0) summary = `✅ ${synergies.length} synergies detected!`;
-      else if (cautions.length > 0) summary = `🔶 ${cautions.length} cautions detected...`;
-      else summary = "Neutral combination.";
+      setAnalyzing(false);
     }
-
-    // --- 5단계 정확한 예상 점수 계산 (다중 시너지 고려) ---
-    let projectedScore = score;
-    if (potentialSynergy) {
-      const partner = potentialSynergy.pair[1];
-      const { data: allPartnerInteractions } = await supabase
-        .from("interactions")
-        .select("*")
-        .or(`ingredient_a_id.eq.${partner.id},ingredient_b_id.eq.${partner.id}`);
-
-      const relevantInteractions = (allPartnerInteractions as Interaction[])?.filter(int => {
-        const otherId = int.ingredient_a_id === partner.id ? int.ingredient_b_id : int.ingredient_a_id;
-        return ingredientIds.includes(otherId);
-      }) || [];
-
-      let newSynerCount = 0;
-      let newCautCount = 0;
-      let newConfCount = 0;
-
-      relevantInteractions.forEach(int => {
-        if (int.type === "SYNERGY") newSynerCount++;
-        else if (int.type === "CAUTION") newCautCount++;
-        else if (int.type === "CONFLICT") newConfCount++;
-      });
-
-      // 기존 점수에서의 변화량: 시너지 보너스 + 기초 보완 보너스(+10) - 감점 요소
-      const boost = (newSynerCount * 20) + 10 - (newCautCount * 5) - (newConfCount * 20);
-      projectedScore = Math.max(10, Math.min(100, score + boost));
-    }
-
-    setAnalysisResult({
-      ingredients: [...selectedIngredients],
-      synergies, cautions, conflicts, score, summary,
-      potentialSynergy,
-      projectedScore,
-      analyzed_at: new Date().toISOString()
-    });
   }, [selectedIngredients, language, dbIngredients, setHasResult, setAnalysisResult, setAnalyzing]);
 
 

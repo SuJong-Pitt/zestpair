@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useBasketStore } from "@/store/basketStore";
 import { BrandLogo, BrandName } from "@/components/BrandAssets";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useState } from "react";
+import Toast from "@/components/ui/Toast";
 
 /**
  * 분석 리포트 전용 헤더 (AI 디자인실장 영자 스타일 🎨)
@@ -17,8 +19,42 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
  */
 export default function ReportHeader() {
     const router = useRouter();
-    const { language } = useBasketStore();
+    const { language, selectedIngredients, analysisResult } = useBasketStore();
     const isMobile = useMediaQuery("(max-width: 768px)");
+    const [toast, setToast] = useState({ show: false, message: "" });
+
+    const handleShare = async () => {
+        // IDs를 콤마로 연결해 URL 파라미터 생성
+        const ids = selectedIngredients.map(ing => ing.id).join(',');
+        const shareUrl = `${window.location.origin}/analysis?ids=${ids}`;
+        
+        const shareData = {
+            title: language === 'ko' ? "ZestPair | 영양제 궁합 분석 결과" : "ZestPair | Supplement Synergy Analysis",
+            text: language === 'ko'
+                ? `🔥 저의 영양제 궁합 점수는 ${analysisResult?.score ?? 0}점! Pori AI가 알려주는 최적의 조합을 확인해보세요.`
+                : `🔥 My supplement synergy score is ${analysisResult?.score ?? 0}pts! Check your personalized analysis by Pori AI at ZestPair.`,
+            url: shareUrl
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.log('Error sharing', err);
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                setToast({ 
+                    show: true, 
+                    message: language === 'ko' ? "링크가 복사되었습니다!" : "Link copied to clipboard!" 
+                });
+                setTimeout(() => setToast({ show: false, message: "" }), 3000);
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+        }
+    };
 
     return (
         <header className="fixed top-0 left-0 right-0 z-[100] px-4 py-3 md:py-4 transition-all duration-300 bg-slate-950/40 backdrop-blur-md border-b border-white/5">
@@ -78,10 +114,7 @@ export default function ReportHeader() {
                         transition={{ delay: 0.2 }}
                         className="p-2 md:p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-2xl hover:bg-emerald-500/20 hover:border-emerald-500/40 transition-all active:scale-95 group"
                         title={language === 'ko' ? '공유하기' : 'Share'}
-                        onClick={() => {
-                            // TODO: 실제 공유 기능 연결 (기존 컴포넌트 로직 활용)
-                            alert(language === 'ko' ? '결과 페이지 공유 기능 준비 중...' : 'Sharing feature coming soon...');
-                        }}
+                        onClick={handleShare}
                     >
                         <Share2 size={16} className="text-emerald-400 group-hover:scale-110 transition-transform" />
                     </motion.button>
@@ -91,6 +124,12 @@ export default function ReportHeader() {
 
             {/* 하단 세련된 디바이더 라인 */}
             <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+            {/* 세련된 알림 토스트 (영자 실장 픽 ✨) */}
+            <Toast 
+                show={toast.show} 
+                message={toast.message} 
+                onClose={() => setToast({ ...toast, show: false })} 
+            />
         </header>
     );
 }

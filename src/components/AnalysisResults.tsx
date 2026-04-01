@@ -25,6 +25,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 // New modular components
 import ScoreRing from "./analysis/ScoreRing";
 import InteractionCard from "./analysis/InteractionCard";
+import Toast from "./ui/Toast";
 
 interface AnalysisResultsProps {
     result: AnalysisResult;
@@ -36,18 +37,23 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     const { language, clearBasket } = useBasketStore();
     const t = UI_TRANSLATIONS[language];
     const isMobile = useMediaQuery("(max-width: 768px)");
+    const [toast, setToast] = useState({ show: false, message: "" });
 
     if (!result || !result.ingredients) {
         return <div className="p-20 text-center text-slate-400">{t.common.loading}...</div>;
     }
 
     const handleShare = async () => {
+        // IDs를 콤마로 연결해 URL 파라미터 생성
+        const ids = result.ingredients.map(ing => ing.id).join(',');
+        const shareUrl = `${window.location.origin}/analysis?ids=${ids}`;
+
         const shareData = {
             title: language === 'ko' ? "ZestPair | 영양제 궁합 분석 결과" : "ZestPair | Supplement Synergy Analysis",
             text: language === 'ko'
-                ? `🔥 나의 영양제 궁합 점수는 ${result.score}점! Pori AI가 알려주는 최적의 조합을 확인해보세요.`
-                : `🔥 My supplement synergy score is ${result.score}! Check your personalized analysis by Pori AI at ZestPair.`,
-            url: window.location.origin
+                ? `🔥 저의 영양제 궁합 점수는 ${result.score}점! Pori AI가 알려주는 최적의 조합을 확인해보세요.`
+                : `🔥 My supplement synergy score is ${result.score}pts! Check your personalized analysis by Pori AI at ZestPair.`,
+            url: shareUrl
         };
 
         if (navigator.share) {
@@ -58,8 +64,12 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
             }
         } else {
             try {
-                await navigator.clipboard.writeText(window.location.origin);
-                alert(language === 'ko' ? "링크가 복사되었습니다!" : "Link copied to clipboard!");
+                await navigator.clipboard.writeText(shareUrl);
+                setToast({ 
+                    show: true, 
+                    message: language === 'ko' ? "링크가 복사되었습니다!" : "Link copied to clipboard!" 
+                });
+                setTimeout(() => setToast({ show: false, message: "" }), 3000);
             } catch (err) {
                 console.error('Failed to copy', err);
             }
@@ -469,6 +479,12 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     </motion.div>
                 </div>
             </motion.div>
+            {/* 공유 피드백 토스트 (영자 실장의 배려 ✨) */}
+            <Toast 
+                show={toast.show} 
+                message={toast.message} 
+                onClose={() => setToast({ ...toast, show: false })} 
+            />
         </div>
     );
 }

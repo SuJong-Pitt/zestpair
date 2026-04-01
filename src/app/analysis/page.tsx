@@ -1,44 +1,106 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useBasketStore } from "@/store/basketStore";
 import AnalysisResults from "@/components/AnalysisResults";
 import ReportHeader from "@/components/analysis/ReportHeader";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { performAnalysis } from "@/lib/analysis";
+import type { Ingredient } from "@/types/database";
 
 /**
- * 분석 결과 전용 페이지 (/analysis)
- * 
- * - Zustand 스토어에서 직접 결과를 읽어와 렌더링
- * - 결과가 없거나(새로고침 등) 잘못된 접근 시 홈(/)으로 리다이렉트
- * - 영자 실장의 감각을 담아 부드러운 로딩 연출
+ * 분석 결과 페이지 본체 (Suspense 대응을 위해 분리)
  */
-export default function AnalysisPage() {
+function AnalysisContent() {
     const router = useRouter();
-    const { analysisResult, language, setAnalyzing, setHasResult } = useBasketStore();
+    const searchParams = useSearchParams();
+    const { 
+        analysisResult, 
+        language, 
+        setAnalyzing, 
+        setHasResult, 
+        setAnalysisResult,
+        addIngredient,
+        clearBasket
+    } = useBasketStore();
+    
+    const [isLoading, setIsLoading] = useState(!analysisResult);
     const [isRedirecting, setIsRedirecting] = useState(false);
 
     useEffect(() => {
-        // 대표님, 이제 결과 페이지가 떴으니 분석 오버레이를 자연스럽게 걷어낼게요! ✨
-        if (analysisResult) {
-            setAnalyzing(false);
-            setHasResult(true);
-        }
+        const handleSharedLink = async () => {
+            const idsParam = searchParams.get("ids");
+            
+            // 1. 이미 결과가 있는 경우 (정상 진입)
+            if (analysisResult) {
+                setAnalyzing(false);
+                setHasResult(true);
+                setIsLoading(false);
+                return;
+            }
 
-        // 분석 결과가 없으면 메인으로 튕겨냄
-        if (!analysisResult) {
+            // 2. 공유 링크를 통해 들어온 경우 (?ids=...)
+            if (idsParam) {
+                const ids = idsParam.split(",");
+                setIsLoading(true);
+
+                try {
+                    // 모든 성분 데이터 가져오기 (추천 로직용)
+                    const { data: allIngs } = await supabase
+                        .from("ingredients")
+                        .select("*")
+                        .order("sort_order", { ascending: true });
+
+                    if (!allIngs) throw new Error("Failed to fetch ingredients");
+
+                    // 링크에 포함된 성분들 필터링
+                    const selectedIngs = allIngs.filter(ing => ids.includes(ing.id));
+                    
+                    if (selectedIngs.length >= 2) {
+                        // 바구니 업데이트 (공유받은 리스트로 교체)
+                        clearBasket();
+                        selectedIngs.forEach(ing => addIngredient(ing));
+
+                        // 분석 실행
+                        const result = await performAnalysis(selectedIngs, language, allIngs);
+                        if (result) {
+                            setAnalysisResult(result);
+                            setHasResult(true);
+                        }
+                    } else {
+                        // 성분이 부족하면 홈으로
+                        setIsRedirecting(true);
+                    }
+                } catch (error) {
+                    console.error("Error loading shared analysis:", error);
+                    setIsRedirecting(true);
+                } finally {
+                    setIsLoading(false);
+                }
+                return;
+            }
+
+            // 3. 결과도 없고 공유 링크도 아니면 홈으로 리다이렉트
             setIsRedirecting(true);
+        };
+
+        handleSharedLink();
+    }, [analysisResult, searchParams, language, setAnalyzing, setHasResult, setAnalysisResult, clearBasket, addIngredient]);
+
+    useEffect(() => {
+        if (isRedirecting) {
             const timer = setTimeout(() => {
                 router.push("/");
             }, 1500);
             return () => clearTimeout(timer);
         }
-    }, [analysisResult, router]);
+    }, [isRedirecting, router]);
 
-    // 결과가 없을 때 보여줄 안내 화면 (영자's 트랜지션)
-    if (isRedirecting || !analysisResult) {
+    // 로딩 중이거나 리다이렉트 중일 때 보여줄 화면
+    if (isLoading || isRedirecting) {
         return (
             <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
                 <motion.div
@@ -57,20 +119,26 @@ export default function AnalysisPage() {
                             <Loader2 className="text-emerald-500 animate-spin" size={32} />
                         </div>
                     </div>
-                    <div className="space-y-2">
-                        <h2 className="text-xl md:text-2xl font-black text-white">
-                            {language === 'ko' ? '분석 데이터를 찾을 수 없어요!' : 'Analysis data not found!'}
+                    <div className="space-y-3">
+                        <h2 className="text-xl md:text-2xl font-[1000] text-white tracking-tight leading-tight">
+                            {isRedirecting 
+                                ? (language === 'ko' ? '데이터를 찾을 수 없어요!' : 'Data not found!')
+                                : (language === 'ko' ? '분석 결과를 불러오는 중...' : 'Loading analysis results...')
+                            }
                         </h2>
-                        <p className="text-slate-400 text-sm md:text-base font-medium">
-                            {language === 'ko' 
-                                ? '대표님, 홈 스크린에서 분석을 다시 시작해 볼까요? ✨' 
-                                : 'Representative, shall we start the analysis again from home? ✨'}
+                        <p className="text-slate-400 text-sm md:text-base font-bold bg-white/5 py-2 px-4 rounded-xl border border-white/5">
+                            {isRedirecting 
+                                ? (language === 'ko' ? '대표님, 홈 스크린에서 다시 시작해 볼까요? ✨' : 'Shall we start again from the home screen? ✨')
+                                : (language === 'ko' ? 'Pori AI가 조합을 정밀 분석하고 있어요. 잠시만 기다려주세요!' : 'Pori AI is precisely analyzing your combination. Just a moment!')
+                            }
                         </p>
                     </div>
                 </motion.div>
             </div>
         );
     }
+
+    if (!analysisResult) return null;
 
     return (
         <main className="min-h-screen bg-[#030712] selection:bg-emerald-500/30 overflow-x-hidden">
@@ -84,5 +152,21 @@ export default function AnalysisPage() {
                 <AnalysisResults result={analysisResult} />
             </motion.div>
         </main>
+    );
+}
+
+/**
+ * 분석 결과 페이지 (/analysis)
+ * Suspense로 감싸 useSearchParams 사용 가능하게 처리
+ */
+export default function AnalysisPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+                <Loader2 className="text-emerald-500 animate-spin" size={32} />
+            </div>
+        }>
+            <AnalysisContent />
+        </Suspense>
     );
 }
