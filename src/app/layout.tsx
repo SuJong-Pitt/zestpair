@@ -130,6 +130,10 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <head>
         {/* SEO: Google Knowledge Panel / Search Logo & Thumbnail */}
+        <meta name="NaverBot" content="All" />
+        <meta name="NaverBot" content="index,follow" />
+        <meta name="Yeti" content="All" />
+        <meta name="Yeti" content="index,follow" />
         <meta name="thumbnail" content="https://zestpair.com/hero-illustration-v3.webp" />
         <meta name="thumbnail" content="https://zestpair.com/hero-illustration-v4.webp" />
         <meta name="thumbnail" content="https://zestpair.com/hero-illustration-v5.webp" />
