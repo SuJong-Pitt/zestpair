@@ -372,14 +372,24 @@ export default function HomePage() {
                 />
               </motion.span>
 
-              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-2xl sm:text-3xl md:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-tight tracking-tighter text-center text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-[1.1] tracking-tighter text-center text-white drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)]">
                 {language === 'ko' ? (
                   <>
-                    지금 드시는 영양제, <span className="text-rose-500 underline decoration-rose-500/30 underline-offset-8 decoration-4">'독'</span>이 될지도 모른다면?
+                    지금 먹는 영양제, 서로 만나면 <span className="relative inline-block mx-1 md:mx-2">
+                      <span className="relative z-10 text-rose-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.8)] animate-pulse">‘독’</span>
+                      {/* Underline Decoration */}
+                      <span className="absolute bottom-0 left-0 w-full h-[6px] bg-rose-500/40 blur-[2px] rounded-full" />
+                      {/* Sub-Glow for extra punch */}
+                      <span className="absolute -inset-2 bg-rose-500/10 blur-xl opacity-50 scale-150 pointer-events-none" />
+                    </span>이 될 수도 있습니다.
                   </>
                 ) : (
                   <>
-                    What if the supplements you take daily are actually <span className="text-rose-500 underline decoration-rose-500/30 underline-offset-8 decoration-4">'POISON'</span>?
+                    The supplements you take daily,<br className="md:hidden" /> 
+                    can turn into <span className="relative inline-block mx-1 md:mx-2">
+                      <span className="relative z-10 text-rose-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.8)] animate-pulse">‘POISON’</span>
+                      <span className="absolute bottom-0 left-0 w-full h-[6px] bg-rose-500/40 blur-[2px] rounded-full" />
+                    </span> when combined.
                   </>
                 )}
               </span>

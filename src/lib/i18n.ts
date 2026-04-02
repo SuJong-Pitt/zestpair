@@ -3,7 +3,7 @@ export const UI_TRANSLATIONS = {
     ko: {
         hero: {
             title1: "🚨 1,300개 데이터 기반 긴급 점검",
-            title2: "지금 드시는 영양제, '독'이 될지도 모른다면?",
+            title2: "지금 먹는 영양제, 서로 만나면 ‘독’이 될 수도 있습니다.",
             subtitle1: "잘못된 조합은 간과 신장을 소리 없이 망가뜨립니다.",
             subtitle2: "3초 만에 독성 검증",
             subtitle3: "받고 건강을 지키세요. (무료 분석)",

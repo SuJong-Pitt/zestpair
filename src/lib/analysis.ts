@@ -46,35 +46,7 @@ export async function performAnalysis(
         }
     }
 
-    // 3. 다이내믹 시너지 추천 로직
-    let potentialSynergy: InteractionResult | null = null;
-    for (const ing of selectedIngredients) {
-        const { data: dbPotential } = await supabase
-            .from("interactions")
-            .select("*")
-            .or(`ingredient_a_id.eq.${ing.id},ingredient_b_id.eq.${ing.id}`)
-            .eq("type", "SYNERGY");
-
-        const potentialMatch = (dbPotential as Interaction[])?.find(int => {
-            const partnerId = int.ingredient_a_id === ing.id ? int.ingredient_b_id : int.ingredient_a_id;
-            const partner = allIngredients.find(i => i.id === partnerId);
-            return !ingredientIds.includes(partnerId) && partner?.category !== 'drugs';
-        });
-
-        if (potentialMatch) {
-            const partnerId = potentialMatch.ingredient_a_id === ing.id ? potentialMatch.ingredient_b_id : potentialMatch.ingredient_a_id;
-            const partner = allIngredients.find(i => i.id === partnerId);
-            if (partner) {
-                potentialSynergy = {
-                    pair: [ing, partner],
-                    interaction: potentialMatch
-                };
-                break;
-            }
-        }
-    }
-
-    // 4. 점수 계산
+    // 3. 점수 계산 (먼저 수행하여 기준점 확보)
     let synergyWeight = synergies.length * 20;
     let cautionPenalty = 0;
     let conflictPenalty = 0;
@@ -102,6 +74,85 @@ export async function performAnalysis(
 
     const score = Math.max(5, Math.min(100, 70 + synergyWeight + foundationBonus - cautionPenalty - conflictPenalty));
 
+    // 4. 다이내믹 시너지 추천 로직 (성능 최적화 및 안정화 버전 ✨)
+    let potentialSynergy: InteractionResult | null = null;
+    let projectedScore = score;
+    let bestSimScore = -1;
+
+    try {
+        // 1단계: 현재 선택된 성분들과 시너지가 있는 모든 상호작용을 한 번에 가져옴
+        const { data: dbPotential } = await supabase
+            .from("interactions")
+            .select("*")
+            .or(`ingredient_a_id.in.(${ingredientIds.map(id => `"${id}"`).join(',')}),ingredient_b_id.in.(${ingredientIds.map(id => `"${id}"`).join(',')})`)
+            .eq("type", "SYNERGY");
+
+        const potentialSynergies = (dbPotential as Interaction[]) || [];
+
+        if (potentialSynergies.length > 0) {
+            // 2단계: 파트너 후보군 추출 (현재 바구니에 없는 것만)
+            const partnerCandidates = potentialSynergies
+                .map(int => ingredientIds.includes(int.ingredient_a_id) ? int.ingredient_b_id : int.ingredient_a_id)
+                .filter(id => !ingredientIds.includes(id));
+
+            if (partnerCandidates.length > 0) {
+                // 3단계: 후보 파트너들의 모든 상호작용을 벌크로 가져옴 (시뮬레이션용)
+                const uniquePartnerIds = [...new Set(partnerCandidates)];
+                const { data: dbPartnerInteractions } = await supabase
+                    .from("interactions")
+                    .select("*")
+                    .or(`ingredient_a_id.in.(${uniquePartnerIds.map(id => `"${id}"`).join(',')}),ingredient_b_id.in.(${uniquePartnerIds.map(id => `"${id}"`).join(',')})`);
+
+                const pInteractions = (dbPartnerInteractions as Interaction[]) || [];
+
+                // 4단계: 로컬 시뮬레이션
+                for (const partnerId of uniquePartnerIds) {
+                    const partner = allIngredients.find(i => i.id === partnerId);
+                    if (!partner || partner.category === 'drugs') continue;
+
+                    const relevantInts = pInteractions.filter(pint => {
+                        const otherId = pint.ingredient_a_id === partnerId ? pint.ingredient_b_id : pint.ingredient_a_id;
+                        return ingredientIds.includes(otherId);
+                    });
+
+                    let newSynerCount = 0;
+                    let newCautCount = 0;
+                    let newConfCount = 0;
+
+                    relevantInts.forEach(pint => {
+                        if (pint.type === "SYNERGY") newSynerCount++;
+                        else if (pint.type === "CAUTION") newCautCount++;
+                        else if (pint.type === "CONFLICT") newConfCount++;
+                    });
+
+                    const boost = (newSynerCount * 20) + 10 - (newCautCount * 5) - (newConfCount * 20);
+                    const simScore = Math.max(10, Math.min(100, score + boost));
+
+                    if (simScore >= bestSimScore) {
+                        if (simScore >= score || !potentialSynergy) {
+                            const originInt = potentialSynergies.find(ps => ps.ingredient_a_id === partnerId || ps.ingredient_b_id === partnerId);
+                            if (originInt) {
+                                const originIngId = originInt.ingredient_a_id === partnerId ? originInt.ingredient_b_id : originInt.ingredient_a_id;
+                                const originIng = selectedIngredients.find(si => si.id === originIngId);
+                                
+                                if (originIng) {
+                                    potentialSynergy = { pair: [originIng, partner], interaction: originInt };
+                                    projectedScore = simScore;
+                                    bestSimScore = simScore;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } catch (err) {
+        console.warn("Synergy search failed, but proceeding with base analysis:", err);
+    }
+
+
+
+
     // 5. 요약 텍스트 생성
     let summary = "";
     if (language === "ko") {
@@ -116,33 +167,6 @@ export async function performAnalysis(
         else summary = "Neutral combination.";
     }
 
-    // 6. 예상 점수 계산
-    let projectedScore = score;
-    if (potentialSynergy) {
-        const partner = potentialSynergy.pair[1];
-        const { data: allPartnerInteractions } = await supabase
-            .from("interactions")
-            .select("*")
-            .or(`ingredient_a_id.eq.${partner.id},ingredient_b_id.eq.${partner.id}`);
-
-        const relevantInteractions = (allPartnerInteractions as Interaction[])?.filter(int => {
-            const otherId = int.ingredient_a_id === partner.id ? int.ingredient_b_id : int.ingredient_a_id;
-            return ingredientIds.includes(otherId);
-        }) || [];
-
-        let newSynerCount = 0;
-        let newCautCount = 0;
-        let newConfCount = 0;
-
-        relevantInteractions.forEach(int => {
-            if (int.type === "SYNERGY") newSynerCount++;
-            else if (int.type === "CAUTION") newCautCount++;
-            else if (int.type === "CONFLICT") newConfCount++;
-        });
-
-        const boost = (newSynerCount * 20) + 10 - (newCautCount * 5) - (newConfCount * 20);
-        projectedScore = Math.max(10, Math.min(100, score + boost));
-    }
 
     return {
         ingredients: [...selectedIngredients],
