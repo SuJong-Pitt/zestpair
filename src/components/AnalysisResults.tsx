@@ -291,64 +291,87 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     </h3>
                                 </div>
 
-                                <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 w-full pt-4">
+                                <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 w-full pt-6 pb-2">
                                     {/* ── CURRENT HUD Gauge ── */}
                                     <motion.div
                                         initial={{ opacity: 0, x: -20 }}
                                         whileInView={{ opacity: 1, x: 0 }}
                                         transition={{ duration: 0.6 }}
-                                        className="relative flex flex-col items-center gap-3 p-5 md:p-6 rounded-[2rem] w-full max-w-[220px] md:max-w-[260px] overflow-hidden"
+                                        className="relative flex flex-col items-center justify-center p-6 md:p-8 rounded-[2.5rem] w-full max-w-[240px] md:max-w-[280px] overflow-hidden group/hud"
                                         style={{
-                                            background: "linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.8) 100%)",
-                                            border: "1px solid rgba(148,163,184,0.15)",
-                                            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05), 0 20px 60px rgba(0,0,0,0.5)"
+                                            background: "radial-gradient(120% 120% at 50% 0%, rgba(30,41,59,0.5) 0%, rgba(15,23,42,0.9) 100%)",
+                                            border: "1px solid rgba(148,163,184,0.1)",
+                                            boxShadow: "0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.05)"
                                         }}
                                     >
-                                        {/* scan line decoration */}
-                                        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2rem]">
-                                            <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.03)_1px,transparent_1px)] bg-[size:100%_8px]" />
+                                        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md -z-10" />
+                                        
+                                        {/* Luxury Scan Lines */}
+                                        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2.5rem] opacity-30 mix-blend-overlay">
+                                            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:100%_4px]" />
                                         </div>
-                                        {/* corner brackets */}
-                                        <div className="absolute top-3 left-3 w-3 h-3 border-t border-l border-slate-500/40 rounded-tl pointer-events-none" />
-                                        <div className="absolute top-3 right-3 w-3 h-3 border-t border-r border-slate-500/40 rounded-tr pointer-events-none" />
-                                        <div className="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-slate-500/40 rounded-bl pointer-events-none" />
-                                        <div className="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-slate-500/40 rounded-br pointer-events-none" />
+
+                                        {/* Futuristic Corner Brackets */}
+                                        <div className="absolute top-4 left-4 w-5 h-5 border-t border-l border-slate-500/50 rounded-tl-md pointer-events-none drop-shadow-[0_0_3px_rgba(100,116,139,0.5)] transition-all group-hover/hud:translate-x-[-2px] group-hover/hud:translate-y-[-2px]" />
+                                        <div className="absolute top-4 right-4 w-5 h-5 border-t border-r border-slate-500/50 rounded-tr-md pointer-events-none drop-shadow-[0_0_3px_rgba(100,116,139,0.5)] transition-all group-hover/hud:translate-x-[2px] group-hover/hud:translate-y-[-2px]" />
+                                        <div className="absolute bottom-4 left-4 w-5 h-5 border-b border-l border-slate-500/50 rounded-bl-md pointer-events-none drop-shadow-[0_0_3px_rgba(100,116,139,0.5)] transition-all group-hover/hud:translate-x-[-2px] group-hover/hud:translate-y-[2px]" />
+                                        <div className="absolute bottom-4 right-4 w-5 h-5 border-b border-r border-slate-500/50 rounded-br-md pointer-events-none drop-shadow-[0_0_3px_rgba(100,116,139,0.5)] transition-all group-hover/hud:translate-x-[2px] group-hover/hud:translate-y-[2px]" />
+
+                                        {/* Subtle Tech Text */}
+                                        <div className="absolute top-5 right-6 text-[6px] text-slate-500 font-mono tracking-widest opacity-50">SYS.ON</div>
+                                        <div className="absolute bottom-5 left-6 text-[6px] text-slate-500 font-mono tracking-widest opacity-50">V.2.5</div>
 
                                         {/* header badge */}
-                                        <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-600/30 backdrop-blur z-10">
-                                            <span className="text-[8px] md:text-[9px] font-black text-slate-400 tracking-[0.2em] md:tracking-[0.3em] uppercase">Current</span>
+                                        <div className="flex items-center gap-2 px-3 py-1 mb-5 rounded-full bg-slate-800/80 border border-slate-500/30 backdrop-blur shadow-[0_0_15px_rgba(71,85,105,0.2)] z-10">
+                                            <span className="text-[9px] md:text-[10px] font-black text-slate-300 tracking-[0.3em] uppercase drop-shadow-sm">Current</span>
                                         </div>
 
-                                        {/* ring */}
-                                        <div className="relative w-28 h-28 md:w-36 md:h-36 flex items-center justify-center z-10">
+                                        {/* ring container */}
+                                        <div className="relative w-32 h-32 md:w-44 md:h-44 flex items-center justify-center z-10">
+                                            {/* Outer Dashed Tech Ring */}
+                                            <div className="absolute inset-2 rounded-full border border-dashed border-slate-600/20 animate-[spin_30s_linear_infinite]" />
+                                            
+                                            {/* Inner Glow Base */}
+                                            <div className="absolute inset-6 rounded-full bg-slate-500/5 blur-xl group-hover/hud:bg-slate-500/10 transition-colors duration-700" />
+
                                             <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                                                <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.04)" strokeWidth="10" fill="none" />
+                                                <defs>
+                                                    <linearGradient id="currentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                        <stop offset="0%" stopColor="#cbd5e1" />
+                                                        <stop offset="100%" stopColor="#64748b" />
+                                                    </linearGradient>
+                                                </defs>
+                                                <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.03)" strokeWidth="10" fill="none" />
+                                                
                                                 <motion.circle
                                                     cx="50" cy="50" r="42"
-                                                    stroke="#94a3b8" strokeWidth="8" fill="none" strokeLinecap="round"
+                                                    stroke="url(#currentGradient)" strokeWidth="8" fill="none" strokeLinecap="round"
                                                     strokeDasharray="264"
                                                     initial={{ strokeDashoffset: 264 }}
                                                     whileInView={{ strokeDashoffset: 264 - (264 * result.score) / 100 }}
-                                                    transition={{ duration: 1.6, ease: "easeOut" }}
-                                                    style={{ opacity: 0.7 }}
+                                                    transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+                                                    style={{ filter: "drop-shadow(0 0 6px rgba(148,163,184,0.4))" }}
                                                 />
                                             </svg>
-                                            <div className="absolute flex flex-col items-center">
-                                                <span className="text-2xl md:text-3xl font-[1000] leading-none text-slate-400">{result.score}</span>
-                                                <span className="text-[7px] md:text-[8px] font-black text-slate-600 tracking-widest mt-0.5">PTS</span>
+                                            <div className="absolute flex flex-col items-center justify-center mt-1">
+                                                <span className="text-4xl md:text-5xl font-[1000] leading-none text-slate-200 tracking-tighter" style={{ textShadow: "0 2px 15px rgba(148,163,184,0.4)" }}>{result.score}</span>
+                                                <span className="text-[8px] md:text-[10px] font-black text-slate-500 tracking-[0.3em] mt-1.5 drop-shadow-sm">PTS</span>
                                             </div>
                                         </div>
                                     </motion.div>
 
                                     {/* ── ARROW ── */}
                                     <motion.div
-                                        animate={{ y: [0, 5, 0], opacity: [0.4, 1, 0.4] }}
-                                        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                                        className="flex md:flex-col items-center gap-2 md:gap-1"
+                                        animate={{ y: [0, -4, 0], opacity: [0.3, 0.8, 0.3], filter: ["blur(1px)", "blur(0px)", "blur(1px)"] }}
+                                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                                        className="flex md:flex-col items-center gap-2 md:gap-4 shrink-0"
                                     >
-                                        <div className="hidden md:block h-12 w-px bg-gradient-to-b from-slate-700 via-emerald-500/50 to-slate-700" />
-                                        <ArrowRight className="text-emerald-500/70 rotate-90 md:rotate-0" size={20} />
-                                        <div className="hidden md:block h-12 w-px bg-gradient-to-b from-slate-700 via-emerald-500/50 to-slate-700" />
+                                        <div className="hidden md:block h-12 w-[2px] bg-gradient-to-b from-transparent via-emerald-500/40 to-transparent" />
+                                        <div className="relative group">
+                                            <div className="absolute inset-0 bg-emerald-400 blur-lg opacity-40 group-hover:opacity-70 transition-opacity" />
+                                            <ArrowRight className="text-emerald-300 rotate-90 md:rotate-0 relative z-10" size={28} strokeWidth={2.5} />
+                                        </div>
+                                        <div className="hidden md:block h-12 w-[2px] bg-gradient-to-b from-transparent via-emerald-500/40 to-transparent" />
                                     </motion.div>
 
                                     {/* ── TARGET HUD Gauge ── */}
@@ -356,43 +379,97 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                         initial={{ opacity: 0, x: 20 }}
                                         whileInView={{ opacity: 1, x: 0 }}
                                         transition={{ duration: 0.6, delay: 0.2 }}
-                                        className="relative flex flex-col items-center gap-3 p-5 md:p-6 rounded-[2rem] w-full max-w-[220px] md:max-w-[260px] overflow-hidden"
+                                        className="relative flex flex-col items-center justify-center p-6 md:p-8 rounded-[2.5rem] w-full max-w-[240px] md:max-w-[280px] overflow-hidden group/hud"
                                         style={{
                                             background: isPerfect
-                                                ? "linear-gradient(135deg, rgba(30,20,5,0.95) 0%, rgba(45,30,10,0.85) 100%)"
-                                                : "linear-gradient(135deg, rgba(6,27,22,0.95) 0%, rgba(15,41,35,0.85) 100%)",
+                                                ? "radial-gradient(120% 120% at 50% 0%, rgba(69,26,3,0.6) 0%, rgba(20,8,0,0.95) 100%)"
+                                                : "radial-gradient(120% 120% at 50% 0%, rgba(2,44,34,0.6) 0%, rgba(2,6,23,0.95) 100%)",
                                             border: isPerfect
-                                                ? "1px solid rgba(251,191,36,0.25)"
-                                                : "1px solid rgba(52,211,153,0.25)"
+                                                ? "1px solid rgba(251,191,36,0.15)"
+                                                : "1px solid rgba(16,185,129,0.15)",
+                                            boxShadow: isPerfect
+                                                ? "0 30px 60px -15px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.05), inset 0 0 40px rgba(251,191,36,0.08)"
+                                                : "0 30px 60px -15px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.05), inset 0 0 40px rgba(16,185,129,0.08)"
                                         }}
                                     >
-                                        {/* corner brackets */}
-                                        <div className={cn("absolute top-3 left-3 w-3 h-3 border-t border-l rounded-tl pointer-events-none", isPerfect ? "border-amber-500/40" : "border-emerald-500/40")} />
-                                        <div className={cn("absolute top-3 right-3 w-3 h-3 border-t border-r rounded-tr pointer-events-none", isPerfect ? "border-amber-500/40" : "border-emerald-500/40")} />
-                                        <div className={cn("absolute bottom-3 left-3 w-3 h-3 border-b border-l rounded-bl pointer-events-none", isPerfect ? "border-amber-500/40" : "border-emerald-500/40")} />
-                                        <div className={cn("absolute bottom-3 right-3 w-3 h-3 border-b border-r rounded-br pointer-events-none", isPerfect ? "border-amber-500/40" : "border-emerald-500/40")} />
+                                        <div className="absolute inset-0 bg-black/20 backdrop-blur-md -z-10" />
 
-                                        {/* header badge */}
-                                        <div className={cn("flex items-center gap-2 px-2.5 py-1 rounded-full backdrop-blur z-10 border", isPerfect ? "bg-amber-900/50 border-amber-500/30" : "bg-emerald-900/50 border-emerald-500/30")}>
-                                            <span className={cn("text-[8px] md:text-[9px] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase", isPerfect ? "text-amber-400" : "text-emerald-400")}>Target</span>
+                                        {/* Luxury Scan Lines */}
+                                        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2.5rem] opacity-30 mix-blend-overlay">
+                                            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:100%_4px]" />
                                         </div>
 
-                                        {/* ring */}
-                                        <div className="relative w-28 h-28 md:w-36 md:h-36 flex items-center justify-center z-10">
+                                        {/* Futuristic Corner Brackets */}
+                                        <div className={cn("absolute top-4 left-4 w-5 h-5 border-t border-l rounded-tl-md pointer-events-none transition-all duration-500 group-hover/hud:translate-x-[-2px] group-hover/hud:translate-y-[-2px]", isPerfect ? "border-amber-500/70 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]" : "border-emerald-400/70 drop-shadow-[0_0_4px_rgba(52,211,153,0.6)]")} />
+                                        <div className={cn("absolute top-4 right-4 w-5 h-5 border-t border-r rounded-tr-md pointer-events-none transition-all duration-500 group-hover/hud:translate-x-[2px] group-hover/hud:translate-y-[-2px]", isPerfect ? "border-amber-500/70 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]" : "border-emerald-400/70 drop-shadow-[0_0_4px_rgba(52,211,153,0.6)]")} />
+                                        <div className={cn("absolute bottom-4 left-4 w-5 h-5 border-b border-l rounded-bl-md pointer-events-none transition-all duration-500 group-hover/hud:translate-x-[-2px] group-hover/hud:translate-y-[2px]", isPerfect ? "border-amber-500/70 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]" : "border-emerald-400/70 drop-shadow-[0_0_4px_rgba(52,211,153,0.6)]")} />
+                                        <div className={cn("absolute bottom-4 right-4 w-5 h-5 border-b border-r rounded-br-md pointer-events-none transition-all duration-500 group-hover/hud:translate-x-[2px] group-hover/hud:translate-y-[2px]", isPerfect ? "border-amber-500/70 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]" : "border-emerald-400/70 drop-shadow-[0_0_4px_rgba(52,211,153,0.6)]")} />
+
+                                        {/* Subtle Tech Text */}
+                                        <div className={cn("absolute top-5 right-6 text-[6px] font-mono tracking-widest opacity-60", isPerfect ? "text-amber-400" : "text-emerald-400")}>MAX.P</div>
+                                        <div className={cn("absolute bottom-5 left-6 text-[6px] font-mono tracking-widest opacity-60", isPerfect ? "text-amber-400" : "text-emerald-400")}>SYNC</div>
+
+                                        {/* header badge */}
+                                        <div className={cn("flex items-center gap-2 px-3 py-1 mb-5 rounded-full backdrop-blur shadow-[0_0_20px_rgba(0,0,0,0.5)] z-10 border", isPerfect ? "bg-amber-950/60 border-amber-500/40" : "bg-emerald-950/60 border-emerald-500/40")}>
+                                            <span className={cn("text-[9px] md:text-[10px] font-black tracking-[0.3em] uppercase drop-shadow-md", isPerfect ? "text-amber-400" : "text-emerald-400")}>Target</span>
+                                        </div>
+
+                                        {/* ring container */}
+                                        <div className="relative w-32 h-32 md:w-44 md:h-44 flex items-center justify-center z-10">
+                                            {/* Outer Dashed Tech Ring */}
+                                            <div className={cn("absolute inset-2 rounded-full border border-dashed animate-[spin_20s_linear_infinite_reverse]", isPerfect ? "border-amber-500/30" : "border-emerald-500/30")} />
+                                            
+                                            {/* Inner Intense Glow Base */}
+                                            <motion.div 
+                                                animate={{ scale: [1, 1.05, 1], opacity: [0.6, 0.9, 0.6] }}
+                                                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                                                className={cn("absolute inset-4 rounded-full blur-[24px] -z-10", isPerfect ? "bg-amber-500/20" : "bg-emerald-500/25")} 
+                                            />
+
                                             <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                                                <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.04)" strokeWidth="10" fill="none" />
+                                                <defs>
+                                                    <linearGradient id="targetGradientPerfect" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                        <stop offset="0%" stopColor="#fef3c7" />
+                                                        <stop offset="50%" stopColor="#f59e0b" />
+                                                        <stop offset="100%" stopColor="#b45309" />
+                                                    </linearGradient>
+                                                    <linearGradient id="targetGradientEmer" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                        <stop offset="0%" stopColor="#a7f3d0" />
+                                                        <stop offset="50%" stopColor="#10b981" />
+                                                        <stop offset="100%" stopColor="#047857" />
+                                                    </linearGradient>
+                                                </defs>
+                                                
+                                                {/* Track */}
+                                                <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.03)" strokeWidth="10" fill="none" />
+
+                                                {/* Progress Ring with Glow */}
                                                 <motion.circle
                                                     cx="50" cy="50" r="42"
-                                                    stroke={isPerfect ? "#fbbf24" : "#34d399"} strokeWidth="8" fill="none" strokeLinecap="round"
+                                                    stroke={isPerfect ? "url(#targetGradientPerfect)" : "url(#targetGradientEmer)"} strokeWidth="8" fill="none" strokeLinecap="round"
                                                     strokeDasharray="264"
                                                     initial={{ strokeDashoffset: 264 }}
                                                     whileInView={{ strokeDashoffset: 264 - (264 * displayProjectedScore) / 100 }}
-                                                    transition={{ duration: 1.6, ease: "easeOut", delay: 0.4 }}
+                                                    transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+                                                    style={{ 
+                                                        filter: isPerfect ? "drop-shadow(0 0 12px rgba(245,158,11,0.8))" : "drop-shadow(0 0 12px rgba(16,185,129,0.8))"
+                                                    }}
                                                 />
                                             </svg>
-                                            <div className="absolute flex flex-col items-center">
-                                                <span className={cn("text-2xl md:text-3xl font-[1000] leading-none", isPerfect ? "text-amber-400" : "text-emerald-400")}>{displayProjectedScore}</span>
-                                                <span className={cn("text-[7px] md:text-[8px] font-black tracking-widest mt-0.5", isPerfect ? "text-amber-700" : "text-emerald-700")}>PTS</span>
+                                            
+                                            <div className="absolute flex flex-col items-center justify-center mt-1">
+                                                <motion.span 
+                                                    initial={{ scale: 0.8, opacity: 0 }}
+                                                    whileInView={{ scale: 1, opacity: 1 }}
+                                                    transition={{ duration: 0.5, delay: 1 }}
+                                                    className={cn("text-4xl md:text-5xl font-[1000] leading-none tracking-tighter", isPerfect ? "text-amber-300" : "text-emerald-300")} 
+                                                    style={{ textShadow: isPerfect ? "0 4px 20px rgba(245,158,11,0.6)" : "0 4px 20px rgba(16,185,129,0.6)" }}
+                                                >
+                                                    {displayProjectedScore}
+                                                </motion.span>
+                                                <span className={cn("text-[8px] md:text-[10px] font-black tracking-[0.3em] mt-1.5 relative drop-shadow-md", isPerfect ? "text-amber-500" : "text-emerald-500")}>
+                                                    PTS
+                                                </span>
                                             </div>
                                         </div>
                                     </motion.div>
