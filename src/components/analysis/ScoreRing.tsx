@@ -78,7 +78,7 @@ const ScoreRing = memo(function ScoreRing({ score, size }: ScoreRingProps) {
     const isMaxScore = score === 100;
 
     return (
-        <div 
+        <div
             className="relative flex items-center justify-center select-none group/score w-52 h-52 md:w-60 md:h-60"
             style={size ? { width: size, height: size } : {}}
         >
