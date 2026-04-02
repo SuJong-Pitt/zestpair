@@ -321,10 +321,9 @@ const ScoreRing = memo(function ScoreRing({ score, size }: ScoreRingProps) {
                         className="font-[1000] tracking-tighter leading-none pr-[0.05em]"
                         style={{
                             fontSize: "clamp(2.5rem, 5vw, 3.6rem)",
-                            background: `linear-gradient(135deg, #ffffff 0%, ${colors.gradA} 35%, ${colors.gradB} 70%, ${colors.gradC} 100%)`,
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            filter: `drop-shadow(0 0 20px ${colors.shadow}) drop-shadow(0 2px 4px rgba(0,0,0,0.8))`
+                            color: "#ffffff",
+                            textShadow: `0 0 12px ${colors.gradA}, 0 0 24px ${colors.gradB}`,
+                            /* Android/Samsung Internet 스크롤 시 background-clip 텍스트 증발 버그 우회 */
                         }}
                     >
                         {rounded}
