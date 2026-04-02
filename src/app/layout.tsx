@@ -50,7 +50,25 @@ export const metadata: Metadata = {
         url: "/hero-illustration-v3.webp",
         width: 1200,
         height: 630,
-        alt: "제스트페어 AI 영양제 궁합 & 비타민 조합 가이드",
+        alt: "제스트페어 AI 영양제 궁합 & 비타민 조합 가이드 (v3)",
+      },
+      {
+        url: "/hero-illustration-v4.webp",
+        width: 1200,
+        height: 630,
+        alt: "제스트페어 AI 영양제 궁합 & 비타민 조합 가이드 (v4)",
+      },
+      {
+        url: "/hero-illustration-v5.webp",
+        width: 1200,
+        height: 630,
+        alt: "제스트페어 AI 영양제 궁합 & 비타민 조합 가이드 (v5)",
+      },
+      {
+        url: "/hero-illustration-v6.webp",
+        width: 1200,
+        height: 630,
+        alt: "제스트페어 AI 영양제 궁합 & 비타민 조합 가이드 (v6)",
       },
     ],
   },
@@ -58,7 +76,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ZestPair | AI 영양제 궁합 분석 & 추천 가이드",
     description: "AI로 분석하는 내 영양제 궁합과 비타민 상호작용. 제스트페어에서 나에게 딱 맞는 영양제 조합을 확인하세요.",
-    images: ["/hero-illustration-v3.webp"],
+    images: [
+      "/hero-illustration-v3.webp",
+      "/hero-illustration-v4.webp",
+      "/hero-illustration-v5.webp",
+      "/hero-illustration-v6.webp",
+    ],
   },
   icons: {
     icon: [
@@ -106,6 +129,28 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
+        {/* SEO: Google Knowledge Panel / Search Logo & Thumbnail */}
+        <meta name="thumbnail" content="https://zestpair.com/hero-illustration-v3.webp" />
+        <meta name="thumbnail" content="https://zestpair.com/hero-illustration-v4.webp" />
+        <meta name="thumbnail" content="https://zestpair.com/hero-illustration-v5.webp" />
+        <meta name="thumbnail" content="https://zestpair.com/hero-illustration-v6.webp" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              url: "https://zestpair.com",
+              logo: "https://zestpair.com/hero-illustration-v3.webp",
+              image: [
+                "https://zestpair.com/hero-illustration-v3.webp",
+                "https://zestpair.com/hero-illustration-v4.webp",
+                "https://zestpair.com/hero-illustration-v5.webp",
+                "https://zestpair.com/hero-illustration-v6.webp",
+              ]
+            }),
+          }}
+        />
         {/* Pretendard: modern, premium Korean/English optimized font */}
         <link
           rel="stylesheet"
