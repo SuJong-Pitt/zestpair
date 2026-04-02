@@ -31,7 +31,7 @@ function getCategoryTheme(name: string) {
   return THEME_MAP.default;
 }
 
-const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = false }: IngredientCardProps) {
+const IngredientCardContent = memo(function IngredientCardContent({ ingredient, isFeatured = false }: IngredientCardProps) {
   // ── useHasMounted 제거: Zustand isSelected는 클라이언트 전용이므로 직접 호출해도 안전
   const { isSelected, toggleIngredient, language } = useBasketStore();
   const selected = isSelected(ingredient.id);
@@ -62,8 +62,8 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
       onClick={handleToggle}
       onMouseEnter={() => !selected && setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
-      className="group relative w-full text-left transition-transform duration-200 active:scale-95 hover:-translate-y-1"
-      style={{ zIndex: showTooltip ? 30 : 1 }}
+      className="group relative w-full text-left transition-transform duration-200 active:scale-95 hover:-translate-y-1 hover:z-[60]"
+      style={{ zIndex: showTooltip ? 50 : 1 }}
     >
       {/* ── 카드 본체 ── */}
       <div
@@ -78,18 +78,10 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
             : "linear-gradient(145deg, #ffffff 0%, #f9fafb 100%)",
           border: isFeatured ? "1.5px solid rgba(16,185,129,0.2)" : "1.5px solid rgba(0,0,0,0.06)",
           boxShadow: isFeatured
-            ? "0 12px 40px rgba(16,185,129,0.1)"
-            : "0 4px 24px rgba(0,0,0,0.04)",
+            ? "0 6px 20px rgba(16,185,129,0.06)" // 최적화: 40px 블러 -> 20px 블러, 투명도 0.06으로 대폭 하향
+            : "0 4px 16px rgba(0,0,0,0.03)",
         }}
       >
-        {/* ── Shimmer: CSS 애니메이션으로 교체 (JS motion 제거 → GPU 합성 레이어 처리) ── */}
-        <div
-          className="absolute inset-0 z-10 pointer-events-none opacity-[0.35] animate-shimmer"
-          style={{
-            background: "linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.45) 50%, transparent 60%)",
-          }}
-        />
-
         {/* ── 배경 글로우 오브 (Selected) ── */}
         {selected && (
           <div
@@ -267,4 +259,40 @@ const IngredientCard = memo(function IngredientCard({ ingredient, isFeatured = f
   );
 });
 
-export default IngredientCard;
+export default function IngredientCard(props: IngredientCardProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Stop early if no ref
+    if (!ref.current) return;
+
+    // Use IntersectionObserver to delay heavy rendering until near viewport
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // Once visible, keeps it rendered to prevent re-renders
+        }
+      },
+      { rootMargin: "600px" } // Load before coming into view
+    );
+    
+    observer.observe(ref.current);
+    
+    return () => observer.disconnect();
+  }, []);
+
+  if (isVisible) {
+    return <IngredientCardContent {...props} />;
+  }
+
+  // Render a placeholder that matches the final card dimensions to prevent Layout Shifts (CLS)
+  return (
+    <div
+      ref={ref}
+      className="w-full h-[180px] md:h-[220px] rounded-[1.75rem] border border-slate-100 bg-slate-50/50"
+      aria-hidden="true"
+    />
+  );
+}

@@ -105,7 +105,9 @@ export async function performAnalysis(
 
                 const pInteractions = (dbPartnerInteractions as Interaction[]) || [];
 
-                // 4단계: 로컬 시뮬레이션
+                // 4단계: 로컬 시뮬레이션 및 최고 점수 후보군 수집
+                const topCandidates: Array<{ pair: [Ingredient, Ingredient], interaction: Interaction, simScore: number }> = [];
+
                 for (const partnerId of uniquePartnerIds) {
                     const partner = allIngredients.find(i => i.id === partnerId);
                     if (!partner || partner.category === 'drugs') continue;
@@ -128,21 +130,30 @@ export async function performAnalysis(
                     const boost = (newSynerCount * 20) + 10 - (newCautCount * 5) - (newConfCount * 20);
                     const simScore = Math.max(10, Math.min(100, score + boost));
 
-                    if (simScore >= bestSimScore) {
-                        if (simScore >= score || !potentialSynergy) {
-                            const originInt = potentialSynergies.find(ps => ps.ingredient_a_id === partnerId || ps.ingredient_b_id === partnerId);
-                            if (originInt) {
-                                const originIngId = originInt.ingredient_a_id === partnerId ? originInt.ingredient_b_id : originInt.ingredient_a_id;
-                                const originIng = selectedIngredients.find(si => si.id === originIngId);
-                                
-                                if (originIng) {
-                                    potentialSynergy = { pair: [originIng, partner], interaction: originInt };
-                                    projectedScore = simScore;
+                    if (simScore >= bestSimScore && (simScore >= score || topCandidates.length === 0)) {
+                        const originInt = potentialSynergies.find(ps => ps.ingredient_a_id === partnerId || ps.ingredient_b_id === partnerId);
+                        if (originInt) {
+                            const originIngId = originInt.ingredient_a_id === partnerId ? originInt.ingredient_b_id : originInt.ingredient_a_id;
+                            const originIng = selectedIngredients.find(si => si.id === originIngId);
+                            
+                            if (originIng) {
+                                if (simScore > bestSimScore) {
+                                    topCandidates.length = 0; // 더 높은 점수가 나오면 기존 후보지 비우기
+                                    topCandidates.push({ pair: [originIng, partner], interaction: originInt, simScore });
                                     bestSimScore = simScore;
+                                } else if (simScore === bestSimScore) {
+                                    topCandidates.push({ pair: [originIng, partner], interaction: originInt, simScore }); // 동점일 경우 후보군에 추가
                                 }
                             }
                         }
                     }
+                }
+
+                // 5단계: 최고 점수 후보군 중 랜덤 추출 (특정 부원료 고정 노출 방지)
+                if (topCandidates.length > 0) {
+                    const winner = topCandidates[Math.floor(Math.random() * topCandidates.length)];
+                    potentialSynergy = { pair: winner.pair, interaction: winner.interaction };
+                    projectedScore = winner.simScore;
                 }
             }
         }

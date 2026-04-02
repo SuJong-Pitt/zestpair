@@ -97,6 +97,23 @@ function HorizontalScroll({ children, className }: { children: React.ReactNode; 
   );
 }
 
+// 카테고리별 테마 컬러 및 스타일 설정
+const CATEGORY_THEMES: Record<string, { bg: string, border: string, text: string }> = {
+  all: { bg: "rgba(15,23,42,0.06)", border: "rgba(15,23,42,0.12)", text: "#10b981" },
+  vitamins: { bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.15)", text: "#f59e0b" },
+  minerals: { bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.15)", text: "#f97316" },
+  omega: { bg: "rgba(14,165,233,0.08)", border: "rgba(14,165,233,0.15)", text: "#0ea5e9" },
+  probiotics: { bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.15)", text: "#10b981" },
+  antioxidants: { bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.15)", text: "#8b5cf6" },
+  amino_acids: { bg: "rgba(217,119,6,0.08)", border: "rgba(217,119,6,0.15)", text: "#d97706" },
+  lipids: { bg: "rgba(244,63,94,0.08)", border: "rgba(244,63,94,0.15)", text: "#f43f5e" },
+  enzymes: { bg: "rgba(132,204,22,0.08)", border: "rgba(132,204,22,0.15)", text: "#84cc16" },
+  herbs: { bg: "rgba(20,184,166,0.08)", border: "rgba(20,184,166,0.15)", text: "#14b8a6" },
+  hormones: { bg: "rgba(217,70,239,0.08)", border: "rgba(217,70,239,0.15)", text: "#d946ef" },
+  drugs: { bg: "rgba(100,116,139,0.08)", border: "rgba(100,116,139,0.15)", text: "#64748b" },
+  other: { bg: "rgba(100,116,139,0.08)", border: "rgba(100,116,139,0.15)", text: "#64748b" },
+};
+
 export default function HomePage() {
   const router = useRouter();
   const resultRef = useRef<HTMLDivElement>(null);
@@ -106,17 +123,14 @@ export default function HomePage() {
   const isHeroSearchVisible = useInView(heroSearchContainerRef, { amount: 0.01 });
   const isIngredientsVisible = useInView(ingredientsRef, { amount: 0.01 }); // 더 민감하게 (1%만 보여도 감지)
 
-
-
-
   const [isMounted, setIsMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [isPending, startTransition] = useTransition();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [showAllPopular, setShowAllPopular] = useState(false);
+  const [sortBy, setSortBy] = useState<'default' | 'name' | 'popular'>('default');
   const [isGuideOpen, setIsGuideOpen] = useState(false);
-  // 카테고리 전환 감지: 0=초기 로드(stagger 적용), >0=탭 전환(딜레이 없이 즉각 표시)
+  // 카테고리 전환 감지: 1=초기 로드(stagger 적용), >0=탭 전환(딜레이 없이 즉각 표시)
   const categoryVersionRef = useRef(0);
   const [hasInitialLoaded, setHasInitialLoaded] = useState(false);
   const [showTopAlert, setShowTopAlert] = useState(false);
@@ -166,12 +180,41 @@ export default function HomePage() {
 
   const t = UI_TRANSLATIONS[language];
 
-  // 메인 그리드용 필터링 (검색어 제외, 카테고리만) - 성능 최적화: useMemo
+  // 메인 그리드용 필터링 및 정렬 - 성능 최적화: useMemo
   const filteredIngredients = useMemo(() => {
-    return dbIngredients.filter((ing) => {
+    // 1. 카테고리 필터링
+    let result = dbIngredients.filter((ing) => {
       return selectedCategory === "all" || ing.category === selectedCategory;
     });
-  }, [dbIngredients, selectedCategory]);
+
+    // 2. 정렬 적용
+    switch (sortBy) {
+      case 'name':
+        // 이름순 (가나다/ABC)
+        result = [...result].sort((a, b) => {
+          const nameA = (language === 'ko' ? a.name : a.name_en).toLowerCase();
+          const nameB = (language === 'ko' ? b.name : b.name_en).toLowerCase();
+          return nameA.localeCompare(nameB, language === 'ko' ? 'ko' : 'en');
+        });
+        break;
+      case 'popular':
+        // 인기순 (is_popular 성분을 최상단으로)
+        result = [...result].sort((a, b) => {
+          if (a.is_popular && !b.is_popular) return -1;
+          if (!a.is_popular && b.is_popular) return 1;
+          return (a.sort_order || 0) - (b.sort_order || 0); // 같은 인기라면 기존 순서 유지
+        });
+        break;
+      case 'default':
+      default:
+        // 추천순 (기존 sort_order 유지)
+        // dbIngredients 자체가 이미 sort_order로 가져와졌으므로 추가 정렬 불필요할 수 있으나, 명시적으로 처리
+        result = [...result].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+        break;
+    }
+
+    return result;
+  }, [dbIngredients, selectedCategory, sortBy, language]);
 
   // 카테고리 변경 시 버전 증가 (최초 로드 제외)
   const prevCategoryRef = useRef(selectedCategory);
@@ -221,8 +264,19 @@ export default function HomePage() {
   const isBlur = isDropdownOpen && dropdownResults.length > 0;
 
   const popularIngredients = useMemo(() => {
-    return dbIngredients.filter((i) => i.is_popular);
-  }, [dbIngredients]);
+    return [...dbIngredients.filter((i) => i.is_popular)].sort((a, b) => {
+      if (sortBy === 'name') {
+        const nameA = (language === 'ko' ? a.name : a.name_en) || '';
+        const nameB = (language === 'ko' ? b.name : b.name_en) || '';
+        return nameA.localeCompare(nameB);
+      }
+      if (sortBy === 'popular') {
+        // 인기순 정렬 (이미 필터링 되었으므로 sort_order 위주로 정렬하거나, is_popular 내부 순서 유지)
+        return (a.sort_order || 0) - (b.sort_order || 0);
+      }
+      return 0; // default (order by sort_order or featured)
+    });
+  }, [dbIngredients, sortBy, language]);
 
   // 데이터 로드 완료 후 첫 렌더 플래그 해제
   useEffect(() => {
@@ -241,7 +295,7 @@ export default function HomePage() {
 
     // 공통 분석 로직 호출 (lib/analysis.ts)
     const result = await performAnalysis(selectedIngredients, language, dbIngredients);
-    
+
     if (result) {
       setAnalysisResult(result);
     } else {
@@ -261,7 +315,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-slate-50/50">
       <section
-        className="relative pb-16 pt-10 md:pb-32 md:pt-12 z-40"
+        className="relative pb-10 pt-10 md:pb-16 md:pt-12 z-40"
         style={{
           background: "radial-gradient(circle at 50% 0%, #0d1a15 0%, #080c14 50%, #030712 100%)"
         }}
@@ -385,7 +439,7 @@ export default function HomePage() {
                   </>
                 ) : (
                   <>
-                    The supplements you take daily,<br className="md:hidden" /> 
+                    The supplements you take daily,<br className="md:hidden" />
                     can turn into <span className="relative inline-block mx-1 md:mx-2">
                       <span className="relative z-10 text-rose-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.8)] animate-pulse">‘POISON’</span>
                       <span className="absolute bottom-0 left-0 w-full h-[6px] bg-rose-500/40 blur-[2px] rounded-full" />
@@ -690,101 +744,101 @@ export default function HomePage() {
                 })}
               </div>
             </motion.div>
+          </motion.div>
 
-            {/* === 선택된 성분 목록 (위치 이동: 인기 태그 하단) === */}
-            <AnimatePresence>
-              {selectedIngredients.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{
-                    opacity: isBlur ? 0.3 : 1,
-                    y: 0,
-                    scale: 1,
-                    filter: isBlur ? "blur(5px)" : "blur(0px)"
-                  }}
-                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                  className="flex flex-wrap justify-center gap-1.5 md:gap-2 mt-6 mb-2 px-4"
-                >
-                  {isMounted && selectedIngredients.map((ingredient) => (
-                    <motion.div
-                      layout
-                      key={ingredient.id}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                      className="group relative flex items-center gap-1 px-1.5 py-0.5 md:px-3 md:py-1 rounded-xl transition-all duration-300 whitespace-nowrap shrink-0"
-                      style={{
-                        background: "rgba(15, 23, 42, 0.85)",
-                        border: "1.5px solid rgba(16, 185, 129, 0.5)",
-                        boxShadow: "0 8px 20px rgba(16, 185, 129, 0.2)",
-                        backdropFilter: "blur(16px)"
-                      }}
+          {/* === 선택된 성분 목록 (위치 이동: 인기 태그 하단) === */}
+          <AnimatePresence>
+            {selectedIngredients.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{
+                  opacity: isBlur ? 0.3 : 1,
+                  y: 0,
+                  scale: 1,
+                  filter: isBlur ? "blur(5px)" : "blur(0px)"
+                }}
+                exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                className="flex flex-wrap justify-center gap-1.5 md:gap-2 mt-6 mb-2 px-4"
+              >
+                {isMounted && selectedIngredients.map((ingredient) => (
+                  <motion.div
+                    layout
+                    key={ingredient.id}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                    className="group relative flex items-center gap-1 px-1.5 py-0.5 md:px-3 md:py-1 rounded-xl transition-all duration-300 whitespace-nowrap shrink-0"
+                    style={{
+                      background: "rgba(15, 23, 42, 0.85)",
+                      border: "1.5px solid rgba(16, 185, 129, 0.5)",
+                      boxShadow: "0 8px 20px rgba(16, 185, 129, 0.2)",
+                      backdropFilter: "blur(16px)"
+                    }}
+                  >
+                    <span className="text-[10px] md:text-sm group-hover:scale-110 transition-transform">
+                      {ingredient.icon_emoji}
+                    </span>
+                    <span className="text-[8px] md:text-[11px] font-[900] text-white tracking-tight">
+                      {language === 'ko' ? ingredient.name : ingredient.name_en}
+                    </span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
+                      className="ml-0.5 p-0.5 text-white/30 hover:text-white/80 transition-colors"
                     >
-                      <span className="text-[10px] md:text-sm group-hover:scale-110 transition-transform">
-                        {ingredient.icon_emoji}
-                      </span>
-                      <span className="text-[8px] md:text-[11px] font-[900] text-white tracking-tight">
-                        {language === 'ko' ? ingredient.name : ingredient.name_en}
-                      </span>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
-                        className="ml-0.5 p-0.5 text-white/30 hover:text-white/80 transition-colors"
-                      >
-                        <X className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={3} />
-                      </button>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      <X className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={3} />
+                    </button>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-            {/* === 소셜 프루프 배지 행 (상태 가속화) === */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{
-                opacity: isBlur ? 0.3 : 1,
-                y: 0,
-                filter: isBlur ? "blur(8px)" : "blur(0px)",
-                scale: isBlur ? 0.98 : 1
-              }}
-              transition={{
-                duration: 0.5,
-                delay: !hasInitialLoaded ? 1.5 : 0,
-                ease: "easeOut"
-              }}
-              className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2.5 mt-8 md:mt-12 mb-4 max-w-4xl mx-auto gpu-accelerated"
-            >
-              {[
-                { icon: "⚡", text: language === 'ko' ? '0.5초 분석' : '0.5s Analysis', color: "#fbbf24" },
-                { icon: "🔬", text: language === 'ko' ? 'AI 성분 매칭' : 'AI Matching', color: "#34d399" },
-                { icon: "🛡️", text: language === 'ko' ? '충돌 감지' : 'Conflict Alert', color: "#f87171" },
-                { icon: "✨", text: language === 'ko' ? '시너지 발견' : 'Synergy Finder', color: "#a78bfa" },
-                { icon: "📱", text: language === 'ko' ? 'App 출시 예정' : 'App Coming Soon', color: "#60a5fa" },
-                { icon: "💚", text: language === 'ko' ? '무료 서비스' : 'Free Forever', color: "#34d399" },
-              ].map((badge, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{
-                    delay: !hasInitialLoaded ? (1.6 + i * 0.05) : 0,
-                    duration: 0.3
-                  }}
-                  whileHover={{ y: -2, backgroundColor: "rgba(255,255,255,0.08)" }}
-                  className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[8.5px] md:text-[11px] font-[900] transition-colors whitespace-nowrap gpu-accelerated"
-                  style={{
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    backdropFilter: "blur(8px)",
-                    color: badge.color,
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)"
-                  }}
-                >
-                  <span className="filter drop-shadow-[0_0_5px_rgba(0,0,0,0.3)]">{badge.icon}</span>
-                  <span className="tracking-tighter">{badge.text}</span>
-                </motion.span>
-              ))}
-            </motion.div>
+          {/* === 소셜 프루프 배지 행 (상태 가속화) === */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{
+              opacity: isBlur ? 0.3 : 1,
+              y: 0,
+              filter: isBlur ? "blur(8px)" : "blur(0px)",
+              scale: isBlur ? 0.98 : 1
+            }}
+            transition={{
+              duration: 0.5,
+              delay: !hasInitialLoaded ? 1.5 : 0,
+              ease: "easeOut"
+            }}
+            className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2.5 mt-8 md:mt-12 mb-4 max-w-4xl mx-auto gpu-accelerated"
+          >
+            {[
+              { icon: "⚡", text: language === 'ko' ? '0.5초 분석' : '0.5s Analysis', color: "#fbbf24" },
+              { icon: "🔬", text: language === 'ko' ? 'AI 성분 매칭' : 'AI Matching', color: "#34d399" },
+              { icon: "🛡️", text: language === 'ko' ? '충돌 감지' : 'Conflict Alert', color: "#f87171" },
+              { icon: "✨", text: language === 'ko' ? '시너지 발견' : 'Synergy Finder', color: "#a78bfa" },
+              { icon: "📱", text: language === 'ko' ? 'App 출시 예정' : 'App Coming Soon', color: "#60a5fa" },
+              { icon: "💚", text: language === 'ko' ? '무료 서비스' : 'Free Forever', color: "#34d399" },
+            ].map((badge, i) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  delay: !hasInitialLoaded ? (1.6 + i * 0.05) : 0,
+                  duration: 0.3
+                }}
+                whileHover={{ y: -2, backgroundColor: "rgba(255,255,255,0.08)" }}
+                className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[8.5px] md:text-[11px] font-[900] transition-colors whitespace-nowrap gpu-accelerated"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  backdropFilter: "blur(8px)",
+                  color: badge.color,
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)"
+                }}
+              >
+                <span className="filter drop-shadow-[0_0_5px_rgba(0,0,0,0.3)]">{badge.icon}</span>
+                <span className="tracking-tighter">{badge.text}</span>
+              </motion.span>
+            ))}
           </motion.div>
         </div>
 
@@ -812,29 +866,29 @@ export default function HomePage() {
                 </span>
               </div>
             </div>
-
-            <HorizontalScroll className="gap-2 pt-1 pb-4">
+            {/* 카테고리 나래비 (모바일 그리드 / 데스크탑 플렉스) */}
+            <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-2 md:gap-3 px-1 md:px-0 pt-1 pb-6">
               {Object.entries(CATEGORIES_TRANSLATIONS).map(([key, data]) => {
                 const isActive = selectedCategory === key;
                 return (
                   <motion.button
                     key={key}
-                    layout
-                    whileHover={{ y: -3, scale: 1.02 }}
+                    layout="position"
+                    whileHover={{ y: -3, scale: 1.02, boxShadow: "0 8px 20px rgba(0,0,0,0.06)" }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => setSelectedCategory(key)}
-                    className="group relative flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-2xl text-[12px] font-black transition-all duration-300"
+                    className="group relative flex items-center justify-center sm:justify-start gap-1.5 md:gap-2.5 px-2 md:px-5 py-2 md:py-3.5 rounded-xl md:rounded-[1.25rem] text-[10px] md:text-[13px] font-[900] transition-all duration-300"
                     style={isActive ? {
                       background: "linear-gradient(135deg, #0a1a15 0%, #071210 100%)",
-                      border: "1.5px solid rgba(16,185,129,0.5)",
+                      border: "1.2px solid rgba(16,185,129,0.5)",
                       color: "#34d399",
-                      boxShadow: "0 10px 25px rgba(0,0,0,0.3), 0 0 15px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.08)"
+                      boxShadow: "0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.1)"
                     } : {
-                      background: "rgba(255,255,255,0.45)",
-                      border: "1px solid rgba(0,0,0,0.04)",
+                      background: "rgba(255,255,255,0.6)",
+                      border: "1px solid rgba(0,0,0,0.05)",
                       color: "#64748b",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
-                      backdropFilter: "blur(16px)"
+                      boxShadow: "0 4px 10px rgba(0,0,0,0.02)",
+                      backdropFilter: "blur(20px)"
                     }}
                   >
                     {/* 활성 배경 글로우 (Liquid Light 효과) */}
@@ -843,40 +897,45 @@ export default function HomePage() {
                         layoutId="activeCategoryGlow"
                         className="absolute inset-x-0 -bottom-1 h-3 blur-md opacity-60 z-0 pointer-events-none"
                         style={{ background: "#10b981" }}
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                        transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
                       />
                     )}
+
                     {/* 내부 광원 효과 (Active 전용) */}
                     {isActive && (
                       <motion.div
-                        animate={{ opacity: [0.1, 0.25, 0.1] }}
-                        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute inset-0 bg-emerald-400/10 rounded-2xl pointer-events-none"
+                        animate={{ opacity: [0.1, 0.3, 0.1] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute inset-0 bg-emerald-400/10 rounded-xl md:rounded-[1.25rem] pointer-events-none"
                       />
                     )}
-                    <span className="relative z-10 text-base leading-none group-hover:scale-110 transition-transform">{data.emoji}</span>
+
+                    <span className="relative z-10 text-xs md:text-lg leading-none group-hover:scale-110 transition-transform duration-500">
+                      {data.emoji}
+                    </span>
                     <motion.span
-                      className="relative z-10 tracking-tight"
-                      animate={isActive ? { scale: 1.05 } : { scale: 1 }}
+                      className="relative z-10 tracking-tight whitespace-nowrap"
+                      animate={isActive ? { scale: 1.02 } : { scale: 1 }}
                     >
                       {data[language]}
                     </motion.span>
-                    {/* 활성 하단 포인트 닷 */}
+
+                    {/* 활성 하단 포인트 닷 (프리미엄 피니시) */}
                     {isActive && (
                       <motion.div
                         initial={{ opacity: 0, scale: 0, y: 5 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-0.5 rounded-full"
+                        className="absolute bottom-1 md:bottom-2 left-1/2 -translate-x-1/2 w-1 h-0.5 rounded-full"
                         style={{
                           background: "#10b981",
-                          boxShadow: "0 0 8px #10b981, 0 0 16px #10b981"
+                          boxShadow: "0 0 8px #10b981"
                         }}
                       />
                     )}
                   </motion.button>
                 );
               })}
-            </HorizontalScroll>
+            </div>
           </div>
 
           {searchQuery === "" && selectedCategory === "all" && (
@@ -889,75 +948,58 @@ export default function HomePage() {
               }}
             >
               {/* 섹션 헤더 */}
-              <div className="flex items-center justify-between mb-7">
+              <div className="flex items-start sm:items-center justify-between mb-7">
                 <div className="flex items-start gap-3">
                   {/* 아이콘 오브 */}
                   <motion.div
                     animate={{ scale: [1, 1.12, 1], rotate: [0, 5, 0] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                    className="relative shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center"
+                    className="relative shrink-0 w-8 h-8 rounded-xl flex items-center justify-center"
                     style={{
                       background: "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(251,191,36,0.08) 100%)",
                       border: "1px solid rgba(245,158,11,0.2)",
-                      boxShadow: "0 0 20px rgba(245,158,11,0.15)"
+                      boxShadow: "0 0 15px rgba(245,158,11,0.12)"
                     }}
                   >
-                    <Sparkles size={18} style={{ color: "#f59e0b" }} />
+                    <Sparkles size={15} style={{ color: "#f59e0b" }} />
                   </motion.div>
 
                   <div>
-                    <h2 className="text-xl font-[900] tracking-tight" style={{ color: "#0f172a" }}>
+                    <h2 className="text-base font-[900] tracking-tight" style={{ color: "#0f172a", lineHeight: "1.2" }}>
                       {t.common.popular}
                     </h2>
-                    <p className="text-[10px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.18em" }}>
+                    <p className="text-[9px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.15em", lineHeight: "1" }}>
                       Curated trending picks
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  {/* 라이브 뱃지 */}
-                  <div
-                    className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full"
-                    style={{
-                      background: "rgba(16,185,129,0.06)",
-                      border: "1px solid rgba(16,185,129,0.15)"
-                    }}
-                  >
-                    <motion.div
-                      animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ background: "#10b981", boxShadow: "0 0 6px #10b981" }}
-                    />
-                    <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: "#10b981" }}>
-                      {t.common.popularPicks}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-3 pt-1 sm:pt-0">
 
-                  {/* 전체보기 버튼 */}
-                  {popularIngredients.length > 8 && (
-                    <motion.button
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      onClick={() => setShowAllPopular(!showAllPopular)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all"
-                      style={showAllPopular ? {
-                        background: "linear-gradient(135deg, #10b981, #06b6d4)",
-                        color: "white",
-                        boxShadow: "0 6px 20px rgba(16,185,129,0.35)"
-                      } : {
-                        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-                        color: "white",
-                        boxShadow: "0 6px 20px rgba(0,0,0,0.25)"
+
+                  {/* 정렬 셀렉터 (인기 섹션 버전) */}
+                  <div className="relative group">
+                    <div
+                      className="absolute inset-0 bg-emerald-500/5 blur-sm rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                    />
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as any)}
+                      className="relative z-10 appearance-none bg-white/40 hover:bg-white/60 border border-slate-200/60 rounded-xl px-3 pr-8 py-1.5 text-[10px] md:text-[11px] font-[900] text-slate-600 cursor-pointer transition-all outline-none focus:ring-2 focus:ring-emerald-500/20"
+                      style={{
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
                       }}
                     >
-                      <span>{showAllPopular ? t.common.hide : t.common.showAll}</span>
-                      <motion.div animate={{ rotate: showAllPopular ? 180 : 0 }} transition={{ duration: 0.3 }}>
-                        <ChevronDown size={13} strokeWidth={3} />
-                      </motion.div>
-                    </motion.button>
-                  )}
+                      <option value="default">{language === 'ko' ? '추천순' : 'Recommended'}</option>
+                      <option value="name">{language === 'ko' ? '이름순' : 'A-Z'}</option>
+                      <option value="popular">{language === 'ko' ? '인기순' : 'Popularity'}</option>
+                    </select>
+                    <ChevronDown
+                      size={10}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-emerald-500 transition-colors"
+                      strokeWidth={3}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -968,27 +1010,17 @@ export default function HomePage() {
                       <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
                     ))}
                   </div>
-                ) : showAllPopular ? (
+                ) : (
                   <motion.div
-                    key="grid"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
+                    key="popular-grid"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
                     className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-4 px-1"
                   >
+                    {/* 상위 인기 품목 전원을 고정 노출 (토글 기능 및 개수 제한 없음) */}
                     {popularIngredients.map((ing) => (
                       <IngredientCard key={ing.id} ingredient={ing} isFeatured={true} />
                     ))}
-                  </motion.div>
-                ) : (
-                  <motion.div key="scroll" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <HorizontalScroll className="gap-3 pt-2 pb-4 px-1">
-                      {popularIngredients.slice(0, 8).map((ing) => (
-                        <div key={ing.id} className="w-[135px] md:w-[175px] flex-shrink-0">
-                          <IngredientCard ingredient={ing} isFeatured={true} />
-                        </div>
-                      ))}
-                    </HorizontalScroll>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -996,147 +1028,181 @@ export default function HomePage() {
           )}
 
           <div className="mb-8 relative pt-4">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-emerald-500/50 to-transparent" />
 
-            {/* ── 전체 목록 헤더 ── */}
-            <div className="flex items-center justify-between mb-6 px-1">
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(15,23,42,0.06) 0%, rgba(15,23,42,0.03) 100%)",
-                    border: "1px solid rgba(0,0,0,0.06)"
-                  }}
+
+            <AnimatePresence mode="wait">
+              {(selectedCategory !== 'all' || searchQuery !== '') && (
+                <motion.div
+                  key="list-header-and-content"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                 >
-                  <Database size={12} style={{ color: "#10b981" }} />
-                  <h2 className="font-[900] text-sm tracking-tight" style={{ color: "#0f172a" }}>
-                    {t.common.all}
-                  </h2>
-                  <span
-                    className="text-xs font-black px-1.5 py-0.5 rounded-lg"
-                    style={{
-                      background: "rgba(16,185,129,0.1)",
-                      color: "#10b981"
-                    }}
-                  >
-                    {filteredIngredients.length}
-                  </span>
-                </div>
-              </div>
-
-              <div
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-                style={{
-                  background: "rgba(16,185,129,0.05)",
-                  border: "1px solid rgba(16,185,129,0.12)"
-                }}
-              >
-                <Info size={10} style={{ color: "#10b981" }} />
-                <span
-                  className="text-[9px] font-black uppercase tracking-tight"
-                  style={{ color: "#64748b" }}
-                >
-                  {language === 'ko' ? '2개 이상 선택 시 분석 활성화' : 'Select 2+ to Analyze'}
-                </span>
-              </div>
-            </div>
-
-            {isLoadingList ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 px-1">
-                {[...Array(8)].map((_, i) => (
-                  <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
-                ))}
-              </div>
-            ) : filteredIngredients.length > 0 ? (
-              <div
-                key={categoryVersionRef.current}
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 px-1 animate-fade-in"
-              >
-                {filteredIngredients.map((ing) => (
-                  <IngredientCard key={ing.id} ingredient={ing} />
-                ))}
-              </div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="flex flex-col items-center justify-center py-20 px-8 text-center"
-              >
-                <div className="relative mb-10 group">
-                  {/* 프리미엄 리어 글로우 (오로라 효과) - 일관성 유지 */}
-                  <div className="absolute inset-0 bg-emerald-300 blur-[100px] opacity-30 rounded-full group-hover:scale-110 transition-transform duration-1000" />
-                  <div className="absolute inset-0 bg-cyan-200 blur-[70px] opacity-20 rounded-full -translate-x-6 translate-y-6" />
-
-                  {/* 깜찍한 3D 포리 애니메이션 */}
-                  <motion.div
-                    className="relative z-10 w-44 h-44 md:w-60 md:h-60 object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)]"
-                    animate={{
-                      y: [0, -15, 0],
-                      rotate: [0, 2, -1, 0]
-                    }}
-                    transition={{
-                      duration: 5,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    <Image
-                      src="/images/pori.png"
-                      alt="Pori Mascot"
-                      width={240}
-                      height={240}
-                      className="w-full h-full object-contain"
-                    />
-                  </motion.div>
-
-                  {/* 바닥 그림자 애니메이션 */}
-                  <motion.div
-                    animate={{
-                      scaleX: [0.8, 1, 0.8],
-                      opacity: [0.1, 0.18, 0.1]
-                    }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-2.5 bg-black/30 blur-lg rounded-full"
-                  />
-                </div>
-
-                <div className="space-y-4 max-w-sm">
-                  <h3 className="text-2xl md:text-3xl font-[1000] text-slate-800 tracking-tighter leading-tight drop-shadow-sm">
-                    {t.common.poriNoResult}
-                  </h3>
-                  <p className="text-slate-400 font-bold text-sm md:text-base leading-relaxed opacity-90">
-                    {t.common.poriNoResultSub}
-                  </p>
-                </div>
-
-                <div className="mt-12">
-                  <button
-                    onClick={() => {
-                      setInputValue("");
-                      startTransition(() => setSearchQuery(""));
-                      setSelectedCategory("all");
-                    }}
-                    className="group/btn relative px-10 h-14 rounded-full font-black text-lg transition-all active:scale-95 shadow-xl hover:shadow-2xl overflow-hidden"
-                    style={{
-                      background: "linear-gradient(135deg, #10b981 0%, #0891b2 100%)",
-                      color: "white"
-                    }}
-                  >
-                    {/* 내부 쉬머(Shimmer) 애니메이션 */}
-                    <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] animate-shimmer pointer-events-none" />
-
-                    <div className="relative flex items-center gap-3">
-                      <RefreshCcw className="h-5 w-5 group-hover/btn:rotate-180 transition-transform duration-700" />
-                      <span>{t.common.viewAllIngredients}</span>
+                  {/* ── 전체 목록 헤더 ── */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 px-1">
+                    <div className="flex items-center gap-3">
+                      {/* 카테고리 칩 (동적 테마 적용) */}
+                      {(() => {
+                        const theme = CATEGORY_THEMES[selectedCategory] || CATEGORY_THEMES.all;
+                        const categoryInfo = CATEGORIES_TRANSLATIONS[selectedCategory as keyof typeof CATEGORIES_TRANSLATIONS];
+                        
+                        return (
+                          <div
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl shrink-0 transition-colors duration-300"
+                            style={{
+                              background: theme.bg,
+                              border: `1px solid ${theme.border}`
+                            }}
+                          >
+                            <span className="text-sm grayscale-[0.3]">
+                              {selectedCategory === 'all' ? <Database size={12} style={{ color: theme.text }} /> : categoryInfo?.emoji}
+                            </span>
+                            <h2 className="font-[900] text-sm tracking-tight" style={{ color: theme.text }}>
+                              {selectedCategory === 'all' ? t.common.searchResult : categoryInfo[language]}
+                            </h2>
+                            <span
+                              className="text-[10px] font-black px-1.5 py-0.5 rounded-lg"
+                              style={{
+                                background: "rgba(255,255,255,0.5)",
+                                color: theme.text
+                              }}
+                            >
+                              {filteredIngredients.length}
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </div>
-                  </button>
-                </div>
-              </motion.div>
-            )}
+
+                    <div className="flex items-center self-end sm:self-auto gap-3">
+
+                      
+                      {/* 정렬 셀렉터 */}
+                      <div className="relative group shrink-0">
+                        <div
+                          className="absolute inset-0 bg-emerald-500/5 blur-sm rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                        />
+                        <select
+                          value={sortBy}
+                          onChange={(e) => setSortBy(e.target.value as any)}
+                          className="relative z-10 appearance-none bg-white/40 hover:bg-white/60 border border-slate-200/60 rounded-xl px-3 pr-8 py-1.5 text-[10px] md:text-[11px] font-[900] text-slate-600 cursor-pointer transition-all outline-none focus:ring-2 focus:ring-emerald-500/20"
+                          style={{
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+                          }}
+                        >
+                          <option value="default">{language === 'ko' ? '추천순' : 'Recommended'}</option>
+                          <option value="name">{language === 'ko' ? '이름순' : 'A-Z'}</option>
+                          <option value="popular">{language === 'ko' ? '인기순' : 'Popularity'}</option>
+                        </select>
+                        <ChevronDown
+                          size={10}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-emerald-500 transition-colors"
+                          strokeWidth={3}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {isLoadingList ? (
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 px-1">
+                      {[...Array(8)].map((_, i) => (
+                        <Skeleton key={i} className="w-full h-[180px] md:h-[220px] rounded-[1.75rem]" />
+                      ))}
+                    </div>
+                  ) : filteredIngredients.length > 0 ? (
+                    <div
+                      key={`${selectedCategory}-${categoryVersionRef.current}`}
+                      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 px-1 animate-fade-in"
+                    >
+                      {filteredIngredients.map((ing) => (
+                        <IngredientCard key={ing.id} ingredient={ing} />
+                      ))}
+                    </div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      className="flex flex-col items-center justify-center py-20 px-8 text-center"
+                    >
+                      <div className="relative mb-10 group">
+                        {/* 프리미엄 리어 글로우 (오로라 효과) - 일관성 유지 */}
+                        <div className="absolute inset-0 bg-emerald-300 blur-[100px] opacity-30 rounded-full group-hover:scale-110 transition-transform duration-1000" />
+                        <div className="absolute inset-0 bg-cyan-200 blur-[70px] opacity-20 rounded-full -translate-x-6 translate-y-6" />
+
+                        {/* 깜찍한 3D 포리 애니메이션 */}
+                        <motion.div
+                          className="relative z-10 w-44 h-44 md:w-60 md:h-60 object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)]"
+                          animate={{
+                            y: [0, -15, 0],
+                            rotate: [0, 2, -1, 0]
+                          }}
+                          transition={{
+                            duration: 5,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                        >
+                          <Image
+                            src="/images/pori.png"
+                            alt="Pori Mascot"
+                            width={240}
+                            height={240}
+                            className="w-full h-full object-contain"
+                          />
+                        </motion.div>
+
+                        {/* 바닥 그림자 애니메이션 */}
+                        <motion.div
+                          animate={{
+                            scaleX: [0.8, 1, 0.8],
+                            opacity: [0.1, 0.18, 0.1]
+                          }}
+                          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                          className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-2.5 bg-black/30 blur-lg rounded-full"
+                        />
+                      </div>
+
+                      <div className="space-y-4 max-w-sm">
+                        <h3 className="text-2xl md:text-3xl font-[1000] text-slate-800 tracking-tighter leading-tight drop-shadow-sm">
+                          {t.common.poriNoResult}
+                        </h3>
+                        <p className="text-slate-400 font-bold text-sm md:text-base leading-relaxed opacity-90">
+                          {t.common.poriNoResultSub}
+                        </p>
+                      </div>
+
+                      <div className="mt-12">
+                        <button
+                          onClick={() => {
+                            setInputValue("");
+                            startTransition(() => setSearchQuery(""));
+                            setSelectedCategory("all");
+                          }}
+                          className="group/btn relative px-10 h-14 rounded-full font-black text-lg transition-all active:scale-95 shadow-xl hover:shadow-2xl overflow-hidden"
+                          style={{
+                            background: "linear-gradient(135deg, #10b981 0%, #0891b2 100%)",
+                            color: "white"
+                          }}
+                        >
+                          {/* 내부 쉬머(Shimmer) 애니메이션 */}
+                          <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] animate-shimmer pointer-events-none" />
+
+                          <div className="relative flex items-center gap-3">
+                            <RefreshCcw className="h-5 w-5 group-hover/btn:rotate-180 transition-transform duration-700" />
+                            <span>{t.common.viewAllIngredients}</span>
+                          </div>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div> {/* ingredientsRef 닫기 */}
 
-        <div ref={resultRef} id="analysis-results-section" className="mt-8 min-h-[50vh] scroll-mt-0">
+        <div ref={resultRef} id="analysis-results-section" className={`mt-8 scroll-mt-0 ${(isAnalyzing || hasResult) ? 'min-h-[50vh]' : 'min-h-0'}`}>
 
           {isAnalyzing && <AnalyzingAnimation onComplete={handleAnimationComplete} />}
         </div>

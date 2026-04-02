@@ -39,6 +39,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     const t = UI_TRANSLATIONS[language];
     const isMobile = useMediaQuery("(max-width: 768px)");
     const [toast, setToast] = useState({ show: false, message: "" });
+    const [isExiting, setIsExiting] = useState(false);
 
     if (!result || !result.ingredients) {
         return <div className="p-20 text-center text-slate-400">{t.common.loading}...</div>;
@@ -92,7 +93,12 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                animate={{ 
+                    opacity: isExiting ? 0 : 1, 
+                    y: isExiting ? 40 : 0,
+                    scale: isExiting ? 0.98 : 1
+                }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 py-12 md:py-24"
             >
                 {/* Main Glass Panel */}
@@ -534,8 +540,19 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
                         <button
                             onClick={() => {
-                                clearBasket();
-                                router.push("/");
+                                // 1. 먼저 부드러운 퇴장 애니메이션을 시작합니다.
+                                setIsExiting(true);
+                                
+                                // 2. 애니메이션이 어느 정도 진행된 후(약 400ms) 실제 이동을 시작합니다.
+                                setTimeout(() => {
+                                    router.push("/");
+                                    window.scrollTo({ top: 0, behavior: "smooth" });
+                                    
+                                    // 3. 페이지가 완전히 넘어가기 직전에 바구니를 비워 에러 화면을 방지합니다.
+                                    setTimeout(() => {
+                                        clearBasket();
+                                    }, 200);
+                                }, 400);
                             }}
                             className="group relative flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl transition-all hover:bg-white/10 hover:border-emerald-500/30 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] active:scale-95"
                         >
