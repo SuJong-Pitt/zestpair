@@ -877,18 +877,18 @@ export default function HomePage() {
                     whileHover={{ y: -3, scale: 1.02, boxShadow: "0 8px 20px rgba(0,0,0,0.06)" }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => setSelectedCategory(key)}
-                    className="group relative flex items-center justify-center sm:justify-start gap-1.5 md:gap-3 px-2 md:px-5 py-2 md:py-3.5 rounded-xl md:rounded-2xl text-[10px] md:text-[13px] font-[950] transition-all duration-300"
+                    className="group relative flex items-center justify-center sm:justify-start gap-1.5 md:gap-2.5 px-2 md:px-5 py-2 md:py-3.5 rounded-xl md:rounded-[1.25rem] text-[10px] md:text-[13px] font-[900] transition-all duration-300"
                     style={isActive ? {
-                      background: "linear-gradient(145deg, #0f241d 0%, #06110e 100%)",
-                      border: "1.5px solid rgba(52,211,153,0.4)",
+                      background: "linear-gradient(135deg, #0a1a15 0%, #071210 100%)",
+                      border: "1.2px solid rgba(16,185,129,0.5)",
                       color: "#34d399",
-                      boxShadow: "0 15px 35px -10px rgba(16,185,129,0.4), 0 0 20px rgba(16,185,129,0.15), inset 0 1px 1px rgba(255,255,255,0.12)"
+                      boxShadow: "0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.1)"
                     } : {
-                      background: "rgba(255,255,255,0.7)",
-                      border: "1px solid rgba(0,0,0,0.06)",
+                      background: "rgba(255,255,255,0.6)",
+                      border: "1px solid rgba(0,0,0,0.05)",
                       color: "#64748b",
-                      boxShadow: "0 5px 12px rgba(0,0,0,0.03)",
-                      backdropFilter: "blur(24px)"
+                      boxShadow: "0 4px 10px rgba(0,0,0,0.02)",
+                      backdropFilter: "blur(20px)"
                     }}
                   >
                     {/* 활성 배경 글로우 (Liquid Light 효과) */}
@@ -901,16 +901,16 @@ export default function HomePage() {
                       />
                     )}
 
-                    {/* 내부 광원 효과 (Active 전용 - Liquid Glow ✨) */}
+                    {/* 내부 광원 효과 (Active 전용) */}
                     {isActive && (
                       <motion.div
-                        animate={{ opacity: [0.15, 0.35, 0.15] }}
+                        animate={{ opacity: [0.1, 0.3, 0.1] }}
                         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute inset-0 bg-emerald-400/15 rounded-xl md:rounded-2xl pointer-events-none"
+                        className="absolute inset-0 bg-emerald-400/10 rounded-xl md:rounded-[1.25rem] pointer-events-none"
                       />
                     )}
 
-                    <span className="relative z-10 text-xs md:text-xl leading-none group-hover:scale-110 transition-transform duration-500" style={isActive ? { filter: "drop-shadow(0 0 5px rgba(52,211,153,0.3))" } : {}}>
+                    <span className="relative z-10 text-xs md:text-lg leading-none group-hover:scale-110 transition-transform duration-500">
                       {data.emoji}
                     </span>
                     <motion.span
@@ -924,11 +924,11 @@ export default function HomePage() {
                     {isActive && (
                       <motion.div
                         initial={{ opacity: 0, scale: 0, y: 5 }}
-                        animate={{ opacity: 1, scaleX: 1, y: 0 }}
-                        className="absolute bottom-1 md:bottom-2 left-1/2 -translate-x-1/2 w-4 md:w-6 h-[2px] rounded-full z-10 origin-center"
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="absolute bottom-1 md:bottom-2 left-1/2 -translate-x-1/2 w-1 h-0.5 rounded-full"
                         style={{
-                          background: "linear-gradient(90deg, transparent, #34d399, transparent)",
-                          boxShadow: "0 0 10px #10b981"
+                          background: "#10b981",
+                          boxShadow: "0 0 8px #10b981"
                         }}
                       />
                     )}

@@ -32,7 +32,7 @@ export const UI_TRANSLATIONS = {
             analyze: "분석하기",
             reset: "결과 리셋하고 처음부터 다시하기",
             popular: "많이 찾는 영양제",
-            all: "전체",
+            all: "트렌드",
             categoryTitle: "카테고리 선택",
             showAll: "전체보기",
             hide: "접기",
@@ -237,7 +237,7 @@ export type TranslationType = typeof UI_TRANSLATIONS['ko']; // 기본 구조로 
 export type I18nContent = typeof UI_TRANSLATIONS['ko'] | typeof UI_TRANSLATIONS['en'];
 
 export const CATEGORIES_TRANSLATIONS = {
-    all: { ko: "전체", en: "All", emoji: "✨" },
+    all: { ko: "트렌드", en: "Trend", emoji: "✨" },
     drugs: { ko: "의약품", en: "Medicines", emoji: "💊" },
     vitamins: { ko: "비타민", en: "Vitamins", emoji: "💊" },
     minerals: { ko: "미네랄", en: "Minerals", emoji: "⚗️" },
