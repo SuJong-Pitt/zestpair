@@ -324,7 +324,7 @@ const ScoreRing = memo(function ScoreRing({ score, size }: ScoreRingProps) {
                             background: `linear-gradient(135deg, #ffffff 0%, ${colors.gradA} 35%, ${colors.gradB} 70%, ${colors.gradC} 100%)`,
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
-                            filter: `drop-shadow(0 0 20px ${colors.shadow}) drop-shadow(0 2px 4px rgba(0,0,0,0.8))`
+                            // drop-shadow filter on text-clip creates black boxes on Android/Samsung Internet scrolling
                         }}
                     >
                         {rounded}
