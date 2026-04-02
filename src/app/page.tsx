@@ -97,21 +97,21 @@ function HorizontalScroll({ children, className }: { children: React.ReactNode; 
   );
 }
 
-// 카테고리별 테마 컬러 및 스타일 설정
+// 카테고리별 테마 컬러 및 스타일 설정 (화사한 헥스 코드로 전면 개편 ✨)
 const CATEGORY_THEMES: Record<string, { bg: string, border: string, text: string }> = {
-  all: { bg: "rgba(15,23,42,0.06)", border: "rgba(15,23,42,0.12)", text: "#10b981" },
-  vitamins: { bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.15)", text: "#f59e0b" },
-  minerals: { bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.15)", text: "#f97316" },
-  omega: { bg: "rgba(14,165,233,0.08)", border: "rgba(14,165,233,0.15)", text: "#0ea5e9" },
-  probiotics: { bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.15)", text: "#10b981" },
-  antioxidants: { bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.15)", text: "#8b5cf6" },
-  amino_acids: { bg: "rgba(217,119,6,0.08)", border: "rgba(217,119,6,0.15)", text: "#d97706" },
-  lipids: { bg: "rgba(244,63,94,0.08)", border: "rgba(244,63,94,0.15)", text: "#f43f5e" },
-  enzymes: { bg: "rgba(132,204,22,0.08)", border: "rgba(132,204,22,0.15)", text: "#84cc16" },
-  herbs: { bg: "rgba(20,184,166,0.08)", border: "rgba(20,184,166,0.15)", text: "#14b8a6" },
-  hormones: { bg: "rgba(217,70,239,0.08)", border: "rgba(217,70,239,0.15)", text: "#d946ef" },
-  drugs: { bg: "rgba(100,116,139,0.08)", border: "rgba(100,116,139,0.15)", text: "#64748b" },
-  other: { bg: "rgba(100,116,139,0.08)", border: "rgba(100,116,139,0.15)", text: "#64748b" },
+  all: { bg: "#f0fdfa", border: "#ccfbf1", text: "#10b981" },
+  vitamins: { bg: "#fff7ed", border: "#ffedd5", text: "#f59e0b" },
+  minerals: { bg: "#f0f9ff", border: "#e0f2fe", text: "#f97316" }, // 오렌지 계열 유지
+  omega: { bg: "#ecfeff", border: "#cffafe", text: "#0ea5e9" },
+  probiotics: { bg: "#f0fdf4", border: "#dcfce7", text: "#10b981" },
+  antioxidants: { bg: "#f5f3ff", border: "#ede9fe", text: "#8b5cf6" },
+  amino_acids: { bg: "#fffbeb", border: "#fef3c7", text: "#d97706" },
+  lipids: { bg: "#fff1f2", border: "#ffe4e6", text: "#f43f5e" },
+  enzymes: { bg: "#f7fee7", border: "#ecfccb", text: "#84cc16" },
+  herbs: { bg: "#f0fdfa", border: "#ccfbf1", text: "#14b8a6" },
+  hormones: { bg: "#fdf4ff", border: "#fae8ff", text: "#d946ef" },
+  drugs: { bg: "#f8fafc", border: "#f1f5f9", text: "#64748b" },
+  other: { bg: "#f8fafc", border: "#f1f5f9", text: "#64748b" },
 };
 
 export default function HomePage() {
@@ -877,18 +877,18 @@ export default function HomePage() {
                     whileHover={{ y: -3, scale: 1.02, boxShadow: "0 8px 20px rgba(0,0,0,0.06)" }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => setSelectedCategory(key)}
-                    className="group relative flex items-center justify-center sm:justify-start gap-1.5 md:gap-2.5 px-2 md:px-5 py-2 md:py-3.5 rounded-xl md:rounded-[1.25rem] text-[10px] md:text-[13px] font-[900] transition-all duration-300"
+                    className="group relative flex items-center justify-center sm:justify-start gap-1.5 md:gap-3 px-2 md:px-5 py-2 md:py-3.5 rounded-xl md:rounded-2xl text-[10px] md:text-[13px] font-[950] transition-all duration-300"
                     style={isActive ? {
-                      background: "linear-gradient(135deg, #0a1a15 0%, #071210 100%)",
-                      border: "1.2px solid rgba(16,185,129,0.5)",
+                      background: "linear-gradient(145deg, #0f241d 0%, #06110e 100%)",
+                      border: "1.5px solid rgba(52,211,153,0.4)",
                       color: "#34d399",
-                      boxShadow: "0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.1)"
+                      boxShadow: "0 15px 35px -10px rgba(16,185,129,0.4), 0 0 20px rgba(16,185,129,0.15), inset 0 1px 1px rgba(255,255,255,0.12)"
                     } : {
-                      background: "rgba(255,255,255,0.6)",
-                      border: "1px solid rgba(0,0,0,0.05)",
+                      background: "rgba(255,255,255,0.7)",
+                      border: "1px solid rgba(0,0,0,0.06)",
                       color: "#64748b",
-                      boxShadow: "0 4px 10px rgba(0,0,0,0.02)",
-                      backdropFilter: "blur(20px)"
+                      boxShadow: "0 5px 12px rgba(0,0,0,0.03)",
+                      backdropFilter: "blur(24px)"
                     }}
                   >
                     {/* 활성 배경 글로우 (Liquid Light 효과) */}
@@ -901,16 +901,16 @@ export default function HomePage() {
                       />
                     )}
 
-                    {/* 내부 광원 효과 (Active 전용) */}
+                    {/* 내부 광원 효과 (Active 전용 - Liquid Glow ✨) */}
                     {isActive && (
                       <motion.div
-                        animate={{ opacity: [0.1, 0.3, 0.1] }}
+                        animate={{ opacity: [0.15, 0.35, 0.15] }}
                         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute inset-0 bg-emerald-400/10 rounded-xl md:rounded-[1.25rem] pointer-events-none"
+                        className="absolute inset-0 bg-emerald-400/15 rounded-xl md:rounded-2xl pointer-events-none"
                       />
                     )}
 
-                    <span className="relative z-10 text-xs md:text-lg leading-none group-hover:scale-110 transition-transform duration-500">
+                    <span className="relative z-10 text-xs md:text-xl leading-none group-hover:scale-110 transition-transform duration-500" style={isActive ? { filter: "drop-shadow(0 0 5px rgba(52,211,153,0.3))" } : {}}>
                       {data.emoji}
                     </span>
                     <motion.span
@@ -924,11 +924,11 @@ export default function HomePage() {
                     {isActive && (
                       <motion.div
                         initial={{ opacity: 0, scale: 0, y: 5 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        className="absolute bottom-1 md:bottom-2 left-1/2 -translate-x-1/2 w-1 h-0.5 rounded-full"
+                        animate={{ opacity: 1, scaleX: 1, y: 0 }}
+                        className="absolute bottom-1 md:bottom-2 left-1/2 -translate-x-1/2 w-4 md:w-6 h-[2px] rounded-full z-10 origin-center"
                         style={{
-                          background: "#10b981",
-                          boxShadow: "0 0 8px #10b981"
+                          background: "linear-gradient(90deg, transparent, #34d399, transparent)",
+                          boxShadow: "0 0 10px #10b981"
                         }}
                       />
                     )}
@@ -1027,49 +1027,87 @@ export default function HomePage() {
             </div>
           )}
 
-          <div className="mb-8 relative pt-4">
+          <div className="relative">
 
 
             <AnimatePresence mode="wait">
               {(selectedCategory !== 'all' || searchQuery !== '') && (
                 <motion.div
                   key="list-header-and-content"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className="mb-20 md:mb-32 -mx-4 px-5 py-8 rounded-[2rem] transition-all duration-700"
+                  initial={{ opacity: 0, scale: 1, y: 0 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  style={{
+                    background: (() => {
+                      const theme = CATEGORY_THEMES[selectedCategory] || CATEGORY_THEMES.all;
+                      // 대표님 요청: HEX -> RGBA 변환으로 완벽한 화사함 구현 (0.8 / 0.95 / 0.6 룰 적용 ✨)
+                      const r1 = parseInt(theme.bg.slice(1, 3), 16);
+                      const g1 = parseInt(theme.bg.slice(3, 5), 16);
+                      const b1 = parseInt(theme.bg.slice(5, 7), 16);
+                      
+                      const r2 = parseInt(theme.border.slice(1,3), 16);
+                      const g2 = parseInt(theme.border.slice(3,5), 16);
+                      const b2 = parseInt(theme.border.slice(5,7), 16);
+                      
+                      return `linear-gradient(160deg, rgba(${r1}, ${g1}, ${b1}, 0.8) 0%, rgba(255, 255, 255, 0.95) 40%, rgba(${r2}, ${g2}, ${b2}, 0.6) 100%)`;
+                    })(),
+                    border: `1px solid ${selectedCategory === 'all' ? 'rgba(16,185,129,0.1)' : (CATEGORY_THEMES[selectedCategory]?.border || '#eee') + 'cc'}`,
+                    boxShadow: selectedCategory === 'all'
+                      ? "0 4px 30px rgba(16,185,129,0.06), inset 0 1px 0 rgba(255,255,255,0.8)"
+                      : `0 4px 30px ${(CATEGORY_THEMES[selectedCategory]?.text || '#000')}06, inset 0 1px 0 rgba(255,255,255,0.8)`
+                  }}
                 >
-                  {/* ── 전체 목록 헤더 ── */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 px-1">
+                  {/* ── 전체 목록 헤더 (인기 섹션과 100% 매칭 ✨) ── */}
+                  <div className="flex items-start sm:items-center justify-between gap-4 mb-7 px-1">
                     <div className="flex items-center gap-3">
-                      {/* 카테고리 칩 (동적 테마 적용) */}
+                      {/* ── 메인 결과 헤더 (많이 찾는 영양제 섹션과 완벽 매칭 ✨) ── */}
                       {(() => {
                         const theme = CATEGORY_THEMES[selectedCategory] || CATEGORY_THEMES.all;
                         const categoryInfo = CATEGORIES_TRANSLATIONS[selectedCategory as keyof typeof CATEGORIES_TRANSLATIONS];
-                        
+
                         return (
-                          <div
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl shrink-0 transition-colors duration-300"
-                            style={{
-                              background: theme.bg,
-                              border: `1px solid ${theme.border}`
-                            }}
-                          >
-                            <span className="text-sm grayscale-[0.3]">
-                              {selectedCategory === 'all' ? <Database size={12} style={{ color: theme.text }} /> : categoryInfo?.emoji}
-                            </span>
-                            <h2 className="font-[900] text-sm tracking-tight" style={{ color: theme.text }}>
-                              {selectedCategory === 'all' ? t.common.searchResult : categoryInfo[language]}
-                            </h2>
-                            <span
-                              className="text-[10px] font-black px-1.5 py-0.5 rounded-lg"
+                          <div className="flex items-center gap-3.5 group">
+                            {/* 프리미엄 아이콘 보주(Orb) - 압도적인 볼륨감 (XL) ✨ */}
+                            <motion.div
+                              animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
+                              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                              className="relative shrink-0 w-8 h-8 rounded-xl flex items-center justify-center"
                               style={{
-                                background: "rgba(255,255,255,0.5)",
-                                color: theme.text
+                                background: `linear-gradient(135deg, ${theme.text}26 0%, ${theme.text}14 100%)`,
+                                border: `1px solid ${theme.text}33`,
+                                boxShadow: `0 0 15px ${theme.text}1f`
                               }}
                             >
-                              {filteredIngredients.length}
-                            </span>
+                              <span className="text-base grayscale-[0.1] drop-shadow-sm group-hover:rotate-[-6deg] transition-transform">
+                                {selectedCategory === 'all' ? <Sparkles size={15} style={{ color: theme.text }} /> : categoryInfo?.emoji}
+                              </span>
+                            </motion.div>
+
+                            {/* 제목 및 부제목 - 인기 섹션과 동일 사양 ✨ */}
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h2 className="text-base font-[900] tracking-tight" style={{ color: "#0f172a", lineHeight: "1.2" }}>
+                                  {selectedCategory === 'all' ? t.common.searchResult : categoryInfo[language]}
+                                </h2>
+                                <span
+                                  className="text-[9px] font-black px-1.5 py-0.5 rounded-lg border border-slate-100 flex items-center justify-center min-w-[24px] shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
+                                  style={{
+                                    background: "#fff",
+                                    color: theme.text,
+                                    border: `1px solid ${theme.border}30`
+                                  }}
+                                >
+                                  {filteredIngredients.length}
+                                </span>
+                              </div>
+                              <p className="text-[9px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.15em", lineHeight: "1" }}>
+                                {selectedCategory === 'all'
+                                  ? 'Curated trending picks'
+                                  : `Discover ${selectedCategory.split('_')[0]} collection`}
+                              </p>
+                            </div>
                           </div>
                         );
                       })()}
@@ -1077,7 +1115,7 @@ export default function HomePage() {
 
                     <div className="flex items-center self-end sm:self-auto gap-3">
 
-                      
+
                       {/* 정렬 셀렉터 */}
                       <div className="relative group shrink-0">
                         <div
@@ -1113,7 +1151,7 @@ export default function HomePage() {
                   ) : filteredIngredients.length > 0 ? (
                     <div
                       key={`${selectedCategory}-${categoryVersionRef.current}`}
-                      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 px-1 animate-fade-in"
+                      className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2 pb-4 px-1 animate-fade-in"
                     >
                       {filteredIngredients.map((ing) => (
                         <IngredientCard key={ing.id} ingredient={ing} />
