@@ -176,12 +176,17 @@ export default function RootLayout({
 
         </TooltipProvider>
         
-        {/* Kakao SDK 스크립트 세팅 */}
+        {/* Kakao SDK 스크립트 세팅 (호환성 최적화) */}
         <Script 
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" 
           integrity="sha384-TiCmbV0Xf0xve2aA21GpkC02G2b3qTohqZfBfLw2oNfS2x1vVzY5b32i28j3p8f4" 
           crossOrigin="anonymous" 
-          strategy="afterInteractive"
+          strategy="lazyOnload"
+          onLoad={() => {
+            if (window.Kakao && !window.Kakao.isInitialized()) {
+              window.Kakao.init("27a049c799662857ed882c2639461392");
+            }
+          }}
         />
       </body>
     </html>

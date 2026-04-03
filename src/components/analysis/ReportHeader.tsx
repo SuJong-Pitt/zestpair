@@ -165,17 +165,77 @@ export default function ReportHeader() {
                         </span>
                     </motion.button>
 
-                    {/* 공유하기 간편 버튼 */}
-                    <motion.button
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="p-2 md:p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-2xl hover:bg-emerald-500/20 hover:border-emerald-500/40 transition-all active:scale-95 group"
-                        title={language === 'ko' ? '공유하기' : 'Share'}
-                        onClick={handleShare}
-                    >
-                        <Share2 size={16} className="text-emerald-400 group-hover:scale-110 transition-transform" />
-                    </motion.button>
+                    {/* 공유하기 액션 (투-트랙) */}
+                    <div className="flex items-center gap-1.5 md:gap-2">
+                        {/* 1. 카카오톡 전용 아이콘 */}
+                        <motion.button
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.15 }}
+                            className="p-2 md:p-2.5 rounded-xl bg-[#FEE500] hover:bg-[#FEE500]/90 transition-all active:scale-95 group shadow-lg"
+                            title={language === 'ko' ? '카카오톡 공유' : 'Kakao Share'}
+                            onClick={() => {
+                                // AnalysisResults와 동일한 로직을 수행하기 위해 
+                                // window.handleKakaoShare가 전역에 있으면 좋겠지만, 
+                                // 일단 여기서 직접 태웁니다.
+                                if (typeof window !== "undefined" && window.Kakao) {
+                                    if (!window.Kakao.isInitialized()) {
+                                        window.Kakao.init("27a049c799662857ed882c2639461392");
+                                    }
+                                    
+                                    const slugs = selectedIngredients.map(ing => ing.slug);
+                                    const encoded = encodeShareParams(slugs);
+                                    const shareUrl = `${window.location.origin}/analysis?v=${encoded}`;
+                                    const score = analysisResult?.score ?? 0;
+
+                                    let imageFileName = "pori-0.png";
+                                    if (score === 100) imageFileName = "pori-100.png";
+                                    else if (score >= 90) imageFileName = "pori-90.png";
+                                    else if (score >= 70) imageFileName = "pori-70.png";
+                                    else if (score >= 50) imageFileName = "pori-50.png";
+                                    const targetImageUrl = `${window.location.origin}/images/share/${imageFileName}`;
+
+                                    const title = language === 'ko' 
+                                        ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
+                                        : `🚨 Supplement Match Score: ${score}pts!`;
+
+                                    window.Kakao.Share.sendDefault({
+                                        objectType: 'feed',
+                                        content: {
+                                            title: title,
+                                            description: language === 'ko' ? "Pori AI에게 영양제 궁합을 채점받아보세요." : "Check your supplement interactions!",
+                                            imageUrl: targetImageUrl,
+                                            imageWidth: 800,
+                                            imageHeight: 800,
+                                            link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+                                        },
+                                        buttons: [{
+                                            title: language === 'ko' ? '내 점수 확인하기' : 'Check my score',
+                                            link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+                                        }],
+                                    });
+                                } else {
+                                    handleShare(); // Fallback
+                                }
+                            }}
+                        >
+                            <svg className="w-4 h-4 fill-[#3A1D1D]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 3c-5.5 0-10 3.5-10 7.8 0 2.8 1.8 5.2 4.6 6.5l-1.1 4c-.1.3.3.6.6.4l4.5-3.1c.5.1 1 .1 1.5.1 5.5 0 10-3.5 10-7.8s-4.5-7.8-10-7.8z"/>
+                            </svg>
+                        </motion.button>
+
+                        {/* 2. 일반 공유 (링크 복사) 아이콘 */}
+                        <motion.button
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="p-2 md:p-2.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 transition-all active:scale-95 group"
+                            title={language === 'ko' ? '링크 복사' : 'Copy Link'}
+                            onClick={handleShare}
+                        >
+                            <Share2 size={16} className="text-white/70 group-hover:text-white transition-colors" />
+                        </motion.button>
+                    </div>
                 </div>
 
             </div>
