@@ -2,9 +2,9 @@
 export const UI_TRANSLATIONS = {
     ko: {
         hero: {
-            title1: "🚨 1,300개 데이터 기반 긴급 점검",
-            title2: "지금 먹는 영양제, 서로 만나면 ‘독’이 될 수도 있습니다.",
-            subtitle1: "잘못된 조합은 간과 신장을 소리 없이 망가뜨립니다.",
+            title1: "🛡️ 부작용 방지를 위한 영양제 상호작용 분석",
+            title2: "건강을 위한 영양제, 조합에 따라 결과가 다릅니다.",
+            subtitle1: "의도치 않은 상충 작용을 피하고 최적의 시너지를 찾으세요.",
             subtitle2: "3초 만에 독성 검증",
             subtitle3: "받고 건강을 지키세요. (무료 분석)",
             searchPlaceholder: "🔍 지금 드시는 영양제를 입력해 보세요.",
@@ -117,9 +117,9 @@ export const UI_TRANSLATIONS = {
     },
     en: {
         hero: {
-            title1: "🚨 EMERGENCY: SUPPLEMENT CHECK",
-            title2: "What if the supplements you take daily are actually 'POISON'?",
-            subtitle1: "Wrong combinations silently damage your liver and kidneys.",
+            title1: "🔬 AI-POWERED INGREDIENT INTERACTION ANALYSIS",
+            title2: "Ensure your daily supplements are working safely together.",
+            subtitle1: "Avoid unintended conflicts and find the perfect synergy.",
             subtitle2: "Get 3-Second TOXICITY Check",
             subtitle3: "and protect your health. (Free Analysis)",
             searchPlaceholder: "🔍 Search for supplements you take right now.",

@@ -1046,11 +1046,11 @@ export default function HomePage() {
                       const r1 = parseInt(theme.bg.slice(1, 3), 16);
                       const g1 = parseInt(theme.bg.slice(3, 5), 16);
                       const b1 = parseInt(theme.bg.slice(5, 7), 16);
-                      
-                      const r2 = parseInt(theme.border.slice(1,3), 16);
-                      const g2 = parseInt(theme.border.slice(3,5), 16);
-                      const b2 = parseInt(theme.border.slice(5,7), 16);
-                      
+
+                      const r2 = parseInt(theme.border.slice(1, 3), 16);
+                      const g2 = parseInt(theme.border.slice(3, 5), 16);
+                      const b2 = parseInt(theme.border.slice(5, 7), 16);
+
                       return `linear-gradient(160deg, rgba(${r1}, ${g1}, ${b1}, 0.8) 0%, rgba(255, 255, 255, 0.95) 40%, rgba(${r2}, ${g2}, ${b2}, 0.6) 100%)`;
                     })(),
                     border: `1px solid ${selectedCategory === 'all' ? 'rgba(16,185,129,0.1)' : (CATEGORY_THEMES[selectedCategory]?.border || '#eee') + 'cc'}`,
