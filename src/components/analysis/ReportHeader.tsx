@@ -42,7 +42,8 @@ export default function ReportHeader() {
     const handleShare = async () => {
         const slugs = selectedIngredients.map(ing => ing.slug);
         const encoded = encodeShareParams(slugs);
-        const shareUrl = `${window.location.origin}/analysis?v=${encoded}`;
+        const canonicalBase = "https://zestpair.com";
+        const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
         const score = analysisResult?.score ?? 0;
 
         // 점수별 타겟 이미지 매핑 (미리 public/images/share 폴더에 세팅함)
@@ -185,7 +186,8 @@ export default function ReportHeader() {
                                     
                                     const slugs = selectedIngredients.map(ing => ing.slug);
                                     const encoded = encodeShareParams(slugs);
-                                    const shareUrl = `${window.location.origin}/analysis?v=${encoded}`;
+                                    const canonicalBase = "https://zestpair.com";
+                                    const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
                                     const score = analysisResult?.score ?? 0;
 
                                     let imageFileName = "pori-0.png";
@@ -193,7 +195,7 @@ export default function ReportHeader() {
                                     else if (score >= 90) imageFileName = "pori-90.png";
                                     else if (score >= 70) imageFileName = "pori-70.png";
                                     else if (score >= 50) imageFileName = "pori-50.png";
-                                    const targetImageUrl = `${window.location.origin}/images/share/${imageFileName}`;
+                                    const targetImageUrl = `${canonicalBase}/images/share/${imageFileName}`;
 
                                     const title = language === 'ko' 
                                         ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 

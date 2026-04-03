@@ -53,7 +53,8 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     const getShareUrlAndData = () => {
         const slugs = result.ingredients.map(ing => ing.slug);
         const encoded = encodeShareParams(slugs);
-        const shareUrl = `${window.location.origin}/analysis?v=${encoded}`;
+        const canonicalBase = "https://zestpair.com";
+        const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
         return { shareUrl, score: result.score };
     };
 
@@ -66,7 +67,8 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
         else if (score >= 70) imageFileName = "pori-70.png";
         else if (score >= 50) imageFileName = "pori-50.png";
 
-        const targetImageUrl = `${window.location.origin}/images/share/${imageFileName}`;
+        const canonicalBase = "https://zestpair.com";
+        const targetImageUrl = `${canonicalBase}/images/share/${imageFileName}`;
 
         const title = language === 'ko' 
             ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
