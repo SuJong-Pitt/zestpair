@@ -46,25 +46,61 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     }
 
     const handleShare = async () => {
-        // IDs 대신 슬러그를 인코딩하여 URL 길이를 줄임 (대표님 제안 반영 ✨)
         const slugs = result.ingredients.map(ing => ing.slug);
         const encoded = encodeShareParams(slugs);
         const shareUrl = `${window.location.origin}/analysis?v=${encoded}`;
+        const score = result.score;
+
+        let imageFileName = "pori-0.png";
+        if (score === 100) imageFileName = "pori-100.png";
+        else if (score >= 90) imageFileName = "pori-90.png";
+        else if (score >= 70) imageFileName = "pori-70.png";
+        else if (score >= 50) imageFileName = "pori-50.png";
+
+        const targetImageUrl = `${window.location.origin}/images/share/${imageFileName}`;
+
+        const title = language === 'ko' 
+            ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
+            : `🚨 Supplement Match Score: ${score}pts!`;
+        const description = language === 'ko'
+            ? "비싼 소변을 만들고 계시지는 않나요? Pori AI에게 영양제 궁합을 채점받아보세요."
+            : "Check your active supplement interactions instantly!";
+
+        if (typeof window !== "undefined" && window.Kakao && window.Kakao.isInitialized()) {
+            window.Kakao.Share.sendDefault({
+                objectType: 'feed',
+                content: {
+                    title: title,
+                    description: description,
+                    imageUrl: targetImageUrl,
+                    imageWidth: 800,
+                    imageHeight: 800,
+                    link: {
+                        mobileWebUrl: shareUrl,
+                        webUrl: shareUrl,
+                    },
+                },
+                buttons: [
+                    {
+                        title: language === 'ko' ? '내 약통 점수 확인하기' : 'Check my score',
+                        link: {
+                            mobileWebUrl: shareUrl,
+                            webUrl: shareUrl,
+                        },
+                    },
+                ],
+            });
+            return;
+        }
 
         const shareData = {
-            title: language === 'ko' ? "ZestPair | 영양제 궁합 분석 결과" : "ZestPair | Supplement Synergy Analysis",
-            text: language === 'ko'
-                ? `🔥 저의 영양제 궁합 점수는 ${result.score}점! Pori AI가 알려주는 최적의 조합을 확인해보세요.`
-                : `🔥 My supplement synergy score is ${result.score}pts! Check your personalized analysis by Pori AI at ZestPair.`,
+            title: "ZestPair | 영양제 궁합 분석 결과",
+            text: title,
             url: shareUrl
         };
 
         if (navigator.share) {
-            try {
-                await navigator.share(shareData);
-            } catch (err) {
-                console.log('Error sharing', err);
-            }
+            try { await navigator.share(shareData); } catch (err) {}
         } else {
             try {
                 await navigator.clipboard.writeText(shareUrl);
@@ -73,9 +109,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     message: language === 'ko' ? "링크가 복사되었습니다!" : "Link copied to clipboard!"
                 });
                 setTimeout(() => setToast({ show: false, message: "" }), 3000);
-            } catch (err) {
-                console.error('Failed to copy', err);
-            }
+            } catch (err) {}
         }
     };
 
