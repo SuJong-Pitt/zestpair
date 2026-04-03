@@ -53,7 +53,8 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     const getShareUrlAndData = () => {
         const slugs = result.ingredients.map(ing => ing.slug);
         const encoded = encodeShareParams(slugs);
-        const canonicalBase = "https://zestpair.com";
+        const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+        const canonicalBase = isLocal ? window.location.origin : "https://zestpair.com";
         const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
         return { shareUrl, score: result.score };
     };
@@ -67,7 +68,8 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
         else if (score >= 70) imageFileName = "pori-70.png";
         else if (score >= 50) imageFileName = "pori-50.png";
 
-        const canonicalBase = "https://zestpair.com";
+        const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+        const canonicalBase = isLocal ? window.location.origin : "https://zestpair.com";
         const targetImageUrl = `${canonicalBase}/images/share/${imageFileName}`;
 
         const title = language === 'ko' 

@@ -42,7 +42,8 @@ export default function ReportHeader() {
     const handleShare = async () => {
         const slugs = selectedIngredients.map(ing => ing.slug);
         const encoded = encodeShareParams(slugs);
-        const canonicalBase = "https://zestpair.com";
+        const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+        const canonicalBase = isLocal ? window.location.origin : "https://zestpair.com";
         const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
         const score = analysisResult?.score ?? 0;
 
@@ -188,7 +189,8 @@ export default function ReportHeader() {
                                         
                                         const slugs = selectedIngredients.map(ing => ing.slug);
                                         const encoded = encodeShareParams(slugs);
-                                        const canonicalBase = "https://zestpair.com";
+                                        const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+                                        const canonicalBase = isLocal ? window.location.origin : "https://zestpair.com";
                                         const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
                                         const score = analysisResult?.score ?? 0;
 
