@@ -66,7 +66,10 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
             ? "비싼 소변을 만들고 계시지는 않나요? Pori AI에게 영양제 궁합을 채점받아보세요."
             : "Check your active supplement interactions instantly!";
 
-        if (typeof window !== "undefined" && window.Kakao && window.Kakao.isInitialized()) {
+        if (typeof window !== "undefined" && window.Kakao) {
+            if (!window.Kakao.isInitialized()) {
+                window.Kakao.init("27a049c799662857ed882c2639461392");
+            }
             window.Kakao.Share.sendDefault({
                 objectType: 'feed',
                 content: {

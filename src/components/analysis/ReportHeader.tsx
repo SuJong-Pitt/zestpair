@@ -63,7 +63,10 @@ export default function ReportHeader() {
             : "Check your active supplement interactions instantly!";
 
         // 카카오톡 공유 기능이 로드되었는지 확인
-        if (typeof window !== "undefined" && window.Kakao && window.Kakao.isInitialized()) {
+        if (typeof window !== "undefined" && window.Kakao) {
+            if (!window.Kakao.isInitialized()) {
+                window.Kakao.init("27a049c799662857ed882c2639461392");
+            }
             window.Kakao.Share.sendDefault({
                 objectType: 'feed',
                 content: {
