@@ -45,11 +45,15 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
         return <div className="p-20 text-center text-slate-400">{t.common.loading}...</div>;
     }
 
-    const handleShare = async () => {
+    const getShareUrlAndData = () => {
         const slugs = result.ingredients.map(ing => ing.slug);
         const encoded = encodeShareParams(slugs);
         const shareUrl = `${window.location.origin}/analysis?v=${encoded}`;
-        const score = result.score;
+        return { shareUrl, score: result.score };
+    };
+
+    const handleKakaoShare = () => {
+        const { shareUrl, score } = getShareUrlAndData();
 
         let imageFileName = "pori-0.png";
         if (score === 100) imageFileName = "pori-100.png";
@@ -93,8 +97,16 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     },
                 ],
             });
-            return;
+        } else {
+            handleNativeShare();
         }
+    };
+
+    const handleNativeShare = async () => {
+        const { shareUrl, score } = getShareUrlAndData();
+        const title = language === 'ko' 
+            ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
+            : `🚨 Supplement Match Score: ${score}pts!`;
 
         const shareData = {
             title: "ZestPair | 영양제 궁합 분석 결과",
@@ -218,20 +230,35 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     {result.summary}
                                 </div>
 
-                                {/* Share Action */}
+                                {/* Share Action (Two-Track) */}
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: 0.4 }}
-                                    className="mb-8"
+                                    className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 w-full"
                                 >
+                                    {/* 1. 카카오톡 전용 공유 버튼 */}
                                     <Button
-                                        onClick={handleShare}
-                                        className="group/share relative px-8 h-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-black transition-all duration-300 shadow-[0_10px_30px_rgba(16,185,129,0.3)]"
+                                        onClick={handleKakaoShare}
+                                        className="group relative px-6 md:px-8 h-12 md:h-14 rounded-full bg-[#FEE500] hover:bg-[#FEE500]/90 text-[#3A1D1D] font-black transition-all duration-300 shadow-[0_10px_30px_rgba(254,229,0,0.2)] w-full sm:w-auto"
                                     >
-                                        <div className="relative flex items-center gap-2">
+                                        <div className="relative flex items-center gap-2 text-sm md:text-base">
+                                            <svg className="w-4 h-4 md:w-5 md:h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 3c-5.5 0-10 3.5-10 7.8 0 2.8 1.8 5.2 4.6 6.5l-1.1 4c-.1.3.3.6.6.4l4.5-3.1c.5.1 1 .1 1.5.1 5.5 0 10-3.5 10-7.8s-4.5-7.8-10-7.8z"/>
+                                            </svg>
+                                            <span>{language === 'ko' ? "카카오톡 결과 공유" : "Share via Kakao"}</span>
+                                        </div>
+                                    </Button>
+
+                                    {/* 2. 일반 공유 (링크) 버튼 */}
+                                    <Button
+                                        onClick={handleNativeShare}
+                                        variant="outline"
+                                        className="group relative px-6 md:px-8 h-12 md:h-14 rounded-full border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 text-white font-black transition-all duration-300 backdrop-blur-xl w-full sm:w-auto"
+                                    >
+                                        <div className="relative flex items-center gap-2 text-sm md:text-base">
                                             <Share2 size={16} />
-                                            <span>{language === 'ko' ? "분석 결과 공유하기" : "Share Analysis"}</span>
+                                            <span>{language === 'ko' ? "일반 링크 복사" : "Copy Link"}</span>
                                         </div>
                                     </Button>
                                 </motion.div>
