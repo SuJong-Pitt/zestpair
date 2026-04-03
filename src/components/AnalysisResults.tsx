@@ -68,9 +68,9 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
         else if (score >= 70) imageFileName = "pori-70.png";
         else if (score >= 50) imageFileName = "pori-50.png";
 
-        const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
-        const canonicalBase = isLocal ? window.location.origin : "https://zestpair.com";
-        const targetImageUrl = `${canonicalBase}/images/share/${imageFileName}`;
+        // 이미지는 Kakao 서버가 접근 가능해야 하므로, 로컬 테스트 중에도 운영 서버 이미지를 참조하게 합니다.
+        const imageBase = "https://zestpair.com";
+        const targetImageUrl = `${imageBase}/images/share/${imageFileName}`;
 
         const title = language === 'ko' 
             ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
@@ -255,17 +255,33 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     {/* 1. 카카오톡 전용 공유 버튼 */}
                                     <Button
                                         onClick={handleKakaoShare}
-                                        className="group relative px-6 md:px-8 h-12 md:h-14 rounded-full bg-[#FEE500] hover:bg-[#FEE500]/90 text-[#3A1D1D] font-black transition-all duration-300 shadow-[0_10px_30px_rgba(254,229,0,0.2)] w-full sm:w-auto"
+                                        className="group relative h-12 md:h-14 rounded-full border border-[#FEE500]/30 hover:border-[#FEE500]/50 bg-[#FEE500] text-[#3A1D1D] font-black transition-all duration-300 shadow-[0_10px_30px_rgba(254,229,0,0.15)] w-full sm:w-[240px] flex items-center justify-center p-0 active:scale-95"
                                     >
-                                        <div className="relative flex items-center gap-2 text-sm md:text-base">
-                                            <svg className="w-4 h-4 md:w-5 md:h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M12 3c-5.5 0-10 3.5-10 7.8 0 2.8 1.8 5.2 4.6 6.5l-1.1 4c-.1.3.3.6.6.4l4.5-3.1c.5.1 1 .1 1.5.1 5.5 0 10-3.5 10-7.8s-4.5-7.8-10-7.8z"/>
-                                            </svg>
-                                            <span>{language === 'ko' ? "카카오톡 결과 공유" : "Share via Kakao"}</span>
+                                        <div className="relative flex items-center gap-3 text-sm md:text-base">
+                                            <img src="/icons/kakao.svg" className="w-8 h-8 md:w-10 md:h-10 rounded-xl" alt="Kakao" />
+                                            <span className="font-extrabold">{language === 'ko' ? "카카오톡 공유" : "Share via Kakao"}</span>
                                         </div>
                                     </Button>
 
-                                    {/* 2. 일반 공유 (링크) 버튼 */}
+                                    {/* 2. 라인(LINE) 전용 공유 버튼 */}
+                                    <Button
+                                        onClick={() => {
+                                            const { shareUrl, score } = getShareUrlAndData();
+                                            const title = language === 'ko' 
+                                                ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
+                                                : `🚨 Supplement Match Score: ${score}pts!`;
+                                            const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
+                                            window.open(lineUrl, '_blank');
+                                        }}
+                                        className="group relative h-12 md:h-14 rounded-full border border-[#00B900]/30 hover:border-[#00B900]/50 bg-[#00B900] text-white font-black transition-all duration-300 shadow-[0_10px_30px_rgba(0,185,0,0.15)] w-full sm:w-[240px] flex items-center justify-center p-0 active:scale-95"
+                                    >
+                                        <div className="relative flex items-center gap-3 text-sm md:text-base">
+                                            <img src="/icons/line.svg" className="w-8 h-8 md:w-10 md:h-10 rounded-xl" alt="LINE" />
+                                            <span className="font-extrabold">{language === 'ko' ? "LINE 공유" : "LINE Share"}</span>
+                                        </div>
+                                    </Button>
+
+                                    {/* 3. 일반 공유 (링크) 버튼 */}
                                     <Button
                                         onClick={handleNativeShare}
                                         variant="outline"

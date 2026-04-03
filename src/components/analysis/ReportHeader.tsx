@@ -127,24 +127,11 @@ export default function ReportHeader() {
                     className="flex items-center gap-2.5 cursor-pointer group"
                     onClick={() => router.push("/")}
                 >
-                    <div className="relative flex items-center gap-3 px-3.5 md:px-5 py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
+                    <div className="relative flex items-center gap-2 md:gap-3 px-3 md:px-5 py-2 md:py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
                         <BrandLogo />
-                        <BrandName size="text-[15px] md:text-[20px]" />
-                        <div className="hidden md:block w-px h-4 bg-white/20 mx-1" />
-                        <Link
-                            href="/about"
-                            className="hidden md:flex text-[9px] font-black uppercase tracking-widest text-[#6ee7b7]/80 items-center gap-1.5 hover:text-[#6ee7b7] transition-all group/core"
-                        >
-                            <div className="flex items-center gap-1">
-                                <motion.div
-                                    animate={{ opacity: [0.4, 1, 0.4] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                    className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"
-                                />
-                                <span>AI Core v2.5</span>
-                            </div>
-                            <Info size={10} className="text-[#6ee7b7]/40 group-hover/core:text-[#6ee7b7] transition-colors" />
-                        </Link>
+                        <div className="hidden sm:block">
+                            <BrandName size="text-[15px] md:text-[20px]" />
+                        </div>
                     </div>
                 </motion.div>
 
@@ -156,25 +143,22 @@ export default function ReportHeader() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
                         onClick={() => router.push("/")}
-                        className="flex items-center gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 group"
+                        className="flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-5 md:py-2.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 transition-all active:scale-95 group"
                     >
-                        <ArrowLeft size={16} className="text-slate-400 group-hover:text-emerald-400 group-hover:-translate-x-0.5 transition-all" />
-                        <span className="hidden sm:inline-block text-[11px] md:text-xs font-black text-slate-300 group-hover:text-white uppercase tracking-widest whitespace-nowrap">
+                        <ArrowLeft size={16} className="text-slate-400 group-hover:text-emerald-400 transition-all" />
+                        <span className="hidden md:inline-block text-[11px] md:text-xs font-black text-slate-300 group-hover:text-white uppercase tracking-widest ml-2 whitespace-nowrap">
                             {language === 'ko' ? '선택 수정하기' : 'Edit Selection'}
-                        </span>
-                        <span className="sm:hidden text-[10px] font-black text-slate-300 group-hover:text-white uppercase tracking-widest whitespace-nowrap">
-                            {language === 'ko' ? '수정' : 'Edit'}
                         </span>
                     </motion.button>
 
                     {/* 공유하기 액션 (투-트랙) */}
-                    <div className="flex items-center gap-1.5 md:gap-2">
+                    <div className="flex items-center gap-1 md:gap-2">
                         {/* 1. 카카오톡 전용 아이콘 */}
                         <motion.button
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.15 }}
-                            className="p-2 md:p-2.5 rounded-xl bg-[#FEE500] hover:bg-[#FEE500]/90 transition-all active:scale-95 group shadow-lg"
+                            className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 transition-all active:scale-95 group"
                             title={language === 'ko' ? '카카오톡 공유' : 'Kakao Share'}
                             onClick={() => {
                                 // AnalysisResults와 동일한 로직을 수행하기 위해 
@@ -199,7 +183,8 @@ export default function ReportHeader() {
                                         else if (score >= 90) imageFileName = "pori-90.png";
                                         else if (score >= 70) imageFileName = "pori-70.png";
                                         else if (score >= 50) imageFileName = "pori-50.png";
-                                        const targetImageUrl = `${canonicalBase}/images/share/${imageFileName}`;
+                                        const imageBase = "https://zestpair.com";
+                                        const targetImageUrl = `${imageBase}/images/share/${imageFileName}`;
 
                                         const title = language === 'ko' 
                                             ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
@@ -229,21 +214,45 @@ export default function ReportHeader() {
                                 }
                             }}
                         >
-                            <svg className="w-4 h-4 fill-[#3A1D1D]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 3c-5.5 0-10 3.5-10 7.8 0 2.8 1.8 5.2 4.6 6.5l-1.1 4c-.1.3.3.6.6.4l4.5-3.1c.5.1 1 .1 1.5.1 5.5 0 10-3.5 10-7.8s-4.5-7.8-10-7.8z"/>
-                            </svg>
+                            <img src="/icons/kakao.svg" className="w-8 h-8 md:w-8.5 md:h-8.5" alt="Kakao" />
                         </motion.button>
 
-                        {/* 2. 일반 공유 (링크 복사) 아이콘 */}
+                        {/* 2. 라인(LINE) 전용 아이콘 */}
+                        <motion.button
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.18 }}
+                            className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 transition-all active:scale-95 group"
+                            title={language === 'ko' ? '라인 공유' : 'LINE Share'}
+                            onClick={() => {
+                                const slugs = selectedIngredients.map(ing => ing.slug);
+                                const encoded = encodeShareParams(slugs);
+                                const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+                                const canonicalBase = isLocal ? window.location.origin : "https://zestpair.com";
+                                const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
+                                const score = analysisResult?.score ?? 0;
+
+                                const title = language === 'ko' 
+                                    ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
+                                    : `🚨 Supplement Match Score: ${score}pts!`;
+                                
+                                const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
+                                window.open(lineUrl, '_blank');
+                            }}
+                        >
+                            <img src="/icons/line.svg" className="w-8 h-8 md:w-8.5 md:h-8.5" alt="LINE" />
+                        </motion.button>
+
+                        {/* 3. 일반 공유 (링크 복사) 아이콘 */}
                         <motion.button
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="p-2 md:p-2.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 transition-all active:scale-95 group"
+                            className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 transition-all active:scale-95 group"
                             title={language === 'ko' ? '링크 복사' : 'Copy Link'}
                             onClick={handleShare}
                         >
-                            <Share2 size={16} className="text-white/70 group-hover:text-white transition-colors" />
+                            <Share2 size={22} className="text-white/70 group-hover:text-white transition-colors" />
                         </motion.button>
                     </div>
                 </div>
