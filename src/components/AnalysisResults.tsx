@@ -77,35 +77,41 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
             ? "비싼 소변을 만들고 계시지는 않나요? Pori AI에게 영양제 궁합을 채점받아보세요."
             : "Check your active supplement interactions instantly!";
 
-        if (typeof window !== "undefined" && window.Kakao) {
-            if (!window.Kakao.isInitialized()) {
-                window.Kakao.init("27a049c799662857ed882c2639461392");
-            }
-            window.Kakao.Share.sendDefault({
-                objectType: 'feed',
-                content: {
-                    title: title,
-                    description: description,
-                    imageUrl: targetImageUrl,
-                    imageWidth: 800,
-                    imageHeight: 800,
-                    link: {
-                        mobileWebUrl: shareUrl,
-                        webUrl: shareUrl,
-                    },
-                },
-                buttons: [
-                    {
-                        title: language === 'ko' ? '내 약통 점수 확인하기' : 'Check my score',
+        if (typeof window !== "undefined" && (window as any).Kakao) {
+            const Kakao = (window as any).Kakao;
+            try {
+                if (!Kakao.isInitialized()) {
+                    Kakao.init("27a049c799662857ed882c2639461392");
+                }
+                Kakao.Share.sendDefault({
+                    objectType: 'feed',
+                    content: {
+                        title: title,
+                        description: description,
+                        imageUrl: targetImageUrl,
+                        imageWidth: 800,
+                        imageHeight: 800,
                         link: {
                             mobileWebUrl: shareUrl,
                             webUrl: shareUrl,
                         },
                     },
-                ],
-            });
+                    buttons: [
+                        {
+                            title: language === 'ko' ? '내 약통 점수 확인하기' : 'Check my score',
+                            link: {
+                                mobileWebUrl: shareUrl,
+                                webUrl: shareUrl,
+                            },
+                        },
+                    ],
+                });
+            } catch (err) {
+                console.error("Kakao Share Error:", err);
+                alert("카카오톡 실행 중 오류가 발생했습니다. (설정 확인 필요)");
+            }
         } else {
-            handleNativeShare();
+            alert("카카오톡 모듈을 불러오는 중입니다. 잠시 후 상단 아이콘이나 다시 시도해 주세요!");
         }
     };
 

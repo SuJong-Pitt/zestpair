@@ -179,45 +179,51 @@ export default function ReportHeader() {
                                 // AnalysisResults와 동일한 로직을 수행하기 위해 
                                 // window.handleKakaoShare가 전역에 있으면 좋겠지만, 
                                 // 일단 여기서 직접 태웁니다.
-                                if (typeof window !== "undefined" && window.Kakao) {
-                                    if (!window.Kakao.isInitialized()) {
-                                        window.Kakao.init("27a049c799662857ed882c2639461392");
+                                if (typeof window !== "undefined" && (window as any).Kakao) {
+                                    const Kakao = (window as any).Kakao;
+                                    try {
+                                        if (!Kakao.isInitialized()) {
+                                            Kakao.init("27a049c799662857ed882c2639461392");
+                                        }
+                                        
+                                        const slugs = selectedIngredients.map(ing => ing.slug);
+                                        const encoded = encodeShareParams(slugs);
+                                        const canonicalBase = "https://zestpair.com";
+                                        const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
+                                        const score = analysisResult?.score ?? 0;
+
+                                        let imageFileName = "pori-0.png";
+                                        if (score === 100) imageFileName = "pori-100.png";
+                                        else if (score >= 90) imageFileName = "pori-90.png";
+                                        else if (score >= 70) imageFileName = "pori-70.png";
+                                        else if (score >= 50) imageFileName = "pori-50.png";
+                                        const targetImageUrl = `${canonicalBase}/images/share/${imageFileName}`;
+
+                                        const title = language === 'ko' 
+                                            ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
+                                            : `🚨 Supplement Match Score: ${score}pts!`;
+
+                                        Kakao.Share.sendDefault({
+                                            objectType: 'feed',
+                                            content: {
+                                                title: title,
+                                                description: language === 'ko' ? "Pori AI에게 영양제 궁합을 채점받아보세요." : "Check your supplement interactions!",
+                                                imageUrl: targetImageUrl,
+                                                imageWidth: 800,
+                                                imageHeight: 800,
+                                                link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+                                            },
+                                            buttons: [{
+                                                title: language === 'ko' ? '내 점수 확인하기' : 'Check my score',
+                                                link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+                                            }],
+                                        });
+                                    } catch (err) {
+                                        console.error("Kakao Share Error:", err);
+                                        alert("카카오톡 실행 오류: " + (err as Error).message);
                                     }
-                                    
-                                    const slugs = selectedIngredients.map(ing => ing.slug);
-                                    const encoded = encodeShareParams(slugs);
-                                    const canonicalBase = "https://zestpair.com";
-                                    const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
-                                    const score = analysisResult?.score ?? 0;
-
-                                    let imageFileName = "pori-0.png";
-                                    if (score === 100) imageFileName = "pori-100.png";
-                                    else if (score >= 90) imageFileName = "pori-90.png";
-                                    else if (score >= 70) imageFileName = "pori-70.png";
-                                    else if (score >= 50) imageFileName = "pori-50.png";
-                                    const targetImageUrl = `${canonicalBase}/images/share/${imageFileName}`;
-
-                                    const title = language === 'ko' 
-                                        ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
-                                        : `🚨 Supplement Match Score: ${score}pts!`;
-
-                                    window.Kakao.Share.sendDefault({
-                                        objectType: 'feed',
-                                        content: {
-                                            title: title,
-                                            description: language === 'ko' ? "Pori AI에게 영양제 궁합을 채점받아보세요." : "Check your supplement interactions!",
-                                            imageUrl: targetImageUrl,
-                                            imageWidth: 800,
-                                            imageHeight: 800,
-                                            link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
-                                        },
-                                        buttons: [{
-                                            title: language === 'ko' ? '내 점수 확인하기' : 'Check my score',
-                                            link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
-                                        }],
-                                    });
                                 } else {
-                                    handleShare(); // Fallback
+                                    alert("카카오톡 모듈이 로드되지 않았습니다. 잠시 후 상단 아이콘이나 다시 시도해 주세요!");
                                 }
                             }}
                         >
