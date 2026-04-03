@@ -40,6 +40,11 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     const isMobile = useMediaQuery("(max-width: 768px)");
     const [toast, setToast] = useState({ show: false, message: "" });
     const [isExiting, setIsExiting] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     if (!result || !result.ingredients) {
         return <div className="p-20 text-center text-slate-400">{t.common.loading}...</div>;
@@ -191,7 +196,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     animate={{ scale: 1, opacity: 1 }}
                                     className="relative mb-6"
                                 >
-                                    <ScoreRing score={result.score} size={isMobile ? 220 : 300} />
+                                    <ScoreRing score={result.score} size={(!isMounted || !isMobile) ? 300 : 220} />
                                 </motion.div>
 
                                 {/* AI Badge */}
