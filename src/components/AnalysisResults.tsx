@@ -258,7 +258,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     >
                                         <div className="relative flex items-center gap-2 text-sm md:text-base">
                                             <Share2 size={16} />
-                                            <span>{language === 'ko' ? "일반 링크 복사" : "Copy Link"}</span>
+                                            <span>{language === 'ko' ? "링크 복사" : "Copy Link"}</span>
                                         </div>
                                     </Button>
                                 </motion.div>
