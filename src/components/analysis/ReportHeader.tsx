@@ -126,7 +126,7 @@ export default function ReportHeader() {
                     onClick={() => router.push("/")}
                 >
                     <div className="relative flex items-center gap-3 px-3.5 md:px-5 py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
-                        <BrandLogo size={isMobile ? 24 : 36} />
+                        <BrandLogo />
                         <BrandName size="text-[15px] md:text-[20px]" />
                         <div className="hidden md:block w-px h-4 bg-white/20 mx-1" />
                         <Link

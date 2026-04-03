@@ -13,16 +13,17 @@ export function BrandLogo({ className, size = 36 }: { className?: string; size?:
         <div 
             className={cn(
                 "relative flex items-center justify-center rounded-full bg-[#0C1821] border border-white/5 shadow-xl shrink-0 overflow-hidden group",
+                size === 28 ? "w-7 h-7" : size === 24 ? "w-6 h-6" : "w-9 h-9 md:w-12 md:h-12",
                 className
             )}
-            style={{ width: size, height: size }}
         >
             <div className="relative w-[75%] h-[75%] transition-transform duration-500 group-hover:scale-110">
                 <Image
                     src="/logo.svg"
                     alt="ZestPair Logo"
-                    fill
-                    className="object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.2)]"
+                    width={36}
+                    height={36}
+                    className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.2)]"
                     priority
                 />
             </div>

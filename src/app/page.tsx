@@ -320,8 +320,8 @@ export default function HomePage() {
           background: "radial-gradient(circle at 50% 0%, #0d1a15 0%, #080c14 50%, #030712 100%)"
         }}
       >
-        {/* 고도화된 배경 장식 (Hydration mismatch 방지) */}
-        {isMounted && !isMobile && <VisualDecorations />}
+        {/* 고도화된 배경 장식 */}
+        {!isMobile && <VisualDecorations />}
 
         <div className="absolute top-6 left-6 right-6 sm:top-10 sm:left-10 sm:right-10 z-50 flex items-center justify-between pointer-events-none">
           <button
@@ -363,7 +363,7 @@ export default function HomePage() {
             {/* 뒤 배경 글로우 */}
             <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
             <div className="relative flex items-center gap-2.5 md:gap-3 px-3.5 md:px-5 py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
-              <BrandLogo size={(!isMounted || !isMobile) ? 36 : 28} />
+              <BrandLogo />
               <BrandName size="text-[17px] md:text-[20px]" />
               <div className="w-px h-3 md:h-4 bg-white/20 mx-1" />
               <Link

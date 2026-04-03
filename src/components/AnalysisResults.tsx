@@ -196,7 +196,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     animate={{ scale: 1, opacity: 1 }}
                                     className="relative mb-6"
                                 >
-                                    <ScoreRing score={result.score} size={(!isMounted || !isMobile) ? 300 : 220} />
+                                    <ScoreRing score={result.score} size={isMobile ? 220 : 300} />
                                 </motion.div>
 
                                 {/* AI Badge */}
