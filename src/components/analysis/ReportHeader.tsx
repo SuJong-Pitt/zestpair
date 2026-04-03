@@ -7,9 +7,15 @@ import Link from "next/link";
 import { useBasketStore } from "@/store/basketStore";
 import { BrandLogo, BrandName } from "@/components/BrandAssets";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Toast from "@/components/ui/Toast";
 import { encodeShareParams } from "@/lib/utils";
+
+declare global {
+  interface Window {
+    Kakao: any;
+  }
+}
 
 /**
  * 분석 리포트 전용 헤더 (AI 디자인실장 영자 스타일 🎨)
@@ -23,27 +29,76 @@ export default function ReportHeader() {
     const { language, selectedIngredients, analysisResult } = useBasketStore();
     const isMobile = useMediaQuery("(max-width: 768px)");
     const [toast, setToast] = useState({ show: false, message: "" });
+    
+    // 카카오 SDK 초기화
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.Kakao) {
+            if (!window.Kakao.isInitialized()) {
+                window.Kakao.init("27a049c799662857ed882c2639461392");
+            }
+        }
+    }, []);
 
     const handleShare = async () => {
-        // IDs 대신 슬러그를 인코딩하여 URL 길이를 줄임 (대표님 제안 반영 ✨)
         const slugs = selectedIngredients.map(ing => ing.slug);
         const encoded = encodeShareParams(slugs);
         const shareUrl = `${window.location.origin}/analysis?v=${encoded}`;
-        
+        const score = analysisResult?.score ?? 0;
+
+        // 점수별 타겟 이미지 매핑 (미리 public/images/share 폴더에 세팅함)
+        let imageFileName = "pori-0.png";
+        if (score === 100) imageFileName = "pori-100.png";
+        else if (score >= 90) imageFileName = "pori-90.png";
+        else if (score >= 70) imageFileName = "pori-70.png";
+        else if (score >= 50) imageFileName = "pori-50.png";
+
+        const targetImageUrl = `${window.location.origin}/images/share/${imageFileName}`;
+
+        // 찰진 마케팅 워딩 조합
+        const title = language === 'ko' 
+            ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
+            : `🚨 Supplement Match Score: ${score}pts!`;
+        const description = language === 'ko'
+            ? "비싼 소변을 만들고 계시지는 않나요? Pori AI에게 영양제 궁합을 채점받아보세요."
+            : "Check your active supplement interactions instantly!";
+
+        // 카카오톡 공유 기능이 로드되었는지 확인
+        if (typeof window !== "undefined" && window.Kakao && window.Kakao.isInitialized()) {
+            window.Kakao.Share.sendDefault({
+                objectType: 'feed',
+                content: {
+                    title: title,
+                    description: description,
+                    imageUrl: targetImageUrl,
+                    imageWidth: 800,
+                    imageHeight: 800,
+                    link: {
+                        mobileWebUrl: shareUrl,
+                        webUrl: shareUrl,
+                    },
+                },
+                buttons: [
+                    {
+                        title: language === 'ko' ? '내 약통 점수 확인하기' : 'Check my score',
+                        link: {
+                            mobileWebUrl: shareUrl,
+                            webUrl: shareUrl,
+                        },
+                    },
+                ],
+            });
+            return; // 카카오 공유 성공 시 일반 시스템 루틴 종료
+        }
+
+        // 카카오 미지원 환경 (해외 등) 폴백: Web Share API 또는 클립보드 복사
         const shareData = {
-            title: language === 'ko' ? "ZestPair | 영양제 궁합 분석 결과" : "ZestPair | Supplement Synergy Analysis",
-            text: language === 'ko'
-                ? `🔥 저의 영양제 궁합 점수는 ${analysisResult?.score ?? 0}점! Pori AI가 알려주는 최적의 조합을 확인해보세요.`
-                : `🔥 My supplement synergy score is ${analysisResult?.score ?? 0}pts! Check your personalized analysis by Pori AI at ZestPair.`,
+            title: "ZestPair | 영양제 궁합 분석 결과",
+            text: title,
             url: shareUrl
         };
 
         if (navigator.share) {
-            try {
-                await navigator.share(shareData);
-            } catch (err) {
-                console.log('Error sharing', err);
-            }
+            try { await navigator.share(shareData); } catch (err) {}
         } else {
             try {
                 await navigator.clipboard.writeText(shareUrl);
@@ -52,9 +107,7 @@ export default function ReportHeader() {
                     message: language === 'ko' ? "링크가 복사되었습니다!" : "Link copied to clipboard!" 
                 });
                 setTimeout(() => setToast({ show: false, message: "" }), 3000);
-            } catch (err) {
-                console.error('Failed to copy', err);
-            }
+            } catch (err) {}
         }
     };
 
