@@ -23,8 +23,8 @@ export default function GlobalFooter() {
           {/* 🦾 1. 브랜드 정체성 영역 (4/12) */}
           <div className="lg:col-span-4 flex flex-col items-center lg:items-start gap-5">
             <div className="flex items-center gap-3">
-              <BrandLogo size={42} />
-              <BrandName size="text-2xl" />
+              <BrandLogo size={32} />
+              <BrandName size="text-3xl" />
             </div>
             <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-xs">
               {language === 'ko' 

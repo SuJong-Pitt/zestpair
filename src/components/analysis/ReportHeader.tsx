@@ -12,9 +12,9 @@ import Toast from "@/components/ui/Toast";
 import { encodeShareParams, getKakaoShareDetails } from "@/lib/utils";
 
 declare global {
-  interface Window {
-    Kakao: any;
-  }
+    interface Window {
+        Kakao: any;
+    }
 }
 
 
@@ -31,7 +31,7 @@ export default function ReportHeader() {
     const { language, selectedIngredients, analysisResult } = useBasketStore();
     const isMobile = useMediaQuery("(max-width: 768px)");
     const [toast, setToast] = useState({ show: false, message: "" });
-    
+
     // 카카오 SDK 초기화
     useEffect(() => {
         if (typeof window !== "undefined" && window.Kakao) {
@@ -91,23 +91,23 @@ export default function ReportHeader() {
         };
 
         if (navigator.share) {
-            try { await navigator.share(shareData); } catch (err) {}
+            try { await navigator.share(shareData); } catch (err) { }
         } else {
             try {
                 await navigator.clipboard.writeText(shareUrl);
-                setToast({ 
-                    show: true, 
-                    message: language === 'ko' ? "링크가 복사되었습니다!" : "Link copied to clipboard!" 
+                setToast({
+                    show: true,
+                    message: language === 'ko' ? "링크가 복사되었습니다!" : "Link copied to clipboard!"
                 });
                 setTimeout(() => setToast({ show: false, message: "" }), 3000);
-            } catch (err) {}
+            } catch (err) { }
         }
     };
 
     return (
         <header className="fixed top-0 left-0 right-0 z-[100] px-4 py-3 md:py-4 transition-all duration-300 bg-slate-950/40 backdrop-blur-md border-b border-white/5">
             <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 md:gap-4">
-                
+
                 {/* 🎨 1. 브랜드 로고 (Home 이동) */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
@@ -115,10 +115,10 @@ export default function ReportHeader() {
                     className="flex items-center gap-2.5 cursor-pointer group"
                     onClick={() => router.push("/")}
                 >
-                    <div className="relative flex items-center gap-2 md:gap-3 px-3 md:px-5 py-2 md:py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
-                        <BrandLogo />
+                    <div className="relative flex items-center gap-2.5 md:gap-3 px-4 md:px-6 py-2 md:py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
+                        <BrandLogo size={32} />
                         <div className="hidden sm:block">
-                            <BrandName size="text-[15px] md:text-[20px]" />
+                            <BrandName size="text-[18px] md:text-[26px]" />
                         </div>
                     </div>
                 </motion.div>
@@ -158,7 +158,7 @@ export default function ReportHeader() {
                                         if (!Kakao.isInitialized()) {
                                             Kakao.init("27a049c799662857ed882c2639461392");
                                         }
-                                        
+
                                         const slugs = selectedIngredients.map(ing => ing.slug);
                                         const encoded = encodeShareParams(slugs);
                                         const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
@@ -213,7 +213,7 @@ export default function ReportHeader() {
                                 const score = analysisResult?.score ?? 0;
 
                                 const { title } = getKakaoShareDetails(score, language);
-                                
+
                                 const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
                                 window.open(lineUrl, '_blank');
                             }}
@@ -240,10 +240,10 @@ export default function ReportHeader() {
             {/* 하단 세련된 디바이더 라인 */}
             <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
             {/* 세련된 알림 토스트 (영자 실장 픽 ✨) */}
-            <Toast 
-                show={toast.show} 
-                message={toast.message} 
-                onClose={() => setToast({ ...toast, show: false })} 
+            <Toast
+                show={toast.show}
+                message={toast.message}
+                onClose={() => setToast({ ...toast, show: false })}
             />
         </header>
     );
