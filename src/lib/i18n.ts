@@ -3,7 +3,7 @@ export const UI_TRANSLATIONS = {
     ko: {
         hero: {
             title1: "🛡️ 영양제 상호작용 무료 분석",
-            title2: "지금 먹는 영양제, 잘못 드시면 '독'이 될 수도 있습니다.",
+            title2: "영양제의 만남, 때로는 독이 될 수 있습니다.",
             subtitle1: "3초 만에 부작용 피하고",
             subtitle2: "최적의 시너지",
             subtitle3: "찾기",
@@ -118,7 +118,7 @@ export const UI_TRANSLATIONS = {
     en: {
         hero: {
             title1: "🛡️ FREE SUPPLEMENT INTERACTION ANALYSIS",
-            title2: "The supplements you take, could be 'POISONOUS' if taken incorrectly.",
+            title2: "When supplements meet, it can sometimes be POISON.",
             subtitle1: "Avoid side effects in 3s and find",
             subtitle2: "Perfect Synergy",
             subtitle3: "",
