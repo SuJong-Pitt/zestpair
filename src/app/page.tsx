@@ -15,7 +15,7 @@ const FloatingBasketBar = dynamic(() => import("@/components/FloatingBasketBar")
 import { useBasketStore } from "@/store/basketStore";
 import { supabase } from "@/lib/supabase";
 import type { AnalysisResult, Ingredient, InteractionResult } from "@/types/database";
-import { cn } from "@/lib/utils";
+import { cn, encodeShareParams } from "@/lib/utils";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence, useInView } from "framer-motion";
@@ -305,10 +305,11 @@ export default function HomePage() {
 
 
   const handleAnimationComplete = useCallback(() => {
-    // 분석이 끝났다고 바로 꺼버리면 홈 화면이 비춰서 안 예뻐요! (영자 실장 생각 ✨)
-    // router.push가 완료될 때까지 오버레이를 유지합니다.
-    router.push("/analysis");
-  }, [router]);
+    // GET 방식: 성분 슬러그를 URL에 인코딩하여 새로고침·공유 모두 동작하도록 합니다.
+    const slugs = selectedIngredients.map(ing => ing.slug);
+    const encoded = encodeShareParams(slugs);
+    router.push(`/analysis?v=${encoded}`);
+  }, [router, selectedIngredients]);
 
   // (페이지 전환 방식으로 변경되어 기존 스크롤 로직은 제거합니다)
 
