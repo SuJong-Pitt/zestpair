@@ -115,18 +115,10 @@ export default function ReportHeader() {
                     className="flex items-center gap-2.5 cursor-pointer group"
                     onClick={() => router.push("/")}
                 >
-                    <div className="relative flex items-center gap-2.5 md:gap-3 px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-slate-900/60 border border-white/10 backdrop-blur-2xl shadow-[0_0_30px_rgba(0,0,0,0.5)] group-hover:border-emerald-500/30 transition-all duration-500">
-                        <BrandLogo size={28} />
-                        <div className="flex items-center gap-2.5">
-                            <BrandName size="text-[16px] md:text-[22px]" />
-                            <div className="h-4 w-[1px] bg-white/20 mx-1" />
-                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                <span className="text-[10px] md:text-[12px] font-black text-emerald-400 tracking-tighter uppercase leading-none">
-                                    AI CORE V2.5
-                                </span>
-                                <Info size={12} className="text-emerald-400/50 hover:text-emerald-400 cursor-help transition-colors" />
-                            </div>
+                    <div className="relative flex items-center gap-2 md:gap-3 px-3 md:px-5 py-2 md:py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
+                        <BrandLogo />
+                        <div className="hidden sm:block">
+                            <BrandName size="text-[15px] md:text-[20px]" />
                         </div>
                     </div>
                 </motion.div>
