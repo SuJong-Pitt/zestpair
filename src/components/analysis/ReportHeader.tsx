@@ -9,13 +9,15 @@ import { BrandLogo, BrandName } from "@/components/BrandAssets";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useState, useEffect } from "react";
 import Toast from "@/components/ui/Toast";
-import { encodeShareParams } from "@/lib/utils";
+import { encodeShareParams, getKakaoShareDetails } from "@/lib/utils";
 
 declare global {
   interface Window {
     Kakao: any;
   }
 }
+
+
 
 /**
  * 분석 리포트 전용 헤더 (AI 디자인실장 영자 스타일 🎨)
@@ -47,22 +49,8 @@ export default function ReportHeader() {
         const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
         const score = analysisResult?.score ?? 0;
 
-        // 점수별 타겟 이미지 매핑 (미리 public/images/share 폴더에 세팅함)
-        let imageFileName = "pori-0.png";
-        if (score === 100) imageFileName = "pori-100.png";
-        else if (score >= 90) imageFileName = "pori-90.png";
-        else if (score >= 70) imageFileName = "pori-70.png";
-        else if (score >= 50) imageFileName = "pori-50.png";
-
+        const { imageFileName, title, description } = getKakaoShareDetails(score, language);
         const targetImageUrl = `${window.location.origin}/images/share/${imageFileName}`;
-
-        // 찰진 마케팅 워딩 조합
-        const title = language === 'ko' 
-            ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
-            : `🚨 Supplement Match Score: ${score}pts!`;
-        const description = language === 'ko'
-            ? "비싼 소변을 만들고 계시지는 않나요? Pori AI에게 영양제 궁합을 채점받아보세요."
-            : "Check your active supplement interactions instantly!";
 
         // 카카오톡 공유 기능이 로드되었는지 확인
         if (typeof window !== "undefined" && window.Kakao) {
@@ -178,23 +166,15 @@ export default function ReportHeader() {
                                         const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
                                         const score = analysisResult?.score ?? 0;
 
-                                        let imageFileName = "pori-0.png";
-                                        if (score === 100) imageFileName = "pori-100.png";
-                                        else if (score >= 90) imageFileName = "pori-90.png";
-                                        else if (score >= 70) imageFileName = "pori-70.png";
-                                        else if (score >= 50) imageFileName = "pori-50.png";
+                                        const { imageFileName, title, description } = getKakaoShareDetails(score, language);
                                         const imageBase = "https://zestpair.com";
                                         const targetImageUrl = `${imageBase}/images/share/${imageFileName}`;
-
-                                        const title = language === 'ko' 
-                                            ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
-                                            : `🚨 Supplement Match Score: ${score}pts!`;
 
                                         Kakao.Share.sendDefault({
                                             objectType: 'feed',
                                             content: {
                                                 title: title,
-                                                description: language === 'ko' ? "Pori AI에게 영양제 궁합을 채점받아보세요." : "Check your supplement interactions!",
+                                                description: description,
                                                 imageUrl: targetImageUrl,
                                                 imageWidth: 800,
                                                 imageHeight: 800,
@@ -232,9 +212,7 @@ export default function ReportHeader() {
                                 const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
                                 const score = analysisResult?.score ?? 0;
 
-                                const title = language === 'ko' 
-                                    ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
-                                    : `🚨 Supplement Match Score: ${score}pts!`;
+                                const { title } = getKakaoShareDetails(score, language);
                                 
                                 const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
                                 window.open(lineUrl, '_blank');

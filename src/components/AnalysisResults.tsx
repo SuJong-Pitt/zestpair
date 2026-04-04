@@ -13,7 +13,7 @@ import {
     RefreshCcw,
     FlaskConical
 } from "lucide-react";
-import { cn, encodeShareParams } from "@/lib/utils";
+import { cn, encodeShareParams, getKakaoShareDetails } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -62,22 +62,11 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     const handleKakaoShare = () => {
         const { shareUrl, score } = getShareUrlAndData();
 
-        let imageFileName = "pori-0.png";
-        if (score === 100) imageFileName = "pori-100.png";
-        else if (score >= 90) imageFileName = "pori-90.png";
-        else if (score >= 70) imageFileName = "pori-70.png";
-        else if (score >= 50) imageFileName = "pori-50.png";
-
+        const { imageFileName, title, description } = getKakaoShareDetails(score, language);
+        
         // 이미지는 Kakao 서버가 접근 가능해야 하므로, 로컬 테스트 중에도 운영 서버 이미지를 참조하게 합니다.
         const imageBase = "https://zestpair.com";
         const targetImageUrl = `${imageBase}/images/share/${imageFileName}`;
-
-        const title = language === 'ko' 
-            ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
-            : `🚨 Supplement Match Score: ${score}pts!`;
-        const description = language === 'ko'
-            ? "비싼 소변을 만들고 계시지는 않나요? Pori AI에게 영양제 궁합을 채점받아보세요."
-            : "Check your active supplement interactions instantly!";
 
         if (typeof window !== "undefined" && (window as any).Kakao) {
             const Kakao = (window as any).Kakao;
@@ -119,9 +108,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
     const handleNativeShare = async () => {
         const { shareUrl, score } = getShareUrlAndData();
-        const title = language === 'ko' 
-            ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
-            : `🚨 Supplement Match Score: ${score}pts!`;
+        const { title } = getKakaoShareDetails(score, language);
 
         const shareData = {
             title: "ZestPair | 영양제 궁합 분석 결과",
@@ -267,9 +254,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     <Button
                                         onClick={() => {
                                             const { shareUrl, score } = getShareUrlAndData();
-                                            const title = language === 'ko' 
-                                                ? `🚨 내 약통 점수는 ${score}점! (치명적 충돌 주의)` 
-                                                : `🚨 Supplement Match Score: ${score}pts!`;
+                                            const { title } = getKakaoShareDetails(score, language);
                                             const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
                                             window.open(lineUrl, '_blank');
                                         }}
