@@ -42,75 +42,65 @@ export function getKakaoShareDetails(score: number, language: string) {
 
     if (score === 100) {
         imageFileName = "pori-kakao-100.png";
-        customTitle = language === 'ko' ? "우와! 영양제 스승님!" : "You are a master!";
-        description = language === 'ko' 
-            ? "100점 만점에 100점! 흠잡을 데 없는 완벽한 짝꿍이에요. 이대로 쭉 드세요! 👍" 
-            : "Perfect match! Keep it up!";
+        customTitle = language === 'ko' ? "완벽한 조합!" : "Perfect combo!";
+        description = language === 'ko' ? "100점 만점! 이 조합 그대로 유지하세요." : "Flawless. Keep this up.";
     } else if (score >= 90) {
         imageFileName = "pori-kakao-90.png";
-        customTitle = language === 'ko' ? "찰떡궁합이에요!" : "Great match!";
-        description = language === 'ko' 
-            ? "서로 돕는 훌륭한 시너지 효과! 내 몸을 아끼는 최고의 선택이에요." 
-            : "Excellent synergy!";
+        customTitle = language === 'ko' ? "찰떡궁합!" : "Great match!";
+        description = language === 'ko' ? "시너지 최고. 매일 챙겨드세요." : "Excellent synergy. Take daily.";
     } else if (score >= 80) {
         imageFileName = "pori-kakao-80.png";
-        customTitle = language === 'ko' ? "아주 좋아요!" : "Very good!";
-        description = language === 'ko' 
-            ? "서로 든든하게 밀어주는 조합이에요. 매일 챙겨 먹기 딱 좋네요!" 
-            : "Great daily combo!";
+        customTitle = language === 'ko' ? "좋은 조합!" : "Good combo!";
+        description = language === 'ko' ? "서로 돕는 안정적인 조합이에요." : "Stable and supportive combination.";
     } else if (score >= 70) {
         imageFileName = "pori-kakao-70.png";
-        customTitle = language === 'ko' ? "무난하고 편안해요!" : "Solid!";
-        description = language === 'ko' 
-            ? "크게 부딪히는 성분 없이 매일매일 속 편하게 먹기 좋은 조합이에요." 
-            : "Comfortable match without major conflicts.";
+        customTitle = language === 'ko' ? "무난해요." : "Solid.";
+        description = language === 'ko' ? "큰 충돌 없이 편하게 먹을 수 있어요." : "No major conflicts. Comfortable.";
     } else if (score >= 60) {
         imageFileName = "pori-kakao-60.png";
-        customTitle = language === 'ko' ? "어라? 살짝 아쉬워요!" : "Slightly lacking!";
-        description = language === 'ko' 
-            ? "나쁘진 않지만... 같이 먹었을 때 큰 시너지가 나지는 않는 조합이에요." 
-            : "Not bad, but not much synergy.";
+        customTitle = language === 'ko' ? "살짝 아쉬워요." : "Could be better.";
+        description = language === 'ko' ? "시너지가 약해요. 조합을 재검토해보세요." : "Low synergy. Consider adjusting.";
     } else if (score >= 50) {
         imageFileName = "pori-kakao-50.png";
-        customTitle = language === 'ko' ? "잠깐, 서로 눈치 보고 있어요!" : "Watch out!";
-        description = language === 'ko' 
-            ? "같이 먹으면 한쪽 영양소의 흡수율이 슬쩍 떨어질 수 있어요. 확인이 필요해요!" 
-            : "Absorption might drop. Needs checking!";
+        customTitle = language === 'ko' ? "주의 필요." : "Watch out.";
+        description = language === 'ko' ? "흡수율이 떨어질 수 있어요. 확인하세요." : "Absorption may drop. Check timing.";
     } else if (score >= 40) {
         imageFileName = "pori-kakao-40.png";
-        customTitle = language === 'ko' ? "헉! 영양소가 새고 있어요!" : "Nutrients leaking!";
-        description = language === 'ko' 
-            ? "이렇게 같이 드시면 기껏 먹은 영양제가 몸 밖으로 빠져나갈 수 있어요!" 
-            : "You might lose nutrients taking them together.";
+        customTitle = language === 'ko' ? "영양소 손실!" : "Nutrient loss!";
+        description = language === 'ko' ? "같이 드시면 영양이 빠져나갈 수 있어요." : "Nutrients may be wasted together.";
     } else if (score >= 30) {
         imageFileName = "pori-kakao-30.png";
-        customTitle = language === 'ko' ? "삑! 따로 드시는 게 좋아요!" : "Better separate!";
-        description = language === 'ko' 
-            ? "서로 너무 안 맞아요! 아침과 저녁으로 시간차를 두고 따로 챙겨 드세요." 
-            : "They don't match well! Take at different times.";
+        customTitle = language === 'ko' ? "따로 드세요." : "Take separately.";
+        description = language === 'ko' ? "아침·저녁으로 나눠서 드세요." : "Split morning and evening doses.";
     } else if (score >= 20) {
         imageFileName = "pori-kakao-20.png";
-        customTitle = language === 'ko' ? "삐용삐용! 과유불급이에요!" : "Too much!";
-        description = language === 'ko' 
-            ? "성분이 너무 겹치거나 부딪혀서, 간과 신장이 몹시 피곤해하고 있어요!" 
-            : "Overlapping components might tax your liver/kidneys!";
+        customTitle = language === 'ko' ? "성분 충돌!" : "Conflict!";
+        description = language === 'ko' ? "간·신장에 부담이 될 수 있어요." : "May burden liver and kidneys.";
     } else if (score >= 10) {
         imageFileName = "pori-kakao-10.png";
-        customTitle = language === 'ko' ? "흑흑... 몸이 힘들어해요!" : "Terrible match!";
-        description = language === 'ko' 
-            ? "영양을 채우려다 오히려 몸을 긁어먹는 조합이에요. 당장 스케줄을 바꿔주세요!" 
-            : "Change your supplement schedule immediately!";
+        customTitle = language === 'ko' ? "위험해요." : "Risky combo.";
+        description = language === 'ko' ? "스케줄을 지금 바로 바꾸세요." : "Change your schedule now.";
     } else {
         imageFileName = "pori-kakao-0.png";
-        customTitle = language === 'ko' ? "꼬르륵... 최악의 궁합!" : "Worst match!";
-        description = language === 'ko' 
-            ? "절대 같이 드시지 마세요! 약통을 당장 멀리멀리 떨어뜨려 놓으셔야 해요!" 
-            : "NEVER take these together!";
+        customTitle = language === 'ko' ? "최악의 궁합!" : "Worst match!";
+        description = language === 'ko' ? "절대 같이 드시지 마세요." : "Never take these together.";
     }
 
+    const scoreIcon = 
+        score >= 100 ? '💎' :
+        score >= 90 ? '🏆' :
+        score >= 80 ? '✨' :
+        score >= 70 ? '👍' :
+        score >= 60 ? '🤔' :
+        score >= 50 ? '⚠️' :
+        score >= 40 ? '🚧' :
+        score >= 30 ? '❌' :
+        score >= 20 ? '⛔' :
+        score >= 10 ? '💀' : '☠️';
+
     const titlePrefix = language === 'ko' 
-        ? `🚨 내 약통 점수는 ${score}점!\n` 
-        : `🚨 Match Score: ${score}pts!\n`;
+        ? `${scoreIcon} 영양제 궁합 ${score}점\n` 
+        : `${scoreIcon} Supplement Score: ${score}pts\n`;
     
     const title = titlePrefix + customTitle;
 
