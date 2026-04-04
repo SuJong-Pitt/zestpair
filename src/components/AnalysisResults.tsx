@@ -89,7 +89,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     },
                     buttons: [
                         {
-                            title: language === 'ko' ? '내 약통 점수 확인하기' : 'Check my score',
+                            title: language === 'ko' ? '내 영양제 궁합 점수' : 'My Supplement Score',
                             link: {
                                 mobileWebUrl: shareUrl,
                                 webUrl: shareUrl,
