@@ -54,17 +54,17 @@ export async function performAnalysis(
 
     cautions.forEach(c => {
         if (!c.interaction) return;
-        const isDrugRelated = selectedIngredients.find(i =>
-            (i.id === c.interaction!.ingredient_a_id || i.id === c.interaction!.ingredient_b_id) && i.category === 'drugs'
-        );
+        const ingA = selectedIngredients.find(i => i.id === c.interaction!.ingredient_a_id);
+        const ingB = selectedIngredients.find(i => i.id === c.interaction!.ingredient_b_id);
+        const isDrugRelated = (ingA && (ingA.category as string) === 'drugs') || (ingB && (ingB.category as string) === 'drugs');
         cautionPenalty += isDrugRelated ? 15 : 5;
     });
 
     conflicts.forEach(c => {
         if (!c.interaction) return;
-        const isDrugRelated = selectedIngredients.find(i =>
-            (i.id === c.interaction!.ingredient_a_id || i.id === c.interaction!.ingredient_b_id) && i.category === 'drugs'
-        );
+        const ingA = selectedIngredients.find(i => i.id === c.interaction!.ingredient_a_id);
+        const ingB = selectedIngredients.find(i => i.id === c.interaction!.ingredient_b_id);
+        const isDrugRelated = (ingA && (ingA.category as string) === 'drugs') || (ingB && (ingB.category as string) === 'drugs');
         conflictPenalty += isDrugRelated ? 35 : 20;
     });
 
@@ -72,7 +72,8 @@ export async function performAnalysis(
     const drugBurden = drugCount * 8;
     const foundationBonus = Math.max(0, rawFoundationBonus - drugBurden);
 
-    const score = Math.max(5, Math.min(100, 70 + synergyWeight + foundationBonus - cautionPenalty - conflictPenalty));
+    const rawScore = 70 + synergyWeight + foundationBonus - cautionPenalty - conflictPenalty;
+    const score = Math.max(5, Math.min(100, rawScore));
 
     // 4. 다이내믹 시너지 추천 로직 (성능 최적화 및 안정화 버전 ✨)
     let potentialSynergy: InteractionResult | null = null;
@@ -97,57 +98,103 @@ export async function performAnalysis(
 
             if (partnerCandidates.length > 0) {
                 // 3단계: 후보 파트너들의 모든 상호작용을 벌크로 가져옴 (시뮬레이션용)
+                // 중요: 전수 조사가 가능하도록 후보군(uniquePartnerIds)과 기존 바구니(ingredientIds)를 합쳐서 모든 관계를 가져옵니다.
                 const uniquePartnerIds = [...new Set(partnerCandidates)];
+                const allInterestedIds = [...new Set([...uniquePartnerIds, ...ingredientIds])];
+                
                 const { data: dbPartnerInteractions } = await supabase
                     .from("interactions")
                     .select("*")
-                    .or(`ingredient_a_id.in.(${uniquePartnerIds.map(id => `"${id}"`).join(',')}),ingredient_b_id.in.(${uniquePartnerIds.map(id => `"${id}"`).join(',')})`);
+                    .or(`ingredient_a_id.in.(${allInterestedIds.map(id => `"${id}"`).join(',')}),ingredient_b_id.in.(${allInterestedIds.map(id => `"${id}"`).join(',')})`);
 
-                const pInteractions = (dbPartnerInteractions as Interaction[]) || [];
+                const allInts = (dbPartnerInteractions as Interaction[]) || [];
 
-                // 4단계: 로컬 시뮬레이션 및 최고 점수 후보군 수집
+                // 4단계: 로컬 시뮬레이션
                 const topCandidates: Array<{ pair: [Ingredient, Ingredient], interaction: Interaction, simScore: number }> = [];
 
                 for (const partnerId of uniquePartnerIds) {
                     const partner = allIngredients.find(i => i.id === partnerId);
-                    if (!partner || partner.category === 'drugs') continue;
+                    if (!partner) continue;
 
-                    const relevantInts = pInteractions.filter(pint => {
-                        const otherId = pint.ingredient_a_id === partnerId ? pint.ingredient_b_id : pint.ingredient_a_id;
-                        return ingredientIds.includes(otherId);
+                    // 이 파트너가 현재 바구니 입장에서 가지는 "모든" 상호작용 (시너지, 주의, 충돌)
+                    const simInteractions = allInts.filter(int => 
+                        (int.ingredient_a_id === partnerId && ingredientIds.includes(int.ingredient_b_id)) ||
+                        (int.ingredient_b_id === partnerId && ingredientIds.includes(int.ingredient_a_id))
+                    );
+
+                    // 현재 바구니 내부에 원래 있던 상호작용 개수 세기
+                    const existingSynergiesCount = synergies.length;
+                    const existingCautionPenalty = cautionPenalty;
+                    const existingConflictPenalty = conflictPenalty;
+                    
+                    let simSynergyCount = existingSynergiesCount;
+                    let simCautionPenalty = existingCautionPenalty;
+                    let simConflictPenalty = existingConflictPenalty;
+                    
+                    const isPartnerDrug = (partner.category as string) === 'drugs';
+                    const simDrugCount = drugCount + (isPartnerDrug ? 1 : 0);
+
+                    simInteractions.forEach(pint => {
+                        if (pint.type === "SYNERGY") simSynergyCount++;
+                        else if (pint.type === "CAUTION") {
+                            const otherId = pint.ingredient_a_id === partnerId ? pint.ingredient_b_id : pint.ingredient_a_id;
+                            const otherIng = selectedIngredients.find(si => si.id === otherId);
+                            const isOtherDrug = otherIng && (otherIng.category as string) === 'drugs';
+                            const isPairDrugRelated = isPartnerDrug || isOtherDrug;
+                            simCautionPenalty += isPairDrugRelated ? 15 : 5;
+                        }
+                        else if (pint.type === "CONFLICT") {
+                            const otherId = pint.ingredient_a_id === partnerId ? pint.ingredient_b_id : pint.ingredient_a_id;
+                            const otherIng = selectedIngredients.find(si => si.id === otherId);
+                            const isOtherDrug = otherIng && (otherIng.category as string) === 'drugs';
+                            const isPairDrugRelated = isPartnerDrug || isOtherDrug;
+                            simConflictPenalty += isPairDrugRelated ? 35 : 20;
+                        }
                     });
 
-                    let newSynerCount = 0;
-                    let newCautCount = 0;
-                    let newConfCount = 0;
+                    const simSynergyWeight = simSynergyCount * 20;
+                    const simIngredientCount = selectedIngredients.length + 1;
+                    const simRawFoundationBonus = Math.max(0, (simIngredientCount - 2) * 10);
+                    const simDrugBurden = simDrugCount * 8;
+                    const simFoundationBonus = Math.max(0, simRawFoundationBonus - simDrugBurden);
 
-                    relevantInts.forEach(pint => {
-                        if (pint.type === "SYNERGY") newSynerCount++;
-                        else if (pint.type === "CAUTION") newCautCount++;
-                        else if (pint.type === "CONFLICT") newConfCount++;
-                    });
+                    const simRawScoreResult = 70 + simSynergyWeight + simFoundationBonus - simCautionPenalty - simConflictPenalty;
+                    const simScore = Math.max(5, Math.min(100, simRawScoreResult));
 
-                    const boost = (newSynerCount * 20) + 10 - (newCautCount * 5) - (newConfCount * 20);
-                    const simScore = Math.max(10, Math.min(100, score + boost));
-
-                    if (simScore >= bestSimScore && (simScore >= score || topCandidates.length === 0)) {
-                        const originInt = potentialSynergies.find(ps => ps.ingredient_a_id === partnerId || ps.ingredient_b_id === partnerId);
+                    if (simScore >= bestSimScore && (simScore > score || topCandidates.length === 0)) {
+                        const originInt = potentialSynergies.find(ps => 
+                            (ps.ingredient_a_id === partnerId && ingredientIds.includes(ps.ingredient_b_id)) || 
+                            (ps.ingredient_b_id === partnerId && ingredientIds.includes(ps.ingredient_a_id))
+                        );
+                        
                         if (originInt) {
                             const originIngId = originInt.ingredient_a_id === partnerId ? originInt.ingredient_b_id : originInt.ingredient_a_id;
                             const originIng = selectedIngredients.find(si => si.id === originIngId);
                             
                             if (originIng) {
                                 if (simScore > bestSimScore) {
-                                    topCandidates.length = 0; // 더 높은 점수가 나오면 기존 후보지 비우기
-                                    topCandidates.push({ pair: [originIng, partner], interaction: originInt, simScore });
+                                    topCandidates.length = 0;
+                                    topCandidates.push({ pair: [originIng!, partner], interaction: originInt, simScore });
                                     bestSimScore = simScore;
                                 } else if (simScore === bestSimScore) {
-                                    topCandidates.push({ pair: [originIng, partner], interaction: originInt, simScore }); // 동점일 경우 후보군에 추가
+                                    topCandidates.push({ pair: [originIng!, partner], interaction: originInt, simScore });
                                 }
                             }
                         }
                     }
                 }
+
+                // 4.5단계: 질적 필터링 - 점수 향상이 미미하거나 의미 없는 추천 제거 (Business Logic ✨)
+                // 만약 최고 예상 점수가 현재 점수보다 1점도 안 오르거나, 
+                // 점수가 5점 부근에서 노는 경우라면 추천을 아예 안 띄우는 게 사용자 신뢰도에 좋습니다.
+                /* 
+                const meaningfulImprovement = bestSimScore - score >= 1.0;
+                const reachesHighQuality = bestSimScore >= 80;
+
+                if (!meaningfulImprovement && !reachesHighQuality) {
+                    topCandidates.length = 0;
+                }
+                */
 
                 // 5단계: 최고 점수 후보군 중 랜덤 추출 (특정 부원료 고정 노출 방지)
                 if (topCandidates.length > 0) {
