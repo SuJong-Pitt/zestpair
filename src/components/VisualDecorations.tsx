@@ -83,13 +83,13 @@ export default function VisualDecorations() {
 
   /* 부유 알약 캡슐 정적 데이터 */
   const capsules = useMemo(() => [
-    { color1: "#10b981", color2: "#06b6d4", x: "8%",  y: "18%", rotate: -20, delay: 0,   scale: 1.1 },
-    { color1: "#f59e0b", color2: "#f97316", x: "88%", y: "14%", rotate:  15, delay: 1.2, scale: 0.9 },
-    { color1: "#8b5cf6", color2: "#ec4899", x: "6%",  y: "62%", rotate:  30, delay: 2.4, scale: 1.0 },
+    { color1: "#10b981", color2: "#06b6d4", x: "8%", y: "18%", rotate: -20, delay: 0, scale: 1.1 },
+    { color1: "#f59e0b", color2: "#f97316", x: "88%", y: "14%", rotate: 15, delay: 1.2, scale: 0.9 },
+    { color1: "#8b5cf6", color2: "#ec4899", x: "6%", y: "62%", rotate: 30, delay: 2.4, scale: 1.0 },
     { color1: "#06b6d4", color2: "#3b82f6", x: "85%", y: "58%", rotate: -10, delay: 3.6, scale: 1.2 },
-    { color1: "#f97316", color2: "#f59e0b", x: "18%", y: "80%", rotate:  25, delay: 0.8, scale: 0.85 },
+    { color1: "#f97316", color2: "#f59e0b", x: "18%", y: "80%", rotate: 25, delay: 0.8, scale: 0.85 },
     { color1: "#10b981", color2: "#8b5cf6", x: "80%", y: "80%", rotate: -35, delay: 2.0, scale: 0.95 },
-    { color1: "#ec4899", color2: "#f59e0b", x: "50%", y: "88%", rotate:  10, delay: 1.6, scale: 0.8 },
+    { color1: "#ec4899", color2: "#f59e0b", x: "50%", y: "88%", rotate: 10, delay: 1.6, scale: 0.8 },
   ], []);
 
   if (!hasMounted) return null;
@@ -104,8 +104,8 @@ export default function VisualDecorations() {
           animate={isInView ? { scale: [1, 1.25, 1], x: ["-2%", "5%", "-2%"], y: ["-2%", "3%", "-2%"] } : {}}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -top-[10%] -left-[5%] w-[60%] h-[65%] gpu-accelerated"
-          style={{ 
-            background: "radial-gradient(circle at 40% 40%, rgba(16,185,129,0.2) 0%, transparent 70%)", 
+          style={{
+            background: "radial-gradient(circle at 40% 40%, rgba(16,185,129,0.2) 0%, transparent 70%)",
             filter: isMobile ? "blur(20px)" : "blur(40px)",
             willChange: "transform, opacity"
           }}
@@ -115,8 +115,8 @@ export default function VisualDecorations() {
           animate={isInView ? { scale: [1.1, 0.95, 1.1], x: ["3%", "-5%", "3%"], y: ["3%", "-3%", "3%"] } : {}}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -top-[5%] -right-[10%] w-[65%] h-[70%] gpu-accelerated"
-          style={{ 
-            background: "radial-gradient(circle at 60% 35%, rgba(139,92,246,0.18) 0%, rgba(6,182,212,0.12) 40%, transparent 70%)", 
+          style={{
+            background: "radial-gradient(circle at 60% 35%, rgba(139,92,246,0.18) 0%, rgba(6,182,212,0.12) 40%, transparent 70%)",
             filter: isMobile ? "blur(25px)" : "blur(50px)",
             willChange: "transform, opacity"
           }}
@@ -126,8 +126,8 @@ export default function VisualDecorations() {
           animate={isInView ? { scale: [1, 1.2, 1], opacity: [0.06, 0.12, 0.06] } : {}}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
           className="absolute bottom-0 left-0 right-0 h-[35%] gpu-accelerated"
-          style={{ 
-            background: "radial-gradient(circle at 50% 100%, rgba(16,185,129,0.12) 0%, transparent 70%)", 
+          style={{
+            background: "radial-gradient(circle at 50% 100%, rgba(16,185,129,0.12) 0%, transparent 70%)",
             filter: isMobile ? "blur(30px)" : "blur(50px)",
             willChange: "opacity, transform"
           }}
@@ -140,18 +140,18 @@ export default function VisualDecorations() {
           <motion.div
             key={i}
             initial={{ opacity: 0, scale: 0.5 }}
-            animate={isInView ? { 
-              opacity: [0, 0.12, 0], 
-              y: [100, -100], 
+            animate={isInView ? {
+              opacity: [0, 0.12, 0],
+              y: [100, -100],
               x: [(Math.random() - 0.5) * 40, (Math.random() - 0.5) * 80],
               scale: [0.5, 1.3, 0.8]
             } : { opacity: 0 }}
             transition={{ duration: 18 + i * 5, repeat: Infinity, ease: "linear", delay: i * 2 }}
             className="absolute rounded-full gpu-accelerated"
-            style={{ 
-              width: 120 + i * 40, 
-              height: 120 + i * 40, 
-              left: `${(i * 20) % 100}%`, 
+            style={{
+              width: 120 + i * 40,
+              height: 120 + i * 40,
+              left: `${(i * 20) % 100}%`,
               top: '85%',
               background: `radial-gradient(circle, ${["#10b98110", "#06b6d410", "#8b5cf610"][i % 3]} 0%, transparent 70%)`,
               filter: isMobile ? "blur(15px)" : "blur(30px)",
@@ -169,8 +169,8 @@ export default function VisualDecorations() {
       )}
 
       {/* === 노이즈 텍스처 (로컬 인라인 CSS로 변경하여 외부 요청 제거) === */}
-      <div 
-        className="absolute inset-0 opacity-[0.015] pointer-events-none" 
+      <div
+        className="absolute inset-0 opacity-[0.015] pointer-events-none"
         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
       />
 

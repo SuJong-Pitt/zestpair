@@ -430,22 +430,19 @@ export default function HomePage() {
               <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-[1.1] tracking-tighter text-center text-white drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)]">
                 {language === 'ko' ? (
                   <>
-                    영양제의 만남, 때로는 <span className="relative inline-block ml-1 md:ml-3">
-                      <span className="relative z-10 text-rose-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.8)] animate-pulse">독</span>
-                      {/* Underline Decoration */}
-                      <span className="absolute bottom-0 left-0 w-full h-[6px] bg-rose-500/40 blur-[2px] rounded-full" />
-                      {/* Sub-Glow for extra punch */}
-                      <span className="absolute -inset-2 bg-rose-500/10 blur-xl opacity-50 scale-150 pointer-events-none" />
-                    </span>이 될 수 있습니다.
+                    <span className="relative inline-block mr-1 md:mr-2">
+                      <span className="relative z-10 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.7)]">데이터로 증명하는</span>
+                      <span className="absolute bottom-0 left-0 w-full h-[4px] bg-emerald-500/30 blur-[1px] rounded-full" />
+                    </span>
+                    완벽한 영양제 궁합
                   </>
                 ) : (
                   <>
-                    When supplements meet, <br className="lg:hidden" />
-                    it can sometimes be <span className="relative inline-block ml-1.5 md:ml-2">
-                      <span className="relative z-10 text-rose-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.8)] animate-pulse">POISON</span>
-                      <span className="absolute bottom-0 left-0 w-full h-[6px] bg-rose-500/40 blur-[2px] rounded-full" />
-                      <span className="absolute -inset-2 bg-rose-500/10 blur-xl opacity-50 scale-150 pointer-events-none" />
-                    </span>.
+                    The perfect pairing, <br className="lg:hidden" />
+                    <span className="relative inline-block ml-1.5 md:ml-2">
+                      <span className="relative z-10 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.7)]">proven by data</span>
+                      <span className="absolute bottom-0 left-0 w-full h-[4px] bg-emerald-500/30 blur-[1px] rounded-full" />
+                    </span>
                   </>
                 )}
               </span>

@@ -3,7 +3,7 @@ export const UI_TRANSLATIONS = {
     ko: {
         hero: {
             title1: "🛡️ 영양제 상호작용 무료 분석",
-            title2: "영양제의 만남, 때로는 독이 될 수 있습니다.",
+            title2: "데이터로 증명하는 완벽한 영양제 궁합",
             subtitle1: "3초 만에 부작용 피하고",
             subtitle2: "최적의 시너지",
             subtitle3: "찾기",
@@ -118,7 +118,7 @@ export const UI_TRANSLATIONS = {
     en: {
         hero: {
             title1: "🛡️ FREE SUPPLEMENT INTERACTION ANALYSIS",
-            title2: "When supplements meet, it can sometimes be POISON.",
+            title2: "The perfect supplement pairing proven by data",
             subtitle1: "Avoid side effects in 3s and find",
             subtitle2: "Perfect Synergy",
             subtitle3: "",
