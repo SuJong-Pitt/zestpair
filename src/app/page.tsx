@@ -316,7 +316,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-slate-50/50">
       <section
-        className="relative pb-10 pt-10 md:pb-16 md:pt-12 z-40"
+        className="relative pb-24 pt-10 md:pb-32 md:pt-12 z-40"
         style={{
           background: "radial-gradient(circle at 50% 0%, #0d1a15 0%, #080c14 50%, #030712 100%)"
         }}
@@ -427,10 +427,10 @@ export default function HomePage() {
                 />
               </motion.span>
 
-              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-[1.1] tracking-tighter text-center text-white drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)]">
+              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-lg sm:text-xl md:text-3xl lg:text-[2.65rem] font-[1000] px-3 md:px-10 py-2 md:py-3 leading-[1.1] tracking-tighter text-center text-white drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)]">
                 {language === 'ko' ? (
                   <>
-                    지금 먹는 영양제, 서로 만나면 <span className="relative inline-block mx-1 md:mx-2">
+                    지금 먹는 영양제, 잘못 드시면 <span className="relative inline-block mx-1 md:mx-2">
                       <span className="relative z-10 text-rose-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.8)] animate-pulse">‘독’</span>
                       {/* Underline Decoration */}
                       <span className="absolute bottom-0 left-0 w-full h-[6px] bg-rose-500/40 blur-[2px] rounded-full" />
@@ -440,11 +440,11 @@ export default function HomePage() {
                   </>
                 ) : (
                   <>
-                    The supplements you take daily,<br className="md:hidden" />
-                    can turn into <span className="relative inline-block mx-1 md:mx-2">
-                      <span className="relative z-10 text-rose-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.8)] animate-pulse">‘POISON’</span>
+                    Supplements you take, <br className="lg:hidden" />
+                    could be <span className="relative inline-block mx-1 md:mx-2">
+                      <span className="relative z-10 text-rose-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.8)] animate-pulse">‘POISONOUS’</span>
                       <span className="absolute bottom-0 left-0 w-full h-[6px] bg-rose-500/40 blur-[2px] rounded-full" />
-                    </span> when combined.
+                    </span> if taken incorrectly.
                   </>
                 )}
               </span>
@@ -843,11 +843,11 @@ export default function HomePage() {
           </motion.div>
         </div>
 
-        {/* 하단 스크림 */}
+        {/* 하단 스크림 (가독성을 위해 높이 조절 및 위치 최적화) */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-20"
+          className="absolute bottom-0 left-0 right-0 h-32 md:h-40 pointer-events-none z-20"
           style={{
-            background: "linear-gradient(to top, rgba(248,250,252,1) 0%, rgba(248,250,252,0.9) 25%, rgba(248,250,252,0.5) 55%, rgba(248,250,252,0.15) 80%, transparent 100%)"
+            background: "linear-gradient(to top, rgba(248,250,252,1) 0%, rgba(248,250,252,0.9) 30%, transparent 100%)"
           }}
         />
       </section>

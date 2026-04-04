@@ -2,12 +2,12 @@
 export const UI_TRANSLATIONS = {
     ko: {
         hero: {
-            title1: "🛡️ 부작용 방지를 위한 영양제 상호작용 분석",
-            title2: "건강을 위한 영양제, 조합에 따라 결과가 다릅니다.",
-            subtitle1: "의도치 않은 상충 작용을 피하고 최적의 시너지를 찾으세요.",
-            subtitle2: "3초 만에 독성 검증",
-            subtitle3: "받고 건강을 지키세요. (무료 분석)",
-            searchPlaceholder: "🔍 지금 드시는 영양제를 입력해 보세요.",
+            title1: "🛡️ 영양제 상호작용 무료 분석",
+            title2: "지금 먹는 영양제, 잘못 드시면 '독'이 될 수도 있습니다.",
+            subtitle1: "3초 만에 부작용 피하고",
+            subtitle2: "최적의 시너지",
+            subtitle3: "찾기",
+            searchPlaceholder: "🔍 영양제 이름을 입력해 보세요.",
             stats: {
                 library: "분석 라이브러리",
                 free: "무료 서비스",
@@ -117,12 +117,12 @@ export const UI_TRANSLATIONS = {
     },
     en: {
         hero: {
-            title1: "🔬 AI-POWERED INGREDIENT INTERACTION ANALYSIS",
-            title2: "Ensure your daily supplements are working safely together.",
-            subtitle1: "Avoid unintended conflicts and find the perfect synergy.",
-            subtitle2: "Get 3-Second TOXICITY Check",
-            subtitle3: "and protect your health. (Free Analysis)",
-            searchPlaceholder: "🔍 Search for supplements you take right now.",
+            title1: "🛡️ FREE SUPPLEMENT INTERACTION ANALYSIS",
+            title2: "The supplements you take, could be 'POISONOUS' if taken incorrectly.",
+            subtitle1: "Avoid side effects in 3s and find",
+            subtitle2: "Perfect Synergy",
+            subtitle3: "",
+            searchPlaceholder: "🔍 Enter supplement name",
             stats: {
                 library: "Analysis Library",
                 free: "Free Service",
