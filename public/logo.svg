@@ -1,4 +1,4 @@
-<svg width="1024" height="1024" viewBox="240 245 544 534" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="pillGreen" x1="512" y1="200" x2="800" y2="500" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#80FFB0" />
@@ -14,17 +14,24 @@
     </linearGradient>
   </defs>
 
-  <!-- Outer Interlocking Hooks (The 'Z' shape) -->
-  <path d="M320 250 H600 C750 250 780 380 780 450 L700 450 C700 400 680 330 600 330 H350 L280 400" stroke="#0C1821" stroke-width="24" stroke-linecap="round" fill="url(#hookGradient)" />
-  <path d="M704 774 H424 C274 774 244 644 244 574 L324 574 C324 624 344 694 424 694 H674 L744 624" stroke="#0C1821" stroke-width="24" stroke-linecap="round" fill="url(#hookGradient)" />
+  <!-- Background: Rounded Black Square -->
+  <rect width="1024" height="1024" rx="160" fill="#0C1821" />
 
-  <!-- The Pill Capsule (at 45 degree angle) -->
-  <g transform="rotate(-45 512 512)">
-    <!-- Bottom Half (Teal) -->
-    <path d="M350 432 H512 V592 H350 C305.817 592 270 556.183 270 512 C270 467.817 305.817 432 350 432Z" fill="url(#pillTeal)" stroke="#0C1821" stroke-width="20" />
-    <!-- Top Half (Green) -->
-    <path d="M512 432 H674 C718.183 432 754 467.817 754 512 C754 556.183 718.183 592 674 592 H512 V432Z" fill="url(#pillGreen)" stroke="#0C1821" stroke-width="20" />
-    <!-- Inner Shine/Highlight -->
-    <path d="M350 452 C320 452 300 472 300 512 C300 482 320 462 350 462 H674 C704 462 724 482 724 512 C724 472 704 452 674 452 H350Z" fill="white" fill-opacity="0.3" />
+  <!-- Scaled Group: Bleed-to-edge (1.55) and centered -->
+  <g transform="translate(512, 512) scale(1.55) translate(-512, -512)">
+    <!-- Outer Interlocking Hooks -->
+    <path d="M320 250 H600 C750 250 780 380 780 450 L700 450 C700 400 680 330 600 330 H350 L280 400" stroke="#000" stroke-width="12" stroke-linecap="round" fill="url(#hookGradient)" />
+    <path d="M704 774 H424 C274 774 244 644 244 574 L324 574 C324 624 344 694 424 694 H674 L744 624" stroke="#000" stroke-width="12" stroke-linecap="round" fill="url(#hookGradient)" />
+
+    <!-- The Pill capsule -->
+    <g transform="rotate(-45 512 512)">
+      <!-- Bottom Half (Teal) -->
+      <path d="M350 432 H512 V592 H350 C305.817 592 270 556.183 270 512 C270 467.817 305.817 432 350 432Z" fill="url(#pillTeal)" stroke="#000" stroke-width="10" />
+      <!-- Top Half (Green) -->
+      <path d="M512 432 H674 C718.183 432 754 467.817 754 512 C754 556.183 718.183 592 674 592 H512 V432Z" fill="url(#pillGreen)" stroke="#000" stroke-width="10" />
+      <!-- Inner Shine -->
+      <path d="M350 452 C320 452 300 472 300 512 C300 482 320 462 350 462 H674 C704 462 724 482 724 512 C724 472 704 452 674 452 H350Z" fill="white" fill-opacity="0.3" />
+    </g>
   </g>
 </svg>
+
