@@ -34,15 +34,17 @@ export default function GlobalFooter() {
           </div>
 
           {/* 💌 2. 프리미엄 커넥션 카드 (문의하기) (4/12) */}
-          <div className="lg:col-span-4 flex flex-col items-center lg:items-start gap-4">
+            <div className="lg:col-span-4 flex flex-col items-center lg:items-start gap-3 w-full">
             <span className="text-[10px] font-black text-emerald-500/80 uppercase tracking-[0.3em]">
               {language === 'ko' ? '문의 사항' : 'Inquiry'}
             </span>
+            
+            {/* Email Inquiry */}
             <motion.a
                 href="mailto:admin@zestpair.com"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative flex items-center gap-3 px-6 py-4 rounded-[2rem] bg-white/[0.03] border border-white/10 backdrop-blur-2xl transition-all hover:bg-white/5 hover:border-white/20 shadow-2xl"
+                className="group relative flex items-center gap-3 px-6 py-4 rounded-[2rem] bg-white/[0.03] border border-white/10 backdrop-blur-2xl transition-all hover:bg-white/5 hover:border-white/20 shadow-2xl w-full max-w-[300px] lg:max-w-none"
             >
                 <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500/20 transition-colors">
                     <Mail size={18} />
@@ -51,7 +53,26 @@ export default function GlobalFooter() {
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">{t.common.inquiry}</span>
                     <span className="text-sm font-black text-white group-hover:text-emerald-400 transition-colors tracking-tight">admin@zestpair.com</span>
                 </div>
-                <ArrowRight size={16} className="text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+                <ArrowRight size={16} className="text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all ml-auto" />
+            </motion.a>
+
+            {/* KakaoTalk Inquiry */}
+            <motion.a
+                href="http://pf.kakao.com/_stxouX/chat"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative flex items-center gap-3 px-6 py-4 rounded-[2rem] bg-white/[0.03] border border-white/10 backdrop-blur-2xl transition-all hover:bg-white/5 hover:border-white/20 shadow-2xl w-full max-w-[300px] lg:max-w-none"
+            >
+                <div className="w-10 h-10 rounded-2xl bg-[#FAE100]/10 flex items-center justify-center text-emerald-400 group-hover:bg-[#FAE100]/20 transition-colors">
+                    <img src="/icons/kakao.svg" className="w-5 h-5" alt="Kakao" />
+                </div>
+                <div className="flex flex-col items-start pr-4 text-left">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">{t.common.kakaoInquiry}</span>
+                    <span className="text-sm font-black text-white group-hover:text-[#FAE100] transition-colors tracking-tight">{t.common.kakaoChannel}</span>
+                </div>
+                <ArrowRight size={16} className="text-slate-600 group-hover:text-[#FAE100] group-hover:translate-x-1 transition-all ml-auto" />
             </motion.a>
           </div>
 
