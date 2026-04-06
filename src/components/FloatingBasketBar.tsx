@@ -135,7 +135,7 @@ export default function FloatingBasketBar({
                   className="absolute -top-4 -right-4 w-28 h-28 rounded-full"
                   style={{ background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)", filter: "blur(25px)" }}
                 />
-                  {/* 상단 하이라이트 라인 (하단에 위치할 때 상단에 배치) */}
+                {/* 상단 하이라이트 라인 (하단에 위치할 때 상단에 배치) */}
                 <div
                   className="absolute top-0 left-8 right-8 h-px"
                   style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent)" }}
@@ -145,13 +145,13 @@ export default function FloatingBasketBar({
               {/* 확장 패널: 선택 목록 */}
               <AnimatePresence>
                 {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                      className="overflow-hidden order-2"
-                    >
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="overflow-hidden order-2"
+                  >
                     <div
                       className="px-5 pt-5 pb-4"
                       style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
@@ -335,7 +335,7 @@ export default function FloatingBasketBar({
                           <motion.span
                             initial={{ x: 0 }}
                             animate={
-                              showAlert && count < 2 
+                              showAlert && count < 2
                                 ? { x: [-4, 4, -4, 4, 0], color: ["#f87171", "#ef4444", "#f87171"] }
                                 : canAnalyze
                                   ? { opacity: [0.7, 1, 0.7], color: ["rgba(52,211,153,0.8)", "rgba(110,231,183,1)", "rgba(52,211,153,0.8)"] }
@@ -407,17 +407,17 @@ export default function FloatingBasketBar({
                       style={
                         canAnalyze
                           ? {
-                              background: "linear-gradient(135deg, #10b981 0%, #0891b2 55%, #7c3aed 100%)",
-                              color: "white",
-                              boxShadow: isAnalyzing ? "none" : "0 4px 24px rgba(16,185,129,0.45), 0 2px 6px rgba(0,0,0,0.35)",
-                              letterSpacing: "0.08em",
-                            }
+                            background: "linear-gradient(135deg, #10b981 0%, #0891b2 55%, #7c3aed 100%)",
+                            color: "white",
+                            boxShadow: isAnalyzing ? "none" : "0 4px 24px rgba(16,185,129,0.45), 0 2px 6px rgba(0,0,0,0.35)",
+                            letterSpacing: "0.08em",
+                          }
                           : {
-                              background: "rgba(255,255,255,0.05)",
-                              color: "rgba(255,255,255,0.18)",
-                              border: "1px solid rgba(255,255,255,0.07)",
-                              letterSpacing: "0.08em",
-                            }
+                            background: "rgba(255,255,255,0.05)",
+                            color: "rgba(255,255,255,0.18)",
+                            border: "1px solid rgba(255,255,255,0.07)",
+                            letterSpacing: "0.08em",
+                          }
                       }
                     >
                       {/* 스캐너 시머 */}

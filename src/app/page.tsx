@@ -372,11 +372,7 @@ export default function HomePage() {
                 className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#6ee7b7]/80 flex items-center gap-1.5 hover:text-[#6ee7b7] transition-all group/core"
               >
                 <div className="flex items-center gap-1">
-                  <motion.div
-                    animate={{ opacity: [0.4, 1, 0.4] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"
-                  />
+                  <div className="dot-pulse w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]" />
                   <span>AI Core v2.5</span>
                 </div>
                 <Info size={10} className="text-[#6ee7b7]/40 group-hover/core:text-[#6ee7b7] transition-colors" />
@@ -512,13 +508,15 @@ export default function HomePage() {
             transition={{ duration: 0.7, delay: 1.25, ease: [0.22, 1, 0.36, 1] }}
             className="relative max-w-2xl mx-auto group z-[800]"
           >
-            {/* 메인 펄스 글로우 (항상 부드럽게 깜빡임) */}
-            <motion.div
-              animate={{ opacity: [0.2, 0.5, 0.2] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -inset-4 rounded-[4rem] blur-xl md:blur-2xl pointer-events-none"
-              style={{ background: "radial-gradient(circle at 50% 50%, rgba(16,185,129,0.15) 0%, transparent 70%)", willChange: "opacity" }}
-            />
+            {/* 메인 펄스 글로우 - 데스크탑 전용 (모바일에서 비활성화) */}
+            {!isMobile && (
+              <motion.div
+                animate={{ opacity: [0.2, 0.5, 0.2] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -inset-4 rounded-[4rem] blur-xl md:blur-2xl pointer-events-none"
+                style={{ background: "radial-gradient(circle at 50% 50%, rgba(16,185,129,0.15) 0%, transparent 70%)", willChange: "opacity" }}
+              />
+            )}
 
             {/* === 독립적인 분석바(검색바) 그룹 (포커스 효과 한정) === */}
             <div className="relative group/bar mb-4 md:mb-10">
@@ -547,23 +545,18 @@ export default function HomePage() {
                   transform: "translateZ(0)"
                 }}
               >
-                {/* 테두리 애니메이션 효과 */}
-                <motion.div
-                  className="absolute inset-0 rounded-[4rem] pointer-events-none"
-                  style={{
-                    boxShadow: "inset 0 0 0 1px rgba(16,185,129,0.1)"
-                  }}
-                  animate={{ opacity: [0.3, 0.6, 0.3] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                />
+                {/* 테두리 애니메이션 효과 - 데스크탑 전용 */}
+                {!isMobile && (
+                  <motion.div
+                    className="absolute inset-0 rounded-[4rem] pointer-events-none"
+                    style={{ boxShadow: "inset 0 0 0 1px rgba(16,185,129,0.1)" }}
+                    animate={{ opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                )}
 
                 <div className="pl-4 md:pl-6 text-emerald-400 relative z-20">
-                  <motion.div
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    <Search size={18} className="md:size-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                  </motion.div>
+                  <Search size={18} className="md:size-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                 </div>
                 <Input
                   ref={searchRef}
@@ -759,32 +752,39 @@ export default function HomePage() {
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                 className="flex flex-wrap justify-center gap-1.5 md:gap-2 mt-6 mb-2 px-4"
               >
-                {isMounted && selectedIngredients.map((ingredient) => (
+                {isMounted && selectedIngredients.map((ingredient, chipIdx) => (
                   <motion.div
                     layout
                     key={ingredient.id}
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                    className="group relative flex items-center gap-1 px-1.5 py-0.5 md:px-3 md:py-1 rounded-xl transition-all duration-300 whitespace-nowrap shrink-0"
+                    initial={{ scale: 0.8, opacity: 0, y: 5 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.8, opacity: 0, transition: { duration: 0.2 } }}
+                    transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                    className="selected-chip group relative flex items-center gap-1.5 px-2 py-1 md:px-3.5 md:py-1.5 rounded-xl whitespace-nowrap shrink-0 overflow-hidden"
                     style={{
-                      background: "rgba(15, 23, 42, 0.85)",
-                      border: "1.5px solid rgba(16, 185, 129, 0.5)",
-                      boxShadow: "0 8px 20px rgba(16, 185, 129, 0.2)",
-                      backdropFilter: "blur(16px)"
+                      background: "rgba(5, 10, 20, 0.95)",
+                      backdropFilter: isMobile ? "none" : "blur(24px)",
                     }}
                   >
-                    <span className="text-[10px] md:text-sm group-hover:scale-110 transition-transform">
+                    {/* CSS shimmer — offloaded from JS thread */}
+                    <div
+                      className="chip-shimmer absolute inset-y-0 w-1/2 pointer-events-none z-0"
+                      style={{
+                        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)",
+                        animationDelay: `${chipIdx * 0.4}s`,
+                      }}
+                    />
+                    <span className="text-xs md:text-sm relative z-10 group-hover:scale-110 transition-transform">
                       {ingredient.icon_emoji}
                     </span>
-                    <span className="text-[8px] md:text-[11px] font-[900] text-white tracking-tight">
+                    <span className="text-[9px] md:text-[11px] font-[900] text-emerald-50 tracking-tight relative z-10">
                       {language === 'ko' ? ingredient.name : ingredient.name_en}
                     </span>
                     <button
                       onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
-                      className="ml-0.5 p-0.5 text-white/30 hover:text-white/80 transition-colors"
+                      className="ml-1 p-0.5 rounded-full bg-white/5 text-white/30 hover:bg-red-500/40 hover:text-white transition-all relative z-10 active:scale-95"
                     >
-                      <X className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={3} />
+                      <X className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={4} />
                     </button>
                   </motion.div>
                 ))}
@@ -824,14 +824,12 @@ export default function HomePage() {
                   delay: !hasInitialLoaded ? (1.6 + i * 0.05) : 0,
                   duration: 0.3
                 }}
-                whileHover={{ y: -2, backgroundColor: "rgba(255,255,255,0.08)" }}
-                className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[8.5px] md:text-[11px] font-[900] transition-colors whitespace-nowrap gpu-accelerated"
+                className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[8.5px] md:text-[11px] font-[900] whitespace-nowrap hover:-translate-y-0.5 transition-transform"
                 style={{
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.12)",
-                  backdropFilter: "blur(8px)",
                   color: badge.color,
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)"
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.2)"
                 }}
               >
                 <span className="filter drop-shadow-[0_0_5px_rgba(0,0,0,0.3)]">{badge.icon}</span>
@@ -900,13 +898,9 @@ export default function HomePage() {
                       />
                     )}
 
-                    {/* 내부 광원 효과 (Active 전용) */}
+                    {/* 내부 광원 효과 (Active 전용) — 정적 opacity로 대체 */}
                     {isActive && (
-                      <motion.div
-                        animate={{ opacity: [0.1, 0.3, 0.1] }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute inset-0 bg-emerald-400/10 rounded-xl md:rounded-[1.25rem] pointer-events-none"
-                      />
+                      <div className="absolute inset-0 bg-emerald-400/15 rounded-xl md:rounded-[1.25rem] pointer-events-none" />
                     )}
 
                     <span className="relative z-10 text-xs md:text-lg leading-none group-hover:scale-110 transition-transform duration-500">

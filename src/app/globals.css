@@ -455,4 +455,47 @@
     perspective: 1000px;
     will-change: transform, opacity, filter;
   }
+
+  /* ============================================================
+   * Selected Chip Glow — CSS-driven (offloads from JS thread)
+   * ============================================================ */
+  @keyframes selected-chip-glow {
+    0%, 100% {
+      border-color: rgba(52, 211, 153, 0.55);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 0px rgba(52,211,153,0);
+    }
+    50% {
+      border-color: rgba(110, 231, 183, 0.95);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 14px rgba(52,211,153,0.35);
+    }
+  }
+
+  .selected-chip {
+    animation: selected-chip-glow 2.2s ease-in-out infinite;
+  }
+
+  /* ============================================================
+   * Status dot pulse — CSS-driven (replaces Framer opacity loop)
+   * ============================================================ */
+  @keyframes dot-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  .dot-pulse {
+    animation: dot-pulse 2s ease-in-out infinite;
+  }
+
+  /* ============================================================
+   * Chip shimmer sweep — CSS-driven
+   * ============================================================ */
+  @keyframes chip-shimmer {
+    0% { transform: translateX(-180%) skewX(-25deg); }
+    100% { transform: translateX(280%) skewX(-25deg); }
+  }
+
+  .chip-shimmer {
+    animation: chip-shimmer 4s ease-in-out infinite;
+    animation-fill-mode: both;
+  }
 }
