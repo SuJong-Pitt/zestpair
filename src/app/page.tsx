@@ -738,59 +738,75 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
 
-          {/* === 선택된 성분 목록 (위치 이동: 인기 태그 하단) === */}
+          {/* === 선택된 성분 목록 — 눈에 확 띄는 디자인 === */}
           <AnimatePresence>
             {selectedIngredients.length > 0 && (
               <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{
                   opacity: isBlur ? 0.3 : 1,
                   y: 0,
-                  scale: 1,
                   filter: isBlur ? "blur(5px)" : "blur(0px)"
                 }}
-                exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                className="flex flex-wrap justify-center gap-1.5 md:gap-2 mt-6 mb-2 px-4"
+                exit={{ opacity: 0, y: -5, transition: { duration: 0.2 } }}
+                className="mt-5 mb-1 px-2"
               >
-                {isMounted && selectedIngredients.map((ingredient, chipIdx) => (
-                  <motion.div
-                    layout
-                    key={ingredient.id}
-                    initial={{ scale: 0.8, opacity: 0, y: 5 }}
-                    animate={{ scale: 1, opacity: 1, y: 0 }}
-                    exit={{ scale: 0.8, opacity: 0, transition: { duration: 0.2 } }}
-                    transition={{ type: "spring", stiffness: 400, damping: 28 }}
-                    className="selected-chip group relative flex items-center gap-1.5 px-2 py-1 md:px-3.5 md:py-1.5 rounded-xl whitespace-nowrap shrink-0 overflow-hidden"
-                    style={{
-                      background: "rgba(5, 10, 20, 0.95)",
-                      backdropFilter: isMobile ? "none" : "blur(24px)",
-                    }}
+                {/* 섹션 헤더 */}
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <div className="h-px flex-1 max-w-[60px]" style={{ background: "linear-gradient(to right, transparent, rgba(52,211,153,0.4))" }} />
+                  <span
+                    className="text-[9px] font-[900] uppercase tracking-[0.18em] flex items-center gap-1.5"
+                    style={{ color: "#6ee7b7" }}
                   >
-                    {/* CSS shimmer — offloaded from JS thread */}
-                    <div
-                      className="chip-shimmer absolute inset-y-0 w-1/2 pointer-events-none z-0"
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_6px_#10b981] dot-pulse" />
+                    {language === 'ko' ? `선택됨 ${selectedIngredients.length}개` : `${selectedIngredients.length} selected`}
+                  </span>
+                  <div className="h-px flex-1 max-w-[60px]" style={{ background: "linear-gradient(to left, transparent, rgba(52,211,153,0.4))" }} />
+                </div>
+
+                {/* 칩 목록 */}
+                <div className="flex flex-wrap justify-center gap-2">
+                  {isMounted && selectedIngredients.map((ingredient, chipIdx) => (
+                    <motion.div
+                      layout
+                      key={ingredient.id}
+                      initial={{ scale: 0.7, opacity: 0, y: 8 }}
+                      animate={{ scale: 1, opacity: 1, y: 0 }}
+                      exit={{ scale: 0.7, opacity: 0, transition: { duration: 0.15 } }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30, delay: chipIdx * 0.04 }}
+                      className="group relative flex items-center gap-2 pl-2.5 pr-1.5 py-1.5 md:pl-3 md:pr-2 md:py-2 rounded-2xl whitespace-nowrap shrink-0 active:scale-95 transition-transform"
                       style={{
-                        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)",
-                        animationDelay: `${chipIdx * 0.4}s`,
+                        background: "linear-gradient(135deg, #059669 0%, #10b981 60%, #34d399 100%)",
+                        boxShadow: "0 4px 16px rgba(16,185,129,0.45), 0 1px 3px rgba(0,0,0,0.3)",
                       }}
-                    />
-                    <span className="text-xs md:text-sm relative z-10 group-hover:scale-110 transition-transform">
-                      {ingredient.icon_emoji}
-                    </span>
-                    <span className="text-[9px] md:text-[11px] font-[900] text-emerald-50 tracking-tight relative z-10">
-                      {language === 'ko' ? ingredient.name : ingredient.name_en}
-                    </span>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
-                      className="ml-1 p-0.5 rounded-full bg-white/5 text-white/30 hover:bg-red-500/40 hover:text-white transition-all relative z-10 active:scale-95"
                     >
-                      <X className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={4} />
-                    </button>
-                  </motion.div>
-                ))}
+                      {/* 체크 뱃지 */}
+                      <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                          <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      {/* 이모지 */}
+                      <span className="text-sm md:text-base leading-none">{ingredient.icon_emoji}</span>
+                      {/* 이름 */}
+                      <span className="text-[11px] md:text-xs font-[900] text-white tracking-tight">
+                        {language === 'ko' ? ingredient.name : ingredient.name_en}
+                      </span>
+                      {/* 삭제 버튼 */}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
+                        className="ml-0.5 w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/15 flex items-center justify-center text-white/70 hover:bg-red-400/80 hover:text-white transition-all active:scale-90 shrink-0"
+                      >
+                        <X className="w-2.5 h-2.5" strokeWidth={3.5} />
+                      </button>
+                    </motion.div>
+                  ))}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
+
+
 
           {/* === 소셜 프루프 배지 행 (상태 가속화) === */}
           <motion.div
