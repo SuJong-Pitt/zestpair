@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect, Suspense, useMemo, useCallback, useTransition } from "react";
-import { Search, Pill, ChevronDown, ChevronRight, Info, Sparkles, RefreshCcw, Languages, Database, Smartphone, X, Zap, RotateCcw } from "lucide-react";
+import { useRef, useState, useEffect, useMemo, useCallback, useTransition } from "react";
+import { Search, ChevronDown, ChevronRight, Info, Sparkles, Languages, X, Zap, RotateCcw, RefreshCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

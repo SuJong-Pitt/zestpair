@@ -157,9 +157,15 @@ export default function RootLayout({
           }}
         />
         {/* Pretendard: modern, premium Korean/English optimized font */}
+        {/* preload: render-blocking 방지 */}
+        <link
+          rel="preload"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+        />
         <link
           rel="stylesheet"
-          as="style"
           crossOrigin="anonymous"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
         />
@@ -176,8 +182,7 @@ export default function RootLayout({
 
         </TooltipProvider>
         
-        {/* Kakao SDK 스크립트 (모바일 웹 호환성을 위해 최우선 로드) */}
-        {/* Kakao SDK 스크립트 (모바일 웹 호환성을 위해 최우선 로드) */}
+        {/* Kakao SDK (afterInteractive: 인터랙션 후 로드) */}
         <Script 
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" 
           strategy="afterInteractive"
