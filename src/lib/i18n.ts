@@ -7,15 +7,22 @@ export const UI_TRANSLATIONS = {
             subtitle1: "3초 만에 부작용 피하고",
             subtitle2: "최적의 시너지",
             subtitle3: "찾기",
-            searchPlaceholder: "🔍 영양제 이름을 입력해 보세요.",
-            stats: {
-                library: "분석 라이브러리",
-                free: "무료 서비스",
-                speed: "처리 속도",
-                unlimited: "무제한 분석",
-                instant: "0.5초 이내"
-            },
-            popularTags: ["비타민", "미네랄", "오메가", "유산균", "항산화", "아미노산"]
+            popularTags: ["비타민", "미네랄", "오메가", "유산균", "항산화", "아미노산"],
+            quickStart: "⚡ 클릭하면 바로 분석!",
+            placeholderExamples: [
+                "💊 '비타민 C'를 검색해보세요",
+                "🐟 '오메가 3'는 어떤가요?",
+                "⚗️ '마그네슘'을 입력해보세요",
+                "💊 '아연'도 인기가 많아요"
+            ],
+            combos: {
+                immunity: "🛡️ 면역력 부스터 (C+아연)",
+                bone: "🦴 뼈 건강 (칼슘+D)",
+                sleep: "🌙 꿀잠 듀오 (마그네슘+테아닌)",
+                vision: "👁️ 눈 피로 개선 (루테인+아스타잔틴)",
+                energy: "🔥 활력 충전 (B12+아르기닌)",
+                heart: "❤️ 심혈관 케어 (오메가3+CoQ10)"
+            }
         },
         howItWorks: {
             title: "ZestPair 이용 가이드",
@@ -124,15 +131,22 @@ export const UI_TRANSLATIONS = {
             subtitle1: "Avoid side effects in 3s and find",
             subtitle2: "Perfect Synergy",
             subtitle3: "",
-            searchPlaceholder: "🔍 Enter supplement name",
-            stats: {
-                library: "Analysis Library",
-                free: "Free Service",
-                speed: "Processing Speed",
-                unlimited: "Unlimited Analysis",
-                instant: "Under 0.5s"
-            },
-            popularTags: ["Vitamin", "Mineral", "Omega", "Probiotics", "Antioxidants", "Amino Acids"]
+            popularTags: ["Vitamin", "Mineral", "Omega", "Probiotics", "Antioxidants", "Amino Acids"],
+            quickStart: "⚡ Try Quick Analysis!",
+            placeholderExamples: [
+                "💊 Try 'Vitamin C'",
+                "🐟 How about 'Omega 3'?",
+                "⚗️ Try 'Magnesium'",
+                "💊 'Zinc' is also popular"
+            ],
+            combos: {
+                immunity: "🛡️ Immunity (C+Zinc)",
+                bone: "🦴 Bone Health (Ca+D)",
+                sleep: "🌙 Sleep Duo (Mg+Theanine)",
+                vision: "👁️ Eye Care (Lutein+Astaxanthin)",
+                energy: "🔥 Energy Boost (B12+Arginine)",
+                heart: "❤️ Heart Care (Omega3+CoQ10)"
+            }
         },
         howItWorks: {
             title: "How ZestPair Works",

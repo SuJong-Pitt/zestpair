@@ -134,6 +134,32 @@ export default function HomePage() {
   const categoryVersionRef = useRef(0);
   const [hasInitialLoaded, setHasInitialLoaded] = useState(false);
   const [showTopAlert, setShowTopAlert] = useState(false);
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [comboIndex, setComboIndex] = useState(0);
+
+  const {
+    selectedIngredients, isAnalyzing, hasResult, setAnalyzing, setHasResult, clearBasket, language, setLanguage,
+    analysisResult, setAnalysisResult, removeIngredient, addIngredient
+  } = useBasketStore();
+
+  const t = UI_TRANSLATIONS[language];
+
+  useEffect(() => {
+    // 플레이스홀더 로테이션 (3초)
+    const pInterval = setInterval(() => {
+      setPlaceholderIndex((prev) => (prev + 1) % t.hero.placeholderExamples.length);
+    }, 3000);
+    
+    // 퀵스타트 콤보 로테이션 (5초)
+    const cInterval = setInterval(() => {
+      setComboIndex((prev) => (prev + 1) % 2); // 2개 세트 로테이션
+    }, 5000);
+
+    return () => {
+      clearInterval(pInterval);
+      clearInterval(cInterval);
+    };
+  }, [t.hero.placeholderExamples.length]);
 
   // 마운트 직후 hydration mismatch 방지
   useEffect(() => {
@@ -172,13 +198,6 @@ export default function HomePage() {
     };
     fetchIngredients();
   }, []);
-
-  const {
-    selectedIngredients, isAnalyzing, hasResult, setAnalyzing, setHasResult, clearBasket, language, setLanguage,
-    analysisResult, setAnalysisResult, removeIngredient, addIngredient
-  } = useBasketStore();
-
-  const t = UI_TRANSLATIONS[language];
 
   // 메인 그리드용 필터링 및 정렬 - 성능 최적화: useMemo
   const filteredIngredients = useMemo(() => {
@@ -226,9 +245,27 @@ export default function HomePage() {
     }
   }
 
+  const popularIngredients = useMemo(() => {
+    return [...dbIngredients.filter((i) => i.is_popular)].sort((a, b) => {
+      if (sortBy === 'name') {
+        const nameA = (language === 'ko' ? a.name : a.name_en) || '';
+        const nameB = (language === 'ko' ? b.name : b.name_en) || '';
+        return nameA.localeCompare(nameB);
+      }
+      if (sortBy === 'popular') {
+        // 인기순 정렬 (이미 필터링 되었으므로 sort_order 위주로 정렬하거나, is_popular 내부 순서 유지)
+        return (a.sort_order || 0) - (b.sort_order || 0);
+      }
+      return 0; // default (order by sort_order or featured)
+    });
+  }, [dbIngredients, sortBy, language]);
+
   // 드롭다운 검색 결과용 필터링 - 성분 및 카테고리 통합 매칭
   const dropdownResults = useMemo(() => {
-    if (!searchQuery) return [];
+    if (!searchQuery) {
+      // 검색어가 없을 때는 인기 성분을 제안 (드롭다운이 열려있을 때만)
+      return popularIngredients.slice(0, 10) as SearchResult[];
+    }
 
     // 1. 카테고리 매칭 확인
     const matchedCategories = Object.entries(CATEGORIES_TRANSLATIONS)
@@ -259,24 +296,9 @@ export default function HomePage() {
 
     // 카테고리 결과를 상단에 배치하고 성분을 뒤에 배치
     return [...matchedCategories, ...matchedIngredients] as SearchResult[];
-  }, [dbIngredients, searchQuery, language]);
+  }, [dbIngredients, searchQuery, language, popularIngredients]);
 
   const isBlur = isDropdownOpen && dropdownResults.length > 0;
-
-  const popularIngredients = useMemo(() => {
-    return [...dbIngredients.filter((i) => i.is_popular)].sort((a, b) => {
-      if (sortBy === 'name') {
-        const nameA = (language === 'ko' ? a.name : a.name_en) || '';
-        const nameB = (language === 'ko' ? b.name : b.name_en) || '';
-        return nameA.localeCompare(nameB);
-      }
-      if (sortBy === 'popular') {
-        // 인기순 정렬 (이미 필터링 되었으므로 sort_order 위주로 정렬하거나, is_popular 내부 순서 유지)
-        return (a.sort_order || 0) - (b.sort_order || 0);
-      }
-      return 0; // default (order by sort_order or featured)
-    });
-  }, [dbIngredients, sortBy, language]);
 
   // 데이터 로드 완료 후 첫 렌더 플래그 해제
   useEffect(() => {
@@ -518,6 +540,19 @@ export default function HomePage() {
               />
             )}
 
+            {/* 분석 가이드 라벨 */}
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1.4 }}
+              className="absolute -top-7 left-6 hidden md:flex items-center gap-2"
+            >
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-slate-900 shadow-[0_0_10px_rgba(16,185,129,0.5)]">1</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+                {language === 'ko' ? '먼저 성분을 추가하세요' : 'Add ingredients first'}
+              </span>
+            </motion.div>
+
             {/* === 독립적인 분석바(검색바) 그룹 (포커스 효과 한정) === */}
             <div className="relative group/bar mb-4 md:mb-10">
               {/* 포커스 시 배경 글로우 (분석바 본체에만 집중) */}
@@ -561,7 +596,7 @@ export default function HomePage() {
                 <Input
                   ref={searchRef}
                   type="text"
-                  placeholder={t.hero.searchPlaceholder}
+                  placeholder={t.hero.placeholderExamples[placeholderIndex]}
                   value={inputValue}
                   onChange={(e) => {
                     setInputValue(e.target.value);
@@ -571,7 +606,7 @@ export default function HomePage() {
                     });
                   }}
                   onFocus={() => setIsDropdownOpen(true)}
-                  className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-[11px] md:text-lg h-8 md:h-12 flex-1 font-bold px-1 md:px-4 tracking-tight relative z-20"
+                  className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-[11px] md:text-lg h-8 md:h-12 flex-1 font-bold px-1 md:px-4 tracking-tight relative z-20 transition-all duration-500"
                 />
                 <div className="flex items-center gap-2 pr-1.5 md:pr-2">
                   {selectedIngredients.length > 0 && (
@@ -705,11 +740,71 @@ export default function HomePage() {
               )}
             </AnimatePresence>
 
+             {/* 퀵 스타트 조합 */}
+             <motion.div
+               initial={{ opacity: 0, y: 10 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: 1.5 }}
+               className="mt-6 flex flex-col items-center gap-3"
+             >
+               <span className="text-[10px] font-black text-emerald-400/60 uppercase tracking-[0.2em] flex items-center gap-2">
+                 <Zap size={10} className="fill-current" />
+                 {t.hero.quickStart}
+               </span>
+               <div className="flex flex-wrap justify-center gap-2 px-4 min-h-[44px]">
+                 <AnimatePresence mode="wait">
+                   <motion.div
+                     key={comboIndex}
+                     initial={{ opacity: 0, y: 5 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     exit={{ opacity: 0, y: -5 }}
+                     transition={{ duration: 0.4 }}
+                     className="flex flex-wrap justify-center gap-2"
+                   >
+                     {(comboIndex === 0 ? [
+                       { id: 'immunity', tags: ['비타민C', '아연'], label: t.hero.combos.immunity },
+                       { id: 'bone', tags: ['칼슘', '비타민D'], label: t.hero.combos.bone },
+                       { id: 'sleep', tags: ['마그네슘', '테아닌'], label: t.hero.combos.sleep },
+                     ] : [
+                       { id: 'vision', tags: ['루테인', '아스타잔틴'], label: t.hero.combos.vision },
+                       { id: 'energy', tags: ['비타민B', '아르기닌'], label: t.hero.combos.energy },
+                       { id: 'heart', tags: ['오메가', '코엔자임', '큐텐'], label: t.hero.combos.heart },
+                     ]).map((combo) => (
+                       <button
+                         key={combo.id}
+                         onClick={() => {
+                           const toAdd = dbIngredients.filter(ing => 
+                             combo.tags.some(tag => 
+                                ing.name.includes(tag) || 
+                                ing.name_en.includes(tag) || 
+                                ing.slug.includes(tag.toLowerCase().replace(' ', '-'))
+                             )
+                           );
+                           toAdd.forEach(ing => {
+                             if (!selectedIngredients.some(s => s.id === ing.id)) {
+                               addIngredient(ing);
+                             }
+                           });
+                           if (toAdd.length > 0) {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                           }
+                         }}
+                         className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/10 text-white/80 hover:text-emerald-300 text-[10px] md:text-xs font-bold transition-all active:scale-95 shadow-lg flex items-center gap-2 group/combo"
+                       >
+                         {combo.label}
+                         <ChevronRight size={12} className="group-hover/combo:translate-x-0.5 transition-transform opacity-30 group-hover/combo:opacity-100" />
+                       </button>
+                     ))}
+                   </motion.div>
+                 </AnimatePresence>
+               </div>
+             </motion.div>
+
             {/* 인기 태그 */}
             <motion.div
               animate={{ filter: "blur(0px)", opacity: 0.75 }}
               transition={{ duration: 0.4 }}
-              className="mt-0 md:mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2"
+              className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2"
             >
               <span className="text-[9px] text-white/50 font-black uppercase tracking-[0.25em] whitespace-nowrap">
                 {language === 'ko' ? '인기' : 'POPULAR'}:
