@@ -12,7 +12,8 @@ import {
     Share2,
     Download,
     Loader2,
-    ChevronDown
+    ChevronDown,
+    Info
 } from "lucide-react";
 import type { InteractionResult } from "@/types/database";
 import { toPng } from "html-to-image";
@@ -210,60 +211,64 @@ const SynergyCard = memo(function SynergyCard({
                             transition={{ duration: 0.3, ease: "easeInOut" }}
                             className="overflow-hidden"
                         >
-                            <div className="px-5 pb-5 pt-2 border-t border-white/5 ml-0 sm:ml-16 relative z-10">
-                                <div className="space-y-6">
+                            <div className="px-4 md:px-5 pb-4 md:pb-5 pt-1 md:pt-2 border-t border-white/5 ml-0 sm:ml-16 relative z-10 text-left">
+                                <div className="space-y-4 md:space-y-6">
                                     {/* Reason Block */}
-                                    <div className="space-y-2 text-left">
-                                        <div className="inline-flex items-center gap-2 px-2 py-0.5 bg-white/5 border border-white/10 rounded-md">
-                                            <span className="text-slate-400 font-black text-[9px] uppercase tracking-widest">{language === 'ko' ? '분석 내용' : 'Analysis Detail'}</span>
+                                        <div className="space-y-2 md:space-y-3">
+                                            <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-white/[0.03] border border-white/5 rounded-md">
+                                                <div className="w-1 h-1 rounded-full bg-slate-500" />
+                                                <span className="text-slate-500 font-black text-[8px] md:text-[9px] uppercase tracking-widest">{language === 'ko' ? '전문가 분석' : 'Analysis'}</span>
+                                            </div>
+                                            <p className="text-[13px] md:text-[15px] text-slate-300 font-bold leading-relaxed tracking-tight break-words pr-8 sm:pr-16">
+                                                {displayReason}
+                                            </p>
                                         </div>
-                                        <p className="text-[13px] md:text-[14px] text-slate-300 font-medium leading-relaxed tracking-tight break-words">
-                                            {displayReason}
-                                        </p>
-                                    </div>
-
-                                            {displayRec && (
-                                                <div className={cn(
-                                                    "relative text-left mt-4 p-4 md:p-5 rounded-2xl border shadow-inner transition-all duration-500",
-                                                    (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT")
-                                                        ? "bg-gradient-to-br from-amber-500/10 to-orange-500/5 border-amber-500/20"
-                                                        : "bg-emerald-500/5 border-emerald-500/20"
-                                                )}>
-                                                    {/* Dynamic Pori with Glass Frame ✨ */}
-                                                    <div className="absolute -top-10 -right-2 w-14 h-14 md:w-16 md:h-16 z-30 select-none hidden sm:block group/pori">
-                                                        <div className="relative w-full h-full p-1 bg-slate-900/80 border border-white/20 rounded-2xl backdrop-blur-md shadow-2xl overflow-hidden ring-4 ring-black/20">
-                                                            <img 
-                                                                src={`/images/share/pori-kakao-${Math.round((result.interaction.type === 'SYNERGY' ? 100 : result.interaction.type === 'CAUTION' ? 40 : 10) / 10) * 10}.png`} 
-                                                                alt="Pori" 
-                                                                className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover/pori:scale-110" 
-                                                            />
-                                                            <motion.div 
-                                                                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-                                                                transition={{ duration: 2, repeat: Infinity }}
-                                                                className={cn(
-                                                                    "absolute top-2 right-2 w-2 h-2 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]",
-                                                                    result.interaction.type === 'SYNERGY' ? "bg-emerald-400" : result.interaction.type === 'CAUTION' ? "bg-amber-400" : "bg-rose-400"
-                                                                )}
-                                                            />
-                                                        </div>
+ 
+                                        {displayRec && (
+                                            <div className={cn(
+                                                "relative mt-4 md:mt-8 p-3.5 md:p-5 rounded-xl md:rounded-2xl border shadow-inner transition-all duration-500",
+                                                (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT")
+                                                    ? "bg-gradient-to-br from-amber-500/10 to-orange-500/5 border-amber-500/20"
+                                                    : "bg-emerald-500/5 border-emerald-500/20"
+                                            )}>
+                                                {/* Dynamic Pori ✨ */}
+                                                <div className="absolute -top-10 -right-1 w-12 h-12 md:w-20 md:h-20 z-30 select-none hidden sm:block">
+                                                    <div className="relative w-full h-full p-1 bg-slate-900/80 border border-white/20 rounded-xl backdrop-blur-md shadow-2xl overflow-hidden ring-4 ring-black/20">
+                                                        <img 
+                                                            src={`/images/share/pori-kakao-${Math.round((result.interaction.type === 'SYNERGY' ? 100 : result.interaction.type === 'CAUTION' ? 40 : 10) / 10) * 10}.png`} 
+                                                            alt="Pori" 
+                                                            className="w-full h-full object-cover rounded-lg" 
+                                                        />
                                                     </div>
-
-                                                    <div className="relative z-20">
-                                                        <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-white/10 border border-white/10 rounded-md mb-3">
-                                                            <Sparkles size={10} className={(result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") ? "text-amber-400" : "text-emerald-400"} />
-                                                            <span className={cn(
-                                                                "font-black text-[9px] md:text-[10px] uppercase tracking-widest",
-                                                                (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") ? "text-amber-300" : "text-emerald-300"
-                                                            )}>
-                                                                {language === 'ko' ? 'Pori의 해결책' : "Pori's Solution"}
-                                                            </span>
-                                                        </div>
-                                                        <p className="text-[13px] md:text-[14px] text-white/90 font-medium leading-relaxed tracking-tight break-words pr-2 sm:pr-10">
+                                                </div>
+ 
+                                                <div className="relative z-20">
+                                                    <div className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-white/10 border border-white/10 rounded-md mb-2 md:mb-4 shadow-sm">
+                                                        <Sparkles size={10} className={(result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") ? "text-amber-400" : "text-emerald-400"} />
+                                                        <span className={cn(
+                                                            "font-black text-[8px] md:text-[10px] uppercase tracking-widest",
+                                                            (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") ? "text-amber-300" : "text-emerald-300"
+                                                        )}>
+                                                            {language === 'ko' ? 'Pori의 해결책' : "Pori's Solution"}
+                                                        </span>
+                                                    </div>
+                                                    <div className="space-y-2 md:space-y-3">
+                                                        <p className="text-[13px] md:text-[16px] text-white font-bold leading-relaxed tracking-tight break-words pr-2 sm:pr-24">
                                                             {language === 'ko' && (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") && (
-                                                                <span className="text-amber-400 font-[1000] mr-1.5 block mb-1">괜찮아요! 🙌</span>
+                                                                <span className="text-amber-400 font-extrabold mr-1 inline-block">TIP!</span>
                                                             )}
                                                             {displayRec}
                                                         </p>
+                                                            
+                                                            {result.interaction.scientific_reference && (
+                                                                <div className="pt-2 flex items-center gap-2 border-t border-white/5">
+                                                                    <Info size={9} className="text-white/30" />
+                                                                    <span className="text-[9px] font-bold text-white/40 tracking-tight italic">
+                                                                        {result.interaction.scientific_reference}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )}
