@@ -109,12 +109,14 @@ export async function performAnalysis(
 
                 const allInts = (dbPartnerInteractions as Interaction[]) || [];
 
-                // 4단계: 로컬 시뮬레이션
-                const topCandidates: Array<{ pair: [Ingredient, Ingredient], interaction: Interaction, simScore: number }> = [];
+                // 4단계: 로컬 시뮬레이션 및 상위 티어 후보 수집
+                const candidatePool: Array<{ pair: [Ingredient, Ingredient], interaction: Interaction, simScore: number }> = [];
 
                 for (const partnerId of uniquePartnerIds) {
                     const partner = allIngredients.find(i => i.id === partnerId);
-                    if (!partner) continue;
+                    
+                    // CRITICAL SAFETY CHECK: 의약품(drugs)은 어떤 경우에도 추천 파트너가 될 수 없음
+                    if (!partner || partner.category === 'drugs') continue;
 
                     // 이 파트너가 현재 바구니 입장에서 가지는 "모든" 상호작용 (시너지, 주의, 충돌)
                     const simInteractions = allInts.filter(int => 
@@ -161,7 +163,8 @@ export async function performAnalysis(
                     const simRawScoreResult = 70 + simSynergyWeight + simFoundationBonus - simCautionPenalty - simConflictPenalty;
                     const simScore = Math.max(5, Math.min(100, simRawScoreResult));
 
-                    if (simScore >= bestSimScore && (simScore > score || topCandidates.length === 0)) {
+                    // 현재 점수보다 개선되거나, 최소한 점수가 유지되는 우수 후보를 풀에 추가
+                    if (simScore >= score) {
                         const originInt = potentialSynergies.find(ps => 
                             (ps.ingredient_a_id === partnerId && ingredientIds.includes(ps.ingredient_b_id)) || 
                             (ps.ingredient_b_id === partnerId && ingredientIds.includes(ps.ingredient_a_id))
@@ -170,35 +173,20 @@ export async function performAnalysis(
                         if (originInt) {
                             const originIngId = originInt.ingredient_a_id === partnerId ? originInt.ingredient_b_id : originInt.ingredient_a_id;
                             const originIng = selectedIngredients.find(si => si.id === originIngId);
-                            
                             if (originIng) {
-                                if (simScore > bestSimScore) {
-                                    topCandidates.length = 0;
-                                    topCandidates.push({ pair: [originIng!, partner], interaction: originInt, simScore });
-                                    bestSimScore = simScore;
-                                } else if (simScore === bestSimScore) {
-                                    topCandidates.push({ pair: [originIng!, partner], interaction: originInt, simScore });
-                                }
+                                candidatePool.push({ pair: [originIng!, partner], interaction: originInt, simScore });
                             }
                         }
                     }
                 }
 
-                // 4.5단계: 질적 필터링 - 점수 향상이 미미하거나 의미 없는 추천 제거 (Business Logic ✨)
-                // 만약 최고 예상 점수가 현재 점수보다 1점도 안 오르거나, 
-                // 점수가 5점 부근에서 노는 경우라면 추천을 아예 안 띄우는 게 사용자 신뢰도에 좋습니다.
-                /* 
-                const meaningfulImprovement = bestSimScore - score >= 1.0;
-                const reachesHighQuality = bestSimScore >= 80;
-
-                if (!meaningfulImprovement && !reachesHighQuality) {
-                    topCandidates.length = 0;
-                }
-                */
-
-                // 5단계: 최고 점수 후보군 중 랜덤 추출 (특정 부원료 고정 노출 방지)
-                if (topCandidates.length > 0) {
-                    const winner = topCandidates[Math.floor(Math.random() * topCandidates.length)];
+                // 5단계: 상위 티어 필터링 및 랜덤 추출 (Variety ✨)
+                if (candidatePool.length > 0) {
+                    const maxSimScore = Math.max(...candidatePool.map(c => c.simScore));
+                    // 최고 점수 대비 -3.0점 이내의 모든 후보를 상위 티어로 인정
+                    const topTierCandidates = candidatePool.filter(c => c.simScore >= maxSimScore - 3.0);
+                    
+                    const winner = topTierCandidates[Math.floor(Math.random() * topTierCandidates.length)];
                     potentialSynergy = { pair: winner.pair, interaction: winner.interaction };
                     projectedScore = winner.simScore;
                 }
