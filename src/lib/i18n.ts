@@ -21,7 +21,9 @@ export const UI_TRANSLATIONS = {
                 sleep: "🌙 꿀잠 듀오 (마그네슘+테아닌)",
                 vision: "👁️ 눈 피로 개선 (루테인+아스타잔틴)",
                 energy: "🔥 활력 충전 (B12+아르기닌)",
-                heart: "❤️ 심혈관 케어 (오메가3+CoQ10)"
+                heart: "❤️ 심혈관 케어 (오메가3+CoQ10)",
+                beauty: "👸 피부 생기 (콜라겐+C)",
+                liver: "🍻 간 건강 (밀크씨슬+B)"
             }
         },
         howItWorks: {
@@ -167,7 +169,9 @@ export const UI_TRANSLATIONS = {
                 sleep: "🌙 Sleep Duo (Mg+Theanine)",
                 vision: "👁️ Eye Care (Lutein+Astaxanthin)",
                 energy: "🔥 Energy Boost (B12+Arginine)",
-                heart: "❤️ Heart Care (Omega3+CoQ10)"
+                heart: "❤️ Heart Care (Omega3+CoQ10)",
+                beauty: "👸 Skin Beauty (Collagen+C)",
+                liver: "🍻 Liver (Milk Thistle+B)"
             }
         },
         howItWorks: {

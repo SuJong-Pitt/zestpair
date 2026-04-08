@@ -149,10 +149,10 @@ export default function HomePage() {
     const pInterval = setInterval(() => {
       setPlaceholderIndex((prev) => (prev + 1) % t.hero.placeholderExamples.length);
     }, 3000);
-    
+
     // 퀵스타트 콤보 로테이션 (5초)
     const cInterval = setInterval(() => {
-      setComboIndex((prev) => (prev + 1) % 2); // 2개 세트 로테이션
+      setComboIndex((prev) => (prev + 1) % 3); // 3개 세트 로테이션
     }, 5000);
 
     return () => {
@@ -740,65 +740,67 @@ export default function HomePage() {
               )}
             </AnimatePresence>
 
-             {/* 퀵 스타트 조합 */}
-             <motion.div
-               initial={{ opacity: 0, y: 10 }}
-               animate={{ opacity: 1, y: 0 }}
-               transition={{ delay: 1.5 }}
-               className="mt-6 flex flex-col items-center gap-3"
-             >
-               <span className="text-[10px] font-black text-emerald-400/60 uppercase tracking-[0.2em] flex items-center gap-2">
-                 <Zap size={10} className="fill-current" />
-                 {t.hero.quickStart}
-               </span>
-               <div className="flex flex-wrap justify-center gap-2 px-4 min-h-[44px]">
-                 <AnimatePresence mode="wait">
-                   <motion.div
-                     key={comboIndex}
-                     initial={{ opacity: 0, y: 5 }}
-                     animate={{ opacity: 1, y: 0 }}
-                     exit={{ opacity: 0, y: -5 }}
-                     transition={{ duration: 0.4 }}
-                     className="flex flex-wrap justify-center gap-2"
-                   >
-                     {(comboIndex === 0 ? [
-                       { id: 'immunity', tags: ['비타민C', '아연'], label: t.hero.combos.immunity },
-                       { id: 'bone', tags: ['칼슘', '비타민D'], label: t.hero.combos.bone },
-                       { id: 'sleep', tags: ['마그네슘', '테아닌'], label: t.hero.combos.sleep },
-                     ] : [
-                       { id: 'vision', tags: ['루테인', '아스타잔틴'], label: t.hero.combos.vision },
-                       { id: 'energy', tags: ['비타민B', '아르기닌'], label: t.hero.combos.energy },
-                       { id: 'heart', tags: ['오메가', '코엔자임', '큐텐'], label: t.hero.combos.heart },
-                     ]).map((combo) => (
-                       <button
-                         key={combo.id}
-                         onClick={() => {
-                           const toAdd = dbIngredients.filter(ing => 
-                             combo.tags.some(tag => 
-                                ing.name.includes(tag) || 
-                                ing.name_en.includes(tag) || 
-                                ing.slug.includes(tag.toLowerCase().replace(' ', '-'))
-                             )
-                           );
-                           toAdd.forEach(ing => {
-                             if (!selectedIngredients.some(s => s.id === ing.id)) {
-                               addIngredient(ing);
-                             }
-                           });
-                           if (toAdd.length > 0) {
+            {/* 퀵 스타트 조합 */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.5 }}
+              className="mt-6 flex flex-col items-center gap-3"
+            >
+              <span className="text-[10px] font-black text-emerald-400/60 uppercase tracking-[0.2em] flex items-center gap-2">
+                <Zap size={10} className="fill-current" />
+                {t.hero.quickStart}
+              </span>
+              <div className="flex flex-wrap justify-center gap-2 px-4 min-h-[44px]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={comboIndex}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    transition={{ duration: 0.4 }}
+                    className="flex flex-wrap justify-center gap-2"
+                  >
+                    {(comboIndex === 0 ? [
+                      { id: 'immunity', tags: ['비타민C', '아연'], label: t.hero.combos.immunity },
+                      { id: 'bone', tags: ['칼슘', '비타민D'], label: t.hero.combos.bone },
+                      { id: 'sleep', tags: ['마그네슘', 'L-테아닌'], label: t.hero.combos.sleep },
+                    ] : comboIndex === 1 ? [
+                      { id: 'vision', tags: ['루테인', '아스타잔틴'], label: t.hero.combos.vision },
+                      { id: 'energy', tags: ['비타민B12', '아르기닌'], label: t.hero.combos.energy },
+                      { id: 'heart', tags: ['오메가-3', '코엔자임Q10'], label: t.hero.combos.heart },
+                    ] : [
+                      { id: 'beauty', tags: ['콜라겐', '비타민C'], label: t.hero.combos.beauty },
+                      { id: 'liver', tags: ['밀크씨슬 (실리마린)', '비타민B12'], label: t.hero.combos.liver }
+                    ]).map((combo) => (
+                      <button
+                        key={combo.id}
+                        onClick={() => {
+                          const toAdd = dbIngredients.filter(ing =>
+                            combo.tags.some(tag =>
+                              ing.name === tag ||
+                              ing.slug === tag
+                            )
+                          );
+                          toAdd.forEach(ing => {
+                            if (!selectedIngredients.some(s => s.id === ing.id)) {
+                              addIngredient(ing);
+                            }
+                          });
+                          if (toAdd.length > 0) {
                             window.scrollTo({ top: 0, behavior: 'smooth' });
-                           }
-                         }}
-                         className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/10 text-white/80 hover:text-emerald-300 text-[10px] md:text-xs font-bold transition-all active:scale-95 shadow-lg flex items-center gap-2 group/combo"
-                       >
-                         {combo.label}
-                         <ChevronRight size={12} className="group-hover/combo:translate-x-0.5 transition-transform opacity-30 group-hover/combo:opacity-100" />
-                       </button>
-                     ))}
-                   </motion.div>
-                 </AnimatePresence>
-               </div>
-             </motion.div>
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/10 text-white/80 hover:text-emerald-300 text-[10px] md:text-xs font-bold transition-all active:scale-95 shadow-lg flex items-center gap-2 group/combo"
+                      >
+                        {combo.label}
+                        <ChevronRight size={12} className="group-hover/combo:translate-x-0.5 transition-transform opacity-30 group-hover/combo:opacity-100" />
+                      </button>
+                    ))}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </motion.div>
 
             {/* 인기 태그 */}
             <motion.div
@@ -878,7 +880,7 @@ export default function HomePage() {
                       {/* 체크 뱃지 */}
                       <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
                         <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                          <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
                       {/* 이모지 */}
