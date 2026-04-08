@@ -3,13 +3,13 @@
 import { useState, memo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { 
-    Sparkles, 
-    Zap, 
-    TrendingUp, 
-    AlertTriangle, 
-    XCircle, 
-    Share2, 
+import {
+    Sparkles,
+    Zap,
+    TrendingUp,
+    AlertTriangle,
+    XCircle,
+    Share2,
     Download,
     Loader2,
     ChevronDown
@@ -49,23 +49,23 @@ const cardTypeConfig = {
     }
 } as const;
 
-const SynergyCard = memo(function SynergyCard({ 
-    result, 
-    index 
-}: { 
-    result: InteractionResult; 
+const SynergyCard = memo(function SynergyCard({
+    result,
+    index
+}: {
+    result: InteractionResult;
     index: number;
 }) {
     const { language } = useBasketStore();
     const t = UI_TRANSLATIONS[language];
-    
+
     if (!result.interaction) return null;
-    
+
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSharing, setIsSharing] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
     const reportRef = useRef<HTMLDivElement>(null);
-    
+
     const config = cardTypeConfig[result.interaction.type];
     const Icon = config.icon;
 
@@ -74,7 +74,7 @@ const SynergyCard = memo(function SynergyCard({
     const displayRec = language === "ko" ? result.interaction.recommendation : (result.interaction.recommendation_en || result.interaction.recommendation);
     const nameA = language === "ko" ? result.pair[0].name : result.pair[0].name_en;
     const nameB = language === "ko" ? result.pair[1].name : result.pair[1].name_en;
-    
+
     const typeString = result.interaction.type === 'SYNERGY' ? t.results.typeSynergy : result.interaction.type === 'CAUTION' ? t.results.typeCaution : t.results.typeConflict;
 
     const handleShare = async (e: React.MouseEvent) => {
@@ -129,17 +129,17 @@ const SynergyCard = memo(function SynergyCard({
             transition={{ duration: 0.4, delay: index * 0.05 }}
             className={cn(
                 "w-full rounded-2xl border backdrop-blur-md overflow-hidden transition-all duration-300",
-                config.bg, 
+                config.bg,
                 config.border,
                 isExpanded ? "shadow-lg" : "shadow-sm"
             )}
         >
-            <div 
+            <div
                 ref={reportRef}
                 className="w-full relative flex flex-col"
             >
                 {/* --- Collapsed Header View --- */}
-                <div 
+                <div
                     onClick={() => setIsExpanded(!isExpanded)}
                     className="flex flex-col sm:flex-row items-start sm:items-center p-4 sm:p-5 gap-3.5 sm:gap-4 cursor-pointer relative z-10 select-none overflow-hidden"
                 >
@@ -172,7 +172,7 @@ const SynergyCard = memo(function SynergyCard({
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* Middle: Content Block (Title + Names) */}
                     <div className="flex-1 min-w-0 py-1 mt-2.5 sm:mt-0 px-0.5">
                         <div className="flex items-start gap-1.5 mb-1 sm:mb-1.5">
@@ -222,44 +222,55 @@ const SynergyCard = memo(function SynergyCard({
                                         </p>
                                     </div>
 
-                                    {/* Actionable Advice / Pori's Solution */}
-                                    {displayRec && (
-                                        <div className={cn(
-                                            "relative text-left mt-4 p-4 md:p-5 rounded-2xl border shadow-inner",
-                                            (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") 
-                                                ? "bg-gradient-to-br from-amber-500/10 to-orange-500/5 border-amber-500/20" 
-                                                : "bg-emerald-500/5 border-emerald-500/20"
-                                        )}>
-                                            {(result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") && (
-                                                <div className="absolute -top-6 -right-2 w-12 h-12 md:w-14 md:h-14 z-10 drop-shadow-xl select-none hidden sm:block">
-                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                    <img src="/hero-pori.png" alt="Pori" className="w-full h-full object-contain" />
+                                            {displayRec && (
+                                                <div className={cn(
+                                                    "relative text-left mt-4 p-4 md:p-5 rounded-2xl border shadow-inner transition-all duration-500",
+                                                    (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT")
+                                                        ? "bg-gradient-to-br from-amber-500/10 to-orange-500/5 border-amber-500/20"
+                                                        : "bg-emerald-500/5 border-emerald-500/20"
+                                                )}>
+                                                    {/* Dynamic Pori with Glass Frame ✨ */}
+                                                    <div className="absolute -top-10 -right-2 w-14 h-14 md:w-16 md:h-16 z-30 select-none hidden sm:block group/pori">
+                                                        <div className="relative w-full h-full p-1 bg-slate-900/80 border border-white/20 rounded-2xl backdrop-blur-md shadow-2xl overflow-hidden ring-4 ring-black/20">
+                                                            <img 
+                                                                src={`/images/share/pori-kakao-${Math.round((result.interaction.type === 'SYNERGY' ? 100 : result.interaction.type === 'CAUTION' ? 40 : 10) / 10) * 10}.png`} 
+                                                                alt="Pori" 
+                                                                className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover/pori:scale-110" 
+                                                            />
+                                                            <motion.div 
+                                                                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                                                                transition={{ duration: 2, repeat: Infinity }}
+                                                                className={cn(
+                                                                    "absolute top-2 right-2 w-2 h-2 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]",
+                                                                    result.interaction.type === 'SYNERGY' ? "bg-emerald-400" : result.interaction.type === 'CAUTION' ? "bg-amber-400" : "bg-rose-400"
+                                                                )}
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="relative z-20">
+                                                        <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-white/10 border border-white/10 rounded-md mb-3">
+                                                            <Sparkles size={10} className={(result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") ? "text-amber-400" : "text-emerald-400"} />
+                                                            <span className={cn(
+                                                                "font-black text-[9px] md:text-[10px] uppercase tracking-widest",
+                                                                (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") ? "text-amber-300" : "text-emerald-300"
+                                                            )}>
+                                                                {language === 'ko' ? 'Pori의 해결책' : "Pori's Solution"}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-[13px] md:text-[14px] text-white/90 font-medium leading-relaxed tracking-tight break-words pr-2 sm:pr-10">
+                                                            {language === 'ko' && (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") && (
+                                                                <span className="text-amber-400 font-[1000] mr-1.5 block mb-1">괜찮아요! 🙌</span>
+                                                            )}
+                                                            {displayRec}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             )}
-                                            
-                                            <div className="relative z-20">
-                                                <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-white/10 border border-white/10 rounded-md mb-3">
-                                                    <Sparkles size={10} className={(result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") ? "text-amber-400" : "text-emerald-400"} />
-                                                    <span className={cn(
-                                                        "font-black text-[9px] md:text-[10px] uppercase tracking-widest",
-                                                        (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") ? "text-amber-300" : "text-emerald-300"
-                                                    )}>
-                                                        {language === 'ko' ? 'Pori의 해결책' : "Pori's Solution"}
-                                                    </span>
-                                                </div>
-                                                <p className="text-[13px] md:text-[14px] text-white/90 font-medium leading-relaxed tracking-tight break-words">
-                                                    {language === 'ko' && (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") && (
-                                                        <span className="text-amber-400 font-[1000] mr-1.5 block mb-1">괜찮아요! 🙌</span>
-                                                    )}
-                                                    {displayRec}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    )}
 
                                     {/* Action Buttons (Share & Download) */}
                                     <div className="flex items-center justify-end gap-2 pt-2">
-                                        <button 
+                                        <button
                                             onClick={handleShare}
                                             disabled={isSharing}
                                             className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl flex items-center gap-2 border border-white/10 transition-colors active:scale-95"
@@ -267,7 +278,7 @@ const SynergyCard = memo(function SynergyCard({
                                             {isSharing ? <Loader2 size={12} className="animate-spin" /> : <Share2 size={12} />}
                                             <span className="text-[9px] font-black tracking-widest uppercase">{language === 'ko' ? '공유' : 'Share'}</span>
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={handleDownload}
                                             disabled={isDownloading}
                                             className={cn(

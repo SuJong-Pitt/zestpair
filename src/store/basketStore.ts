@@ -94,9 +94,11 @@ export const useBasketStore = create<BasketState>()(
             name: "zestpair-basket", // localStorage key
             storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({
-                // 분석 상태는 저장하지 않고 선택된 영양제만 저장
+                // 이제 분석 결과도 로컬에 보관하여 로그인 없이도 히스토리 유지 가능 ✨
                 selectedIngredients: state.selectedIngredients,
                 language: state.language,
+                analysisResult: state.analysisResult,
+                hasResult: state.hasResult,
             }),
         }
     )

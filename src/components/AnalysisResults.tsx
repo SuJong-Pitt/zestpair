@@ -11,7 +11,8 @@ import {
     ArrowRight,
     ShoppingCart,
     RefreshCcw,
-    FlaskConical
+    FlaskConical,
+    Info
 } from "lucide-react";
 import { cn, encodeShareParams, getKakaoShareDetails } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 // New modular components
 import ScoreRing from "./analysis/ScoreRing";
 import InteractionCard from "./analysis/InteractionCard";
+import ReportSummary from "./analysis/ReportSummary";
 import Toast from "./ui/Toast";
 
 interface AnalysisResultsProps {
@@ -63,7 +65,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
         const { shareUrl, score } = getShareUrlAndData();
 
         const { imageFileName, title, description } = getKakaoShareDetails(score, language);
-        
+
         // 이미지는 Kakao 서버가 접근 가능해야 하므로, 로컬 테스트 중에도 운영 서버 이미지를 참조하게 합니다.
         const imageBase = "https://zestpair.com";
         const targetImageUrl = `${imageBase}/images/share/${imageFileName}`;
@@ -117,7 +119,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
         };
 
         if (navigator.share) {
-            try { await navigator.share(shareData); } catch (err) {}
+            try { await navigator.share(shareData); } catch (err) { }
         } else {
             try {
                 await navigator.clipboard.writeText(shareUrl);
@@ -126,7 +128,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     message: language === 'ko' ? "링크가 복사되었습니다!" : "Link copied to clipboard!"
                 });
                 setTimeout(() => setToast({ show: false, message: "" }), 3000);
-            } catch (err) {}
+            } catch (err) { }
         }
     };
 
@@ -144,8 +146,8 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ 
-                    opacity: isExiting ? 0 : 1, 
+                animate={{
+                    opacity: isExiting ? 0 : 1,
                     y: isExiting ? 40 : 0,
                     scale: isExiting ? 0.98 : 1
                 }}
@@ -191,9 +193,9 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                 <motion.div
                                     initial={{ scale: 0.8, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
-                                    className="relative mb-6"
+                                    className="relative mb-2"
                                 >
-                                    <ScoreRing score={result.score} size={isMobile ? 220 : 300} />
+                                    <ScoreRing score={result.score} size={isMobile ? 180 : 260} />
                                 </motion.div>
 
                                 {/* AI Badge */}
@@ -201,100 +203,119 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     initial={{ y: -10, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.2 }}
-                                    className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md mb-6"
+                                    className="flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md mb-4"
                                 >
-                                    <Sparkles size={12} className="text-indigo-300 animate-pulse" />
-                                    <span className="text-[9px] md:text-[10px] font-black text-indigo-100 uppercase tracking-[0.2em] pt-0.5">AI Precision Analysis</span>
+                                    <Sparkles size={10} className="text-indigo-300" />
+                                    <span className="text-[8px] md:text-[9px] font-black text-indigo-100 uppercase tracking-[0.2em]">AI Precision Analysis</span>
                                 </motion.div>
 
                                 {/* Title & Motivation */}
-                                <div className="mb-6 space-y-1.5">
+                                <div className="mb-4 space-y-1">
                                     <motion.h2
                                         initial={{ scale: 0.95, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
                                         transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-                                        className="text-3xl md:text-5xl font-[1000] tracking-tighter leading-none text-white drop-shadow-xl"
+                                        className="text-2xl md:text-4xl font-[1000] tracking-tighter leading-none text-white"
                                     >
-                                        {result.score >= 70 ? t.results.synergy : result.score >= 40 ? t.results.caution : t.results.conflict}
+                                        {result.score >= 90 ? t.results.synergy : result.score >= 70 ? (language === 'ko' ? "좋은 조합입니다!" : "Great Match!") : result.score >= 40 ? t.results.caution : t.results.conflict}
                                     </motion.h2>
                                     <motion.p
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ delay: 0.5 }}
-                                        className="text-base md:text-lg font-black text-emerald-400/90 tracking-tight"
+                                        className="text-sm md:text-base font-black text-emerald-400/90 tracking-tight"
                                     >
-                                        {result.score >= 70 ? t.results.bestMix : result.score >= 40 ? t.results.potentialConflict : t.results.dangerous}
+                                        {result.score >= 90 ? t.results.bestMix : result.score >= 70 ? (language === 'ko' ? "서로의 효능을 보완하는 구성" : "Ingredients complement each other") : result.score >= 40 ? t.results.potentialConflict : t.results.dangerous}
                                     </motion.p>
                                 </div>
 
-                                {/* Summary Box */}
-                                <div className="text-[13px] md:text-base font-bold text-white/70 max-w-xl mb-8 leading-relaxed">
-                                    {result.summary}
-                                </div>
+                                {/* Summary Box - 3 Second Insight with Pori ✨ */}
+                                <ReportSummary result={result} className="w-full max-w-2xl mb-4" />
 
-                                {/* Share Action (Two-Track) */}
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.4 }}
-                                    className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 w-full"
-                                >
-                                    {/* 1. 카카오톡 전용 공유 버튼 */}
+                                {/* Score Rationale Breakdown - Trust Building ✨ */}
+                                {(() => {
+                                    const synergyScore = result.synergies.length * 20;
+                                    const basisScore = 70 + Math.max(0, (result.ingredients.length - 2) * 10);
+                                    const penalties = (result.score - (synergyScore + basisScore));
+                                    
+                                    return (
+                                        <div className="w-full max-w-xl mb-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5">
+                                            <div className="flex items-center justify-between mb-4 px-2">
+                                                <div className="flex items-center gap-1.5 align-middle">
+                                                    <Info size={10} className="text-slate-500" />
+                                                    <h5 className="text-[9px] font-black uppercase tracking-widest text-slate-500 pt-0.5">
+                                                        {language === 'ko' ? "점수 산정 근거" : "Score Rationale"}
+                                                    </h5>
+                                                </div>
+                                                <div className="h-px flex-1 bg-white/5 ml-4" />
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-tighter mb-1">Synergy</span>
+                                                    <span className="text-base font-black text-emerald-400">+{synergyScore}</span>
+                                                </div>
+                                                <div className="flex flex-col items-center border-x border-white/5">
+                                                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-tighter mb-1">Basis</span>
+                                                    <span className="text-base font-black text-blue-400">+{basisScore}</span>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-tighter mb-1">Risk</span>
+                                                    <span className="text-base font-black text-rose-400">{penalties < 0 ? penalties : 0}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+
+
+                                {/* Secondary Actions: Share (Social Proof ✨) */}
+
+                                {/* Secondary Actions: Share (Social Proof ✨) */}
+                                <div className="flex flex-wrap items-center justify-center gap-3 w-full max-w-2xl mb-8">
                                     <Button
                                         onClick={handleKakaoShare}
-                                        className="group relative h-12 md:h-14 rounded-full border border-[#FEE500]/30 hover:border-[#FEE500]/50 bg-[#FEE500] text-[#3A1D1D] font-black transition-all duration-300 shadow-[0_10px_30px_rgba(254,229,0,0.15)] w-full sm:w-[240px] flex items-center justify-center p-0 active:scale-95"
+                                        className="h-10 md:h-12 rounded-xl bg-[#FEE500] text-[#3A1D1D] font-black border border-[#FEE500]/30 hover:bg-[#FEE500]/90 transition-all px-6 active:scale-95"
                                     >
-                                        <div className="relative flex items-center gap-3 text-sm md:text-base">
-                                            <img src="/icons/kakao.svg" className="w-8 h-8 md:w-10 md:h-10 rounded-xl" alt="Kakao" />
-                                            <span className="font-extrabold">{language === 'ko' ? "카카오톡 공유" : "Share via Kakao"}</span>
+                                        <div className="flex items-center gap-2 text-xs md:text-sm">
+                                            <img src="/icons/kakao.svg" className="w-5 h-5" alt="K" />
+                                            <span>Kakao</span>
                                         </div>
                                     </Button>
-
-                                    {/* 2. 라인(LINE) 전용 공유 버튼 */}
-                                    <Button
-                                        onClick={() => {
-                                            const { shareUrl, score } = getShareUrlAndData();
-                                            const { title } = getKakaoShareDetails(score, language);
-                                            const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
-                                            window.open(lineUrl, '_blank');
-                                        }}
-                                        className="group relative h-12 md:h-14 rounded-full border border-[#00B900]/30 hover:border-[#00B900]/50 bg-[#00B900] text-white font-black transition-all duration-300 shadow-[0_10px_30px_rgba(0,185,0,0.15)] w-full sm:w-[240px] flex items-center justify-center p-0 active:scale-95"
-                                    >
-                                        <div className="relative flex items-center gap-3 text-sm md:text-base">
-                                            <img src="/icons/line.svg" className="w-8 h-8 md:w-10 md:h-10 rounded-xl" alt="LINE" />
-                                            <span className="font-extrabold">{language === 'ko' ? "LINE 공유" : "LINE Share"}</span>
-                                        </div>
-                                    </Button>
-
-                                    {/* 3. 일반 공유 (링크) 버튼 */}
                                     <Button
                                         onClick={handleNativeShare}
                                         variant="outline"
-                                        className="group relative px-6 md:px-8 h-12 md:h-14 rounded-full border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 text-white font-black transition-all duration-300 backdrop-blur-xl w-full sm:w-auto"
+                                        className="h-10 md:h-12 rounded-xl bg-white/5 border-white/10 hover:bg-white/10 text-white font-black px-6 active:scale-95 text-xs md:text-sm"
                                     >
-                                        <div className="relative flex items-center gap-2 text-sm md:text-base">
-                                            <Share2 size={16} />
-                                            <span>{language === 'ko' ? "링크 복사" : "Copy Link"}</span>
-                                        </div>
+                                        <Share2 size={14} className="mr-2" />
+                                        COPY LINK
                                     </Button>
-                                </motion.div>
+                                </div>
 
-                                {/* Ingredients Capsule List */}
-                                <div className="flex flex-wrap items-center justify-center gap-2 w-full max-w-2xl">
-                                    {result.ingredients.map((ing, i) => (
-                                        <motion.div
-                                            key={ing.id}
-                                            initial={{ opacity: 0, scale: 0.9 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: 0.1 + i * 0.05 }}
-                                            className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 md:px-4 md:py-2 backdrop-blur-sm"
-                                        >
-                                            <span className="text-base md:text-xl">{ing.icon_emoji}</span>
-                                            <span className="text-[11px] md:text-[13px] font-black text-white/90">
-                                                {language === "ko" ? ing.name : ing.name_en}
-                                            </span>
-                                        </motion.div>
-                                    ))}
+
+                                {/* Ingredients Analyzed Section (Data Focus ✨) */}
+                                <div className="space-y-4 w-full max-w-2xl">
+                                    <div className="flex items-center gap-2 px-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em]">
+                                            {language === 'ko' ? "데이터 매핑 대상 성분" : "Ingredients Analyzed"}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-wrap items-center justify-center gap-2">
+                                        {result.ingredients.map((ing, i) => (
+                                            <motion.div
+                                                key={ing.id}
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ delay: 0.1 + i * 0.05 }}
+                                                className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 md:px-4 md:py-2 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all cursor-default"
+                                            >
+                                                <span className="text-base md:text-xl">{ing.icon_emoji}</span>
+                                                <span className="text-[11px] md:text-[13px] font-black text-white/90">
+                                                    {language === "ko" ? ing.name : ing.name_en}
+                                                </span>
+                                            </motion.div>
+                                        ))}
+                                    </div>
                                 </div>
                             </CardContent>
                         </div>
@@ -385,7 +406,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                         }}
                                     >
                                         <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md -z-10" />
-                                        
+
                                         {/* Luxury Scan Lines */}
                                         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2.5rem] opacity-30 mix-blend-overlay">
                                             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:100%_4px]" />
@@ -410,7 +431,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                         <div className="relative w-32 h-32 md:w-44 md:h-44 flex items-center justify-center z-10">
                                             {/* Outer Dashed Tech Ring */}
                                             <div className="absolute inset-2 rounded-full border border-dashed border-slate-600/20 animate-[spin_30s_linear_infinite]" />
-                                            
+
                                             {/* Inner Glow Base */}
                                             <div className="absolute inset-6 rounded-full bg-slate-500/5 blur-xl group-hover/hud:bg-slate-500/10 transition-colors duration-700" />
 
@@ -422,7 +443,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                                     </linearGradient>
                                                 </defs>
                                                 <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.03)" strokeWidth="10" fill="none" />
-                                                
+
                                                 <motion.circle
                                                     cx="50" cy="50" r="42"
                                                     stroke="url(#currentGradient)" strokeWidth="8" fill="none" strokeLinecap="round"
@@ -498,12 +519,12 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                         <div className="relative w-32 h-32 md:w-44 md:h-44 flex items-center justify-center z-10">
                                             {/* Outer Dashed Tech Ring */}
                                             <div className={cn("absolute inset-2 rounded-full border border-dashed animate-[spin_20s_linear_infinite_reverse]", isPerfect ? "border-amber-500/30" : "border-emerald-500/30")} />
-                                            
+
                                             {/* Inner Intense Glow Base */}
-                                            <motion.div 
+                                            <motion.div
                                                 animate={{ scale: [1, 1.05, 1], opacity: [0.6, 0.9, 0.6] }}
                                                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                                                className={cn("absolute inset-4 rounded-full blur-[24px] -z-10", isPerfect ? "bg-amber-500/20" : "bg-emerald-500/25")} 
+                                                className={cn("absolute inset-4 rounded-full blur-[24px] -z-10", isPerfect ? "bg-amber-500/20" : "bg-emerald-500/25")}
                                             />
 
                                             <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
@@ -519,7 +540,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                                         <stop offset="100%" stopColor="#047857" />
                                                     </linearGradient>
                                                 </defs>
-                                                
+
                                                 {/* Track */}
                                                 <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.03)" strokeWidth="10" fill="none" />
 
@@ -531,18 +552,18 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                                     initial={{ strokeDashoffset: 264 }}
                                                     whileInView={{ strokeDashoffset: 264 - (264 * displayProjectedScore) / 100 }}
                                                     transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-                                                    style={{ 
+                                                    style={{
                                                         filter: isPerfect ? "drop-shadow(0 0 12px rgba(245,158,11,0.8))" : "drop-shadow(0 0 12px rgba(16,185,129,0.8))"
                                                     }}
                                                 />
                                             </svg>
-                                            
+
                                             <div className="absolute flex flex-col items-center justify-center mt-1">
-                                                <motion.span 
+                                                <motion.span
                                                     initial={{ scale: 0.8, opacity: 0 }}
                                                     whileInView={{ scale: 1, opacity: 1 }}
                                                     transition={{ duration: 0.5, delay: 1 }}
-                                                    className={cn("text-4xl md:text-5xl font-[1000] leading-none tracking-tighter", isPerfect ? "text-amber-300" : "text-emerald-300")} 
+                                                    className={cn("text-4xl md:text-5xl font-[1000] leading-none tracking-tighter", isPerfect ? "text-amber-300" : "text-emerald-300")}
                                                     style={{ textShadow: isPerfect ? "0 4px 20px rgba(245,158,11,0.6)" : "0 4px 20px rgba(16,185,129,0.6)" }}
                                                 >
                                                     {displayProjectedScore}
@@ -699,12 +720,12 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                             onClick={() => {
                                 // 1. 먼저 부드러운 퇴장 애니메이션을 시작합니다.
                                 setIsExiting(true);
-                                
+
                                 // 2. 애니메이션이 어느 정도 진행된 후(약 400ms) 실제 이동을 시작합니다.
                                 setTimeout(() => {
                                     router.push("/");
                                     window.scrollTo({ top: 0, behavior: "smooth" });
-                                    
+
                                     // 3. 페이지가 완전히 넘어가기 직전에 바구니를 비워 에러 화면을 방지합니다.
                                     setTimeout(() => {
                                         clearBasket();
