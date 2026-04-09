@@ -142,10 +142,16 @@ const SynergyCard = memo(function SynergyCard({
                 {/* --- Collapsed Header View --- */}
                 <div
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="flex flex-col sm:flex-row items-start sm:items-center p-4 sm:p-5 gap-3.5 sm:gap-4 cursor-pointer relative z-10 select-none overflow-hidden"
+                    className="group/header flex flex-col sm:flex-row items-start sm:items-center p-4 sm:p-5 gap-3.5 sm:gap-4 cursor-pointer relative z-10 select-none overflow-hidden transition-all duration-500 hover:bg-white/[0.03]"
                 >
+                    {/* Background Glow Overlay (Hover Sensitive) */}
+                    <div className={cn(
+                        "absolute inset-0 opacity-0 group-hover/header:opacity-100 transition-opacity duration-700 pointer-events-none -z-10",
+                        result.interaction.type === 'SYNERGY' ? "bg-emerald-500/5" : result.interaction.type === 'CAUTION' ? "bg-amber-500/5" : "bg-rose-500/5"
+                    )} />
+
                     {/* Background Subtle Gradient - Desktop orientation */}
-                    <div className={cn("absolute inset-y-0 left-0 w-24 bg-gradient-to-r pointer-events-none opacity-30", config.gradient)} />
+                    <div className={cn("absolute inset-y-0 left-0 w-32 bg-gradient-to-r pointer-events-none opacity-40 group-hover/header:opacity-70 transition-opacity duration-500", config.gradient)} />
 
                     {/* Left/Top Row: Icons and mobile Badge */}
                     <div className="flex items-center justify-between w-full sm:w-auto shrink-0 relative z-10">
@@ -195,8 +201,16 @@ const SynergyCard = memo(function SynergyCard({
                             <span className={cn("w-1.5 h-1.5 rounded-full animate-pulse", config.dot)} />
                             <span>{typeString}</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
+                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shadow-inner relative group-hover/header:border-emerald-500/30 transition-colors">
                             <ChevronDown size={14} className={cn("text-slate-400 transition-transform duration-300", isExpanded && "rotate-180")} />
+                            {/* Visual Hint Pulse */}
+                            {!isExpanded && (
+                                <motion.div 
+                                    animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                    className="absolute inset-0 rounded-full border border-emerald-500/40 pointer-events-none"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
