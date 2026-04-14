@@ -490,14 +490,14 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                                                 className="absolute inset-y-0 w-2/3 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-[40deg] z-20 pointer-events-none"
                                             />
 
-                                            <div className="flex items-center gap-1.5 md:gap-3 relative z-10">
+                                            <div className="flex items-center gap-1.5 md:gap-3 relative z-10 px-4">
                                                 <Zap size={14} fill="currentColor" className="animate-pulse shrink-0 md:size-[22px]" />
-                                                <span className="text-sm md:text-2xl font-[1000] tracking-tighter whitespace-nowrap">
-                                                    {isKo ? "지금 잠재력 깨우기" : "Awaken Your Potential"}
+                                                <span className="text-[12px] md:text-2xl font-[1000] tracking-tight md:tracking-tighter whitespace-nowrap">
+                                                    {isKo ? "쿠팡에서 잠재력 깨우기" : "Awaken Your Potential"}
                                                 </span>
                                             </div>
-                                            <span className="relative z-10 text-[7px] md:text-[10px] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase opacity-80 group-hover:opacity-100 transition-opacity">
-                                                {isKo ? "시너지 최적화 시작" : "Start Optimization"}
+                                            <span className="relative z-10 text-[8px] md:text-[10px] font-black tracking-[0.15em] md:tracking-[0.3em] uppercase opacity-80 group-hover:opacity-100 transition-opacity">
+                                                {isKo ? "최저가 시너지 조합 찾기" : "Start Optimization"}
                                             </span>
                                             
                                             {/* Magnetic Glow Reveal */}
@@ -540,6 +540,27 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                         </div>
                     </div>
                 </div>
+
+                {/* Coupang Partners Disclosure - HUD Style Footnote */}
+                {isKo && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        className="flex flex-col items-center gap-3 pt-12 pb-4 opacity-20 hover:opacity-40 transition-opacity duration-700 select-none"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-[1px] bg-white/10" />
+                            <div className="flex items-center gap-2 grayscale opacity-50 px-2 py-0.5 rounded border border-white/10 bg-white/5">
+                                <ShoppingCart size={8} className="text-white" />
+                                <span className="text-[7px] font-black uppercase tracking-[0.25em] text-white">Affiliate Disclosure</span>
+                            </div>
+                            <div className="w-8 h-[1px] bg-white/10" />
+                        </div>
+                        <p className="text-[9px] md:text-[11px] font-medium text-slate-400 text-center leading-relaxed px-6 max-w-xl break-keep">
+                            이 게시물은 쿠팡 파트너스 활동의 일환으로,<br className="md:hidden" /> 이에 따른 일정액의 수수료를 제공받습니다.
+                        </p>
+                    </motion.div>
+                )}
             </div>
         </motion.div>
     );
