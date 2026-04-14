@@ -359,7 +359,7 @@ export default function HomePage() {
           <div className="flex items-center gap-2 lg:gap-3 pointer-events-auto">
             <button
               onClick={() => setIsGuideOpen(true)}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl text-emerald-400 font-black text-[10px] transition-all hover:bg-emerald-500/20 hover:text-emerald-300 hover:scale-105 active:scale-95 shadow-lg relative group/guide overflow-hidden"
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl text-white/80 font-black text-[10px] transition-all hover:bg-emerald-500/20 hover:text-white hover:scale-105 active:scale-95 shadow-lg relative group/guide overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/10 to-transparent -translate-x-[150%] group-hover/guide:translate-x-[150%] transition-transform duration-1000 ease-in-out" />
               <span>{language === 'ko' ? '가이드보기' : 'Guide'}</span>
@@ -380,131 +380,105 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="inline-flex items-center gap-3 mb-5 md:mb-8 px-5 py-2.5 rounded-full relative group cursor-default"
+            className="inline-flex items-center gap-3 mb-6 md:mb-10 px-5 py-2.5 rounded-full relative group cursor-default"
           >
-            {/* 뒤 배경 글로우 */}
-            <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
-            <div className="relative flex items-center gap-2.5 md:gap-3 px-4 md:px-6 py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
-              <BrandLogo size={32} />
-              <BrandName size="text-[20px] md:text-[26px]" />
-              <div className="w-px h-3 md:h-4 bg-white/20 mx-1" />
-              <Link
-                href="/about"
-                className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#6ee7b7]/80 flex items-center gap-1.5 hover:text-[#6ee7b7] transition-all group/core"
-              >
-                <div className="flex items-center gap-1">
-                  <div className="dot-pulse w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]" />
-                  <span>AI Core v2.5</span>
-                </div>
-                <Info size={10} className="text-[#6ee7b7]/40 group-hover/core:text-[#6ee7b7] transition-colors" />
-              </Link>
+            <div className="relative flex items-center gap-2 md:gap-3.5 px-4 md:px-7 py-2 md:py-3 rounded-full bg-slate-900/40 border border-emerald-500/20 backdrop-blur-2xl shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+              <BrandLogo size={28} />
+              <BrandName size="text-[18px] md:text-[28px]" />
             </div>
           </motion.div>
 
           {/* === 메인 헤드라인 === */}
-          <h1 className="mb-2 md:mb-4 tracking-tight">
-            {/* 라인 1: 작은 선행 텍스트 */}
+          <div className="mb-2 md:mb-4 flex flex-col items-center gap-2">
+            {/* 스크린샷 1 컨셉: 상단 배지 라벨 */}
+            {/* 프리즘 텍스트 & 아이콘 구성 (박스 제거) */}
             <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative cursor-default"
+            >
+                <div className="flex justify-center w-full font-[1000] text-[16px] md:text-4xl tracking-[0.05em] md:tracking-[0.1em] text-center max-w-[90vw]">
+                  <span 
+                    className="bg-clip-text text-transparent animate-prism-text"
+                    style={{
+                      backgroundImage: "linear-gradient(90deg, #6ee7b7, #34d399, #6ee7b7, #60a5fa, #a78bfa, #f472b6, #6ee7b7)",
+                    }}
+                  >
+                    {(() => {
+                      const text = t.hero.title1.replace('🛡️ ', '');
+                      if (language === 'ko') {
+                        const parts = text.split('무료');
+                        return (
+                          <>
+                            {parts[0]}
+                            <motion.span 
+                              className="relative inline-block mx-1 font-[1000] italic"
+                              animate={{ 
+                                scale: [1, 1.15, 1],
+                                rotate: [-2, 2, -2]
+                              }}
+                              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                              style={{
+                                color: "#10b981",
+                                textShadow: "0 0 15px rgba(16,185,129,0.8), 0 0 30px rgba(16,185,129,0.4)",
+                                filter: "drop-shadow(0 0 10px rgba(255,255,255,0.3))"
+                              }}
+                            >
+                              무료
+                            </motion.span>
+                            {parts[1]}
+                          </>
+                        );
+                      } else {
+                        const parts = text.split('FREE');
+                        return (
+                          <>
+                            {parts[0]}
+                            <motion.span 
+                              className="relative inline-block mx-1 font-[1000] italic"
+                              animate={{ 
+                                scale: [1, 1.15, 1],
+                                rotate: [-2, 2, -2]
+                              }}
+                              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                              style={{
+                                color: "#06b6d4",
+                                textShadow: "0 0 15px rgba(6,182,212,0.8), 0 0 30px rgba(6,182,212,0.4)",
+                                filter: "drop-shadow(0 0 10px rgba(255,255,255,0.3))"
+                              }}
+                            >
+                              FREE
+                            </motion.span>
+                            {parts[1]}
+                          </>
+                        );
+                      }
+                    })()}
+                  </span>
+                </div>
+            </motion.div>
+
+            {/* 메인 타이틀: 깔끔한 텍스트 한 줄 구성 */}
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-xs md:text-xl font-black uppercase mb-1 md:mb-2 text-emerald-400 tracking-[0.2em]"
+              transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="text-xs md:text-2xl font-bold tracking-tight text-white/90 drop-shadow-md px-4"
             >
-              {t.hero.title1}
-            </motion.div>
-
-            {/* 라인 2: 핵심 임팩트 문구 */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.88, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="relative inline-block"
-            >
-              {/* 뒤 글로우 */}
-              <span
-                aria-hidden
-                className="absolute -inset-2 rounded-[2.5rem] opacity-40 blur-xl md:blur-2xl pointer-events-none"
-                style={{ background: "linear-gradient(135deg, #10b981 0%, #0891b2 50%, #7c3aed 100%)", willChange: "filter" }}
-              />
-              {/* 홀로그램 박스 */}
-              <motion.span
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                style={{ transformOrigin: "left" }}
-                className="absolute inset-0 rounded-[2rem] pointer-events-none"
-              >
-                <span
-                  className="absolute inset-0 rounded-[2rem]"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(8,145,178,0.1) 50%, rgba(124,58,237,0.12) 100%)",
-                    border: "1.5px solid rgba(16,185,129,0.4)",
-                    boxShadow: "0 0 50px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.07)",
-                  }}
-                />
-              </motion.span>
-
-              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-[1.1] tracking-tighter text-center text-white drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)]">
                 {language === 'ko' ? (
-                  <>
-                    <span className="relative inline-block mr-1 md:mr-2">
-                      <span className="relative z-10 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.7)]">데이터로 증명하는</span>
-                      <span className="absolute bottom-0 left-0 w-full h-[4px] bg-emerald-500/30 blur-[1px] rounded-full" />
-                    </span>
-                    완벽한 영양제 궁합
-                  </>
+                    <>
+                    <span className="text-emerald-400">데이터로 증명하는</span> 완벽한 영양제 궁합
+                    </>
                 ) : (
-                  <>
-                    The perfect pairing, <br className="lg:hidden" />
-                    <span className="relative inline-block ml-1.5 md:ml-2">
-                      <span className="relative z-10 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.7)]">proven by data</span>
-                      <span className="absolute bottom-0 left-0 w-full h-[4px] bg-emerald-500/30 blur-[1px] rounded-full" />
-                    </span>
-                  </>
+                    <>
+                    <span className="text-emerald-400">Proven by Data,</span> Perfect Supplement Pairing
+                    </>
                 )}
-              </span>
+            </motion.h1>
+          </div>
 
-              {/* 코너 브래킷 */}
-              {[["top-1.5 left-2.5", "border-t-2 border-l-2"], ["top-1.5 right-2.5", "border-t-2 border-r-2"], ["bottom-1.5 left-2.5", "border-b-2 border-l-2"], ["bottom-1.5 right-2.5", "border-b-2 border-r-2"]].map(([pos, border], i) => (
-                <span key={i} className={`absolute ${pos} w-4 h-4 ${border} border-emerald-400/60 hidden md:block`} style={{ borderRadius: "3px" }} />
-              ))}
-              {/* 스파클 */}
-              <motion.span
-                animate={{ opacity: [0, 1, 0], scale: [0.6, 1.4, 0.6], rotate: [-10, 10, -10] }}
-                transition={{ duration: 2.8, repeat: Infinity, delay: 1.2 }}
-                className="absolute -top-6 -right-6 hidden md:block"
-              >
-                <Sparkles size={26} className="text-amber-300" />
-              </motion.span>
-              <motion.span
-                animate={{ opacity: [0, 0.8, 0], scale: [0.5, 1.2, 0.5] }}
-                transition={{ duration: 3.5, repeat: Infinity, delay: 2.5 }}
-                className="absolute -bottom-5 -left-4 hidden md:block"
-              >
-                <Sparkles size={18} className="text-cyan-300" />
-              </motion.span>
-            </motion.div>
-          </h1>
 
-          {/* === 서브타이틀 === */}
-          <motion.p
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.85 }}
-            className="text-[13px] md:text-base mb-3 md:mb-5 leading-relaxed max-w-md mx-auto px-2"
-            style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500 }}
-          >
-            {t.hero.subtitle1}{" "}
-            <span
-              style={{
-                background: "linear-gradient(90deg, #6ee7b7, #22d3ee)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                fontWeight: 800
-              }}
-            >{t.hero.subtitle2}</span>
-            <span style={{ color: "rgba(255,255,255,0.7)" }}>{t.hero.subtitle3}</span>
-          </motion.p>
 
 
 
@@ -517,7 +491,7 @@ export default function HomePage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsDropdownOpen(false)}
-                className="fixed inset-0 z-[700] bg-black/15 backdrop-blur-md"
+                className="fixed inset-0 z-[700] bg-black/10 backdrop-blur-[2px]"
               />
             )}
           </AnimatePresence>
@@ -539,21 +513,10 @@ export default function HomePage() {
               />
             )}
 
-            {/* 분석 가이드 라벨 */}
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.4 }}
-              className="absolute -top-7 left-6 hidden md:flex items-center gap-2"
-            >
-              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-slate-900 shadow-[0_0_10px_rgba(16,185,129,0.5)]">1</span>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
-                {language === 'ko' ? '먼저 성분을 추가하세요' : 'Add ingredients first'}
-              </span>
-            </motion.div>
+
 
             {/* === 독립적인 분석바(검색바) 그룹 (포커스 효과 한정) === */}
-            <div className="relative group/bar mb-4 md:mb-10">
+            <div className="relative group/bar mb-1">
               {/* 포커스 시 배경 글로우 (분석바 본체에만 집중) */}
               <div
                 className="absolute -inset-5 rounded-[4rem] opacity-0 group-focus-within/bar:opacity-100 transition-all duration-700 blur-2xl md:blur-3xl pointer-events-none"
@@ -563,31 +526,61 @@ export default function HomePage() {
                   willChange: "opacity"
                 }}
               />
+              {/* [신규] 배경 강화 광채 (Aurora Glow) */}
               <div
-                className="absolute -inset-1 rounded-[4rem] opacity-0 group-focus-within/bar:opacity-40 transition-all duration-700 blur-xl md:blur-2xl pointer-events-none"
-                style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.4), rgba(6,182,212,0.25))" }}
+                className="absolute -inset-8 opacity-20 transition-all duration-1000 blur-3xl pointer-events-none group-hover/bar:opacity-30"
+                style={{ 
+                  background: "radial-gradient(circle at center, #10b981 0%, #06b6d4 30%, transparent 70%)",
+                }}
+              />
+
+              <div
+                className="absolute -inset-1 rounded-[4rem] opacity-0 group-focus-within/bar:opacity-60 transition-all duration-1000 blur-2xl md:blur-3xl pointer-events-none"
+                style={{ background: "linear-gradient(135deg, #10b981, #06b6d4, #7c3aed, #ec4899)" }}
               />
 
 
               <div
-                className="relative flex items-center rounded-[4rem] p-1 md:p-1.5 transition-all duration-500 overflow-hidden"
+                className="relative flex items-center rounded-[4rem] p-1 md:p-1.5 transition-all duration-700 overflow-hidden group/inner"
                 style={{
-                  background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%)",
-                  border: "1.5px solid rgba(255,255,255,0.18)",
-                  backdropFilter: "blur(16px)",
-                  boxShadow: "0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15)",
+                  background: "rgba(10, 15, 30, 0.45)",
+                  backdropFilter: "blur(24px)",
+                  boxShadow: "0 25px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
                   transform: "translateZ(0)"
                 }}
               >
-                {/* 테두리 애니메이션 효과 - 데스크탑 전용 */}
-                {!isMobile && (
-                  <motion.div
-                    className="absolute inset-0 rounded-[4rem] pointer-events-none"
-                    style={{ boxShadow: "inset 0 0 0 1px rgba(16,185,129,0.1)" }}
-                    animate={{ opacity: [0.3, 0.6, 0.3] }}
-                    transition={{ duration: 3, repeat: Infinity }}
+                {/* [신규] 프리즘 테두리 애니메이션 */}
+                <div className="absolute inset-0 p-[2px] rounded-[4rem] pointer-events-none opacity-40 group-focus-within/bar:opacity-100 transition-opacity duration-1000">
+                  <div 
+                    className="absolute inset-[-100%] animate-spin-slow"
+                    style={{
+                      background: "conic-gradient(from 0deg, transparent 0deg, #10b981 90deg, #06b6d4 180deg, #7c3aed 270deg, transparent 360deg)",
+                      animationDuration: "4s"
+                    }}
                   />
-                )}
+                  <div 
+                    className="absolute inset-[1.5px] rounded-[4rem]" 
+                    style={{ background: "#0a0f1e" }}
+                  />
+                </div>
+
+                {/* [신규] 내부 광택 코팅 (Glossy Coating) */}
+                <div 
+                  className="absolute inset-0 opacity-10 group-focus-within/bar:opacity-20 transition-opacity duration-1000 pointer-events-none"
+                  style={{
+                    background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 55%, transparent 70%)",
+                    backgroundSize: "200% 100%",
+                    animation: "shimmer 8s infinite linear"
+                  }}
+                />
+                {/* 테두리 애니메이션 효과 - 데스크탑 전용 */}
+                {/* 테두리 은은한 광채 효과 */}
+                <motion.div
+                  className="absolute inset-0 rounded-[4rem] pointer-events-none z-10"
+                  style={{ boxShadow: "inset 0 0 15px rgba(16,185,129,0.15)" }}
+                  animate={{ opacity: [0.2, 0.5, 0.2] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                />
 
                 <div className="pl-4 md:pl-6 text-emerald-400 relative z-20">
                   <Search size={18} className="md:size-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
@@ -611,6 +604,80 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* === 선택된 성분 목록 — 검색 바 하단 배치 === */}
+            <AnimatePresence>
+              {selectedIngredients.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{
+                    opacity: isBlur ? 0.7 : 1, // 블러 대신 살짝 투명도 처리 (선명도 유지)
+                    y: 0,
+                  }}
+                  exit={{ opacity: 0, y: -5, transition: { duration: 0.2 } }}
+                  className="mt-3 mb-3 px-2 w-full"
+                >
+                  {/* 섹션 헤더 */}
+                  <div className="flex items-center justify-between gap-2 mb-2 px-1">
+                    <div className="h-px flex-1" style={{ background: "linear-gradient(to right, transparent, rgba(52,211,153,0.3))" }} />
+                    <span
+                      className="text-[9px] font-[1000] uppercase tracking-[0.2em] flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.1)]"
+                      style={{ color: "#6ee7b7" }}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_#10b981] dot-pulse" />
+                      {language === 'ko' ? `선택됨 ${selectedIngredients.length}` : `${selectedIngredients.length} Items`}
+                    </span>
+                    <div className="h-px flex-1" style={{ background: "linear-gradient(to left, transparent, rgba(52,211,153,0.3))" }} />
+                  </div>
+
+                  {/* 칩 목록: 모바일 최적화 (높이 제한 및 스크롤) */}
+                  <div 
+                    className="flex flex-wrap justify-center gap-1.5 max-h-[130px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-1 px-0.5"
+                    style={{
+                      maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+                      WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)"
+                    }}
+                  >
+                    {isMounted && selectedIngredients.map((ingredient, chipIdx) => (
+                      <motion.div
+                        layout
+                        key={ingredient.id}
+                        initial={{ scale: 0.7, opacity: 0, y: 8 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.7, opacity: 0, transition: { duration: 0.15 } }}
+                        transition={{ type: "spring", stiffness: 500, damping: 30, delay: chipIdx * 0.04 }}
+                        className="group relative flex items-center gap-1.5 pl-2 pr-1 py-1 md:pl-3 md:pr-2 md:py-1.5 rounded-xl whitespace-nowrap shrink-0 active:scale-95 transition-transform border border-white/10"
+                        style={{
+                          background: "linear-gradient(135deg, #059669 0%, #10b981 60%, #34d399 100%)",
+                          boxShadow: "0 4px 16px rgba(16,185,129,0.45), 0 1px 3px rgba(0,0,0,0.3)",
+                        }}
+                      >
+                        {/* 체크 뱃지 */}
+                        <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                          <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                            <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                        {/* 이모지 */}
+                        <span className="text-sm md:text-base leading-none">{ingredient.icon_emoji}</span>
+                        {/* 이름 */}
+                        <span className="text-[10px] md:text-xs font-[900] text-white tracking-tight max-w-[90px] md:max-w-[150px] truncate">
+                          {language === 'ko' ? ingredient.name : ingredient.name_en}
+                        </span>
+                        {/* 삭제 버튼 */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
+                          className="ml-0.5 w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/15 flex items-center justify-center text-white/70 hover:bg-red-400/80 hover:text-white transition-all active:scale-90 shrink-0"
+                        >
+                          <X className="w-2.5 h-2.5" strokeWidth={3.5} />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+
             {/* ===== 검색 바 하단 액션 바 ===== */}
             <AnimatePresence>
               {selectedIngredients.length > 0 && (
@@ -619,7 +686,7 @@ export default function HomePage() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -6, scale: 0.98 }}
                   transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                  className="relative flex items-center gap-2.5 px-3 py-2.5 mb-3 rounded-2xl"
+                  className="relative flex items-center gap-2.5 px-3 py-2.5 mb-1 rounded-2xl"
                   style={{
                     background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
                     border: "1px solid rgba(255,255,255,0.13)",
@@ -788,8 +855,13 @@ export default function HomePage() {
             {/* 퀵 스타트 조합 */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.5 }}
+              animate={{
+                opacity: isBlur ? 0.3 : 1,
+                y: 0,
+                filter: isBlur ? "blur(8px)" : "blur(0px)",
+                scale: isBlur ? 0.98 : 1
+              }}
+              transition={{ duration: 0.4 }}
               className="mt-6 flex flex-col items-center gap-3"
             >
               <span className="text-[10px] font-black text-emerald-400/60 uppercase tracking-[0.2em] flex items-center gap-2">
@@ -804,44 +876,44 @@ export default function HomePage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
                     transition={{ duration: 0.4 }}
-                    className="flex flex-wrap justify-center gap-2"
+                    className="w-full"
                   >
-                    {(comboIndex === 0 ? [
-                      { id: 'immunity', tags: ['비타민C', '아연'], label: t.hero.combos.immunity },
-                      { id: 'bone', tags: ['칼슘', '비타민D'], label: t.hero.combos.bone },
-                      { id: 'sleep', tags: ['마그네슘', 'L-테아닌'], label: t.hero.combos.sleep },
-                    ] : comboIndex === 1 ? [
-                      { id: 'vision', tags: ['루테인', '아스타잔틴'], label: t.hero.combos.vision },
-                      { id: 'energy', tags: ['비타민B12', '아르기닌'], label: t.hero.combos.energy },
-                      { id: 'heart', tags: ['오메가-3', '코엔자임Q10'], label: t.hero.combos.heart },
-                    ] : [
-                      { id: 'beauty', tags: ['콜라겐', '비타민C'], label: t.hero.combos.beauty },
-                      { id: 'liver', tags: ['밀크씨슬 (실리마린)', '비타민B12'], label: t.hero.combos.liver }
-                    ]).map((combo) => (
-                      <button
-                        key={combo.id}
-                        onClick={() => {
-                          const toAdd = dbIngredients.filter(ing =>
-                            combo.tags.some(tag =>
-                              ing.name === tag ||
-                              ing.slug === tag
-                            )
-                          );
-                          toAdd.forEach(ing => {
-                            if (!selectedIngredients.some(s => s.id === ing.id)) {
-                              addIngredient(ing);
+                    <div className="grid grid-cols-2 gap-2 w-full max-w-lg mx-auto">
+                      {(comboIndex === 0 ? [
+                        { id: 'immunity', tags: ['비타민C', '아연'], label: t.hero.combos.immunity },
+                        { id: 'bone', tags: ['칼슘', '비타민D'], label: t.hero.combos.bone },
+                      ] : comboIndex === 1 ? [
+                        { id: 'vision', tags: ['루테인', '아스타잔틴'], label: t.hero.combos.vision },
+                        { id: 'energy', tags: ['비타민B12', '아르기닌'], label: t.hero.combos.energy },
+                      ] : [
+                        { id: 'beauty', tags: ['콜라겐', '비타민C'], label: t.hero.combos.beauty },
+                        { id: 'liver', tags: ['밀크씨슬 (실리마린)', '비타민B12'], label: t.hero.combos.liver }
+                      ]).map((combo) => (
+                        <button
+                          key={combo.id}
+                          onClick={() => {
+                            const toAdd = dbIngredients.filter(ing =>
+                              combo.tags.some(tag =>
+                                ing.name === tag ||
+                                ing.slug === tag
+                              )
+                            );
+                            toAdd.forEach(ing => {
+                              if (!selectedIngredients.some(s => s.id === ing.id)) {
+                                addIngredient(ing);
+                              }
+                            });
+                            if (toAdd.length > 0) {
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
                             }
-                          });
-                          if (toAdd.length > 0) {
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                          }
-                        }}
-                        className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/10 text-white/80 hover:text-emerald-300 text-[10px] md:text-xs font-bold transition-all active:scale-95 shadow-lg flex items-center gap-2 group/combo"
-                      >
-                        {combo.label}
-                        <ChevronRight size={12} className="group-hover/combo:translate-x-0.5 transition-transform opacity-30 group-hover/combo:opacity-100" />
-                      </button>
-                    ))}
+                          }}
+                          className="px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/10 text-white/80 hover:text-emerald-300 text-[10px] md:text-xs font-bold transition-all active:scale-95 shadow-lg flex items-center justify-between gap-1 group/combo"
+                        >
+                          <span className="truncate">{combo.label}</span>
+                          <ChevronRight size={12} className="group-hover/combo:translate-x-0.5 transition-transform opacity-30 group-hover/combo:opacity-100 shrink-0" />
+                        </button>
+                      ))}
+                    </div>
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -849,7 +921,11 @@ export default function HomePage() {
 
             {/* 인기 태그 */}
             <motion.div
-              animate={{ filter: "blur(0px)", opacity: 0.75 }}
+              animate={{
+                opacity: isBlur ? 0.3 : 0.75,
+                filter: isBlur ? "blur(8px)" : "blur(0px)",
+                scale: isBlur ? 0.98 : 1
+              }}
               transition={{ duration: 0.4 }}
               className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2"
             >
@@ -880,73 +956,7 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
 
-          {/* === 선택된 성분 목록 — 눈에 확 띄는 디자인 === */}
-          <AnimatePresence>
-            {selectedIngredients.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{
-                  opacity: isBlur ? 0.3 : 1,
-                  y: 0,
-                  filter: isBlur ? "blur(5px)" : "blur(0px)"
-                }}
-                exit={{ opacity: 0, y: -5, transition: { duration: 0.2 } }}
-                className="mt-5 mb-1 px-2"
-              >
-                {/* 섹션 헤더 */}
-                <div className="flex items-center justify-center gap-2 mb-3">
-                  <div className="h-px flex-1 max-w-[60px]" style={{ background: "linear-gradient(to right, transparent, rgba(52,211,153,0.4))" }} />
-                  <span
-                    className="text-[9px] font-[900] uppercase tracking-[0.18em] flex items-center gap-1.5"
-                    style={{ color: "#6ee7b7" }}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_6px_#10b981] dot-pulse" />
-                    {language === 'ko' ? `선택됨 ${selectedIngredients.length}개` : `${selectedIngredients.length} selected`}
-                  </span>
-                  <div className="h-px flex-1 max-w-[60px]" style={{ background: "linear-gradient(to left, transparent, rgba(52,211,153,0.4))" }} />
-                </div>
 
-                {/* 칩 목록 */}
-                <div className="flex flex-wrap justify-center gap-2">
-                  {isMounted && selectedIngredients.map((ingredient, chipIdx) => (
-                    <motion.div
-                      layout
-                      key={ingredient.id}
-                      initial={{ scale: 0.7, opacity: 0, y: 8 }}
-                      animate={{ scale: 1, opacity: 1, y: 0 }}
-                      exit={{ scale: 0.7, opacity: 0, transition: { duration: 0.15 } }}
-                      transition={{ type: "spring", stiffness: 500, damping: 30, delay: chipIdx * 0.04 }}
-                      className="group relative flex items-center gap-2 pl-2.5 pr-1.5 py-1.5 md:pl-3 md:pr-2 md:py-2 rounded-2xl whitespace-nowrap shrink-0 active:scale-95 transition-transform"
-                      style={{
-                        background: "linear-gradient(135deg, #059669 0%, #10b981 60%, #34d399 100%)",
-                        boxShadow: "0 4px 16px rgba(16,185,129,0.45), 0 1px 3px rgba(0,0,0,0.3)",
-                      }}
-                    >
-                      {/* 체크 뱃지 */}
-                      <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                        <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                          <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </div>
-                      {/* 이모지 */}
-                      <span className="text-sm md:text-base leading-none">{ingredient.icon_emoji}</span>
-                      {/* 이름 */}
-                      <span className="text-[11px] md:text-xs font-[900] text-white tracking-tight">
-                        {language === 'ko' ? ingredient.name : ingredient.name_en}
-                      </span>
-                      {/* 삭제 버튼 */}
-                      <button
-                        onClick={(e) => { e.stopPropagation(); removeIngredient(ingredient.id); }}
-                        className="ml-0.5 w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/15 flex items-center justify-center text-white/70 hover:bg-red-400/80 hover:text-white transition-all active:scale-90 shrink-0"
-                      >
-                        <X className="w-2.5 h-2.5" strokeWidth={3.5} />
-                      </button>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
 
 
@@ -954,9 +964,8 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{
-              opacity: isBlur ? 0.3 : 1,
+              opacity: isBlur ? 0.7 : 1, // 블러 대신 투명도만 살짝 (선명도 유지)
               y: 0,
-              filter: isBlur ? "blur(8px)" : "blur(0px)",
               scale: isBlur ? 0.98 : 1
             }}
             transition={{

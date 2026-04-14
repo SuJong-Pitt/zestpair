@@ -487,15 +487,25 @@
   }
 
   /* ============================================================
-   * Chip shimmer sweep — CSS-driven
+   * Prism & Rainbow Effects
    * ============================================================ */
-  @keyframes chip-shimmer {
-    0% { transform: translateX(-180%) skewX(-25deg); }
-    100% { transform: translateX(280%) skewX(-25deg); }
+  @keyframes prism-move {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
   }
 
-  .chip-shimmer {
-    animation: chip-shimmer 4s ease-in-out infinite;
-    animation-fill-mode: both;
+  @keyframes prism-text-move {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+
+  .animate-prism {
+    background-size: 200% 100%;
+    animation: prism-move 4s linear infinite;
+  }
+
+  .animate-prism-text {
+    background-size: 200% auto;
+    animation: prism-text-move 6s linear infinite;
   }
 }

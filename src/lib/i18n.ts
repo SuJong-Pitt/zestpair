@@ -4,9 +4,9 @@ export const UI_TRANSLATIONS = {
         hero: {
             title1: "🛡️ 영양제 상호작용 무료 분석",
             title2: "데이터로 증명하는 완벽한 영양제 궁합",
-            subtitle1: "3초 만에 부작용 피하고",
-            subtitle2: "최적의 시너지",
-            subtitle3: "찾기",
+            subtitle1: "3초 만에 부작용 피하고 최적의 시너지 찾기",
+            subtitle2: "",
+            subtitle3: "",
             popularTags: ["비타민", "미네랄", "오메가", "유산균", "항산화", "아미노산"],
             quickStart: "⚡ 클릭하면 바로 분석!",
             placeholderExamples: [
@@ -152,8 +152,8 @@ export const UI_TRANSLATIONS = {
         hero: {
             title1: "🛡️ FREE SUPPLEMENT INTERACTION ANALYSIS",
             title2: "The perfect supplement pairing proven by data",
-            subtitle1: "Avoid side effects in 3s and find",
-            subtitle2: "Perfect Synergy",
+            subtitle1: "Avoid side effects in 3s and find perfect synergy",
+            subtitle2: "",
             subtitle3: "",
             popularTags: ["Vitamin", "Mineral", "Omega", "Probiotics", "Antioxidants", "Amino Acids"],
             quickStart: "⚡ Try Quick Analysis!",

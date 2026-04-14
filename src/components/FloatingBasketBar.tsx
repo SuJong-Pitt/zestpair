@@ -48,7 +48,8 @@ export default function FloatingBasketBar({
       !isAnalyzing &&
       !isHeroSearchVisible &&
       !isHeroDropdownOpen &&
-      (!hasResult || isIngredientsVisible);
+      isIngredientsVisible && // 스크롤을 내려 카드가 나올 때만 표시
+      !hasResult; // 결과 페이지에서는 숨김 (필요시 ingredients 섹션 가시성으로 조절)
     setIsVisible(shouldShow);
     if ((count === 0 || isHeroSearchVisible || isHeroDropdownOpen || (hasResult && !isIngredientsVisible)) && !isSearchActive) {
       setIsExpanded(false);
