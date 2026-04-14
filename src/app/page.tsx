@@ -133,7 +133,6 @@ export default function HomePage() {
   // 카테고리 전환 감지: 1=초기 로드(stagger 적용), >0=탭 전환(딜레이 없이 즉각 표시)
   const categoryVersionRef = useRef(0);
   const [hasInitialLoaded, setHasInitialLoaded] = useState(false);
-  const [showTopAlert, setShowTopAlert] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [comboIndex, setComboIndex] = useState(0);
 
@@ -608,59 +607,105 @@ export default function HomePage() {
                   onFocus={() => setIsDropdownOpen(true)}
                   className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-[11px] md:text-lg h-8 md:h-12 flex-1 font-bold px-1 md:px-4 tracking-tight relative z-20 transition-all duration-500"
                 />
-                <div className="flex items-center gap-2 pr-1.5 md:pr-2">
-                  {selectedIngredients.length > 0 && (
-                    <button
-                      onClick={clearBasket}
-                      title={language === 'ko' ? '초기화' : 'Reset'}
-                      className="p-1.5 md:p-2 text-white/25 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-full transition-all active:scale-90 group/reset border border-white/5 hover:border-emerald-500/20 shadow-sm"
-                    >
-                      <RotateCcw size={14} className="group-hover/reset:rotate-[-180deg] transition-transform duration-500" />
-                    </button>
-                  )}
-                  <motion.button
-                    initial={{ x: 0 }}
-                    animate={showTopAlert && selectedIngredients.length < 2 ? { x: [-4, 4, -4, 4, 0] } : {}}
-                    transition={{ duration: 0.4 }}
-                    onClick={() => {
-                      if (selectedIngredients.length < 2) {
-                        setShowTopAlert(true);
-                        setTimeout(() => setShowTopAlert(false), 2000);
-                        return;
-                      }
-                      handleAnalyze();
-                    }}
-                    className="relative flex items-center gap-1.5 md:gap-2 px-3 md:px-6 py-2 md:py-2.5 rounded-full font-[900] text-[9px] md:text-xs transition-all active:scale-95 whitespace-nowrap group/btn overflow-hidden"
-                    style={{
-                      background: (selectedIngredients.length < 2 && !showTopAlert)
-                        ? "rgba(255,255,255,0.05)"
-                        : (showTopAlert && selectedIngredients.length < 2)
-                          ? "linear-gradient(135deg, #f87171 0%, #ef4444 100%)"
-                          : "linear-gradient(135deg, #10b981 0%, #0891b2 60%, #7c3aed 100%)",
-                      color: (selectedIngredients.length < 2 && !showTopAlert) ? "rgba(255,255,255,0.2)" : "white",
-                      boxShadow: (selectedIngredients.length < 2) ? "none" : "0 8px 32px rgba(16,185,129,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
-                      letterSpacing: "0.08em",
-                      border: (selectedIngredients.length < 2 && !showTopAlert) ? "1px solid rgba(255,255,255,0.1)" : "none"
-                    }}
-                  >
-                    {selectedIngredients.length >= 2 && (
-                      <motion.span
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        animate={{ x: ["-100%", "100%"] }}
-                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                        style={{ transform: "skewX(-20deg)" }}
-                      />
-                    )}
-                    <span className="relative z-10 uppercase">
-                      {showTopAlert && selectedIngredients.length < 2
-                        ? (language === 'ko' ? '2개 이상 선택!' : 'MIN 2 ITEMS!')
-                        : (language === 'ko' ? '분석하기' : 'ANALYZE')}
-                    </span>
-                    <ChevronRight size={16} className="relative z-10 group-hover/btn:translate-x-0.5 transition-transform" />
-                  </motion.button>
-                </div>
+                {/* 검색 Input 우측 영역: 기존 버튼들은 아래 액션 바로 이동 */}
               </div>
             </div>
+
+            {/* ===== 검색 바 하단 액션 바 ===== */}
+            <AnimatePresence>
+              {selectedIngredients.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative flex items-center gap-2.5 px-3 py-2.5 mb-3 rounded-2xl"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
+                    border: "1px solid rgba(255,255,255,0.13)",
+                    backdropFilter: "blur(16px)",
+                    boxShadow: "0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1)",
+                  }}
+                >
+                  {/* 좌측: 초기화 버튼 */}
+                  <button
+                    onClick={clearBasket}
+                    className="group/reset flex items-center gap-2 px-3.5 py-2 rounded-xl text-[11px] font-black transition-all duration-200 active:scale-95 shrink-0"
+                    style={{
+                      color: "rgba(255,255,255,0.55)",
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                    }}
+                    onMouseEnter={e => {
+                      const btn = e.currentTarget;
+                      btn.style.color = "#f87171";
+                      btn.style.background = "rgba(248,113,113,0.12)";
+                      btn.style.borderColor = "rgba(248,113,113,0.35)";
+                    }}
+                    onMouseLeave={e => {
+                      const btn = e.currentTarget;
+                      btn.style.color = "rgba(255,255,255,0.55)";
+                      btn.style.background = "rgba(255,255,255,0.05)";
+                      btn.style.borderColor = "rgba(255,255,255,0.12)";
+                    }}
+                  >
+                    <RotateCcw size={12} className="group-hover/reset:rotate-[-180deg] transition-transform duration-500 shrink-0" />
+                    <span className="whitespace-nowrap">{language === 'ko' ? '초기화' : 'Clear'}</span>
+                  </button>
+
+                  {/* 구분선 */}
+                  <div className="w-px self-stretch shrink-0 my-1" style={{ background: "rgba(255,255,255,0.1)" }} />
+
+                  {/* 우측: 상태 분기 분석 버튼 — flex-1로 남은 공간 채움 */}
+                  {selectedIngredients.length === 1 ? (
+                    /* 비활성화 — 1개 선택 시: amber 경고 스타일 */
+                    <div
+                      className="flex items-center justify-center gap-2 flex-1 py-2 px-3 rounded-xl text-[11px] font-black"
+                      style={{
+                        background: "linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.04))",
+                        border: "1px dashed rgba(251,191,36,0.35)",
+                        color: "rgba(251,191,36,0.7)",
+                      }}
+                    >
+                      <span className="text-sm leading-none shrink-0">+</span>
+                      <span className="whitespace-nowrap">{language === 'ko' ? '1개를 더 선택해주세요' : 'Select 1 more item'}</span>
+                    </div>
+                  ) : (
+                    /* 활성화 — 2개 이상: 프리즘 고광량 버튼 */
+                    <motion.button
+                      onClick={handleAnalyze}
+                      className="relative flex items-center justify-center gap-2 flex-1 py-2 px-4 rounded-xl font-[900] text-[12px] overflow-hidden"
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.97 }}
+                      style={{
+                        background: "linear-gradient(135deg, #10b981 0%, #0891b2 50%, #7c3aed 100%)",
+                        color: "white",
+                        boxShadow: "0 4px 20px rgba(16,185,129,0.5), 0 8px 32px rgba(124,58,237,0.3), inset 0 1px 0 rgba(255,255,255,0.25)",
+                      }}
+                    >
+                      {/* 프리즘 광택 슬라이드 */}
+                      <motion.span
+                        className="absolute inset-0 pointer-events-none"
+                        style={{ background: "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.35) 50%, transparent 65%)", transform: "skewX(-20deg)" }}
+                        animate={{ x: ["-150%", "150%"] }}
+                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.2, ease: "easeInOut" }}
+                      />
+                      {/* 상단 하이라이트 */}
+                      <span
+                        className="absolute top-0 left-[10%] right-[10%] h-px pointer-events-none rounded-full"
+                        style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)" }}
+                      />
+                      <Zap size={13} className="relative z-10 fill-current shrink-0" />
+                      <span className="relative z-10 tracking-tight whitespace-nowrap">
+                        {language === 'ko'
+                          ? `${selectedIngredients.length}개 조합 분석!!`
+                          : `Analyze ${selectedIngredients.length}!`}
+                      </span>
+                    </motion.button>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* === 검색 드롭다운 === */}
             <AnimatePresence>
