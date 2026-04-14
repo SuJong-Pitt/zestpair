@@ -380,103 +380,132 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="inline-flex items-center gap-3 mb-6 md:mb-10 px-5 py-2.5 rounded-full relative group cursor-default"
+            className="inline-flex items-center gap-3 mb-5 md:mb-8 px-5 py-2.5 rounded-full relative group cursor-default"
           >
-            <div className="relative flex items-center gap-2 md:gap-3.5 px-4 md:px-7 py-2 md:py-3 rounded-full bg-slate-900/40 border border-emerald-500/20 backdrop-blur-2xl shadow-[0_0_30px_rgba(16,185,129,0.15)]">
-              <BrandLogo size={28} />
-              <BrandName size="text-[18px] md:text-[28px]" />
+            {/* 뒤 배경 글로우 */}
+            <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
+            <div className="relative flex items-center gap-2.5 md:gap-3 px-4 md:px-6 py-2.5 rounded-full bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.3)]">
+              <BrandLogo size={32} />
+              <BrandName size="text-[20px] md:text-[26px]" />
+              <div className="w-px h-3 md:h-4 bg-white/20 mx-1" />
+              <Link
+                href="/about"
+                className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#6ee7b7]/80 flex items-center gap-1.5 hover:text-[#6ee7b7] transition-all group/core"
+              >
+                <div className="flex items-center gap-1">
+                  <div className="dot-pulse w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]" />
+                  <span>AI Core v2.5</span>
+                </div>
+                <Info size={10} className="text-[#6ee7b7]/40 group-hover/core:text-[#6ee7b7] transition-colors" />
+              </Link>
             </div>
           </motion.div>
 
           {/* === 메인 헤드라인 === */}
-          <div className="mb-2 md:mb-4 flex flex-col items-center gap-2">
-            {/* 스크린샷 1 컨셉: 상단 배지 라벨 */}
-            {/* 프리즘 텍스트 & 아이콘 구성 (박스 제거) */}
+          <h1 className="mb-2 md:mb-4 tracking-tight">
+            {/* 라인 1: 상단 소형 텍스트 */}
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative cursor-default"
-            >
-                <div className="flex justify-center w-full font-[1000] text-[16px] md:text-4xl tracking-[0.05em] md:tracking-[0.1em] text-center max-w-[90vw]">
-                  <span 
-                    className="bg-clip-text text-transparent animate-prism-text"
-                    style={{
-                      backgroundImage: "linear-gradient(90deg, #6ee7b7, #34d399, #6ee7b7, #60a5fa, #a78bfa, #f472b6, #6ee7b7)",
-                    }}
-                  >
-                    {(() => {
-                      const text = t.hero.title1.replace('🛡️ ', '');
-                      if (language === 'ko') {
-                        const parts = text.split('무료');
-                        return (
-                          <>
-                            {parts[0]}
-                            <motion.span 
-                              className="relative inline-block mx-1 font-[1000] italic"
-                              animate={{ 
-                                scale: [1, 1.15, 1],
-                                rotate: [-2, 2, -2]
-                              }}
-                              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                              style={{
-                                color: "#10b981",
-                                textShadow: "0 0 15px rgba(16,185,129,0.8), 0 0 30px rgba(16,185,129,0.4)",
-                                filter: "drop-shadow(0 0 10px rgba(255,255,255,0.3))"
-                              }}
-                            >
-                              무료
-                            </motion.span>
-                            {parts[1]}
-                          </>
-                        );
-                      } else {
-                        const parts = text.split('FREE');
-                        return (
-                          <>
-                            {parts[0]}
-                            <motion.span 
-                              className="relative inline-block mx-1 font-[1000] italic"
-                              animate={{ 
-                                scale: [1, 1.15, 1],
-                                rotate: [-2, 2, -2]
-                              }}
-                              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                              style={{
-                                color: "#06b6d4",
-                                textShadow: "0 0 15px rgba(6,182,212,0.8), 0 0 30px rgba(6,182,212,0.4)",
-                                filter: "drop-shadow(0 0 10px rgba(255,255,255,0.3))"
-                              }}
-                            >
-                              FREE
-                            </motion.span>
-                            {parts[1]}
-                          </>
-                        );
-                      }
-                    })()}
-                  </span>
-                </div>
-            </motion.div>
-
-            {/* 메인 타이틀: 깔끔한 텍스트 한 줄 구성 */}
-            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="text-xs md:text-2xl font-bold tracking-tight text-white/90 drop-shadow-md px-4"
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="text-xs md:text-xl font-black uppercase mb-1 md:mb-2 text-emerald-400 tracking-[0.2em]"
             >
+              {t.hero.title1}
+            </motion.div>
+
+            {/* 라인 2: 핵심 임팩트 문구 */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.88, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="relative inline-block"
+            >
+              {/* 뒤 글로우 */}
+              <span
+                aria-hidden
+                className="absolute -inset-2 rounded-[2.5rem] opacity-40 blur-xl md:blur-2xl pointer-events-none"
+                style={{ background: "linear-gradient(135deg, #10b981 0%, #0891b2 50%, #7c3aed 100%)", willChange: "filter" }}
+              />
+              {/* 슬로건 박스 */}
+              <motion.span
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                style={{ transformOrigin: "left" }}
+                className="absolute inset-0 rounded-[2rem] pointer-events-none"
+              >
+                <span
+                  className="absolute inset-0 rounded-[2rem]"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(8,145,178,0.1) 50%, rgba(124,58,237,0.12) 100%)",
+                    border: "1.5px solid rgba(16,185,129,0.4)",
+                    boxShadow: "0 0 50px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.07)",
+                  }}
+                />
+              </motion.span>
+
+              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-[1.1] tracking-tighter text-center text-white drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)]">
                 {language === 'ko' ? (
-                    <>
-                    <span className="text-emerald-400">데이터로 증명하는</span> 완벽한 영양제 궁합
-                    </>
+                  <>
+                    <span className="relative inline-block mr-1 md:mr-2">
+                      <span className="relative z-10 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.7)]">영양제 상호작용</span>
+                      <span className="absolute bottom-0 left-0 w-full h-[4px] bg-emerald-500/30 blur-[1px] rounded-full" />
+                    </span>
+                    무료 분석
+                  </>
                 ) : (
-                    <>
-                    <span className="text-emerald-400">Proven by Data,</span> Perfect Supplement Pairing
-                    </>
+                  <>
+                    Free Supplement <br className="lg:hidden" />
+                    <span className="relative inline-block ml-1.5 md:ml-2">
+                      <span className="relative z-10 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.7)]">Interaction Analysis</span>
+                      <span className="absolute bottom-0 left-0 w-full h-[4px] bg-emerald-500/30 blur-[1px] rounded-full" />
+                    </span>
+                  </>
                 )}
-            </motion.h1>
-          </div>
+              </span>
+
+              {/* 코너 브래킷 */}
+              {[["top-1.5 left-2.5", "border-t-2 border-l-2"], ["top-1.5 right-2.5", "border-t-2 border-r-2"], ["bottom-1.5 left-2.5", "border-b-2 border-l-2"], ["bottom-1.5 right-2.5", "border-b-2 border-r-2"]].map(([pos, border], i) => (
+                <span key={i} className={`absolute ${pos} w-4 h-4 ${border} border-emerald-400/60 hidden md:block`} style={{ borderRadius: "3px" }} />
+              ))}
+              {/* 반짝이 */}
+              <motion.span
+                animate={{ opacity: [0, 1, 0], scale: [0.6, 1.4, 0.6], rotate: [-10, 10, -10] }}
+                transition={{ duration: 2.8, repeat: Infinity, delay: 1.2 }}
+                className="absolute -top-6 -right-6 hidden md:block"
+              >
+                <Sparkles size={26} className="text-amber-300" />
+              </motion.span>
+              <motion.span
+                animate={{ opacity: [0, 0.8, 0], scale: [0.5, 1.2, 0.5] }}
+                transition={{ duration: 3.5, repeat: Infinity, delay: 2.5 }}
+                className="absolute -bottom-5 -left-4 hidden md:block"
+              >
+                <Sparkles size={18} className="text-cyan-300" />
+              </motion.span>
+            </motion.div>
+          </h1>
+
+          {/* === 서브타이틀 === */}
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.85 }}
+            className="text-[13px] md:text-base mb-3 md:mb-5 leading-relaxed max-w-md mx-auto px-2"
+            style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500 }}
+          >
+            {t.hero.subtitle1}{" "}
+            <span
+              style={{
+                background: "linear-gradient(90deg, #6ee7b7, #22d3ee)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+              className="font-black"
+            >
+              {t.hero.subtitle2}
+            </span>
+          </motion.p>
 
 
 
@@ -529,7 +558,7 @@ export default function HomePage() {
               {/* [신규] 배경 강화 광채 (Aurora Glow) */}
               <div
                 className="absolute -inset-8 opacity-20 transition-all duration-1000 blur-3xl pointer-events-none group-hover/bar:opacity-30"
-                style={{ 
+                style={{
                   background: "radial-gradient(circle at center, #10b981 0%, #06b6d4 30%, transparent 70%)",
                 }}
               />
@@ -551,21 +580,21 @@ export default function HomePage() {
               >
                 {/* [신규] 프리즘 테두리 애니메이션 */}
                 <div className="absolute inset-0 p-[2px] rounded-[4rem] pointer-events-none opacity-40 group-focus-within/bar:opacity-100 transition-opacity duration-1000">
-                  <div 
+                  <div
                     className="absolute inset-[-100%] animate-spin-slow"
                     style={{
                       background: "conic-gradient(from 0deg, transparent 0deg, #10b981 90deg, #06b6d4 180deg, #7c3aed 270deg, transparent 360deg)",
                       animationDuration: "4s"
                     }}
                   />
-                  <div 
-                    className="absolute inset-[1.5px] rounded-[4rem]" 
+                  <div
+                    className="absolute inset-[1.5px] rounded-[4rem]"
                     style={{ background: "#0a0f1e" }}
                   />
                 </div>
 
                 {/* [신규] 내부 광택 코팅 (Glossy Coating) */}
-                <div 
+                <div
                   className="absolute inset-0 opacity-10 group-focus-within/bar:opacity-20 transition-opacity duration-1000 pointer-events-none"
                   style={{
                     background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 55%, transparent 70%)",
@@ -629,13 +658,9 @@ export default function HomePage() {
                     <div className="h-px flex-1" style={{ background: "linear-gradient(to left, transparent, rgba(52,211,153,0.3))" }} />
                   </div>
 
-                  {/* 칩 목록: 모바일 최적화 (높이 제한 및 스크롤) */}
-                  <div 
-                    className="flex flex-wrap justify-center gap-1.5 max-h-[130px] md:max-h-[180px] overflow-y-auto scrollbar-hide py-1 px-0.5"
-                    style={{
-                      maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
-                      WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)"
-                    }}
+                  {/* 칩 목록: 전체 노출 (스크롤 및 높이 제한 제거) */}
+                  <div
+                    className="flex flex-wrap justify-center gap-1.5 py-1 px-0.5"
                   >
                     {isMounted && selectedIngredients.map((ingredient, chipIdx) => (
                       <motion.div

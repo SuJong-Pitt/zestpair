@@ -1,9 +1,8 @@
-
 export const UI_TRANSLATIONS = {
     ko: {
         hero: {
-            title1: "🛡️ 영양제 상호작용 무료 분석",
-            title2: "데이터로 증명하는 완벽한 영양제 궁합",
+            title1: "데이터로 증명하는 완벽한 영양제 궁합",
+            title2: "🛡️ 영양제 상호작용 무료 분석",
             subtitle1: "3초 만에 부작용 피하고 최적의 시너지 찾기",
             subtitle2: "",
             subtitle3: "",
