@@ -56,6 +56,8 @@ export interface Ingredient {
   warnings_en?: string[] | null; // 영문 주의사항 목록
   coupang_search_keyword: string; // 쿠팡 파트너스 검색 키워드
   amazon_search_keyword?: string; // 글로벌(영문) 사이트용 아마존 파트너스 키워드
+  coupang_url?: string; // 직접 지정된 쿠팡 파트너스 링크
+  amazon_url?: string; // 직접 지정된 아마존 파트너스 링크
   is_popular: boolean; // 인기 성분 여부 (홈 화면 우선 노출)
   sort_order: number; // 정렬 순서
   created_at: string; // ISO 8601

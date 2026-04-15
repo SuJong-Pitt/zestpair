@@ -215,8 +215,8 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
         const recName = isKo ? targetPartner.name : targetPartner.name_en;
 
         const buyUrl = isKo
-            ? `https://www.coupang.com/np/search?q=${encodeURIComponent(targetPartner.name)}`
-            : `https://www.amazon.com/s?k=${encodeURIComponent(targetPartner.name_en || targetPartner.name)}`;
+            ? (targetPartner.coupang_url || `https://www.coupang.com/np/search?q=${encodeURIComponent(targetPartner.name)}`)
+            : (targetPartner.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(targetPartner.name_en || targetPartner.name)}`);
 
         const isPerfect = currentScore >= 100;
         const efficiencyGain = 45 + Math.floor(Math.random() * 20);
