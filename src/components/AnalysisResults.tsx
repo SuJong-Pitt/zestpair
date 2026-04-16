@@ -42,18 +42,19 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     const shareData = useMemo(() => {
         if (!result || !result.ingredients) return null;
         const slugs = result.ingredients.map(ing => ing.slug);
+        const names = result.ingredients.map(ing => ing.name).join(" + ");
         const encoded = encodeShareParams(slugs);
         const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
         const canonicalBase = isLocal ? window.location.origin : "https://zestpair.com";
         const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
         
-        return { shareUrl, score: result.score };
+        return { shareUrl, score: result.score, names };
     }, [result]);
 
     const handleKakaoShare = useCallback(() => {
         if (!shareData) return;
-        const { shareUrl, score } = shareData;
-        const { imageFileName, title, description } = getKakaoShareDetails(score, language);
+        const { shareUrl, score, names } = shareData;
+        const { imageFileName, title, description } = getKakaoShareDetails(score, language, names);
         const imageBase = "https://zestpair.com";
         const targetImageUrl = `${imageBase}/images/share/${imageFileName}`;
 

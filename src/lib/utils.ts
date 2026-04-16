@@ -37,7 +37,7 @@ export function decodeShareParams(encoded: string): string[] {
 /**
  * 점수별로 카카오톡 공유에 쓰일 동적 이미지와 메시지를 가져옵니다.
  */
-export function getKakaoShareDetails(score: number, language: string) {
+export function getKakaoShareDetails(score: number, language: string, ingredientNames?: string) {
   let imageFileName, customTitle, description;
 
   if (score === 100) {
@@ -98,11 +98,23 @@ export function getKakaoShareDetails(score: number, language: string) {
                     score >= 20 ? '⛔' :
                       score >= 10 ? '💀' : '☠️';
 
-  const titlePrefix = language === 'ko' 
-    ? `${scoreIcon} 영양제 궁합 ${score}점 - ` 
-    : `${scoreIcon} Supplement Score: ${score}pts - `;
+  // 성분명 가공 (너무 길면 'A, B 외 N건'으로 요약)
+  let processedNames = "";
+  if (ingredientNames) {
+    const namesArray = ingredientNames.split(" + ");
+    if (namesArray.length > 2) {
+      processedNames = language === 'ko' 
+        ? `${namesArray[0]}, ${namesArray[1]} 외 ${namesArray.length - 2}건`
+        : `${namesArray[0]}, ${namesArray[1]} & ${namesArray.length - 2} others`;
+    } else {
+      processedNames = ingredientNames;
+    }
+  }
 
-  const title = titlePrefix + customTitle;
+  const comboPart = processedNames ? `${processedNames}: ` : "";
+  const title = language === 'ko' 
+    ? `${scoreIcon} ${comboPart}${score}점!`
+    : `${scoreIcon} ${comboPart}${score}pts!`;
 
   return { imageFileName, title, description };
 }

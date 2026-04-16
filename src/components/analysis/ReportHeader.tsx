@@ -165,8 +165,8 @@ export default function ReportHeader() {
                                         const canonicalBase = isLocal ? window.location.origin : "https://zestpair.com";
                                         const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
                                         const score = analysisResult?.score ?? 0;
-
-                                        const { imageFileName, title, description } = getKakaoShareDetails(score, language);
+                                        const ingredientNames = selectedIngredients.map(ing => ing.name).join(" + ");
+                                        const { imageFileName, title, description } = getKakaoShareDetails(score, language, ingredientNames);
                                         const imageBase = "https://zestpair.com";
                                         const targetImageUrl = `${imageBase}/images/share/${imageFileName}`;
 
