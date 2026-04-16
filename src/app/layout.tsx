@@ -182,6 +182,21 @@ export default function RootLayout({
 
         </TooltipProvider>
         
+        {/* Google Analytics (GA4) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-ZKMGFGYT2E"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-ZKMGFGYT2E');
+          `}
+        </Script>
+
         {/* Kakao SDK (afterInteractive: 인터랙션 후 로드) */}
         <Script 
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" 

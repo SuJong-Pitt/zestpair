@@ -73,6 +73,15 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     }],
                 });
+
+                // GA4 Share Tracking
+                if ((window as any).gtag) {
+                    (window as any).gtag('event', 'share_kakao', {
+                        'event_category': 'engagement',
+                        'event_label': `Score: ${score}`,
+                        'score': score
+                    });
+                }
             } catch (err) { console.error(err); }
         }
     }, [shareData, language]);
@@ -88,9 +97,17 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
             try { await navigator.share(data); } catch (err) {}
         } else {
             try {
-                await navigator.clipboard.writeText(shareUrl);
                 setToast({ show: true, message: language === 'ko' ? "링크가 복사되었습니다!" : "Link copied!" });
                 setTimeout(() => setToast({ show: false, message: "" }), 3000);
+
+                // GA4 Share Tracking (Link Copy)
+                if (typeof window !== 'undefined' && (window as any).gtag) {
+                    (window as any).gtag('event', 'share_link_copy', {
+                        'event_category': 'engagement',
+                        'event_label': `Score: ${score}`,
+                        'score': score
+                    });
+                }
             } catch (err) {}
         }
     }, [shareData, language]);

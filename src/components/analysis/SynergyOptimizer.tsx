@@ -245,6 +245,18 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
         efficiencyGain
     } = optimizerData;
 
+    // GA4 Click Tracking
+    const handleAffiliateClick = () => {
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'click_affiliate_link', {
+                'event_category': 'outbound',
+                'event_label': recName,
+                'ingredient_id': targetPartner.id,
+                'platform': isKo ? 'coupang' : 'amazon'
+            });
+        }
+    };
+
     return (
         <motion.div
             id="synergy-optimizer-section"
@@ -474,6 +486,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                                             href={buyUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
+                                            onClick={handleAffiliateClick}
                                             whileHover={{ scale: 1.05, y: -5 }}
                                             whileTap={{ scale: 0.95 }}
                                             className={cn(
