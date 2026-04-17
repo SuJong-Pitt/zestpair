@@ -34,10 +34,9 @@ export const metadata: Metadata = {
     telephone: false,
   },
   alternates: {
-    canonical: "/",
     languages: {
       "ko-KR": "/",
-      "en-US": "/",
+      "en-US": "/?lang=en",
     },
   },
   openGraph: {
