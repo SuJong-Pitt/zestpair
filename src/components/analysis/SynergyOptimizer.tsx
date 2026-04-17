@@ -5,7 +5,7 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Sparkles, ArrowRight, ShoppingCart, FlaskConical, TrendingUp, AlertCircle, Activity, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
-import type { AnalysisResult } from "@/types/database";
+import type { AnalysisResult, Ingredient } from "@/types/database";
 
 // --- High-End HUD Component for Synergy Visualization ---
 const SynergyHUD = memo(function SynergyHUD({
@@ -203,7 +203,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
     language
 }: SynergyOptimizerProps) {
     const isKo = language === 'ko';
-    const [popularIngredients, setPopularIngredients] = useState<any[]>([]);
+    const [popularIngredients, setPopularIngredients] = useState<Ingredient[]>([]);
 
     useEffect(() => {
         const fetchPopular = async () => {
@@ -221,7 +221,8 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                     currentIds.push(result.potentialSynergy.pair[1].id);
                 }
 
-                const filtered = data
+                const populars = data as Ingredient[];
+                const filtered = populars
                     .filter(ing => !currentIds.includes(ing.id))
                     .slice(0, 2);
                 
