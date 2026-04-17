@@ -4,6 +4,7 @@ import { memo, useMemo, useEffect, useState } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Sparkles, ArrowRight, ShoppingCart, FlaskConical, TrendingUp, AlertCircle, Activity, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 import type { AnalysisResult } from "@/types/database";
 
 // --- High-End HUD Component for Synergy Visualization ---
@@ -202,6 +203,33 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
     language
 }: SynergyOptimizerProps) {
     const isKo = language === 'ko';
+    const [popularIngredients, setPopularIngredients] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchPopular = async () => {
+            const { data } = await supabase
+                .from("ingredients")
+                .select("*")
+                .eq("is_popular", true)
+                .neq("category", "drugs")
+                .limit(4); // Get a few to filter
+
+            if (data) {
+                // Filter out currently analyzed and the target partner
+                const currentIds = result.ingredients.map(ing => ing.id);
+                if (result.potentialSynergy?.pair[1].id) {
+                    currentIds.push(result.potentialSynergy.pair[1].id);
+                }
+
+                const filtered = data
+                    .filter(ing => !currentIds.includes(ing.id))
+                    .slice(0, 2);
+                
+                setPopularIngredients(filtered);
+            }
+        };
+        fetchPopular();
+    }, [result.ingredients, result.potentialSynergy]);
 
     const optimizerData = useMemo(() => {
         const potentialSynergy = result.potentialSynergy;
@@ -404,8 +432,60 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                 </div>
             </div>
 
-            {/* Persuasive Bridge Card */}
-            <div className="relative overflow-hidden rounded-[3rem] md:rounded-[5rem] bg-slate-950/40 border border-white/10 backdrop-blur-3xl p-6 md:p-16 lg:p-20 shadow-[0_60px_120px_-40px_rgba(0,0,0,0.9)] group/card">
+
+            {/* Popular Selection - Secondary Engagement Section */}
+            {popularIngredients.length > 0 && (
+                <div className="pt-10 space-y-8">
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-white/5">
+                            <TrendingUp size={10} className="text-slate-400" />
+                            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-400">
+                                {isKo ? "사용자들이 가장 많이 찾는 영양제" : "Global Popular Selections"}
+                            </span>
+                        </div>
+                        <h4 className="text-xl md:text-3xl font-black text-white tracking-tight">
+                            {isKo ? "놓치면 아쉬운 대중적인 인기템" : "Don't Miss These Trending Items"}
+                        </h4>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 md:gap-6 max-w-4xl mx-auto">
+                        {popularIngredients.map((ing) => (
+                            <motion.a
+                                key={ing.id}
+                                href={isKo 
+                                    ? (ing.coupang_url || `https://www.coupang.com/np/search?q=${encodeURIComponent(ing.name)}`)
+                                    : (ing.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(ing.name_en || ing.name)}`)
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                whileHover={{ y: -5, scale: 1.02 }}
+                                className="relative group/pop p-[1px] rounded-[2rem] overflow-hidden"
+                            >
+                                {/* Subtle Hover Border Glow */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent group-hover/pop:from-emerald-500/20 transition-all duration-300" />
+                                
+                                <div className="relative p-5 md:p-8 rounded-[1.9rem] bg-slate-900/60 backdrop-blur-xl border border-white/5 flex flex-col items-center gap-4 text-center h-full">
+                                    <span className="text-4xl md:text-6xl drop-shadow-xl group-hover/pop:scale-110 transition-transform duration-500">
+                                        {ing.icon_emoji}
+                                    </span>
+                                    <div className="space-y-1">
+                                        <h5 className="text-sm md:text-xl font-black text-white">{isKo ? ing.name : (ing.name_en || ing.name)}</h5>
+                                        <p className="text-[9px] md:text-xs text-slate-500 font-bold tracking-tight line-clamp-1">
+                                            {isKo ? ing.short_description : (ing.short_description_en || ing.short_description)}
+                                        </p>
+                                    </div>
+                                    <div className="mt-auto pt-2 flex items-center gap-2 text-[9px] md:text-xs font-black text-emerald-500 opacity-60 group-hover/pop:opacity-100 transition-opacity">
+                                        <span>{isKo ? "최저가 확인" : "View Details"}</span>
+                                        <ArrowRight size={10} />
+                                    </div>
+                                </div>
+                            </motion.a>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div className="relative mt-12 overflow-hidden rounded-[3rem] md:rounded-[5rem] bg-slate-950/40 border border-white/10 backdrop-blur-3xl p-6 md:p-16 lg:p-20 shadow-[0_60px_120px_-40px_rgba(0,0,0,0.9)] group/card">
                 {/* Intense Central Glow */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/[0.03] blur-[180px] rounded-full pointer-events-none" />
 
