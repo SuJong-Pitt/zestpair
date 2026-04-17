@@ -212,21 +212,20 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                 .select("*")
                 .eq("is_popular", true)
                 .neq("category", "drugs")
-                .limit(4); // Get a few to filter
+                .limit(10); // Fetch more for variety
 
             if (data) {
-                // Filter out currently analyzed and the target partner
                 const currentIds = result.ingredients.map(ing => ing.id);
                 if (result.potentialSynergy?.pair[1].id) {
                     currentIds.push(result.potentialSynergy.pair[1].id);
                 }
 
                 const populars = data as Ingredient[];
-                const filtered = populars
-                    .filter(ing => !currentIds.includes(ing.id))
-                    .slice(0, 2);
+                const filtered = populars.filter(ing => !currentIds.includes(ing.id));
                 
-                setPopularIngredients(filtered);
+                // Shuffle logic for fresh variety on each visit
+                const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+                setPopularIngredients(shuffled.slice(0, 2));
             }
         };
         fetchPopular();
