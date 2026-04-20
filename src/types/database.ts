@@ -109,6 +109,23 @@ export interface AnalysisResult {
   potentialSynergy?: InteractionResult | null; // 추천용 잠재적 시너지 (데이터베이스 기반)
   projectedScore?: number; // 추천 성분 추가 시의 예상 점수
   analyzed_at: string; // 분석 시각 ISO 8601
+  schedule?: ScheduleSlot[]; // AI생성 복용 시간표
+}
+
+/**
+ * AI 복용 시간표 상세 타입
+ */
+export interface ScheduleItem {
+  ingredient_id: string;
+  name: string;
+  icon: string;
+  note: string;
+}
+
+export interface ScheduleSlot {
+  time_id: "morning_before" | "morning_after" | "lunch_after" | "evening_after" | "night_before" | "anytime";
+  items: ScheduleItem[];
+  ai_insight: string;
 }
 
 

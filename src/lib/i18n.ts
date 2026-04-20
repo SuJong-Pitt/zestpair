@@ -239,7 +239,9 @@ export const UI_TRANSLATIONS = {
             summaryNeutral: "Neutral combination.",
             typeSynergy: "SYNERGY",
             typeCaution: "CAUTION",
-            typeConflict: "CONFLICT"
+            typeConflict: "CONFLICT",
+            actionPlan: "Today's Action Plan",
+            actionPlanSub: "Optimized schedule based on your analysis.",
         },
         dosage: {
             before_meal: "Pre-meal",
@@ -272,8 +274,6 @@ export const UI_TRANSLATIONS = {
             bestValue: "Best Value",
             outOfStock: "Back in stock soon",
             whyRecommend: "Why do we recommend this?",
-            actionPlan: "Today's Action Plan",
-            actionPlanSub: "Optimized schedule based on your analysis.",
             officialReport: "Official Analysis Report",
             clinicalInsights: "AI Clinical Insights",
             evidenceLevel: "Evidence Level",

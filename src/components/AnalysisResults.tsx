@@ -18,6 +18,7 @@ import Toast from "./ui/Toast";
 import OptimizedScoreSection from "./analysis/OptimizedScoreSection";
 import SynergyOptimizer from "./analysis/SynergyOptimizer";
 import ScientificEvidence from "./analysis/ScientificEvidence";
+import DosageSchedule from "./analysis/DosageSchedule";
 
 interface AnalysisResultsProps {
     result: AnalysisResult;
@@ -202,6 +203,9 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
                         {/* 3. Synergy Optimization (Extracted) */}
                         <SynergyOptimizer result={result} language={language} />
+
+                        {/* 3.1 AI Dosage Schedule */}
+                        <DosageSchedule result={result} language={language} />
 
                         {/* 4. Scientific Evidence (Extracted) */}
                         <ScientificEvidence result={result} language={language} />
