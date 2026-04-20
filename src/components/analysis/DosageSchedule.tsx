@@ -82,10 +82,10 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">{t.results.actionPlan}</span>
                 </motion.div>
                 <h3 className="text-2xl md:text-5xl font-[1000] text-white tracking-tighter">
-                    AI 개인 맞춤형 <span className="text-emerald-400">복용 타임라인</span>
+                    {t.results.actionPlan}
                 </h3>
                 <p className="text-slate-400 text-xs md:text-lg font-medium max-w-xl break-keep">
-                    {t.results.actionPlanSub} 성분 간 충돌을 최소화하고 시너지를 극대화하는 최적의 시간표입니다.
+                    {t.results.actionPlanSub}
                 </p>
             </div>
 
@@ -104,7 +104,10 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
                                 className="group relative flex flex-col md:flex-row gap-4 md:gap-8"
                             >
                                 {/* Left: Time Marker */}
-                                <div className="flex items-center md:flex-col md:items-end gap-3 md:pt-4 shrink-0 md:w-32">
+                                <div className={cn(
+                                    "flex items-center md:flex-col md:items-end gap-3 md:pt-4 shrink-0",
+                                    language === 'en' ? "md:w-44" : "md:w-32"
+                                )}>
                                     <div className={cn(
                                         "w-12 h-12 md:w-16 md:h-16 rounded-3xl flex items-center justify-center bg-gradient-to-br shadow-xl group-hover:scale-110 transition-transform duration-500",
                                         config.color
@@ -148,10 +151,6 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-transparent blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                                 
-                                {/* Timeline connecting line (Desktop only) */}
-                                {idx < schedule.length - 1 && (
-                                    <div className="hidden md:block absolute left-8 top-20 bottom-[-32px] w-px bg-gradient-to-b from-white/10 to-transparent" />
-                                )}
                             </motion.div>
                         );
                     })}
