@@ -317,15 +317,22 @@ export default function HomeClient() {
     setAnalyzing(true);
 
     // 공통 분석 로직 호출 (lib/analysis.ts)
-    const result = await performAnalysis(selectedIngredients, language, dbIngredients);
+    const result = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ingredient_ids: selectedIngredients.map(i => i.id),
+        language
+      })
+    }).then(res => res.json());
 
-    if (result) {
-      setAnalysisResult(result);
-      addToHistory(result); // 히스토리에 저장 ✨
+    if (result.success && result.data) {
+      setAnalysisResult(result.data);
+      addToHistory(result.data);
     } else {
       setAnalyzing(false);
     }
-  }, [selectedIngredients, language, dbIngredients, setHasResult, setAnalysisResult, setAnalyzing, addToHistory]);
+  }, [selectedIngredients, language, setHasResult, setAnalysisResult, setAnalyzing, addToHistory]);
 
 
   const handleAnimationComplete = useCallback(() => {

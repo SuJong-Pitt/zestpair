@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import type { Ingredient, Interaction, InteractionResult, AnalysisResult } from "@/types/database";
+import { generateUnifiedAnalysis } from "./gemini";
 
 /**
  * 영양제 조합 분석 코어 로직 (AI 디자인실장 영자 & Pori AI 합작 ✨)
@@ -214,11 +215,21 @@ export async function performAnalysis(
     }
 
 
+    // AI 통합 요약(브리핑 & 시간표) 1회 호출로 해결 ✨ (할당량 최적화)
+    const { briefing: ai_briefing, schedule } = await generateUnifiedAnalysis(
+        selectedIngredients,
+        { synergies, cautions, conflicts },
+        score,
+        language
+    );
+
     return {
         ingredients: [...selectedIngredients],
         synergies, cautions, conflicts, score, summary,
         potentialSynergy,
         projectedScore,
+        ai_briefing,
+        schedule,
         analyzed_at: new Date().toISOString()
     };
 }

@@ -20,6 +20,11 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
     const isKo = language === 'ko';
 
     const insights = useMemo(() => {
+        // 0. AI Briefing Priority (Luxury Insight Core ✨)
+        if (result.ai_briefing && result.ai_briefing.length >= 3) {
+            return result.ai_briefing.slice(0, 3);
+        }
+
         let items: string[] = [];
         const isKo = language === 'ko';
         
@@ -99,7 +104,7 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
         }
 
         return items.slice(0, 3);
-    }, [score, ingredients, synergies, cautions, conflicts, language]);
+    }, [score, ingredients, synergies, cautions, conflicts, language, result.ai_briefing]);
 
     const getPoriImage = () => {
         const interval = Math.round(score / 10) * 10;

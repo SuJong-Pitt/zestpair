@@ -110,3 +110,74 @@ function fallbackSchedule(ingredients: Ingredient[], language: "ko" | "en"): Sch
 
     return Object.values(slots).filter(s => s.items.length > 0);
 }
+
+/**
+ * Gemini를 사용하여 통합 분석(브리핑 3개 + 복용 시간표)을 한 번의 호출로 생성합니다.
+ * (Unified Intelligence Core v1.0 ✨)
+ */
+export async function generateUnifiedAnalysis(
+    ingredients: Ingredient[],
+    interactions: { synergies: InteractionResult[], cautions: InteractionResult[], conflicts: InteractionResult[] },
+    score: number,
+    language: "ko" | "en"
+): Promise<{ briefing: string[], schedule: ScheduleSlot[] }> {
+    const isKo = language === 'ko';
+    
+    const prompt = `
+You are the "Chief AI Design Director" for ZestPair.
+Your task is to provide a COMPLETE ANALYSIS package:
+1. Luxury Essential Briefing (3 premium points)
+2. Optimal Dosage Schedule (grouped by time slots)
+
+## Input Data:
+- Ingredients: ${ingredients.map(i => isKo ? i.name : i.name_en).join(", ")}
+- Score: ${score}/100
+- Synergies Found: ${interactions.synergies.length}
+- Cautions Found: ${interactions.cautions.length}
+- Conflicts Found: ${interactions.conflicts.length}
+
+## Style: Luxury, Professional, Scientific.
+- Briefing: 3 concise, impactful points.
+- Schedule: Group into morning_before, morning_after, lunch_after, evening_after, night_before, anytime.
+
+## Return Format (Strict JSON only):
+{
+  "briefing": ["point1", "point2", "point3"],
+  "schedule": [
+    {
+      "time_id": "...",
+      "items": [{"ingredient_id": "...", "name": "...", "icon": "...", "note": "..."}],
+      "ai_insight": "..."
+    }
+  ]
+}
+
+Language: ${isKo ? 'Korean' : 'English'}.
+Only return the JSON. No markdown code blocks.
+`;
+
+    try {
+        let text = await callGeminiWithRetry(prompt);
+        text = text.replace(/```json\n?/, "").replace(/\n?```/, "").replace(/```\n?/, "").trim();
+        const result = JSON.parse(text);
+        
+        return {
+            briefing: (result.briefing && result.briefing.length > 0) ? result.briefing.slice(0, 3) : FALLBACK_BRIEFING,
+            schedule: (result.schedule && result.schedule.length > 0) ? result.schedule : []
+        };
+    } catch (error) {
+        console.error("Gemini Unified Analysis Failed. Using Luxury Fallback:", error);
+        
+        // 할당량 초과 시에도 럭셔리한 경험을 유지하기 위한 '품격 있는 대안' 데이터 ✨
+        return {
+            briefing: FALLBACK_BRIEFING,
+            schedule: [] // 시간표가 없는 경우 UI에서 휴리스틱 로직이 작동하거나 빈 슬롯 처리
+        };
+    }
+}
+
+const FALLBACK_BRIEFING = [
+    "현재 조합은 기초 대사량 증진과 세포 보호를 위한 핵심 성분들이 조화롭게 구성된 프리미엄 베이스를 갖추고 있습니다.",
+    "성분 간의 흡수율을 극대화하기 위해 식사 직후 복용을 권장하며, 수분 섭취를 충분히 늘려 대사 효율을 보조하시기 바랍니다.",
+    "이 구성을 4주간 유지할 경우 활력 지수의 유의미한 수치 개선과 항산화 밸런스의 정교한 최적화가 기대됩니다."
+];

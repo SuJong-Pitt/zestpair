@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useBasketStore } from "@/store/basketStore";
 import AnalysisResults from "@/components/AnalysisResults";
@@ -28,13 +28,14 @@ function AnalysisContent() {
         clearBasket
     } = useBasketStore();
     
-    const [isLoading, setIsLoading] = useState(!analysisResult);
+    const [isLoading, setIsLoading] = useState(true);
     const [isRedirecting, setIsRedirecting] = useState(false);
+    const isFetchingRef = useRef(false); // 중복 호출 방지용 락 (Race Condition 해결 ✨)
 
     useEffect(() => {
         const handleSharedLink = async () => {
-            // 1. 이미 결과가 있는 경우 (정상 진입)
-            if (analysisResult) {
+            // 1. 이미 결과가 있거나 요청 중이면 중복 실행 방지
+            if (analysisResult || isFetchingRef.current) {
                 setAnalyzing(false);
                 setHasResult(true);
                 setIsLoading(false);
@@ -73,16 +74,32 @@ function AnalysisContent() {
                     });
                     
                     if (selectedIngs.length >= 2) {
+                        // 로딩 시작 및 락 걸기
+                        isFetchingRef.current = true;
+                        setAnalyzing(true);
+
                         // 바구니 업데이트 (공유받은 리스트로 교체)
                         clearBasket();
                         selectedIngs.forEach(ing => addIngredient(ing));
 
-                        // 분석 실행
-                        const result = await performAnalysis(selectedIngs, language, allIngs as Ingredient[]);
-                        if (result) {
-                            setAnalysisResult(result);
+                        // 분석 실행 (서버 사이드 API 호출)
+                        const response = await fetch("/api/analyze", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                ingredient_ids: selectedIngs.map(i => i.id),
+                                language
+                            })
+                        });
+                        const result = await response.json();
+
+                        if (result.success && result.data) {
+                            setAnalysisResult(result.data);
                             setHasResult(true);
                         }
+                        
+                        isFetchingRef.current = false;
+                        setAnalyzing(false);
                     } else {
                         // 성분이 부족하면 홈으로
                         setIsRedirecting(true);

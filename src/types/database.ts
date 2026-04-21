@@ -110,6 +110,7 @@ export interface AnalysisResult {
   projectedScore?: number; // 추천 성분 추가 시의 예상 점수
   analyzed_at: string; // 분석 시각 ISO 8601
   schedule?: ScheduleSlot[]; // AI생성 복용 시간표
+  ai_briefing?: string[]; // AI가 생성한 프리미엄 브리핑 포인트 (3가지)
 }
 
 /**

@@ -22,42 +22,9 @@ const TIME_CONFIG: Record<string, { icon: any, color: string, label: string, lab
 };
 
 const DosageSchedule = memo(function DosageSchedule({ result, language }: DosageScheduleProps) {
-    const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const schedule = result.schedule || [];
+    const isLoading = false; 
     const t = UI_TRANSLATIONS[language];
-
-    useEffect(() => {
-        const fetchSchedule = async () => {
-            setIsLoading(true);
-            try {
-                const response = await fetch("/api/schedule", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        ingredients: result.ingredients,
-                        interactions: {
-                            synergies: result.synergies,
-                            cautions: result.cautions,
-                            conflicts: result.conflicts
-                        },
-                        language
-                    })
-                });
-                const data = await response.json();
-                if (data.success && data.schedule) {
-                    setSchedule(data.schedule);
-                }
-            } catch (err) {
-                console.error("Failed to load schedule:", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        if (result && result.ingredients.length > 0) {
-            fetchSchedule();
-        }
-    }, [result, language]);
 
     if (isLoading) {
         return (
