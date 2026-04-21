@@ -93,6 +93,8 @@ function HorizontalScroll({ children, className }: { children: React.ReactNode; 
       >
         {children}
       </motion.div>
+
+
     </div>
   );
 }
@@ -138,7 +140,7 @@ export default function HomeClient() {
 
   const {
     selectedIngredients, isAnalyzing, hasResult, setAnalyzing, setHasResult, clearBasket, language, setLanguage,
-    analysisResult, setAnalysisResult, removeIngredient, addIngredient
+    analysisResult, setAnalysisResult, removeIngredient, addIngredient, analysisHistory, addToHistory, clearHistory
   } = useBasketStore();
 
   const t = UI_TRANSLATIONS[language];
@@ -319,10 +321,11 @@ export default function HomeClient() {
 
     if (result) {
       setAnalysisResult(result);
+      addToHistory(result); // 히스토리에 저장 ✨
     } else {
       setAnalyzing(false);
     }
-  }, [selectedIngredients, language, dbIngredients, setHasResult, setAnalysisResult, setAnalyzing]);
+  }, [selectedIngredients, language, dbIngredients, setHasResult, setAnalysisResult, setAnalyzing, addToHistory]);
 
 
   const handleAnimationComplete = useCallback(() => {
@@ -627,7 +630,7 @@ export default function HomeClient() {
                     });
                   }}
                   onFocus={() => setIsDropdownOpen(true)}
-                  className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-[11px] md:text-lg h-8 md:h-12 flex-1 font-bold px-1 md:px-4 tracking-tight relative z-20 transition-all duration-500"
+                  className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-base md:text-lg h-10 md:h-12 flex-1 font-bold px-1 md:px-4 tracking-tight relative z-20 transition-all duration-500"
                 />
                 {/* 검색 Input 우측 영역: 기존 버튼들은 아래 액션 바로 이동 */}
               </div>
@@ -944,6 +947,74 @@ export default function HomeClient() {
               </div>
             </motion.div>
 
+            {/* 최근 분석 히스토리 [신규 ✨] */}
+            {isMounted && analysisHistory.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{
+                  opacity: isBlur ? 0.2 : 1,
+                  filter: isBlur ? "blur(10px)" : "blur(0px)",
+                  scale: isBlur ? 0.97 : 1
+                }}
+                className="mt-8 w-full max-w-xl mx-auto"
+              >
+                <div className="flex items-center justify-between gap-4 mb-3 px-2">
+                  <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.25em] flex items-center gap-2 italic">
+                    <RotateCcw size={10} />
+                    {language === 'ko' ? '최근 분석 기록' : 'Recent Scans'}
+                  </span>
+                  <button 
+                    onClick={clearHistory}
+                    className="text-[9px] font-bold text-white/20 hover:text-red-400 transition-colors uppercase tracking-wider"
+                  >
+                    {language === 'ko' ? '기록 삭제' : 'Clear All'}
+                  </button>
+                </div>
+                
+                <div className="flex flex-wrap justify-center gap-2">
+                  {analysisHistory.map((history, hIdx) => (
+                    <motion.button
+                      key={history.analyzed_at || hIdx}
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => {
+                        clearBasket();
+                        history.ingredients.forEach(ing => addIngredient(ing));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="group relative flex items-center gap-2 pl-3 pr-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all shadow-lg"
+                    >
+                      <div className="flex -space-x-2 mr-1">
+                        {history.ingredients.slice(0, 3).map((ing, i) => (
+                          <div 
+                            key={ing.id} 
+                            className="w-6 h-6 rounded-full bg-slate-800 border-2 border-slate-900 flex items-center justify-center text-xs shadow-sm"
+                            style={{ zIndex: 3 - i }}
+                          >
+                            {ing.icon_emoji}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex flex-col items-start min-w-0">
+                        <span className="text-[10px] font-black text-white/80 line-clamp-1 max-w-[120px]">
+                          {history.ingredients.map(ing => language === 'ko' ? ing.name : ing.name_en).join(', ')}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                           <span className="text-[8px] font-bold" style={{ color: history.score >= 80 ? '#10b981' : history.score >= 60 ? '#f59e0b' : '#f87171' }}>
+                            SCORE: {history.score}
+                           </span>
+                           <span className="w-1 h-1 rounded-full bg-white/10" />
+                           <span className="text-[8px] font-medium text-white/20">
+                            {new Date(history.analyzed_at || '').toLocaleDateString(language, { month: 'short', day: 'numeric' })}
+                           </span>
+                        </div>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* 인기 태그 */}
             <motion.div
               animate={{
@@ -952,7 +1023,7 @@ export default function HomeClient() {
                 scale: isBlur ? 0.98 : 1
               }}
               transition={{ duration: 0.4 }}
-              className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2"
+              className="mt-10 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2"
             >
               <span className="text-[9px] text-white/50 font-black uppercase tracking-[0.25em] whitespace-nowrap">
                 {language === 'ko' ? '인기' : 'POPULAR'}:
@@ -1005,18 +1076,29 @@ export default function HomeClient() {
               { icon: "🔬", text: language === 'ko' ? 'AI 성분 매칭' : 'AI Matching', color: "#34d399" },
               { icon: "🛡️", text: language === 'ko' ? '충돌 감지' : 'Conflict Alert', color: "#f87171" },
               { icon: "✨", text: language === 'ko' ? '시너지 발견' : 'Synergy Finder', color: "#a78bfa" },
-              { icon: "📱", text: language === 'ko' ? 'App 출시 예정' : 'App Coming Soon', color: "#60a5fa" },
+              { 
+                icon: "📱", 
+                text: language === 'ko' ? 'App 출시 예정' : 'App Coming Soon', 
+                color: "#60a5fa",
+                onClick: () => alert(language === 'ko' ? '모바일 전용 ZestPair App이 곧 출시됩니다! 기대해 주세요.' : 'ZestPair App for mobile is coming soon! Stay tuned.')
+              },
               { icon: "💚", text: language === 'ko' ? '무료 서비스' : 'Free Forever', color: "#34d399" },
-            ].map((badge, i) => (
-              <motion.span
+            ].map((badge: any, i) => (
+              <motion.button
                 key={i}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.05, y: -2, backgroundColor: "rgba(255,255,255,0.08)" }}
+                whileTap={{ scale: 0.95 }}
+                onClick={badge.onClick}
                 transition={{
                   delay: !hasInitialLoaded ? (1.6 + i * 0.05) : 0,
                   duration: 0.3
                 }}
-                className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[8.5px] md:text-[11px] font-[900] whitespace-nowrap hover:-translate-y-0.5 transition-transform"
+                className={cn(
+                  "inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[8.5px] md:text-[11px] font-[900] whitespace-nowrap transition-all",
+                  badge.onClick ? "cursor-pointer" : "cursor-default"
+                )}
                 style={{
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.12)",
@@ -1026,7 +1108,7 @@ export default function HomeClient() {
               >
                 <span className="filter drop-shadow-[0_0_5px_rgba(0,0,0,0.3)]">{badge.icon}</span>
                 <span className="tracking-tighter">{badge.text}</span>
-              </motion.span>
+              </motion.button>
             ))}
           </motion.div>
         </div>
@@ -1055,8 +1137,10 @@ export default function HomeClient() {
                 </span>
               </div>
             </div>
-            {/* 카테고리 나래비 (모바일 그리드 / 데스크탑 플렉스) */}
-            <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-2 md:gap-3 px-1 md:px-0 pt-1 pb-6">
+            {/* 카테고리 나래비 (모바일 가로 스크롤 / 데스크탑 플렉스) ✨ */}
+            <div 
+              className="flex overflow-x-auto no-scrollbar sm:flex-wrap items-center justify-start sm:justify-center gap-2 md:gap-3 px-1 md:px-0 pt-1 pb-6 [-ms-overflow-style:none] [scrollbar-width:none]"
+            >
               {Object.entries(CATEGORIES_TRANSLATIONS).map(([key, data]) => {
                 const isActive = selectedCategory === key;
                 return (
@@ -1346,73 +1430,75 @@ export default function HomeClient() {
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95, y: 30 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
-                      className="flex flex-col items-center justify-center py-20 px-8 text-center"
+                      className="flex flex-col items-center justify-center py-12 px-8 text-center"
                     >
-                      <div className="relative mb-10 group">
+                      <div className="relative mb-8 group">
                         {/* 프리미엄 리어 글로우 (오로라 효과) - 일관성 유지 */}
                         <div className="absolute inset-0 bg-emerald-300 blur-[100px] opacity-30 rounded-full group-hover:scale-110 transition-transform duration-1000" />
-                        <div className="absolute inset-0 bg-cyan-200 blur-[70px] opacity-20 rounded-full -translate-x-6 translate-y-6" />
-
+                        
                         {/* 깜찍한 3D 포리 애니메이션 */}
                         <motion.div
-                          className="relative z-10 w-44 h-44 md:w-60 md:h-60 object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)]"
-                          animate={{
-                            y: [0, -15, 0],
-                            rotate: [0, 2, -1, 0]
-                          }}
-                          transition={{
-                            duration: 5,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                          }}
+                          className="relative z-10 w-32 h-32 md:w-44 md:h-44 object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.1)]"
+                          animate={{ y: [0, -10, 0] }}
+                          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         >
                           <Image
                             src="/images/pori.png"
                             alt="Pori Mascot"
-                            width={240}
-                            height={240}
+                            width={180}
+                            height={180}
                             className="w-full h-full object-contain"
                           />
                         </motion.div>
-
-                        {/* 바닥 그림자 애니메이션 */}
-                        <motion.div
-                          animate={{
-                            scaleX: [0.8, 1, 0.8],
-                            opacity: [0.1, 0.18, 0.1]
-                          }}
-                          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                          className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-2.5 bg-black/30 blur-lg rounded-full"
-                        />
                       </div>
 
-                      <div className="space-y-4 max-w-sm">
-                        <h3 className="text-2xl md:text-3xl font-[1000] text-slate-800 tracking-tighter leading-tight drop-shadow-sm">
+                      <div className="space-y-3 max-w-sm mb-10">
+                        <h3 className="text-xl md:text-2xl font-[1000] text-slate-800 tracking-tighter leading-tight">
                           {t.common.poriNoResult}
                         </h3>
-                        <p className="text-slate-400 font-bold text-sm md:text-base leading-relaxed opacity-90">
+                        <p className="text-slate-400 font-bold text-xs md:text-sm leading-relaxed opacity-90">
                           {t.common.poriNoResultSub}
                         </p>
                       </div>
 
-                      <div className="mt-12">
+                      {/* [신규] 대안 제안: 인기 성분 바로가기 */}
+                      <div className="w-full max-w-md mx-auto mb-10">
+                        <div className="flex items-center gap-2 mb-4 justify-center">
+                          <span className="h-px w-8 bg-slate-200" />
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Maybe Try These?</span>
+                          <span className="h-px w-8 bg-slate-200" />
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-2">
+                          {popularIngredients.slice(0, 4).map((ing) => (
+                            <button
+                              key={ing.id}
+                              onClick={() => {
+                                setInputValue(language === 'ko' ? ing.name : ing.name_en);
+                                startTransition(() => setSearchQuery(language === 'ko' ? ing.name : ing.name_en));
+                              }}
+                              className="px-3 py-1.5 rounded-xl bg-white border border-slate-100 text-slate-600 text-[10px] font-bold hover:border-emerald-300 hover:text-emerald-500 transition-all shadow-sm active:scale-95"
+                            >
+                              {ing.icon_emoji} {language === 'ko' ? ing.name : ing.name_en}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="">
                         <button
                           onClick={() => {
                             setInputValue("");
                             startTransition(() => setSearchQuery(""));
                             setSelectedCategory("all");
                           }}
-                          className="group/btn relative px-10 h-14 rounded-full font-black text-lg transition-all active:scale-95 shadow-xl hover:shadow-2xl overflow-hidden"
+                          className="group/btn relative px-8 h-12 rounded-full font-black text-sm transition-all active:scale-95 shadow-lg hover:shadow-xl overflow-hidden"
                           style={{
                             background: "linear-gradient(135deg, #10b981 0%, #0891b2 100%)",
                             color: "white"
                           }}
                         >
-                          {/* 내부 쉬머(Shimmer) 애니메이션 */}
-                          <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] animate-shimmer pointer-events-none" />
-
-                          <div className="relative flex items-center gap-3">
-                            <RefreshCcw className="h-5 w-5 group-hover/btn:rotate-180 transition-transform duration-700" />
+                          <div className="relative flex items-center gap-2">
+                            <RefreshCcw className="h-4 w-4 group-hover/btn:rotate-180 transition-transform duration-700" />
                             <span>{t.common.viewAllIngredients}</span>
                           </div>
                         </button>
@@ -1485,6 +1571,8 @@ export default function HomeClient() {
           </motion.div>
         )}
       </AnimatePresence>
+
+
     </div>
   );
 }

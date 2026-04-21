@@ -5,6 +5,25 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 /**
+ * 재시도 로직을 포함한 Gemini 호출 래퍼 (Exponential Backoff ✨)
+ */
+async function callGeminiWithRetry(prompt: string, retries = 2, delay = 2000): Promise<string> {
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text().trim();
+    } catch (error: any) {
+        // 429 (Too Many Requests) 에러 발생 시 재시도
+        if (retries > 0 && (error?.status === 429 || error?.message?.includes("429"))) {
+            console.warn(`[Kodari Alert] Gemini Quota hit! Retrying in ${delay}ms... (Remains: ${retries})`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return callGeminiWithRetry(prompt, retries - 1, delay * 2);
+        }
+        throw error;
+    }
+}
+
+/**
  * Gemini를 사용하여 최적의 영양제 복용 시간표를 생성합니다. (AI Core v2.5)
  */
 export async function generateDosageSchedule(
@@ -45,9 +64,7 @@ Only return the JSON array. Do not include markdown code blocks.
 `;
 
     try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        let text = response.text().trim();
+        let text = await callGeminiWithRetry(prompt);
         
         // Remove markdown code blocks if present
         if (text.startsWith("```json")) {
@@ -60,9 +77,15 @@ Only return the JSON array. Do not include markdown code blocks.
         
         // Filter out empty slots
         return rawSchedule.filter(slot => slot.items.length > 0);
-    } catch (error) {
-        console.error("Gemini Schedule Generation Failed:", error);
-        // Fallback: simple grouping if AI fails
+    } catch (error: any) {
+        // 할당량 초과 에러일 경우 워닝으로 처리
+        if (error?.status === 429) {
+            console.warn("Gemini Quota Exceeded. Using Fallback Schedule.");
+        } else {
+            console.error("Gemini Schedule Generation Failed:", error);
+        }
+        
+        // Fallback: AI 호출 실패 시 휴리스틱 알고리즘으로 대체
         return fallbackSchedule(ingredients, language);
     }
 }

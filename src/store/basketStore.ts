@@ -15,6 +15,7 @@ interface BasketState {
     language: "ko" | "en";
     isBasketExpanded: boolean;
     analysisResult: AnalysisResult | null;
+    analysisHistory: AnalysisResult[];
 
     // Actions
     addIngredient: (ingredient: Ingredient) => void;
@@ -27,6 +28,8 @@ interface BasketState {
     setLanguage: (lang: "ko" | "en") => void;
     setBasketExpanded: (value: boolean) => void;
     setAnalysisResult: (result: AnalysisResult | null) => void;
+    addToHistory: (result: AnalysisResult) => void;
+    clearHistory: () => void;
 }
 
 /**
@@ -43,6 +46,7 @@ export const useBasketStore = create<BasketState>()(
             language: "ko",
             isBasketExpanded: false,
             analysisResult: null,
+            analysisHistory: [],
 
             addIngredient: (ingredient) => {
                 const { selectedIngredients } = get();
@@ -89,16 +93,33 @@ export const useBasketStore = create<BasketState>()(
             setBasketExpanded: (value) => set({ isBasketExpanded: value }),
 
             setAnalysisResult: (result) => set({ analysisResult: result }),
+
+            addToHistory: (result) => {
+                const { analysisHistory } = get();
+                // 동일한 조합(성분 ID 기준)이 이미 히스토리에 있다면 최상단으로 올리기만 함
+                const currentIds = result.ingredients.map(i => i.id).sort().join(',');
+                const filtered = analysisHistory.filter(h => {
+                    const hIds = h.ingredients.map(i => i.id).sort().join(',');
+                    return hIds !== currentIds;
+                });
+                
+                // 최대 6개까지만 보관 (가독성 고려 ✨)
+                set({
+                    analysisHistory: [result, ...filtered].slice(0, 6)
+                });
+            },
+
+            clearHistory: () => set({ analysisHistory: [] }),
         }),
         {
             name: "zestpair-basket", // localStorage key
             storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({
-                // 이제 분석 결과도 로컬에 보관하여 로그인 없이도 히스토리 유지 가능 ✨
                 selectedIngredients: state.selectedIngredients,
                 language: state.language,
                 analysisResult: state.analysisResult,
                 hasResult: state.hasResult,
+                analysisHistory: state.analysisHistory,
             }),
         }
     )

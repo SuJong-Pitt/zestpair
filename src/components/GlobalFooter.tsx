@@ -5,6 +5,7 @@ import { UI_TRANSLATIONS } from "@/lib/i18n";
 import { BrandLogo, BrandName } from "@/components/BrandAssets";
 import { Mail, ArrowRight, Shield } from "lucide-react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function GlobalFooter() {
   const { language } = useBasketStore();
@@ -221,8 +222,20 @@ export default function GlobalFooter() {
             © 2026 ZESTPAIR. All Rights Reserved.
           </p>
           <div className="flex gap-8 text-[10px] font-bold text-slate-700 uppercase tracking-widest">
-            <span className="hover:text-slate-400 cursor-pointer transition-colors duration-200">Privacy Policy</span>
-            <span className="hover:text-slate-400 cursor-pointer transition-colors duration-200">Terms of Service</span>
+            <Link 
+              href="/privacy"
+              className="hover:text-emerald-400 cursor-pointer transition-colors duration-300 relative group"
+            >
+              Privacy Policy
+              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-emerald-500 transition-all group-hover:w-full" />
+            </Link>
+            <Link 
+              href="/terms"
+              className="hover:text-emerald-400 cursor-pointer transition-colors duration-300 relative group"
+            >
+              Terms of Service
+              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-emerald-500 transition-all group-hover:w-full" />
+            </Link>
           </div>
         </div>
       </div>
