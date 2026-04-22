@@ -157,6 +157,17 @@ export interface CoupangAffiliateSlot {
 }
 
 // ============================================================
+// AI 분석 캐시 (AI Analysis Cache)
+// ============================================================
+
+export interface AIAnalysisCache {
+  cache_key: string;
+  response: AnalysisResult;
+  language: string;
+  created_at: string;
+}
+
+// ============================================================
 // API 요청/응답 타입
 // ============================================================
 
@@ -191,6 +202,11 @@ export type Database = {
         Update: Partial<
           Omit<Interaction, "id" | "created_at" | "updated_at" | "ingredient_a" | "ingredient_b">
         >;
+      };
+      ai_analysis_cache: {
+        Row: AIAnalysisCache;
+        Insert: Omit<AIAnalysisCache, "created_at">;
+        Update: Partial<Omit<AIAnalysisCache, "created_at">>;
       };
     };
     Views: Record<string, never>;
