@@ -1199,26 +1199,28 @@ export default function HomeClient() {
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                             }
                           }}
-                          className="px-3.5 py-3 rounded-xl transition-all active:scale-95 flex items-center justify-between gap-1.5 group/combo"
+                          className="px-2.5 py-3 md:px-4 md:py-3.5 rounded-xl transition-all active:scale-95 flex items-center justify-between gap-1 group/combo"
                           style={{
-                            background: "rgba(10, 15, 30, 0.4)",
+                            background: "rgba(10, 15, 30, 0.45)",
                             border: "1px solid rgba(255, 255, 255, 0.08)",
-                            backdropFilter: "blur(12px)",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.25)"
+                            backdropFilter: "blur(16px)",
+                            boxShadow: "0 4px 14px rgba(0,0,0,0.3)"
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = "rgba(16, 185, 129, 0.35)";
-                            e.currentTarget.style.background = "rgba(16, 185, 129, 0.08)";
-                            e.currentTarget.style.boxShadow = "0 0 15px rgba(16, 185, 129, 0.15)";
+                            e.currentTarget.style.borderColor = "rgba(16, 185, 129, 0.4)";
+                            e.currentTarget.style.background = "rgba(16, 185, 129, 0.1)";
+                            e.currentTarget.style.boxShadow = "0 0 20px rgba(16, 185, 129, 0.2)";
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
-                            e.currentTarget.style.background = "rgba(10, 15, 30, 0.4)";
-                            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.25)";
+                            e.currentTarget.style.background = "rgba(10, 15, 30, 0.45)";
+                            e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,0,0,0.3)";
                           }}
                         >
-                          <span className="truncate text-white/70 group-hover/combo:text-emerald-300 transition-colors">{combo.label}</span>
-                          <ChevronRight size={12} className="text-white/20 group-hover/combo:text-emerald-400 group-hover/combo:translate-x-0.5 transition-all shrink-0" />
+                          <span className="text-[10px] md:text-xs font-black text-white/80 group-hover/combo:text-emerald-300 transition-colors tracking-tighter md:tracking-tight leading-tight text-left">
+                            {combo.label}
+                          </span>
+                          <ChevronRight size={10} className="text-white/20 group-hover/combo:text-emerald-400 group-hover/combo:translate-x-0.5 transition-all shrink-0 md:size-3" />
                         </button>
                       ))}
                     </div>
