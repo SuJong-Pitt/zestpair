@@ -2,16 +2,65 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { Ingredient, InteractionResult, ScheduleSlot } from "@/types/database";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+
+/**
+ * 사용자의 의도(예: "잠이 안 와", "피곤해")를 분석하여 등록된 성분 중 가장 적합한 성분들을 매칭합니다.
+ * (할당량 최적화를 위해 최소한의 성분 정보만 사용하여 호출합니다.)
+ */
+export async function matchIngredientsByIntent(
+    intent: string,
+    availableIngredients: { id: string, name: string, short_description: string }[]
+): Promise<string[]> {
+    const ingredientsContext = availableIngredients.map(ing => `- ${ing.name} (ID: ${ing.id}): ${ing.short_description}`).join('\n');
+    
+    const prompt = `
+You are an expert nutritionist AI for "ZestPair".
+Analyze the user's intent and select the 2-3 most appropriate ingredient IDs from the list below.
+
+[Available Ingredients]
+${ingredientsContext}
+
+[User Intent]
+"${intent}"
+
+[Rules]
+1. Select only the most relevant 2-3 ingredients.
+2. Return ONLY a JSON array of strings containing the ingredient IDs.
+3. No explanation, no other text.
+
+Example: ["uuid-1", "uuid-2"]
+`;
+
+    try {
+        console.log(`[AI Match] Analyzing intent: "${intent}"`);
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        let text = response.text().trim();
+        
+        // JSON 추출 로직 (마크다운 등 제거)
+        text = text.replace(/```json\n?/, "").replace(/\n?```/, "").replace(/```\n?/, "").trim();
+        const ingredientIds = JSON.parse(text);
+        
+        console.log(`[AI Match] Successfully matched ${ingredientIds.length} ingredients.`);
+        return Array.isArray(ingredientIds) ? ingredientIds : [];
+    } catch (error) {
+        console.error("[AI Match] Error matching ingredients:", error);
+        return [];
+    }
+}
 
 /**
  * 재시도 로직을 포함한 Gemini 호출 래퍼 (Exponential Backoff ✨)
  */
 async function callGeminiWithRetry(prompt: string, retries = 2, delay = 2000): Promise<string> {
     try {
+        console.log(`[Gemini API] Requesting content... (Prompt length: ${prompt.length})`);
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        return response.text().trim();
+        const text = response.text().trim();
+        console.log(`[Gemini API] Success! Response received.`);
+        return text;
     } catch (error: any) {
         // 429 (Too Many Requests) 에러 발생 시 재시도
         if (retries > 0 && (error?.status === 429 || error?.message?.includes("429"))) {
@@ -119,8 +168,8 @@ export async function generateUnifiedAnalysis(
     ingredients: Ingredient[],
     interactions: { synergies: InteractionResult[], cautions: InteractionResult[], conflicts: InteractionResult[] },
     score: number,
-    language: "ko" | "en"
-): Promise<{ briefing: string[], schedule: ScheduleSlot[] }> {
+    language: "ko" | "en" = "ko"
+): Promise<{ briefing: string[], schedule: ScheduleSlot[], isFallback: boolean }> {
     const isKo = language === 'ko';
     
     const prompt = `
@@ -163,15 +212,18 @@ Only return the JSON. No markdown code blocks.
         
         return {
             briefing: (result.briefing && result.briefing.length > 0) ? result.briefing.slice(0, 3) : FALLBACK_BRIEFING,
-            schedule: (result.schedule && result.schedule.length > 0) ? result.schedule : []
+            schedule: (result.schedule && result.schedule.length > 0) ? result.schedule : [],
+            isFallback: false // 성공 시 false 명시 ✨
         };
     } catch (error) {
-        console.error("Gemini Unified Analysis Failed. Using Luxury Fallback:", error);
+        console.warn("⚠️ [Gemini API] Unified Analysis Failed. Using Luxury Fallback Text.");
+        console.error("Error Detail:", error);
         
         // 할당량 초과 시에도 럭셔리한 경험을 유지하기 위한 '품격 있는 대안' 데이터 ✨
         return {
             briefing: FALLBACK_BRIEFING,
-            schedule: [] // 시간표가 없는 경우 UI에서 휴리스틱 로직이 작동하거나 빈 슬롯 처리
+            schedule: [],
+            isFallback: true // 캐시 방지 등을 위한 플래그 추가
         };
     }
 }

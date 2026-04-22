@@ -143,6 +143,11 @@ export default function HomeClient() {
     analysisResult, setAnalysisResult, removeIngredient, addIngredient, analysisHistory, addToHistory, clearHistory
   } = useBasketStore();
 
+  // AI 매칭 관련 상태
+  const [aiIntent, setAiIntent] = useState("");
+  const [isAiMatching, setIsAiMatching] = useState(false);
+  const [aiMatchError, setAiMatchError] = useState<string | null>(null);
+
   const t = UI_TRANSLATIONS[language];
 
   useEffect(() => {
@@ -316,23 +321,67 @@ export default function HomeClient() {
     setAnalysisResult(null);
     setAnalyzing(true);
 
-    // 공통 분석 로직 호출 (lib/analysis.ts)
-    const result = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ingredient_ids: selectedIngredients.map(i => i.id),
-        language
-      })
-    }).then(res => res.json());
+    // 공통 분석 로직 호출 (api/analyze/route.ts)
+    try {
+      const result = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ingredient_ids: selectedIngredients.map(i => i.id),
+          language
+        })
+      }).then(res => res.json());
 
-    if (result.success && result.data) {
-      setAnalysisResult(result.data);
-      addToHistory(result.data);
-    } else {
+      if (result.success && result.data) {
+        setAnalysisResult(result.data);
+        addToHistory(result.data);
+      } else {
+        setAnalyzing(false);
+      }
+    } catch (error) {
+      console.error("Analysis failed:", error);
       setAnalyzing(false);
     }
   }, [selectedIngredients, language, setHasResult, setAnalysisResult, setAnalyzing, addToHistory]);
+
+  const handleAiMatch = useCallback(async () => {
+    if (!aiIntent || aiIntent.trim().length < 2 || isAiMatching) return;
+
+    setIsAiMatching(true);
+    setAiMatchError(null);
+
+    try {
+      const response = await fetch("/api/match-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ intent: aiIntent, language })
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data && result.data.length > 0) {
+        const matchedIngredients = dbIngredients.filter(ing => result.data.includes(ing.id));
+        
+        if (matchedIngredients.length > 0) {
+          clearBasket();
+          matchedIngredients.forEach(ing => addIngredient(ing));
+          setAiIntent("");
+          
+          // AI가 찾은 후 바로 분석까지 실행할지, 아니면 사용자에게 보여줄지 선택 가능
+          // 여기서는 사용자에게 "AI가 이 조합을 추천했습니다"라고 보여주는 방향으로 유지합니다.
+          // (필요 시 바로 handleAnalyze() 호출 가능)
+        } else {
+          setAiMatchError(language === 'ko' ? "적절한 성분을 찾지 못했습니다." : "No matching ingredients found.");
+        }
+      } else {
+        setAiMatchError(language === 'ko' ? "AI 분석에 실패했습니다." : "AI matching failed.");
+      }
+    } catch (error) {
+      setAiMatchError(language === 'ko' ? "네트워크 오류가 발생했습니다." : "Network error occurred.");
+    } finally {
+      setIsAiMatching(false);
+    }
+  }, [aiIntent, isAiMatching, dbIngredients, clearBasket, addIngredient, language]);
 
 
   const handleAnimationComplete = useCallback(() => {
@@ -542,6 +591,55 @@ export default function HomeClient() {
             transition={{ duration: 0.7, delay: 1.25, ease: [0.22, 1, 0.36, 1] }}
             className="relative max-w-2xl mx-auto group z-[800]"
           >
+            {/* === [신규] AI 상태 매칭 입력 필드 === */}
+            <div className="mb-6 px-4">
+              <div className="relative group/ai-input">
+                <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-purple-500/20 rounded-2xl blur opacity-75 group-focus-within/ai-input:opacity-100 transition-opacity" />
+                <div className="relative flex items-center gap-3 px-5 py-3.5 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
+                  <div className="shrink-0">
+                    {isAiMatching ? (
+                      <RefreshCcw size={18} className="text-emerald-400 animate-spin" />
+                    ) : (
+                      <Sparkles size={18} className="text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    value={aiIntent}
+                    onChange={(e) => setAiIntent(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAiMatch()}
+                    placeholder={language === 'ko' ? "현재 상태를 말씀해주세요 (예: 요즘 너무 피곤해)" : "How do you feel? (e.g., I'm so tired)"}
+                    className="flex-1 bg-transparent border-none text-white placeholder:text-white/30 focus:ring-0 text-sm md:text-base font-medium"
+                  />
+                  <button
+                    onClick={handleAiMatch}
+                    disabled={aiIntent.length < 2 || isAiMatching}
+                    className={cn(
+                      "px-4 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all",
+                      aiIntent.length >= 2 && !isAiMatching
+                        ? "bg-emerald-500 text-slate-900 hover:bg-emerald-400 hover:scale-105 active:scale-95"
+                        : "bg-white/5 text-white/30 cursor-not-allowed"
+                    )}
+                  >
+                    {isAiMatching ? "Matching..." : "Match"}
+                  </button>
+                </div>
+                {aiMatchError && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute -bottom-6 left-5 text-[10px] font-bold text-red-400/80"
+                  >
+                    {aiMatchError}
+                  </motion.p>
+                )}
+              </div>
+              <div className="mt-3 flex items-center justify-center gap-4 text-[10px] font-bold text-white/30 tracking-widest uppercase">
+                <span className="flex items-center gap-1"><Zap size={10} /> Instant Match</span>
+                <span className="w-1 h-1 rounded-full bg-white/10" />
+                <span className="flex items-center gap-1"><Sparkles size={10} /> AI Powered</span>
+              </div>
+            </div>
             {/* 메인 펄스 글로우 - 데스크탑 전용 (모바일에서 비활성화) */}
             {!isMobile && (
               <motion.div

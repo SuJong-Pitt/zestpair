@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
                     allIngredients as Ingredient[]
                 );
                 
-                if (res) {
+                // 임시 데이터(is_fallback)가 아닐 때만 캐시에 저장 ✨
+                if (res && !res.is_fallback) {
                     analysisCache.set(cacheKey, res);
                 }
                 return res;
