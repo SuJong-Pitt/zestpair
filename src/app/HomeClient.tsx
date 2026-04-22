@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, useMemo, useCallback, useTransition } from "react";
-import { Search, ChevronDown, ChevronRight, Info, Sparkles, Languages, X, Zap, RotateCcw, RefreshCcw } from "lucide-react";
+import { Search, ChevronDown, ChevronRight, Info, Sparkles, Languages, X, Zap, RotateCcw, RefreshCcw, Activity } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -1140,22 +1140,26 @@ export default function HomeClient() {
               )}
             </AnimatePresence>
 
-            {/* 퀵 스타트 조합 */}
+            {/* === [신규] 인기 프로토콜 (추천 조합) === */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{
-                opacity: isBlur ? 0.3 : 1,
+                opacity: isBlur ? 0.2 : 1,
                 y: 0,
-                filter: isBlur ? "blur(8px)" : "blur(0px)",
-                scale: isBlur ? 0.98 : 1
+                filter: isBlur ? "blur(12px)" : "blur(0px)",
+                scale: isBlur ? 0.96 : 1
               }}
-              transition={{ duration: 0.4 }}
-              className="mt-6 flex flex-col items-center gap-3"
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-8 flex flex-col items-center gap-4"
             >
-              <span className="text-[10px] font-black text-emerald-400/60 uppercase tracking-[0.2em] flex items-center gap-2">
-                <Zap size={10} className="fill-current" />
-                {t.hero.quickStart}
-              </span>
+              <div className="flex items-center gap-2">
+                <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-emerald-500/30" />
+                <span className="text-[10px] md:text-[11px] font-black text-emerald-400/70 uppercase tracking-[0.25em] flex items-center gap-2">
+                  <Activity size={12} className="text-emerald-500" />
+                  {t.hero.quickStart}
+                </span>
+                <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-emerald-500/30" />
+              </div>
               <div className="flex flex-wrap justify-center gap-2 px-4 min-h-[44px]">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -1195,10 +1199,26 @@ export default function HomeClient() {
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                             }
                           }}
-                          className="px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/10 text-white/80 hover:text-emerald-300 text-[10px] md:text-xs font-bold transition-all active:scale-95 shadow-lg flex items-center justify-between gap-1 group/combo"
+                          className="px-3.5 py-3 rounded-xl transition-all active:scale-95 flex items-center justify-between gap-1.5 group/combo"
+                          style={{
+                            background: "rgba(10, 15, 30, 0.4)",
+                            border: "1px solid rgba(255, 255, 255, 0.08)",
+                            backdropFilter: "blur(12px)",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.25)"
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = "rgba(16, 185, 129, 0.35)";
+                            e.currentTarget.style.background = "rgba(16, 185, 129, 0.08)";
+                            e.currentTarget.style.boxShadow = "0 0 15px rgba(16, 185, 129, 0.15)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
+                            e.currentTarget.style.background = "rgba(10, 15, 30, 0.4)";
+                            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.25)";
+                          }}
                         >
-                          <span className="truncate">{combo.label}</span>
-                          <ChevronRight size={12} className="group-hover/combo:translate-x-0.5 transition-transform opacity-30 group-hover/combo:opacity-100 shrink-0" />
+                          <span className="truncate text-white/70 group-hover/combo:text-emerald-300 transition-colors">{combo.label}</span>
+                          <ChevronRight size={12} className="text-white/20 group-hover/combo:text-emerald-400 group-hover/combo:translate-x-0.5 transition-all shrink-0" />
                         </button>
                       ))}
                     </div>
