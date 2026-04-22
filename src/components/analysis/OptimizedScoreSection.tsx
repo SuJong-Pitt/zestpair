@@ -173,37 +173,96 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                     {/* Summary Box */}
                     <ReportSummary result={result} className="w-full max-w-2xl mb-4" />
 
+                    {/* My Selected Stack - Personalized Verification Section ✨ */}
+                    <div className="w-full max-w-2xl mb-8 pt-6 border-t border-white/[0.04] space-y-6">
+                        <div className="flex items-center justify-between px-2">
+                            <div className="flex items-center gap-3">
+                                <div className="p-1.5 rounded-lg bg-emerald-500/10">
+                                    <TrendingUp size={14} className="text-emerald-400" />
+                                </div>
+                                <h5 className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                    {isKo ? "사용자 맞춤 성분 분석 대상" : "My Selected Stack"}
+                                </h5>
+                            </div>
+                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">
+                                    {result.ingredients.length} {isKo ? "개 성분 검증 완료" : "Ingredients Verified"}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                            {result.ingredients.map((ing, i) => (
+                                <motion.a
+                                    key={ing.id}
+                                    href={isKo 
+                                        ? (ing.coupang_url || `https://www.coupang.com/np/search?q=${encodeURIComponent(ing.name)}`)
+                                        : (ing.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(ing.name_en || ing.name)}`)
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.1 + i * 0.05 }}
+                                    className="flex items-center gap-2.5 bg-white/[0.03] border border-white/10 rounded-2xl px-5 py-3 backdrop-blur-md hover:bg-white/[0.08] hover:border-emerald-500/50 transition-all group/ing shadow-lg"
+                                >
+                                    <div className="relative">
+                                        <span className="text-xl md:text-2xl group-hover/ing:scale-110 transition-transform inline-block">
+                                            {ing.icon_emoji}
+                                        </span>
+                                        <motion.div 
+                                            animate={{ opacity: [0, 1, 0] }}
+                                            transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
+                                            className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400/50 blur-[2px]"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col items-start leading-tight">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-[13px] md:text-[15px] font-black text-white group-hover/ing:text-emerald-400 transition-colors">
+                                                {isKo ? ing.name : ing.name_en}
+                                            </span>
+                                            <ArrowRight size={10} className="text-white/20 group-hover/ing:text-emerald-400 group-hover/ing:translate-x-0.5 transition-all" />
+                                        </div>
+                                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">
+                                            {isKo ? ing.category : ing.category}
+                                        </span>
+                                    </div>
+                                </motion.a>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Score Rationale Breakdown */}
                     <div className={cn(
-                        "w-full max-w-2xl mb-6 p-5 md:p-6 rounded-[2rem] backdrop-blur-md transition-all duration-700",
+                        "w-full max-w-2xl mb-10 p-5 md:p-8 rounded-[2.5rem] backdrop-blur-md transition-all duration-700",
                         scoreRationale.isHighEnd 
-                            ? "bg-yellow-500/[0.03] border border-yellow-500/20 shadow-[0_10px_40px_-15px_rgba(251,191,36,0.1)]" 
-                            : "bg-white/[0.03] border border-white/10"
+                            ? "bg-yellow-500/[0.03] border border-yellow-500/20 shadow-[0_20px_50px_-20px_rgba(251,191,36,0.15)]" 
+                            : "bg-white/[0.03] border border-white/10 shadow-2xl"
                     )}>
-                        <div className="flex items-center justify-between mb-5 px-1">
+                        <div className="flex items-center justify-between mb-6 px-1">
                             <div className="flex items-center gap-2">
                                 <Info size={12} className={scoreRationale.isHighEnd ? "text-yellow-500/50" : "text-slate-500"} />
                                 <h5 className={cn(
                                     "text-[10px] font-black uppercase tracking-[0.2em]",
                                     scoreRationale.isHighEnd ? "text-yellow-500/70" : "text-slate-500"
                                 )}>
-                                    {isKo ? "점수 산정 근거" : "Score Rationale"}
+                                    {isKo ? "과학적 정밀 분석 지표" : "Precision Analysis Metrics"}
                                 </h5>
                             </div>
                             <div className={cn("h-px flex-1 ml-4", scoreRationale.isHighEnd ? "bg-yellow-500/10" : "bg-white/5")} />
                         </div>
                         <div className="grid grid-cols-3 gap-4">
-                            <div className="flex flex-col items-center gap-1">
-                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Synergy</span>
-                                <span className="text-xl md:text-2xl font-black text-emerald-400">+{scoreRationale.synergyScore}</span>
+                            <div className="flex flex-col items-center gap-1.5">
+                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Synergy</span>
+                                <span className="text-2xl md:text-3xl font-[1000] text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">+{scoreRationale.synergyScore}</span>
                             </div>
-                            <div className={cn("flex flex-col items-center gap-1 border-x", scoreRationale.isHighEnd ? "border-yellow-500/10" : "border-white/5")}>
-                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Basis</span>
-                                <span className="text-xl md:text-2xl font-black text-blue-400">+{scoreRationale.basisScore}</span>
+                            <div className={cn("flex flex-col items-center gap-1.5 border-x", scoreRationale.isHighEnd ? "border-yellow-500/10" : "border-white/5")}>
+                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Foundation</span>
+                                <span className="text-2xl md:text-3xl font-[1000] text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.3)]">+{scoreRationale.basisScore}</span>
                             </div>
-                            <div className="flex flex-col items-center gap-1">
-                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Risk</span>
-                                <span className={cn("text-xl md:text-2xl font-black", scoreRationale.penalties < 0 ? "text-rose-400" : "text-slate-600")}>
+                            <div className="flex flex-col items-center gap-1.5">
+                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Risk Factor</span>
+                                <span className={cn("text-2xl md:text-3xl font-[1000]", scoreRationale.penalties < 0 ? "text-rose-400 drop-shadow-[0_0_15px_rgba(251,113,133,0.3)]" : "text-slate-600")}>
                                     {scoreRationale.penalties < 0 ? scoreRationale.penalties : 0}
                                 </span>
                             </div>
@@ -231,32 +290,6 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                         </Button>
                     </div>
 
-                    {/* Ingredients Analyzed */}
-                    <div className="space-y-6 w-full max-w-2xl pt-6 border-t border-white/[0.04]">
-                        <div className="flex items-center justify-center gap-2.5">
-                            <div className="w-1 h-1 rounded-full bg-slate-700" />
-                            <span className="text-[10px] md:text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] pt-0.5">
-                                {isKo ? "데이터 매핑 대상 성분" : "Ingredients Analyzed"}
-                            </span>
-                            <div className="w-1 h-1 rounded-full bg-slate-700" />
-                        </div>
-                        <div className="flex flex-wrap items-center justify-center gap-2.5">
-                            {result.ingredients.map((ing, i) => (
-                                <motion.div
-                                    key={ing.id}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.1 + i * 0.05 }}
-                                    className="flex items-center gap-2.5 bg-white/[0.02] border border-white/5 rounded-xl px-4 py-2 backdrop-blur-sm hover:bg-white/[0.06] hover:border-white/10 transition-all cursor-default group/ing"
-                                >
-                                    <span className="text-lg md:text-2xl group-hover/ing:scale-110 transition-transform">{ing.icon_emoji}</span>
-                                    <span className="text-[12px] md:text-[14px] font-black text-slate-300 group-hover/ing:text-white transition-colors">
-                                        {isKo ? ing.name : ing.name_en}
-                                    </span>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
                 </CardContent>
             </div>
         </div>

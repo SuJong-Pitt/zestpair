@@ -181,7 +181,7 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                 "text-[10px] md:text-[12px] font-black uppercase tracking-[0.25em] md:tracking-[0.35em]",
                                 isHighEnd ? "text-yellow-400" : "text-emerald-400"
                             )}>
-                                {((t as any).analysis?.threeSecondInsight) || (isKo ? "럭셔리 에센셜 브리핑" : "Luxury Essential Briefing")}
+                                {((t as any).analysis?.threeSecondInsight) || (isKo ? "사용자 맞춤 프로토콜 브리핑" : "Your Personal Protocol Briefing")}
                             </h4>
                         </div>
 

@@ -474,10 +474,12 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                                             {isKo ? ing.short_description : (ing.short_description_en || ing.short_description)}
                                         </p>
                                     </div>
-                                    <div className="mt-auto pt-2 flex items-center gap-2 text-[9px] md:text-xs font-black text-emerald-500 opacity-60 group-hover/pop:opacity-100 transition-opacity">
-                                        <span>{isKo ? "최저가 확인" : "View Details"}</span>
-                                        <ArrowRight size={10} />
-                                    </div>
+                                    <div className="mt-auto pt-4 w-full">
+                                         <div className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[10px] md:text-xs font-black text-slate-300 group-hover/pop:bg-emerald-500 group-hover/pop:text-black group-hover/pop:border-emerald-500 transition-all duration-300">
+                                             <span>{isKo ? "최저가 확인하기" : "Check Best Price"}</span>
+                                             <ArrowRight size={12} />
+                                         </div>
+                                     </div>
                                 </div>
                             </motion.a>
                         ))}
