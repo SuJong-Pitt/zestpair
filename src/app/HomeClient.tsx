@@ -130,6 +130,7 @@ export default function HomeClient() {
   const [inputValue, setInputValue] = useState("");
   const [isPending, startTransition] = useTransition();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [searchMode, setSearchMode] = useState<"ai" | "manual">("ai");
   const [sortBy, setSortBy] = useState<'default' | 'name' | 'popular'>('default');
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   // 카테고리 전환 감지: 1=초기 로드(stagger 적용), >0=탭 전환(딜레이 없이 즉각 표시)
@@ -571,7 +572,7 @@ export default function HomeClient() {
 
 
 
-          {/* === 검색 바 === */}
+          {/* ===== 검색 모드 스위처 + 검색 영역 ===== */}
           <AnimatePresence>
             {isDropdownOpen && dropdownResults.length > 0 && (
               <motion.div
@@ -583,163 +584,317 @@ export default function HomeClient() {
               />
             )}
           </AnimatePresence>
+
           <motion.div
             ref={heroSearchContainerRef}
             initial={{ opacity: 0, y: 20, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            whileHover={{ scale: 1.015 }}
             transition={{ duration: 0.7, delay: 1.25, ease: [0.22, 1, 0.36, 1] }}
-            className="relative max-w-2xl mx-auto group z-[800]"
+            className="relative max-w-2xl mx-auto z-[800]"
           >
-            {/* === [신규] AI 상태 매칭 입력 필드 === */}
-            <div className="mb-6 px-4">
-              <div className="relative group/ai-input">
-                <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-purple-500/20 rounded-2xl blur opacity-75 group-focus-within/ai-input:opacity-100 transition-opacity" />
-                <div className="relative flex items-center gap-3 px-5 py-3.5 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
-                  <div className="shrink-0">
-                    {isAiMatching ? (
-                      <RefreshCcw size={18} className="text-emerald-400 animate-spin" />
-                    ) : (
-                      <Sparkles size={18} className="text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                    )}
-                  </div>
-                  <input
-                    type="text"
-                    value={aiIntent}
-                    onChange={(e) => setAiIntent(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAiMatch()}
-                    placeholder={language === 'ko' ? "현재 상태를 말씀해주세요 (예: 요즘 너무 피곤해)" : "How do you feel? (e.g., I'm so tired)"}
-                    className="flex-1 bg-transparent border-none text-white placeholder:text-white/30 focus:ring-0 text-sm md:text-base font-medium"
-                  />
-                  <button
-                    onClick={handleAiMatch}
-                    disabled={aiIntent.length < 2 || isAiMatching}
-                    className={cn(
-                      "px-4 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all",
-                      aiIntent.length >= 2 && !isAiMatching
-                        ? "bg-emerald-500 text-slate-900 hover:bg-emerald-400 hover:scale-105 active:scale-95"
-                        : "bg-white/5 text-white/30 cursor-not-allowed"
-                    )}
-                  >
-                    {isAiMatching ? "Matching..." : "Match"}
-                  </button>
-                </div>
-                {aiMatchError && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="absolute -bottom-6 left-5 text-[10px] font-bold text-red-400/80"
-                  >
-                    {aiMatchError}
-                  </motion.p>
-                )}
-              </div>
-              <div className="mt-3 flex items-center justify-center gap-4 text-[10px] font-bold text-white/30 tracking-widest uppercase">
-                <span className="flex items-center gap-1"><Zap size={10} /> Instant Match</span>
-                <span className="w-1 h-1 rounded-full bg-white/10" />
-                <span className="flex items-center gap-1"><Sparkles size={10} /> AI Powered</span>
-              </div>
-            </div>
-            {/* 메인 펄스 글로우 - 데스크탑 전용 (모바일에서 비활성화) */}
-            {!isMobile && (
-              <motion.div
-                animate={{ opacity: [0.2, 0.5, 0.2] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -inset-4 rounded-[4rem] blur-xl md:blur-2xl pointer-events-none"
-                style={{ background: "radial-gradient(circle at 50% 50%, rgba(16,185,129,0.15) 0%, transparent 70%)", willChange: "opacity" }}
-              />
-            )}
-
-
-
-            {/* === 독립적인 분석바(검색바) 그룹 (포커스 효과 한정) === */}
-            <div className="relative group/bar mb-1">
-              {/* 포커스 시 배경 글로우 (분석바 본체에만 집중) */}
+            {/* ── 탭 스위처 ── */}
+            <div className="flex items-center justify-center mb-4 px-4">
               <div
-                className="absolute -inset-5 rounded-[4rem] opacity-0 group-focus-within/bar:opacity-100 transition-all duration-700 blur-2xl md:blur-3xl pointer-events-none"
+                className="relative flex items-center p-1 rounded-2xl gap-1"
                 style={{
-                  background: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(6,182,212,0.35), rgba(124,58,237,0.25))",
-                  transform: "translateZ(0)",
-                  willChange: "opacity"
-                }}
-              />
-              {/* [신규] 배경 강화 광채 (Aurora Glow) */}
-              <div
-                className="absolute -inset-8 opacity-20 transition-all duration-1000 blur-3xl pointer-events-none group-hover/bar:opacity-30"
-                style={{
-                  background: "radial-gradient(circle at center, #10b981 0%, #06b6d4 30%, transparent 70%)",
-                }}
-              />
-
-              <div
-                className="absolute -inset-1 rounded-[4rem] opacity-0 group-focus-within/bar:opacity-60 transition-all duration-1000 blur-2xl md:blur-3xl pointer-events-none"
-                style={{ background: "linear-gradient(135deg, #10b981, #06b6d4, #7c3aed, #ec4899)" }}
-              />
-
-
-              <div
-                className="relative flex items-center rounded-[4rem] p-1 md:p-1.5 transition-all duration-700 overflow-hidden group/inner"
-                style={{
-                  background: "rgba(10, 15, 30, 0.45)",
-                  backdropFilter: "blur(24px)",
-                  boxShadow: "0 25px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
-                  transform: "translateZ(0)"
+                  background: "rgba(10,15,30,0.6)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  backdropFilter: "blur(20px)",
                 }}
               >
-                {/* [신규] 프리즘 테두리 애니메이션 */}
-                <div className="absolute inset-0 p-[2px] rounded-[4rem] pointer-events-none opacity-40 group-focus-within/bar:opacity-100 transition-opacity duration-1000">
-                  <div
-                    className="absolute inset-[-100%] animate-spin-slow"
-                    style={{
-                      background: "conic-gradient(from 0deg, transparent 0deg, #10b981 90deg, #06b6d4 180deg, #7c3aed 270deg, transparent 360deg)",
-                      animationDuration: "4s"
-                    }}
-                  />
-                  <div
-                    className="absolute inset-[1.5px] rounded-[4rem]"
-                    style={{ background: "#0a0f1e" }}
-                  />
-                </div>
-
-                {/* [신규] 내부 광택 코팅 (Glossy Coating) */}
-                <div
-                  className="absolute inset-0 opacity-10 group-focus-within/bar:opacity-20 transition-opacity duration-1000 pointer-events-none"
-                  style={{
-                    background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 55%, transparent 70%)",
-                    backgroundSize: "200% 100%",
-                    animation: "shimmer 8s infinite linear"
-                  }}
-                />
-                {/* 테두리 애니메이션 효과 - 데스크탑 전용 */}
-                {/* 테두리 은은한 광채 효과 */}
+                {/* 슬라이딩 인디케이터 */}
                 <motion.div
-                  className="absolute inset-0 rounded-[4rem] pointer-events-none z-10"
-                  style={{ boxShadow: "inset 0 0 15px rgba(16,185,129,0.15)" }}
-                  animate={{ opacity: [0.2, 0.5, 0.2] }}
-                  transition={{ duration: 4, repeat: Infinity }}
+                  layoutId="search-tab-indicator"
+                  className="absolute top-1 bottom-1 rounded-xl pointer-events-none"
+                  animate={{
+                    left: searchMode === "ai" ? "4px" : "50%",
+                    width: "calc(50% - 4px)",
+                    background:
+                      searchMode === "ai"
+                        ? "linear-gradient(135deg, rgba(16,185,129,0.25) 0%, rgba(124,58,237,0.2) 100%)"
+                        : "rgba(255,255,255,0.06)",
+                    boxShadow:
+                      searchMode === "ai"
+                        ? "0 0 16px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.1)"
+                        : "none",
+                    borderColor:
+                      searchMode === "ai" ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.1)",
+                    borderWidth: "1px",
+                    borderStyle: "solid",
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
                 />
 
-                <div className="pl-4 md:pl-6 text-emerald-400 relative z-20">
-                  <Search size={18} className="md:size-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                </div>
-                <Input
-                  ref={searchRef}
-                  type="text"
-                  placeholder={t.hero.placeholderExamples[placeholderIndex]}
-                  value={inputValue}
-                  onChange={(e) => {
-                    setInputValue(e.target.value);
-                    setIsDropdownOpen(true);
-                    startTransition(() => {
-                      setSearchQuery(e.target.value);
-                    });
-                  }}
-                  onFocus={() => setIsDropdownOpen(true)}
-                  className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-base md:text-lg h-10 md:h-12 flex-1 font-bold px-1 md:px-4 tracking-tight relative z-20 transition-all duration-500"
-                />
-                {/* 검색 Input 우측 영역: 기존 버튼들은 아래 액션 바로 이동 */}
+                {/* AI 매칭 탭 */}
+                <button
+                  onClick={() => setSearchMode("ai")}
+                  className="relative z-10 flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 rounded-xl transition-colors duration-300"
+                >
+                  <motion.div
+                    animate={{ color: searchMode === "ai" ? "#34d399" : "rgba(255,255,255,0.35)" }}
+                    className="shrink-0"
+                  >
+                    <Sparkles size={13} />
+                  </motion.div>
+                  <motion.span
+                    animate={{ color: searchMode === "ai" ? "#ffffff" : "rgba(255,255,255,0.4)" }}
+                    className="text-[11px] md:text-xs font-black tracking-wide whitespace-nowrap"
+                  >
+                    {language === "ko" ? "AI 매칭" : "AI Match"}
+                  </motion.span>
+                  {searchMode === "ai" && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="hidden md:flex items-center text-[8px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded-full"
+                      style={{ background: "rgba(16,185,129,0.2)", color: "#6ee7b7" }}
+                    >
+                      AI
+                    </motion.span>
+                  )}
+                </button>
+
+                {/* 직접 검색 탭 */}
+                <button
+                  onClick={() => { setSearchMode("manual"); setIsDropdownOpen(true); }}
+                  className="relative z-10 flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 rounded-xl transition-colors duration-300"
+                >
+                  <motion.div
+                    animate={{ color: searchMode === "manual" ? "#94a3b8" : "rgba(255,255,255,0.35)" }}
+                    className="shrink-0"
+                  >
+                    <Search size={13} />
+                  </motion.div>
+                  <motion.span
+                    animate={{ color: searchMode === "manual" ? "#ffffff" : "rgba(255,255,255,0.4)" }}
+                    className="text-[11px] md:text-xs font-black tracking-wide whitespace-nowrap"
+                  >
+                    {language === "ko" ? "직접 검색" : "Search"}
+                  </motion.span>
+                </button>
               </div>
             </div>
+
+            {/* ── 검색 패널 ── */}
+            <AnimatePresence mode="wait">
+
+              {/* ── AI 매칭 패널 ── */}
+              {searchMode === "ai" && (
+                <motion.div
+                  key="ai-panel"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="px-2"
+                >
+                  <div className="relative group/ai-input">
+                    {/* 글로우 */}
+                    <div className="absolute -inset-1 rounded-2xl opacity-60 group-focus-within/ai-input:opacity-100 transition-opacity blur-lg pointer-events-none"
+                      style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.3), rgba(6,182,212,0.2), rgba(124,58,237,0.25))" }}
+                    />
+                    <div
+                      className="relative flex items-center gap-2 md:gap-3 rounded-2xl overflow-hidden"
+                      style={{
+                        background: "linear-gradient(135deg, rgba(10,20,35,0.8) 0%, rgba(15,10,30,0.8) 100%)",
+                        border: "1px solid rgba(16,185,129,0.25)",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
+                        backdropFilter: "blur(24px)",
+                      }}
+                    >
+                      {/* 좌측 AI 배지 */}
+                      <div className="flex items-center gap-2 pl-4 md:pl-5 shrink-0">
+                        <div
+                          className="flex items-center gap-1.5 px-2 py-1 rounded-lg"
+                          style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)" }}
+                        >
+                          {isAiMatching ? (
+                            <RefreshCcw size={11} className="text-emerald-400 animate-spin" />
+                          ) : (
+                            <Sparkles size={11} className="text-emerald-400" />
+                          )}
+                          <span className="text-[9px] font-black tracking-widest uppercase text-emerald-400 hidden md:block">AI</span>
+                        </div>
+                      </div>
+
+                      {/* 입력 */}
+                      <input
+                        type="text"
+                        value={aiIntent}
+                        onChange={(e) => { setAiIntent(e.target.value); setAiMatchError(null); }}
+                        onKeyDown={(e) => e.key === "Enter" && handleAiMatch()}
+                        placeholder={
+                          language === "ko"
+                            ? isMobile ? "어떤 증상이 있으신가요?" : "증상이나 목표를 말씀해주세요 (예: 요즘 너무 피곤해)"
+                            : isMobile ? "How do you feel?" : "Tell me your symptoms (e.g., I'm so tired lately)"
+                        }
+                        className="flex-1 bg-transparent border-none text-white placeholder:text-white/25 focus:ring-0 text-[13px] md:text-[15px] font-medium py-3.5 md:py-4 min-w-0"
+                      />
+
+                      {/* Match 버튼 */}
+                      <div className="pr-2 shrink-0">
+                        <button
+                          onClick={handleAiMatch}
+                          disabled={aiIntent.length < 2 || isAiMatching}
+                          className={cn(
+                            "px-3.5 md:px-5 py-2 rounded-xl text-[11px] md:text-xs font-black uppercase tracking-wider transition-all duration-200",
+                            aiIntent.length >= 2 && !isAiMatching
+                              ? "text-slate-900 hover:scale-105 active:scale-95"
+                              : "bg-white/5 text-white/20 cursor-not-allowed"
+                          )}
+                          style={
+                            aiIntent.length >= 2 && !isAiMatching
+                              ? { background: "linear-gradient(135deg, #10b981, #059669)", boxShadow: "0 4px 14px rgba(16,185,129,0.4)" }
+                              : {}
+                          }
+                        >
+                          {isAiMatching ? (isMobile ? "..." : "분석 중") : (language === "ko" ? "매칭" : "Match")}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 에러 메시지 */}
+                    <AnimatePresence>
+                      {aiMatchError && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="mt-2 left-2 text-[11px] font-bold text-red-400/80 text-center"
+                        >
+                          {aiMatchError}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 하단 힌트 태그 */}
+                  <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+                    {(language === "ko"
+                      ? ["💤 잠이 안 와", "😩 너무 피곤해", "💪 운동 회복", "🧠 집중력 향상", "🌿 피부 개선"]
+                      : ["💤 Can't sleep", "😩 Always tired", "💪 Workout recovery", "🧠 Focus boost", "🌿 Skin glow"]
+                    ).map((hint) => (
+                      <button
+                        key={hint}
+                        onClick={() => { setAiIntent(hint.slice(2).trim()); setAiMatchError(null); }}
+                        className="px-2.5 py-1 rounded-full text-[10px] md:text-[11px] font-bold transition-all hover:scale-105 active:scale-95"
+                        style={{
+                          background: "rgba(255,255,255,0.05)",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          color: "rgba(255,255,255,0.5)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "rgba(16,185,129,0.1)";
+                          e.currentTarget.style.borderColor = "rgba(16,185,129,0.3)";
+                          e.currentTarget.style.color = "#6ee7b7";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                          e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                          e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                        }}
+                      >
+                        {hint}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ── 직접 검색 패널 ── */}
+              {searchMode === "manual" && (
+                <motion.div
+                  key="manual-panel"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="relative group"
+                >
+                  {/* 메인 펄스 글로우 */}
+                  {!isMobile && (
+                    <motion.div
+                      animate={{ opacity: [0.2, 0.5, 0.2] }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute -inset-4 rounded-[4rem] blur-xl md:blur-2xl pointer-events-none"
+                      style={{ background: "radial-gradient(circle at 50% 50%, rgba(16,185,129,0.15) 0%, transparent 70%)", willChange: "opacity" }}
+                    />
+                  )}
+                  <div className="relative group/bar mb-1">
+                    {/* 포커스 글로우 */}
+                    <div
+                      className="absolute -inset-5 rounded-[4rem] opacity-0 group-focus-within/bar:opacity-100 transition-all duration-700 blur-2xl md:blur-3xl pointer-events-none"
+                      style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(6,182,212,0.35), rgba(124,58,237,0.25))", willChange: "opacity" }}
+                    />
+                    <div
+                      className="absolute -inset-1 rounded-[4rem] opacity-0 group-focus-within/bar:opacity-60 transition-all duration-1000 blur-2xl md:blur-3xl pointer-events-none"
+                      style={{ background: "linear-gradient(135deg, #10b981, #06b6d4, #7c3aed, #ec4899)" }}
+                    />
+
+                    <div
+                      className="relative flex items-center rounded-[4rem] p-1 md:p-1.5 transition-all duration-700 overflow-hidden group/inner"
+                      style={{
+                        background: "rgba(10, 15, 30, 0.45)",
+                        backdropFilter: "blur(24px)",
+                        boxShadow: "0 25px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
+                        transform: "translateZ(0)"
+                      }}
+                    >
+                      {/* 프리즘 테두리 애니메이션 */}
+                      <div className="absolute inset-0 p-[2px] rounded-[4rem] pointer-events-none opacity-40 group-focus-within/bar:opacity-100 transition-opacity duration-1000">
+                        <div
+                          className="absolute inset-[-100%] animate-spin-slow"
+                          style={{
+                            background: "conic-gradient(from 0deg, transparent 0deg, #10b981 90deg, #06b6d4 180deg, #7c3aed 270deg, transparent 360deg)",
+                            animationDuration: "4s"
+                          }}
+                        />
+                        <div
+                          className="absolute inset-[1.5px] rounded-[4rem]"
+                          style={{ background: "#0a0f1e" }}
+                        />
+                      </div>
+
+                      {/* 내부 광택 코팅 */}
+                      <div
+                        className="absolute inset-0 opacity-10 group-focus-within/bar:opacity-20 transition-opacity duration-1000 pointer-events-none"
+                        style={{
+                          background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 55%, transparent 70%)",
+                          backgroundSize: "200% 100%",
+                          animation: "shimmer 8s infinite linear"
+                        }}
+                      />
+                      {/* 테두리 은은한 광채 */}
+                      <motion.div
+                        className="absolute inset-0 rounded-[4rem] pointer-events-none z-10"
+                        style={{ boxShadow: "inset 0 0 15px rgba(16,185,129,0.15)" }}
+                        animate={{ opacity: [0.2, 0.5, 0.2] }}
+                        transition={{ duration: 4, repeat: Infinity }}
+                      />
+
+                      <div className="pl-4 md:pl-6 text-emerald-400 relative z-20">
+                        <Search size={18} className="md:size-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                      </div>
+                      <Input
+                        ref={searchRef}
+                        type="text"
+                        placeholder={t.hero.placeholderExamples[placeholderIndex]}
+                        value={inputValue}
+                        onChange={(e) => {
+                          setInputValue(e.target.value);
+                          setIsDropdownOpen(true);
+                          startTransition(() => { setSearchQuery(e.target.value); });
+                        }}
+                        onFocus={() => setIsDropdownOpen(true)}
+                        className="bg-transparent border-none text-white placeholder:text-white/35 focus-visible:ring-0 text-base md:text-lg h-10 md:h-12 flex-1 font-bold px-1 md:px-4 tracking-tight relative z-20 transition-all duration-500"
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+            </AnimatePresence>
+
 
             {/* === 선택된 성분 목록 — 검색 바 하단 배치 === */}
             <AnimatePresence>
