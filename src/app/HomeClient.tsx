@@ -210,7 +210,11 @@ export default function HomeClient() {
   const filteredIngredients = useMemo(() => {
     // 1. 카테고리 필터링
     let result = dbIngredients.filter((ing) => {
-      return selectedCategory === "all" || ing.category === selectedCategory;
+      // [대표님 제안 ✨] '트렌드(all)' 카테고리 선택 시에는 대중적인(is_popular) 성분만 노출
+      if (selectedCategory === "all") {
+        return ing.is_popular;
+      }
+      return ing.category === selectedCategory;
     });
 
     // 2. 정렬 적용
@@ -352,7 +356,8 @@ export default function HomeClient() {
     setAiMatchError(null);
 
     try {
-      const response = await fetch("/api/match-intent", {
+      // [대표님 제안 ✨] 매칭과 분석을 한 번의 API 호출로 통합
+      const response = await fetch("/api/ai-match-and-analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ intent: aiIntent, language })
@@ -360,29 +365,35 @@ export default function HomeClient() {
 
       const result = await response.json();
 
-      if (result.success && result.data && result.data.length > 0) {
-        const matchedIngredients = dbIngredients.filter(ing => result.data.includes(ing.id));
+      if (result.success && result.data) {
+        const { ingredients: matchedIngredients, analysisResult } = result.data;
         
-        if (matchedIngredients.length > 0) {
+        if (matchedIngredients && matchedIngredients.length > 0) {
+          // 1. 바구니 초기화 및 매칭된 성분 추가
           clearBasket();
-          matchedIngredients.forEach(ing => addIngredient(ing));
+          matchedIngredients.forEach((ing: Ingredient) => addIngredient(ing));
           setAiIntent("");
           
-          // AI가 찾은 후 바로 분석까지 실행할지, 아니면 사용자에게 보여줄지 선택 가능
-          // 여기서는 사용자에게 "AI가 이 조합을 추천했습니다"라고 보여주는 방향으로 유지합니다.
-          // (필요 시 바로 handleAnalyze() 호출 가능)
+          // 2. 분석 결과 즉시 반영 및 애니메이션 트리거
+          if (analysisResult) {
+            setAnalysisResult(analysisResult);
+            addToHistory(analysisResult);
+            
+            // 글로벌 분석 애니메이션 시작! (이미 데이터를 가지고 있으므로 바로 보여줄 준비가 됨)
+            setAnalyzing(true);
+          }
         } else {
           setAiMatchError(language === 'ko' ? "적절한 성분을 찾지 못했습니다." : "No matching ingredients found.");
         }
       } else {
-        setAiMatchError(language === 'ko' ? "AI 분석에 실패했습니다." : "AI matching failed.");
+        setAiMatchError(language === 'ko' ? "AI 매칭 및 분석에 실패했습니다." : "AI matching & analysis failed.");
       }
     } catch (error) {
       setAiMatchError(language === 'ko' ? "네트워크 오류가 발생했습니다." : "Network error occurred.");
     } finally {
       setIsAiMatching(false);
     }
-  }, [aiIntent, isAiMatching, dbIngredients, clearBasket, addIngredient, language]);
+  }, [aiIntent, isAiMatching, language, clearBasket, addIngredient, setAnalyzing, setAnalysisResult, addToHistory]);
 
 
   const handleAnimationComplete = useCallback(() => {
@@ -397,7 +408,7 @@ export default function HomeClient() {
   return (
     <div className="min-h-screen" style={{ background: "#030712" }}>
       <section
-        className="relative pb-24 pt-10 md:pb-32 md:pt-12 z-40 hud-grid"
+        className="relative pb-20 pt-24 md:pb-28 md:pt-28 z-40 hud-grid"
         style={{
           background: "radial-gradient(circle at 50% 0%, rgba(13, 26, 21, 0.95) 0%, rgba(8, 12, 20, 0.98) 50%, #030712 100%)"
         }}
@@ -407,35 +418,37 @@ export default function HomeClient() {
         {/* 고도화된 배경 장식 */}
         {!isMobile && <VisualDecorations />}
 
-        <div className="absolute top-6 left-6 right-6 sm:top-10 sm:left-10 sm:right-10 z-50 flex items-center justify-between pointer-events-none">
-          <button
-            onClick={() => setLanguage(language === "ko" ? "en" : "ko")}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-[10px] transition-all hover:bg-white/20 active:scale-95 shadow-lg group pointer-events-auto"
-          >
-            <div className="w-5 h-5 rounded-full bg-emerald-400 flex items-center justify-center group-hover:rotate-180 transition-transform duration-500">
-              <Languages size={12} className="text-slate-900" />
-            </div>
-            <span className="tracking-widest uppercase mr-1">{language === "ko" ? "EN" : "KO"}</span>
-          </button>
-
-          <div className="flex items-center gap-2 lg:gap-3 pointer-events-auto">
+        {/* ── 상단 네비게이션 ── */}
+        <div className="absolute top-0 left-0 right-0 z-50">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+            {/* 언어 토글 */}
             <button
-              onClick={() => setIsGuideOpen(true)}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl text-white/80 font-black text-[10px] transition-all hover:bg-emerald-500/20 hover:text-white hover:scale-105 active:scale-95 shadow-lg relative group/guide overflow-hidden"
+              onClick={() => setLanguage(language === "ko" ? "en" : "ko")}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 font-bold text-[10px] tracking-widest uppercase transition-all active:scale-95 pointer-events-auto"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/10 to-transparent -translate-x-[150%] group-hover/guide:translate-x-[150%] transition-transform duration-1000 ease-in-out" />
-              <span>{language === 'ko' ? '가이드보기' : 'Guide'}</span>
+              <Languages size={11} className="shrink-0" />
+              <span>{language === "ko" ? "EN" : "KO"}</span>
             </button>
-            <Link
-              href="/about"
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl text-white/70 font-black text-[10px] transition-all hover:bg-white/20 hover:text-white active:scale-95 shadow-lg"
-            >
-              <span>{language === 'ko' ? '서비스 소개' : 'About'}</span>
-            </Link>
+
+            {/* 우측 네비 */}
+            <div className="flex items-center gap-2 pointer-events-auto">
+              <button
+                onClick={() => setIsGuideOpen(true)}
+                className="px-3 py-1.5 rounded-lg text-white/60 hover:text-white font-bold text-[10px] tracking-wide transition-all hover:bg-white/5"
+              >
+                {language === 'ko' ? '가이드' : 'Guide'}
+              </button>
+              <Link
+                href="/about"
+                className="px-3 py-1.5 rounded-lg text-white/60 hover:text-white font-bold text-[10px] tracking-wide transition-all hover:bg-white/5"
+              >
+                {language === 'ko' ? '소개' : 'About'}
+              </Link>
+            </div>
           </div>
         </div>
 
-        <div className="relative mx-auto max-w-3xl px-4 text-center mt-6 md:mt-4">
+        <div className="relative mx-auto max-w-2xl px-5 text-center">
 
           {/* === 로고 배지 === */}
           <motion.div
@@ -464,109 +477,59 @@ export default function HomeClient() {
           </motion.div>
 
           {/* === 메인 헤드라인 === */}
-          <h1 className="mb-2 md:mb-4 tracking-tight">
-            {/* 라인 1: 상단 소형 텍스트 */}
+          <h1 className="mb-4 md:mb-6 tracking-tight px-2">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-xs md:text-xl font-black uppercase mb-1 md:mb-2 text-emerald-400 tracking-[0.2em]"
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-[11px] md:text-sm font-black uppercase mb-3 md:mb-4 tracking-[0.25em]"
+              style={{ color: "rgba(52,211,153,0.8)" }}
             >
               {t.hero.title1}
             </motion.div>
 
-            {/* 라인 2: 핵심 임팩트 문구 */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.88, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="relative inline-block"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tighter text-white"
             >
-              {/* 뒤 글로우 */}
-              <span
-                aria-hidden
-                className="absolute -inset-2 rounded-[2.5rem] opacity-40 blur-xl md:blur-2xl pointer-events-none"
-                style={{ background: "linear-gradient(135deg, #10b981 0%, #0891b2 50%, #7c3aed 100%)", willChange: "filter" }}
-              />
-              {/* 슬로건 박스 */}
-              <motion.span
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                style={{ transformOrigin: "left" }}
-                className="absolute inset-0 rounded-[2rem] pointer-events-none"
-              >
-                <span
-                  className="absolute inset-0 rounded-[2rem]"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(8,145,178,0.1) 50%, rgba(124,58,237,0.12) 100%)",
-                    border: "1.5px solid rgba(16,185,129,0.4)",
-                    boxShadow: "0 0 50px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.07)",
-                  }}
-                />
-              </motion.span>
-
-              <span className="relative z-10 flex flex-wrap items-center justify-center gap-x-1 md:gap-x-3 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-[1000] px-3 md:px-10 py-2 md:py-3 leading-[1.1] tracking-tighter text-center text-white drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)]">
-                {language === 'ko' ? (
-                  <>
-                    <span className="relative inline-block mr-1 md:mr-2">
-                      <span className="relative z-10 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.7)]">영양제 상호작용</span>
-                      <span className="absolute bottom-0 left-0 w-full h-[4px] bg-emerald-500/30 blur-[1px] rounded-full" />
-                    </span>
-                    무료 분석
-                  </>
-                ) : (
-                  <>
-                    Free Supplement <br className="lg:hidden" />
-                    <span className="relative inline-block ml-1.5 md:ml-2">
-                      <span className="relative z-10 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.7)]">Interaction Analysis</span>
-                      <span className="absolute bottom-0 left-0 w-full h-[4px] bg-emerald-500/30 blur-[1px] rounded-full" />
-                    </span>
-                  </>
-                )}
-              </span>
-
-              {/* 코너 브래킷 */}
-              {[["top-1.5 left-2.5", "border-t-2 border-l-2"], ["top-1.5 right-2.5", "border-t-2 border-r-2"], ["bottom-1.5 left-2.5", "border-b-2 border-l-2"], ["bottom-1.5 right-2.5", "border-b-2 border-r-2"]].map(([pos, border], i) => (
-                <span key={i} className={`absolute ${pos} w-4 h-4 ${border} border-emerald-400/60 hidden md:block`} style={{ borderRadius: "3px" }} />
-              ))}
-              {/* 반짝이 */}
-              <motion.span
-                animate={{ opacity: [0, 1, 0], scale: [0.6, 1.4, 0.6], rotate: [-10, 10, -10] }}
-                transition={{ duration: 2.8, repeat: Infinity, delay: 1.2 }}
-                className="absolute -top-6 -right-6 hidden md:block"
-              >
-                <Sparkles size={26} className="text-amber-300" />
-              </motion.span>
-              <motion.span
-                animate={{ opacity: [0, 0.8, 0], scale: [0.5, 1.2, 0.5] }}
-                transition={{ duration: 3.5, repeat: Infinity, delay: 2.5 }}
-                className="absolute -bottom-5 -left-4 hidden md:block"
-              >
-                <Sparkles size={18} className="text-cyan-300" />
-              </motion.span>
+              {language === 'ko' ? (
+                <>
+                  <span
+                    className="inline"
+                    style={{
+                      background: "linear-gradient(135deg, #34d399 0%, #22d3ee 50%, #818cf8 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >영양제 상호작용</span>
+                  <span className="text-white"> 무료 분석</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-white">Free Supplement</span>{" "}
+                  <span
+                    style={{
+                      background: "linear-gradient(135deg, #34d399 0%, #22d3ee 50%, #818cf8 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >Analysis</span>
+                </>
+              )}
             </motion.div>
           </h1>
 
           {/* === 서브타이틀 === */}
           <motion.p
-            initial={{ opacity: 0, y: 14 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.85 }}
-            className="text-[13px] md:text-base mb-3 md:mb-5 leading-relaxed max-w-md mx-auto px-2"
-            style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-sm md:text-base mb-8 md:mb-10 leading-relaxed max-w-sm md:max-w-md mx-auto px-4 text-white/45 font-medium"
           >
             {t.hero.subtitle1}{" "}
-            <span
-              style={{
-                background: "linear-gradient(90deg, #6ee7b7, #22d3ee)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-              className="font-black"
-            >
-              {t.hero.subtitle2}
-            </span>
+            <span className="text-white/70 font-semibold">{t.hero.subtitle2}</span>
           </motion.p>
 
 
@@ -595,84 +558,65 @@ export default function HomeClient() {
             className="relative max-w-2xl mx-auto z-[800]"
           >
             {/* ── 탭 스위처 ── */}
-            <div className="flex items-center justify-center mb-4 px-4">
+            <div className="flex items-center justify-center mb-3 px-4">
               <div
-                className="relative flex items-center p-1 rounded-xl gap-1"
+                className="relative inline-flex items-center rounded-xl p-0.5 gap-0.5"
                 style={{
-                  background: "rgba(10,15,30,0.8)",
-                  border: "1px solid var(--color-hud-border)",
-                  backdropFilter: "blur(20px)",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
                 }}
               >
-                {/* 슬라이딩 인디케이터 */}
+                {/* 슬라이딩 배경 */}
                 <motion.div
                   layoutId="search-tab-indicator"
-                  className="absolute top-1 bottom-1 rounded-xl pointer-events-none"
+                  className="absolute top-0.5 bottom-0.5 rounded-[10px] pointer-events-none"
                   animate={{
-                    left: searchMode === "ai" ? "4px" : "50%",
-                    width: "calc(50% - 4px)",
-                    background:
-                      searchMode === "ai"
-                        ? "linear-gradient(135deg, rgba(16,185,129,0.25) 0%, rgba(124,58,237,0.2) 100%)"
-                        : "rgba(255,255,255,0.06)",
-                    boxShadow:
-                      searchMode === "ai"
-                        ? "0 0 16px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.1)"
-                        : "none",
-                    borderColor:
-                      searchMode === "ai" ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.1)",
-                    borderWidth: "1px",
-                    borderStyle: "solid",
+                    left: searchMode === "ai" ? "2px" : "50%",
+                    width: "calc(50% - 2px)",
                   }}
-                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                  style={{
+                    background: searchMode === "ai"
+                      ? "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.15))"
+                      : "rgba(255,255,255,0.06)",
+                    border: searchMode === "ai" ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.08)",
+                  }}
+                  transition={{ type: "spring", stiffness: 500, damping: 40 }}
                 />
 
                 {/* AI 매칭 탭 */}
                 <button
                   onClick={() => setSearchMode("ai")}
-                  className="relative z-10 flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 rounded-xl transition-colors duration-300"
+                  className="relative z-10 flex items-center gap-2 px-5 py-2.5 rounded-[10px] transition-all duration-200 min-w-[120px] justify-center"
                 >
-                  <motion.div
-                    animate={{ color: searchMode === "ai" ? "#34d399" : "rgba(255,255,255,0.35)" }}
-                    className="shrink-0"
-                  >
-                    <Sparkles size={13} />
-                  </motion.div>
-                  <motion.span
-                    animate={{ color: searchMode === "ai" ? "#ffffff" : "rgba(255,255,255,0.4)" }}
-                    className="text-[11px] md:text-xs font-black tracking-wide whitespace-nowrap"
+                  <Sparkles
+                    size={12}
+                    className="shrink-0 transition-colors duration-200"
+                    style={{ color: searchMode === "ai" ? "#34d399" : "rgba(255,255,255,0.3)" }}
+                  />
+                  <span
+                    className="text-[11px] md:text-xs font-bold tracking-wide whitespace-nowrap transition-colors duration-200"
+                    style={{ color: searchMode === "ai" ? "#ffffff" : "rgba(255,255,255,0.35)" }}
                   >
                     {language === "ko" ? "AI 매칭" : "AI Match"}
-                  </motion.span>
-                  {searchMode === "ai" && (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="hidden md:flex items-center text-[8px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded-full"
-                      style={{ background: "rgba(16,185,129,0.2)", color: "#6ee7b7" }}
-                    >
-                      AI
-                    </motion.span>
-                  )}
+                  </span>
                 </button>
 
                 {/* 직접 검색 탭 */}
                 <button
                   onClick={() => { setSearchMode("manual"); setIsDropdownOpen(true); }}
-                  className="relative z-10 flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 rounded-xl transition-colors duration-300"
+                  className="relative z-10 flex items-center gap-2 px-5 py-2.5 rounded-[10px] transition-all duration-200 min-w-[120px] justify-center"
                 >
-                  <motion.div
-                    animate={{ color: searchMode === "manual" ? "#94a3b8" : "rgba(255,255,255,0.35)" }}
-                    className="shrink-0"
-                  >
-                    <Search size={13} />
-                  </motion.div>
-                  <motion.span
-                    animate={{ color: searchMode === "manual" ? "#ffffff" : "rgba(255,255,255,0.4)" }}
-                    className="text-[11px] md:text-xs font-black tracking-wide whitespace-nowrap"
+                  <Search
+                    size={12}
+                    className="shrink-0 transition-colors duration-200"
+                    style={{ color: searchMode === "manual" ? "#94a3b8" : "rgba(255,255,255,0.3)" }}
+                  />
+                  <span
+                    className="text-[11px] md:text-xs font-bold tracking-wide whitespace-nowrap transition-colors duration-200"
+                    style={{ color: searchMode === "manual" ? "#ffffff" : "rgba(255,255,255,0.35)" }}
                   >
                     {language === "ko" ? "직접 검색" : "Search"}
-                  </motion.span>
+                  </span>
                 </button>
               </div>
             </div>
@@ -1241,16 +1185,12 @@ export default function HomeClient() {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="mt-8 flex flex-col items-center gap-4"
             >
-              <div className="flex items-center gap-3">
-                <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-hud-cyan/40" />
-                <div className="flex flex-col items-center">
-                  <span className="text-[10px] md:text-[11px] font-black text-hud-cyan uppercase tracking-[0.3em] flex items-center gap-2">
-                    <Activity size={12} className="text-hud-cyan animate-pulse" />
-                    {t.hero.quickStart}
-                  </span>
-                  <span className="text-[7px] font-black text-hud-cyan/40 tracking-[0.4em] uppercase -mt-0.5">Lab protocols ready</span>
-                </div>
-                <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-hud-cyan/40" />
+              <div className="flex flex-col items-center mb-2">
+                <span className="text-[10px] md:text-xs font-black text-emerald-400 uppercase tracking-[0.3em] flex items-center gap-2 mb-1">
+                  <Activity size={12} className="text-emerald-400" />
+                  {t.hero.quickStart}
+                </span>
+                <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
               </div>
               <div className="flex flex-wrap justify-center gap-2 px-4 min-h-[44px]">
                 <AnimatePresence mode="wait">
@@ -1291,24 +1231,20 @@ export default function HomeClient() {
                               window.scrollTo({ top: 0, behavior: "smooth" });
                             }
                           }}
-                          className="relative group/combo flex flex-col items-start p-3 rounded-xl hud-card transition-all duration-300 hover:scale-[1.02] active:scale-95 border-hud-border/40"
+                          className="relative group/combo flex flex-col items-start p-4 rounded-2xl transition-all duration-300 hover:bg-white/[0.06] active:scale-95 border border-white/10"
                           style={{
-                            background: "rgba(10, 15, 30, 0.4)",
-                            backdropFilter: "blur(12px)",
+                            background: "rgba(255, 255, 255, 0.03)",
+                            backdropFilter: "blur(20px)",
                           }}
                         >
-                          {/* HUD Brackets for cards */}
-                          <div className="hud-corner-br opacity-40 scale-75 origin-bottom-right" />
-                          <div className="hud-corner-bl opacity-40 scale-75 origin-bottom-left" />
-                          
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-hud-cyan/60 animate-pulse" />
-                            <span className="text-[9px] font-black text-hud-cyan/60 uppercase tracking-widest">Protocol {combo.id.toUpperCase()}</span>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                            <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">{combo.id} Protocol</span>
                           </div>
-                          <span className="text-xs md:text-sm font-black text-white mb-1 group-hover/combo:text-hud-cyan transition-colors">{combo.label}</span>
-                          <div className="flex gap-1">
+                          <span className="text-xs md:text-sm font-black text-white mb-2 group-hover/combo:text-emerald-400 transition-colors leading-tight">{combo.label}</span>
+                          <div className="flex flex-wrap gap-1">
                             {combo.tags.map(tag => (
-                              <span key={tag} className="text-[9px] font-bold text-white/40 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">{tag}</span>
+                              <span key={tag} className="text-[8px] font-bold text-emerald-400/70 bg-emerald-500/5 px-2 py-0.5 rounded-md border border-emerald-500/10">{tag}</span>
                             ))}
                           </div>
                         </button>
@@ -1389,17 +1325,20 @@ export default function HomeClient() {
             {/* 인기 태그 */}
             <motion.div
               animate={{
-                opacity: isBlur ? 0.3 : 0.75,
-                filter: isBlur ? "blur(8px)" : "blur(0px)",
+                opacity: isBlur ? 0.3 : 1,
                 scale: isBlur ? 0.98 : 1
               }}
               transition={{ duration: 0.4 }}
-              className="mt-10 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2"
+              className="mt-12 flex flex-col items-center gap-4 px-2"
             >
-              <span className="text-[9px] text-white/50 font-black uppercase tracking-[0.25em] whitespace-nowrap">
-                {language === 'ko' ? '인기' : 'POPULAR'}:
-              </span>
-              <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
+              <div className="flex items-center gap-3">
+                 <div className="w-8 h-[1px] bg-gradient-to-r from-transparent to-white/10" />
+                 <span className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em] whitespace-nowrap">
+                   {language === 'ko' ? '인기 키워드' : 'Trending Tags'}
+                 </span>
+                 <div className="w-8 h-[1px] bg-gradient-to-l from-transparent to-white/10" />
+              </div>
+              <div className="flex flex-wrap justify-center gap-x-2 gap-y-2 max-w-lg">
                 {t.hero.popularTags.map(tag => {
                   const matchingCategory = Object.values(CATEGORIES_TRANSLATIONS).find(c => c.ko === tag || c.en === tag);
                   return (
@@ -1410,12 +1349,11 @@ export default function HomeClient() {
                         startTransition(() => setSearchQuery(tag));
                         setIsDropdownOpen(true);
                       }}
-                      className="group/tag relative text-[10px] md:text-xs font-black transition-all hover:scale-110 active:scale-95 px-2.5 py-1 rounded-lg overflow-hidden flex items-center gap-1"
-                      style={{ color: "#6ee7b7" }}
+                      className="group/tag relative px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/10 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all active:scale-95 flex items-center gap-1.5"
                     >
-                      <span className="relative z-10 opacity-70 group-hover/tag:scale-125 transition-transform">{matchingCategory?.emoji}</span>
-                      <span className="relative z-10">#{tag}</span>
-                      <span className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover/tag:opacity-100 transition-opacity rounded-lg" />
+                      <span className="text-[10px] md:text-xs font-bold text-white/60 group-hover/tag:text-emerald-400 transition-colors">
+                        <span className="opacity-50 mr-0.5">#</span>{tag}
+                      </span>
                     </button>
                   );
                 })}
@@ -1427,11 +1365,10 @@ export default function HomeClient() {
 
 
 
-          {/* === 소셜 프루프 배지 행 (상태 가속화) === */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{
-              opacity: isBlur ? 0.7 : 1, // 블러 대신 투명도만 살짝 (선명도 유지)
+              opacity: isBlur ? 0.7 : 1,
               y: 0,
               scale: isBlur ? 0.98 : 1
             }}
@@ -1440,7 +1377,7 @@ export default function HomeClient() {
               delay: !hasInitialLoaded ? 1.5 : 0,
               ease: "easeOut"
             }}
-            className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2.5 mt-8 md:mt-12 mb-4 max-w-4xl mx-auto gpu-accelerated"
+            className="flex flex-wrap items-center justify-center gap-2 mt-12 mb-6 max-w-3xl mx-auto"
           >
             {[
               { icon: "⚡", text: language === 'ko' ? '0.5초 분석' : '0.5s Analysis', color: "#fbbf24" },
@@ -1451,35 +1388,17 @@ export default function HomeClient() {
                 icon: "📱", 
                 text: language === 'ko' ? 'App 출시 예정' : 'App Coming Soon', 
                 color: "#60a5fa",
-                onClick: () => alert(language === 'ko' ? '모바일 전용 ZestPair App이 곧 출시됩니다! 기대해 주세요.' : 'ZestPair App for mobile is coming soon! Stay tuned.')
               },
               { icon: "💚", text: language === 'ko' ? '무료 서비스' : 'Free Forever', color: "#34d399" },
             ].map((badge: any, i) => (
-              <motion.button
+              <div
                 key={i}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ scale: 1.05, y: -2, backgroundColor: "rgba(255,255,255,0.08)" }}
-                whileTap={{ scale: 0.95 }}
-                onClick={badge.onClick}
-                transition={{
-                  delay: !hasInitialLoaded ? (1.6 + i * 0.05) : 0,
-                  duration: 0.3
-                }}
-                className={cn(
-                  "inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-full text-[8.5px] md:text-[11px] font-[900] whitespace-nowrap transition-all",
-                  badge.onClick ? "cursor-pointer" : "cursor-default"
-                )}
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  color: badge.color,
-                  boxShadow: "0 2px 12px rgba(0,0,0,0.2)"
-                }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[9px] md:text-[10px] font-bold whitespace-nowrap bg-white/[0.02] border border-white/[0.08]"
+                style={{ color: badge.color }}
               >
-                <span className="filter drop-shadow-[0_0_5px_rgba(0,0,0,0.3)]">{badge.icon}</span>
-                <span className="tracking-tighter">{badge.text}</span>
-              </motion.button>
+                <span className="opacity-80">{badge.icon}</span>
+                <span className="tracking-tight text-white/70">{badge.text}</span>
+              </div>
             ))}
           </motion.div>
         </div>
@@ -1523,7 +1442,7 @@ export default function HomeClient() {
                     } : {
                       background: "rgba(255,255,255,0.04)",
                       border: "1px solid rgba(255,255,255,0.07)",
-                      color: "#64748b",
+                      color: "#94a3b8",
                     }}
                   >
                     {/* 활성 배경 글로우 (Liquid Light 효과) */}
@@ -1705,7 +1624,7 @@ export default function HomeClient() {
                             {/* 제목 및 부제목 - 인기 섹션과 동일 사양 ✨ */}
                             <div>
                               <div className="flex items-center gap-2">
-                                <h2 className="text-base font-[900] tracking-tight" style={{ color: "#0f172a", lineHeight: "1.2" }}>
+                                <h2 className="text-base font-[900] tracking-tight" style={{ color: "#f8fafc", lineHeight: "1.2" }}>
                                   {selectedCategory === 'all' ? t.common.searchResult : categoryInfo[language]}
                                 </h2>
                                 <span
@@ -1741,14 +1660,14 @@ export default function HomeClient() {
                         <select
                           value={sortBy}
                           onChange={(e) => setSortBy(e.target.value as any)}
-                          className="relative z-10 appearance-none bg-white/40 hover:bg-white/60 border border-slate-200/60 rounded-xl px-3 pr-8 py-1.5 text-[10px] md:text-[11px] font-[900] text-slate-600 cursor-pointer transition-all outline-none focus:ring-2 focus:ring-emerald-500/20"
+                          className="relative z-10 appearance-none bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-3 pr-8 py-1.5 text-[10px] md:text-[11px] font-[900] text-slate-400 cursor-pointer transition-all outline-none focus:ring-2 focus:ring-emerald-500/20"
                           style={{
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.2)"
                           }}
                         >
-                          <option value="default">{language === 'ko' ? '추천순' : 'Recommended'}</option>
-                          <option value="name">{language === 'ko' ? '이름순' : 'A-Z'}</option>
-                          <option value="popular">{language === 'ko' ? '인기순' : 'Popularity'}</option>
+                          <option value="default" className="bg-slate-900">{language === 'ko' ? '추천순' : 'Recommended'}</option>
+                          <option value="name" className="bg-slate-900">{language === 'ko' ? '이름순' : 'A-Z'}</option>
+                          <option value="popular" className="bg-slate-900">{language === 'ko' ? '인기순' : 'Popularity'}</option>
                         </select>
                         <ChevronDown
                           size={10}
