@@ -151,6 +151,41 @@ export default function HomeClient() {
   const [isAiMatching, setIsAiMatching] = useState(false);
   const [aiMatchError, setAiMatchError] = useState<string | null>(null);
 
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  // AI 매칭 로딩 메시지 설정
+  const aiLoadingMessages = useMemo(() => ({
+    ko: [
+      "신경망 코어 초기화 중...",
+      "증상 벡터 분석 중...",
+      "성분 데이터베이스 스캔 중...",
+      "최적의 시너지 계산 중...",
+      "맞춤형 프로토콜 생성 중...",
+      "데이터 동기화 완료 중..."
+    ],
+    en: [
+      "INITIALIZING NEURAL CORE...",
+      "ANALYZING SYMPTOM VECTORS...",
+      "SCANNING DATABASE...",
+      "CALCULATING SYNERGY...",
+      "GENERATING PROTOCOL...",
+      "FINALIZING DATA SYNC..."
+    ]
+  }), []);
+
+  // 로딩 메시지 순환 효과
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isAiMatching) {
+      interval = setInterval(() => {
+        setLoadingMessageIndex((prev) => (prev + 1) % aiLoadingMessages[language].length);
+      }, 1200);
+    } else {
+      setLoadingMessageIndex(0);
+    }
+    return () => clearInterval(interval);
+  }, [isAiMatching, language, aiLoadingMessages]);
+
   const t = UI_TRANSLATIONS[language];
 
   useEffect(() => {
@@ -637,9 +672,24 @@ export default function HomeClient() {
                   className="px-2"
                 >
                   <div className="relative group/ai-input">
-                    {/* 외부 글로우 */}
+                    {/* 외부 글로우 - 은은한 호흡 느낌 */}
+                    <motion.div
+                      className="absolute -inset-[1px] rounded-xl blur-md pointer-events-none"
+                      animate={{ 
+                        opacity: isAiMatching ? [0.2, 0.4, 0.2] : 0,
+                      }}
+                      transition={{ 
+                        duration: 2.5, 
+                        repeat: Infinity, 
+                        ease: "easeInOut" 
+                      }}
+                      style={{ 
+                        background: "linear-gradient(135deg, rgba(16,185,129,0.3), rgba(6,182,212,0.2), rgba(124,58,237,0.2))",
+                        opacity: 0
+                      }}
+                    />
                     <div
-                      className="absolute -inset-[2px] rounded-xl opacity-0 group-focus-within/ai-input:opacity-100 transition-all duration-700 blur-md pointer-events-none"
+                      className="absolute -inset-[1px] rounded-xl opacity-0 group-focus-within/ai-input:opacity-100 transition-all duration-700 blur-sm pointer-events-none"
                       style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(6,182,212,0.4), rgba(124,58,237,0.45))" }}
                     />
 
@@ -662,9 +712,22 @@ export default function HomeClient() {
                             AI NEURAL MATCH · ONLINE
                           </span>
                         </div>
-                        <span className="text-[8px] font-black tracking-widest text-white/15 uppercase">
-                          {isAiMatching ? "PROCESSING..." : "READY"}
-                        </span>
+                        <AnimatePresence mode="wait">
+                          <motion.span 
+                            key={isAiMatching ? loadingMessageIndex : 'ready'}
+                            initial={{ opacity: 0, x: -2 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 2 }}
+                            transition={{ duration: 0.2 }}
+                            className="text-[9px] font-black tracking-widest uppercase"
+                            style={{ 
+                              color: isAiMatching ? "#34d399" : "rgba(255,255,255,0.15)",
+                              textShadow: isAiMatching ? "0 0 8px rgba(52,211,153,0.5)" : "none"
+                            }}
+                          >
+                            {isAiMatching ? aiLoadingMessages[language][loadingMessageIndex] : "READY"}
+                          </motion.span>
+                        </AnimatePresence>
                       </div>
 
                       {/* 메인 입력 영역 */}
@@ -753,8 +816,41 @@ export default function HomeClient() {
                         </div>
                       </div>
 
-                      {/* HUD 스캔라인 */}
+                      {/* HUD 정밀 스캔라인 효과 */}
                       <div className="hud-scanline opacity-10" />
+                      {isAiMatching && (
+                        <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="absolute inset-0 pointer-events-none z-20 overflow-hidden"
+                        >
+                          {/* 초정밀 레이저 스캐닝 라인 */}
+                          <motion.div 
+                            className="absolute left-0 right-0 h-[1px] bg-cyan-400 shadow-[0_0_8px_#22d3ee]"
+                            animate={{ 
+                              top: ["0%", "100%"] 
+                            }}
+                            transition={{ 
+                              duration: 1.5, 
+                              repeat: Infinity, 
+                              ease: "linear" 
+                            }}
+                          />
+                          
+                          {/* 은은한 데이터 플로우 필터 */}
+                          <motion.div 
+                            className="absolute inset-0 bg-cyan-500/5"
+                            animate={{ 
+                              opacity: [0.03, 0.08, 0.03] 
+                            }}
+                            transition={{ 
+                              duration: 2, 
+                              repeat: Infinity, 
+                              ease: "easeInOut" 
+                            }}
+                          />
+                        </motion.div>
+                      )}
                     </div>
 
                     {/* 에러 메시지 */}
