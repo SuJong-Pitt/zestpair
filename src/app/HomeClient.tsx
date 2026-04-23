@@ -445,7 +445,7 @@ export default function HomeClient() {
   return (
     <div className="min-h-screen" style={{ background: "#030712" }}>
       <section
-        className="relative pb-20 pt-24 md:pb-28 md:pt-28 z-40 hud-grid"
+        className="relative pb-16 pt-16 md:pb-24 md:pt-20 z-40 hud-grid"
         style={{
           background: "radial-gradient(circle at 50% 0%, rgba(13, 26, 21, 0.95) 0%, rgba(8, 12, 20, 0.98) 50%, #030712 100%)"
         }}
@@ -492,7 +492,7 @@ export default function HomeClient() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="inline-flex items-center gap-3 mb-5 md:mb-8 px-5 py-2.5 rounded-full relative group cursor-default"
+            className="inline-flex items-center gap-3 mb-3 md:mb-5 px-5 py-2.5 rounded-full relative group cursor-default"
           >
             {/* 뒤 배경 글로우 */}
             <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -514,12 +514,12 @@ export default function HomeClient() {
           </motion.div>
 
           {/* === 메인 헤드라인 === */}
-          <h1 className="mb-4 md:mb-6 tracking-tight px-2">
+          <h1 className="mb-3 md:mb-4 tracking-tight px-2">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-[11px] md:text-sm font-black uppercase mb-3 md:mb-4 tracking-[0.25em]"
+              className="text-[11px] md:text-sm font-black uppercase mb-2 md:mb-3 tracking-[0.25em]"
               style={{ color: "rgba(52,211,153,0.8)" }}
             >
               {t.hero.title1}
@@ -563,7 +563,7 @@ export default function HomeClient() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-sm md:text-base mb-8 md:mb-10 leading-relaxed max-w-sm md:max-w-md mx-auto px-4 text-white/45 font-medium"
+            className="text-sm md:text-base mb-5 md:mb-8 leading-relaxed max-w-sm md:max-w-md mx-auto px-4 text-white/45 font-medium"
           >
             {t.hero.subtitle1}{" "}
             <span className="text-white/70 font-semibold">{t.hero.subtitle2}</span>
