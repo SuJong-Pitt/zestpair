@@ -550,18 +550,24 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                                         </div>
                                     </div>
 
-                                    {/* Magnetic Pulse Action Button */}
+                                    {/* Market Connect / Affiliate Action Button (Fun & High CTR) ✨ */}
                                     <div className="flex justify-center pt-8 w-full max-w-sm relative">
-                                        {/* Eternal Pulse Ripples */}
+                                        {/* Eternal Pulse Ripples (Base) */}
                                         <motion.div 
                                             animate={{ scale: [1, 1.4, 1.1], opacity: [0.5, 0, 0] }}
                                             transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                                            className="absolute inset-0 rounded-[2rem] border-2 border-emerald-500/50 -z-10"
+                                            className={cn(
+                                                "absolute inset-0 rounded-[2rem] border-2 -z-10",
+                                                isKo ? "border-red-500/50" : "border-orange-500/50"
+                                            )}
                                         />
                                         <motion.div 
                                             animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0] }}
                                             transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
-                                            className="absolute inset-0 rounded-[2rem] border-2 border-emerald-500/30 -z-10"
+                                            className={cn(
+                                                "absolute inset-0 rounded-[2rem] border-2 -z-10",
+                                                isKo ? "border-blue-500/30" : "border-orange-500/30"
+                                            )}
                                         />
 
                                         <motion.a
@@ -569,34 +575,68 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             onClick={handleAffiliateClick}
-                                            whileHover={{ scale: 1.05, y: -5 }}
+                                            whileHover="hover"
                                             whileTap={{ scale: 0.95 }}
+                                            initial="initial"
                                             className={cn(
-                                                "relative w-full py-5 md:py-8 rounded-[1.5rem] md:rounded-[2rem] flex flex-col items-center justify-center gap-1 shadow-[0_20px_50px_-10px_rgba(16,185,129,0.5)] overflow-hidden group/magnetic transition-all duration-300",
-                                                isPerfect 
-                                                    ? "bg-gradient-to-br from-amber-400 to-orange-600 text-black shadow-amber-500/30" 
-                                                    : "bg-[#10b981] text-white"
+                                                "relative w-full py-5 md:py-8 rounded-[1.5rem] md:rounded-[2rem] flex flex-col items-center justify-center gap-1 overflow-hidden group/magnetic transition-all duration-500",
+                                                isKo 
+                                                    ? "bg-gradient-to-r from-[#cb1400] to-[#015199] text-white shadow-[0_20px_50px_-10px_rgba(203,20,0,0.4)]" 
+                                                    : "bg-gradient-to-r from-[#232f3e] to-[#ff9900] text-white shadow-[0_20px_50px_-10px_rgba(255,153,0,0.4)]"
                                             )}
                                         >
-                                            {/* Dynamic Glossy Shine Overlay */}
+                                            {/* Scanning Radar Beam on Hover */}
                                             <motion.div 
-                                                animate={{ x: ['-250%', '250%'] }}
-                                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                                className="absolute inset-y-0 w-2/3 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-[40deg] z-20 pointer-events-none"
+                                                variants={{
+                                                    initial: { x: '-100%', opacity: 0 },
+                                                    hover: { x: '200%', opacity: 1, transition: { duration: 1.5, repeat: Infinity, ease: "linear" } }
+                                                }}
+                                                className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[30deg] z-20 pointer-events-none"
+                                            />
+                                            
+                                            {/* Background Matrix/Dots on Hover */}
+                                            <motion.div 
+                                                variants={{
+                                                    initial: { opacity: 0 },
+                                                    hover: { opacity: 1 }
+                                                }}
+                                                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2)_1px,transparent_1px)] bg-[size:10px_10px] pointer-events-none"
                                             />
 
-                                            <div className="flex items-center gap-1.5 md:gap-3 relative z-10 px-4">
-                                                <Zap size={14} fill="currentColor" className="animate-pulse shrink-0 md:size-[22px]" />
-                                                <span className="text-[12px] md:text-2xl font-[1000] tracking-tight md:tracking-tighter whitespace-nowrap">
-                                                    {isKo ? "쿠팡에서 잠재력 깨우기" : "Awaken Your Potential"}
-                                                </span>
+                                            <div className="flex items-center gap-2 md:gap-3 relative z-10 px-4">
+                                                <motion.div
+                                                    variants={{
+                                                        initial: { rotate: 0 },
+                                                        hover: { rotate: [0, -10, 10, -10, 0], scale: 1.2 }
+                                                    }}
+                                                    transition={{ duration: 0.5 }}
+                                                >
+                                                    <ShoppingCart size={18} fill="currentColor" className="shrink-0 md:size-[26px]" />
+                                                </motion.div>
+                                                
+                                                {/* Text crossfade on hover */}
+                                                <div className="relative h-6 md:h-10 overflow-hidden flex items-center justify-center min-w-[200px]">
+                                                    <motion.span 
+                                                        variants={{ initial: { y: 0, opacity: 1 }, hover: { y: -40, opacity: 0 } }}
+                                                        className="absolute text-[13px] md:text-2xl font-[1000] tracking-tight md:tracking-tighter whitespace-nowrap"
+                                                    >
+                                                        {isKo ? "쿠팡에서 잠재력 깨우기" : "Awaken on Amazon"}
+                                                    </motion.span>
+                                                    <motion.span 
+                                                        variants={{ initial: { y: 40, opacity: 0 }, hover: { y: 0, opacity: 1 } }}
+                                                        className="absolute text-[13px] md:text-2xl font-[1000] tracking-tight md:tracking-tighter whitespace-nowrap text-yellow-300"
+                                                    >
+                                                        {isKo ? "⚡ 실시간 최저가 스캔 중..." : "⚡ Finding Best Price..."}
+                                                    </motion.span>
+                                                </div>
                                             </div>
-                                            <span className="relative z-10 text-[8px] md:text-[10px] font-black tracking-[0.15em] md:tracking-[0.3em] uppercase opacity-80 group-hover:opacity-100 transition-opacity">
-                                                {isKo ? "최저가 시너지 조합 찾기" : "Start Optimization"}
+
+                                            <span className="relative z-10 text-[8px] md:text-[10px] font-black tracking-[0.15em] md:tracking-[0.3em] uppercase text-white/80 group-hover/magnetic:text-white transition-colors">
+                                                {isKo ? "로켓배송으로 내일 당장 시작하기" : "Start Optimization Tomorrow"}
                                             </span>
                                             
-                                            {/* Magnetic Glow Reveal */}
-                                            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
+                                            {/* Glow Reveal */}
+                                            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/magnetic:opacity-100 transition-opacity duration-300 -z-10" />
                                         </motion.a>
                                     </div>
                                 </div>
