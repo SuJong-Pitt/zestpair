@@ -112,7 +112,7 @@ const CATEGORY_THEMES: Record<string, { bg: string, border: string, text: string
   enzymes: { bg: "#f7fee7", border: "#ecfccb", text: "#84cc16" },
   herbs: { bg: "#f0fdfa", border: "#ccfbf1", text: "#14b8a6" },
   hormones: { bg: "#fdf4ff", border: "#fae8ff", text: "#d946ef" },
-  drugs: { bg: "#f8fafc", border: "#f1f5f9", text: "#64748b" },
+  drugs: { bg: "#fff1f2", border: "#ffe4e6", text: "#f43f5e" },
   other: { bg: "#f8fafc", border: "#f1f5f9", text: "#64748b" },
 };
 
@@ -133,6 +133,8 @@ export default function HomeClient() {
   const [searchMode, setSearchMode] = useState<"ai" | "manual">("ai");
   const [sortBy, setSortBy] = useState<'default' | 'name' | 'popular'>('default');
   const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [isMainSortDropdownOpen, setIsMainSortDropdownOpen] = useState(false);
   // 카테고리 전환 감지: 1=초기 로드(stagger 적용), >0=탭 전환(딜레이 없이 즉각 표시)
   const categoryVersionRef = useRef(0);
   const [hasInitialLoaded, setHasInitialLoaded] = useState(false);
@@ -1430,34 +1432,28 @@ export default function HomeClient() {
                   <motion.button
                     key={key}
                     layout="position"
-                    whileHover={{ y: -3, scale: 1.02, boxShadow: "0 8px 20px rgba(0,0,0,0.06)" }}
+                    whileHover={{ y: -3, scale: 1.02 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => setSelectedCategory(key)}
-                    className="group relative flex items-center justify-center sm:justify-start gap-1.5 md:gap-2.5 px-2 md:px-5 py-2 md:py-3.5 rounded-xl md:rounded-[1.25rem] text-[10px] md:text-[13px] font-[900] transition-all duration-300"
+                    className="group relative flex items-center justify-center sm:justify-start gap-2 md:gap-3 px-3 md:px-5 py-2 md:py-3 rounded-full text-[10px] md:text-[13px] font-[900] transition-all duration-300"
                     style={isActive ? {
-                      background: "rgba(16,185,129,0.12)",
-                      border: "1px solid rgba(16,185,129,0.4)",
+                      background: "rgba(16,185,129,0.15)",
+                      border: "1.5px solid rgba(16,185,129,0.5)",
                       color: "#34d399",
-                      boxShadow: "0 0 14px rgba(16,185,129,0.15)"
+                      boxShadow: "0 8px 24px rgba(16,185,129,0.25), inset 0 0 10px rgba(16,185,129,0.1)"
                     } : {
                       background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.07)",
+                      border: "1px solid rgba(255,255,255,0.08)",
                       color: "#94a3b8",
                     }}
                   >
-                    {/* 활성 배경 글로우 (Liquid Light 효과) */}
+                    {/* 활성 배경 글로우 ✨ */}
                     {isActive && (
                       <motion.div
                         layoutId="activeCategoryGlow"
-                        className="absolute inset-x-0 -bottom-1 h-3 blur-md opacity-60 z-0 pointer-events-none"
-                        style={{ background: "#10b981" }}
+                        className="absolute inset-0 bg-emerald-400/10 blur-md rounded-full pointer-events-none"
                         transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
                       />
-                    )}
-
-                    {/* 내부 광원 효과 (Active 전용) — 정적 opacity로 대체 */}
-                    {isActive && (
-                      <div className="absolute inset-0 bg-emerald-400/15 rounded-xl md:rounded-[1.25rem] pointer-events-none" />
                     )}
 
                     <span className="relative z-10 text-xs md:text-lg leading-none group-hover:scale-110 transition-transform duration-500">
@@ -1465,21 +1461,15 @@ export default function HomeClient() {
                     </span>
                     <motion.span
                       className="relative z-10 tracking-tight whitespace-nowrap"
-                      animate={isActive ? { scale: 1.02 } : { scale: 1 }}
                     >
                       {data[language]}
                     </motion.span>
-
-                    {/* 활성 하단 포인트 닷 (프리미엄 피니시) */}
+                    
+                    {/* 하단 활성 인디케이터 바 (스크린샷 참고) */}
                     {isActive && (
                       <motion.div
-                        initial={{ opacity: 0, scale: 0, y: 5 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        className="absolute bottom-1 md:bottom-2 left-1/2 -translate-x-1/2 w-1 h-0.5 rounded-full"
-                        style={{
-                          background: "#10b981",
-                          boxShadow: "0 0 8px #10b981"
-                        }}
+                        layoutId="activeTabUnderline"
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-0.5 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.8)]"
                       />
                     )}
                   </motion.button>
@@ -1490,15 +1480,15 @@ export default function HomeClient() {
 
           {searchQuery === "" && selectedCategory === "all" && (
             <div
-              className="mb-16 -mx-4 px-5 py-8 rounded-2xl"
+              className="mb-20 md:mb-32 -mx-4 px-5 py-8 rounded-[2rem]"
               style={{
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.07)",
               }}
             >
               {/* 섹션 헤더 */}
-              <div className="flex items-start sm:items-center justify-between mb-7">
-                <div className="flex items-start gap-3">
+              <div className="flex items-center justify-between gap-4 mb-7 px-1">
+                <div className="flex items-center gap-3.5">
                   {/* 아이콘 오브 */}
                   <motion.div
                     animate={{ scale: [1, 1.12, 1], rotate: [0, 5, 0] }}
@@ -1514,10 +1504,10 @@ export default function HomeClient() {
                   </motion.div>
 
                   <div>
-                    <h2 className="text-base font-[900] tracking-tight" style={{ color: "#f1f5f9", lineHeight: "1.2" }}>
+                    <h2 className="text-sm md:text-base font-[1000] tracking-tight" style={{ color: "#f8fafc", lineHeight: "1.2" }}>
                     {t.common.popular}
                     </h2>
-                    <p className="text-[9px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.15em", lineHeight: "1" }}>
+                    <p className="text-[8px] md:text-[9px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.2em", lineHeight: "1" }}>
                       Curated trending picks
                     </p>
                   </div>
@@ -1526,30 +1516,72 @@ export default function HomeClient() {
                 <div className="flex items-center gap-3 pt-1 sm:pt-0">
 
 
-                  {/* 정렬 셀렉터 (인기 섹션 버전) */}
-                  <div className="relative group">
-                    <div
-                      className="absolute inset-0 bg-emerald-500/5 blur-sm rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                    />
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as any)}
-                      className="relative z-10 appearance-none border rounded-xl px-3 pr-8 py-1.5 text-[10px] md:text-[11px] font-[900] cursor-pointer transition-all outline-none"
+                  {/* 정렬 셀렉터 (인기 섹션 버전) ✨ */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black transition-all duration-300"
                       style={{
                         background: "rgba(255,255,255,0.05)",
                         border: "1px solid rgba(255,255,255,0.1)",
                         color: "#94a3b8",
                       }}
                     >
-                      <option value="default">{language === 'ko' ? '추천순' : 'Recommended'}</option>
-                      <option value="name">{language === 'ko' ? '이름순' : 'A-Z'}</option>
-                      <option value="popular">{language === 'ko' ? '인기순' : 'Popularity'}</option>
-                    </select>
-                    <ChevronDown
-                      size={10}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-emerald-500 transition-colors"
-                      strokeWidth={3}
-                    />
+                      <span className="whitespace-nowrap">
+                        {sortBy === 'default' ? (language === 'ko' ? '추천순' : 'Recommended') :
+                         sortBy === 'name' ? (language === 'ko' ? '이름순' : 'A-Z') :
+                         (language === 'ko' ? '인기순' : 'Popularity')}
+                      </span>
+                      <ChevronDown
+                        size={12}
+                        className={cn("transition-transform duration-300 text-emerald-400", isSortDropdownOpen && "rotate-180")}
+                        strokeWidth={3}
+                      />
+                    </button>
+
+                    <AnimatePresence>
+                      {isSortDropdownOpen && (
+                        <>
+                          {/* 외부 클릭 감지용 투명 오버레이 */}
+                          <div 
+                            className="fixed inset-0 z-[100]" 
+                            onClick={() => setIsSortDropdownOpen(false)} 
+                          />
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            className="absolute right-0 top-full mt-2 w-32 py-1.5 z-[110] rounded-xl overflow-hidden shadow-2xl"
+                            style={{
+                              background: "rgba(15, 23, 42, 0.95)",
+                              backdropFilter: "blur(20px)",
+                              border: "1px solid rgba(255, 255, 255, 0.1)",
+                            }}
+                          >
+                            {[
+                              { value: 'default', label: language === 'ko' ? '추천순' : 'Recommended' },
+                              { value: 'name', label: language === 'ko' ? '이름순' : 'A-Z' },
+                              { value: 'popular', label: language === 'ko' ? '인기순' : 'Popularity' },
+                            ].map((opt) => (
+                              <button
+                                key={opt.value}
+                                onClick={() => {
+                                  setSortBy(opt.value as any);
+                                  setIsSortDropdownOpen(false);
+                                }}
+                                className="w-full text-left px-4 py-2 text-[11px] font-black transition-colors"
+                                style={{
+                                  background: sortBy === opt.value ? "#2563eb" : "transparent",
+                                  color: sortBy === opt.value ? "white" : "rgba(255,255,255,0.6)",
+                                }}
+                              >
+                                {opt.label}
+                              </button>
+                            ))}
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
@@ -1624,21 +1656,21 @@ export default function HomeClient() {
                             {/* 제목 및 부제목 - 인기 섹션과 동일 사양 ✨ */}
                             <div>
                               <div className="flex items-center gap-2">
-                                <h2 className="text-base font-[900] tracking-tight" style={{ color: "#f8fafc", lineHeight: "1.2" }}>
+                                <h2 className="text-sm md:text-base font-[1000] tracking-tight" style={{ color: "#f8fafc", lineHeight: "1.2" }}>
                                   {selectedCategory === 'all' ? t.common.searchResult : categoryInfo[language]}
                                 </h2>
                                 <span
-                                  className="text-[9px] font-black px-1.5 py-0.5 rounded-lg border border-slate-100 flex items-center justify-center min-w-[24px] shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
+                                  className="text-[9px] font-black px-1.5 py-0.5 rounded-lg flex items-center justify-center min-w-[24px] shadow-[0_2px_4px_rgba(0,0,0,0.1)]"
                                   style={{
                                     background: "#fff",
                                     color: theme.text,
-                                    border: `1px solid ${theme.border}30`
+                                    border: `1px solid ${theme.text}40`
                                   }}
                                 >
                                   {filteredIngredients.length}
                                 </span>
                               </div>
-                              <p className="text-[9px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.15em", lineHeight: "1" }}>
+                              <p className="text-[8px] md:text-[9px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.2em", lineHeight: "1" }}>
                                 {selectedCategory === 'all'
                                   ? 'Curated trending picks'
                                   : `Discover ${selectedCategory.split('_')[0]} collection`}
@@ -1652,28 +1684,71 @@ export default function HomeClient() {
                     <div className="flex items-center self-end sm:self-auto gap-3">
 
 
-                      {/* 정렬 셀렉터 */}
-                      <div className="relative group shrink-0">
-                        <div
-                          className="absolute inset-0 bg-emerald-500/5 blur-sm rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                        />
-                        <select
-                          value={sortBy}
-                          onChange={(e) => setSortBy(e.target.value as any)}
-                          className="relative z-10 appearance-none bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-3 pr-8 py-1.5 text-[10px] md:text-[11px] font-[900] text-slate-400 cursor-pointer transition-all outline-none focus:ring-2 focus:ring-emerald-500/20"
+                      {/* 정렬 셀렉터 ✨ */}
+                      <div className="relative">
+                        <button
+                          onClick={() => setIsMainSortDropdownOpen(!isMainSortDropdownOpen)}
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] md:text-[11px] font-black transition-all duration-300"
                           style={{
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.2)"
+                            background: "rgba(255,255,255,0.05)",
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            color: "#94a3b8",
                           }}
                         >
-                          <option value="default" className="bg-slate-900">{language === 'ko' ? '추천순' : 'Recommended'}</option>
-                          <option value="name" className="bg-slate-900">{language === 'ko' ? '이름순' : 'A-Z'}</option>
-                          <option value="popular" className="bg-slate-900">{language === 'ko' ? '인기순' : 'Popularity'}</option>
-                        </select>
-                        <ChevronDown
-                          size={10}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-emerald-500 transition-colors"
-                          strokeWidth={3}
-                        />
+                          <span className="whitespace-nowrap">
+                            {sortBy === 'default' ? (language === 'ko' ? '추천순' : 'Recommended') :
+                             sortBy === 'name' ? (language === 'ko' ? '이름순' : 'A-Z') :
+                             (language === 'ko' ? '인기순' : 'Popularity')}
+                          </span>
+                          <ChevronDown
+                            size={12}
+                            className={cn("transition-transform duration-300 text-emerald-400", isMainSortDropdownOpen && "rotate-180")}
+                            strokeWidth={3}
+                          />
+                        </button>
+
+                        <AnimatePresence>
+                          {isMainSortDropdownOpen && (
+                            <>
+                              <div 
+                                className="fixed inset-0 z-[100]" 
+                                onClick={() => setIsMainSortDropdownOpen(false)} 
+                              />
+                              <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                className="absolute right-0 top-full mt-2 w-32 py-1.5 z-[110] rounded-xl overflow-hidden shadow-2xl"
+                                style={{
+                                  background: "rgba(15, 23, 42, 0.95)",
+                                  backdropFilter: "blur(20px)",
+                                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                                }}
+                              >
+                                {[
+                                  { value: 'default', label: language === 'ko' ? '추천순' : 'Recommended' },
+                                  { value: 'name', label: language === 'ko' ? '이름순' : 'A-Z' },
+                                  { value: 'popular', label: language === 'ko' ? '인기순' : 'Popularity' },
+                                ].map((opt) => (
+                                  <button
+                                    key={opt.value}
+                                    onClick={() => {
+                                      setSortBy(opt.value as any);
+                                      setIsMainSortDropdownOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-[11px] font-black transition-colors"
+                                    style={{
+                                      background: sortBy === opt.value ? "#2563eb" : "transparent",
+                                      color: sortBy === opt.value ? "white" : "rgba(255,255,255,0.6)",
+                                    }}
+                                  >
+                                    {opt.label}
+                                  </button>
+                                ))}
+                              </motion.div>
+                            </>
+                          )}
+                        </AnimatePresence>
                       </div>
                     </div>
                   </div>

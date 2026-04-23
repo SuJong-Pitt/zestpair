@@ -88,9 +88,9 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
 
         {/* ── TRENDING / LIMITED 배지 ── */}
         {(isFeatured || ingredient.is_popular) && (
-          <div className="absolute top-0 left-5 z-30">
+          <div className="absolute top-2.5 left-2.5 z-30">
             <div
-              className="text-[8px] font-[900] px-2.5 py-1 rounded-b-xl text-white tracking-widest uppercase"
+              className="text-[7px] md:text-[8px] font-[900] px-3 py-1 rounded-full text-white tracking-widest uppercase"
               style={isFeatured ? {
                 background: "linear-gradient(135deg, #10b981 0%, #06b6d4 100%)",
                 boxShadow: "0 4px 12px rgba(16,185,129,0.4)"
