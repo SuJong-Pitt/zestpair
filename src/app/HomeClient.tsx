@@ -395,13 +395,15 @@ export default function HomeClient() {
   // (페이지 전환 방식으로 변경되어 기존 스크롤 로직은 제거합니다)
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
+    <div className="min-h-screen" style={{ background: "#030712" }}>
       <section
-        className="relative pb-24 pt-10 md:pb-32 md:pt-12 z-40"
+        className="relative pb-24 pt-10 md:pb-32 md:pt-12 z-40 hud-grid"
         style={{
-          background: "radial-gradient(circle at 50% 0%, #0d1a15 0%, #080c14 50%, #030712 100%)"
+          background: "radial-gradient(circle at 50% 0%, rgba(13, 26, 21, 0.95) 0%, rgba(8, 12, 20, 0.98) 50%, #030712 100%)"
         }}
       >
+        {/* 미세한 그리드 레이어 추가 */}
+        <div className="absolute inset-0 hud-grid-fine opacity-30 pointer-events-none" />
         {/* 고도화된 배경 장식 */}
         {!isMobile && <VisualDecorations />}
 
@@ -595,10 +597,10 @@ export default function HomeClient() {
             {/* ── 탭 스위처 ── */}
             <div className="flex items-center justify-center mb-4 px-4">
               <div
-                className="relative flex items-center p-1 rounded-2xl gap-1"
+                className="relative flex items-center p-1 rounded-xl gap-1"
                 style={{
-                  background: "rgba(10,15,30,0.6)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "rgba(10,15,30,0.8)",
+                  border: "1px solid var(--color-hud-border)",
                   backdropFilter: "blur(20px)",
                 }}
               >
@@ -689,68 +691,124 @@ export default function HomeClient() {
                   className="px-2"
                 >
                   <div className="relative group/ai-input">
-                    {/* 글로우 */}
-                    <div className="absolute -inset-1 rounded-2xl opacity-60 group-focus-within/ai-input:opacity-100 transition-opacity blur-lg pointer-events-none"
-                      style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.3), rgba(6,182,212,0.2), rgba(124,58,237,0.25))" }}
-                    />
+                    {/* 외부 글로우 */}
                     <div
-                      className="relative flex items-center gap-2 md:gap-3 rounded-2xl overflow-hidden"
+                      className="absolute -inset-[2px] rounded-xl opacity-0 group-focus-within/ai-input:opacity-100 transition-all duration-700 blur-md pointer-events-none"
+                      style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(6,182,212,0.4), rgba(124,58,237,0.45))" }}
+                    />
+
+                    <div
+                      className="relative overflow-hidden rounded-xl"
                       style={{
-                        background: "linear-gradient(135deg, rgba(10,20,35,0.8) 0%, rgba(15,10,30,0.8) 100%)",
-                        border: "1px solid rgba(16,185,129,0.25)",
-                        boxShadow: "0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
-                        backdropFilter: "blur(24px)",
+                        background: "rgba(2, 6, 23, 0.95)",
+                        border: "1px solid rgba(6, 182, 212, 0.2)",
+                        boxShadow: "0 8px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.04)",
                       }}
                     >
-                      {/* 좌측 AI 배지 */}
-                      <div className="flex items-center gap-2 pl-4 md:pl-5 shrink-0">
+                      {/* 상단 상태 스트립 */}
+                      <div
+                        className="flex items-center justify-between px-4 py-1.5 border-b"
+                        style={{ borderColor: "rgba(6,182,212,0.1)", background: "rgba(6,182,212,0.03)" }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse shadow-[0_0_6px_#10b981]" />
+                          <span className="text-[8px] font-black tracking-[0.2em] uppercase text-emerald-400/60">
+                            AI NEURAL MATCH · ONLINE
+                          </span>
+                        </div>
+                        <span className="text-[8px] font-black tracking-widest text-white/15 uppercase">
+                          {isAiMatching ? "PROCESSING..." : "READY"}
+                        </span>
+                      </div>
+
+                      {/* 메인 입력 영역 */}
+                      <div className="flex items-center gap-3 px-3 md:px-4">
+                        {/* 좌측 AI 아이콘 */}
+                        <div className="flex flex-col items-center gap-0.5 shrink-0 py-2.5">
+                          <div
+                            className="flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300"
+                            style={{
+                              background: isAiMatching
+                                ? "linear-gradient(135deg, rgba(16,185,129,0.3), rgba(6,182,212,0.25))"
+                                : "rgba(16,185,129,0.08)",
+                              border: "1px solid rgba(16,185,129,0.2)",
+                            }}
+                          >
+                            {isAiMatching ? (
+                              <RefreshCcw size={14} className="text-emerald-400 animate-spin" />
+                            ) : (
+                              <Sparkles size={14} className="text-emerald-400" />
+                            )}
+                          </div>
+                          <span className="text-[7px] font-black tracking-widest text-emerald-500/40 uppercase">AI</span>
+                        </div>
+
+                        {/* 세로 구분선 */}
                         <div
-                          className="flex items-center gap-1.5 px-2 py-1 rounded-lg"
-                          style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)" }}
-                        >
-                          {isAiMatching ? (
-                            <RefreshCcw size={11} className="text-emerald-400 animate-spin" />
-                          ) : (
-                            <Sparkles size={11} className="text-emerald-400" />
-                          )}
-                          <span className="text-[9px] font-black tracking-widest uppercase text-emerald-400 hidden md:block">AI</span>
+                          className="self-stretch w-px shrink-0 my-2"
+                          style={{ background: "linear-gradient(to bottom, transparent, rgba(6,182,212,0.25), transparent)" }}
+                        />
+
+                        {/* 터미널 프롬프트 + 입력 */}
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <span className="text-emerald-400/30 font-mono text-sm shrink-0 select-none hidden md:block">&gt;_</span>
+                          <input
+                            type="text"
+                            value={aiIntent}
+                            onChange={(e) => { setAiIntent(e.target.value); setAiMatchError(null); }}
+                            onKeyDown={(e) => e.key === "Enter" && handleAiMatch()}
+                            placeholder={
+                              language === "ko"
+                                ? isMobile ? "증상이나 목표를 입력하세요" : "증상이나 목표를 말씀해주세요 (예: 요즘 너무 피곤해)"
+                                : isMobile ? "Describe your symptoms" : "Tell me your symptoms (e.g., I'm so tired lately)"
+                            }
+                            className="flex-1 bg-transparent border-none text-white placeholder:text-white/20 focus:ring-0 text-[13px] md:text-[14px] font-medium py-3 md:py-3.5 min-w-0"
+                          />
+                        </div>
+
+                        {/* EXECUTE 버튼 */}
+                        <div className="shrink-0 py-2 pr-1">
+                          <motion.button
+                            onClick={handleAiMatch}
+                            disabled={aiIntent.length < 2 || isAiMatching}
+                            whileHover={aiIntent.length >= 2 && !isAiMatching ? { scale: 1.04 } : {}}
+                            whileTap={aiIntent.length >= 2 && !isAiMatching ? { scale: 0.96 } : {}}
+                            className="relative overflow-hidden flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-300"
+                            style={
+                              aiIntent.length >= 2 && !isAiMatching
+                                ? {
+                                    background: "linear-gradient(135deg, #10b981, #0891b2)",
+                                    color: "#000",
+                                    boxShadow: "0 0 20px rgba(16,185,129,0.45), inset 0 1px 0 rgba(255,255,255,0.2)",
+                                  }
+                                : {
+                                    background: "rgba(255,255,255,0.04)",
+                                    color: "rgba(255,255,255,0.2)",
+                                    border: "1px solid rgba(255,255,255,0.06)",
+                                    cursor: "not-allowed",
+                                  }
+                            }
+                          >
+                            {aiIntent.length >= 2 && !isAiMatching && (
+                              <motion.span
+                                className="absolute inset-0 pointer-events-none"
+                                style={{ background: "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.3) 50%, transparent 65%)" }}
+                                animate={{ x: ["-150%", "150%"] }}
+                                transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.5 }}
+                              />
+                            )}
+                            <Zap size={10} className="relative z-10 shrink-0" />
+                            <span className="relative z-10">
+                              {isAiMatching
+                                ? (isMobile ? "···" : "SCAN")
+                                : "MATCH"}
+                            </span>
+                          </motion.button>
                         </div>
                       </div>
 
-                      {/* 입력 */}
-                      <input
-                        type="text"
-                        value={aiIntent}
-                        onChange={(e) => { setAiIntent(e.target.value); setAiMatchError(null); }}
-                        onKeyDown={(e) => e.key === "Enter" && handleAiMatch()}
-                        placeholder={
-                          language === "ko"
-                            ? isMobile ? "어떤 증상이 있으신가요?" : "증상이나 목표를 말씀해주세요 (예: 요즘 너무 피곤해)"
-                            : isMobile ? "How do you feel?" : "Tell me your symptoms (e.g., I'm so tired lately)"
-                        }
-                        className="flex-1 bg-transparent border-none text-white placeholder:text-white/25 focus:ring-0 text-[13px] md:text-[15px] font-medium py-3.5 md:py-4 min-w-0"
-                      />
-
-                      {/* Match 버튼 */}
-                      <div className="pr-2 shrink-0">
-                        <button
-                          onClick={handleAiMatch}
-                          disabled={aiIntent.length < 2 || isAiMatching}
-                          className={cn(
-                            "px-3.5 md:px-5 py-2 rounded-xl text-[11px] md:text-xs font-black uppercase tracking-wider transition-all duration-200",
-                            aiIntent.length >= 2 && !isAiMatching
-                              ? "text-slate-900 hover:scale-105 active:scale-95"
-                              : "bg-white/5 text-white/20 cursor-not-allowed"
-                          )}
-                          style={
-                            aiIntent.length >= 2 && !isAiMatching
-                              ? { background: "linear-gradient(135deg, #10b981, #059669)", boxShadow: "0 4px 14px rgba(16,185,129,0.4)" }
-                              : {}
-                          }
-                        >
-                          {isAiMatching ? (isMobile ? "..." : "분석 중") : (language === "ko" ? "매칭" : "Match")}
-                        </button>
-                      </div>
+                      {/* HUD 스캔라인 */}
+                      <div className="hud-scanline opacity-10" />
                     </div>
 
                     {/* 에러 메시지 */}
@@ -768,34 +826,59 @@ export default function HomeClient() {
                     </AnimatePresence>
                   </div>
 
-                  {/* 하단 힌트 태그 */}
-                  <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+                  {/* 하단 힌트 태그 — HUD Query Chips */}
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
                     {(language === "ko"
-                      ? ["💤 잠이 안 와", "😩 너무 피곤해", "💪 운동 회복", "🧠 집중력 향상", "🌿 피부 개선"]
-                      : ["💤 Can't sleep", "😩 Always tired", "💪 Workout recovery", "🧠 Focus boost", "🌿 Skin glow"]
+                      ? [
+                          { code: "SLP", label: "잠이 안 와",    icon: "💤", color: "#818cf8" },
+                          { code: "FAT", label: "너무 피곤해",   icon: "⚡", color: "#f59e0b" },
+                          { code: "RCV", label: "운동 회복",     icon: "💪", color: "#34d399" },
+                          { code: "COG", label: "집중력 향상",   icon: "🧠", color: "#06b6d4" },
+                          { code: "SKN", label: "피부 개선",     icon: "🌿", color: "#a78bfa" },
+                        ]
+                      : [
+                          { code: "SLP", label: "Can't sleep",      icon: "💤", color: "#818cf8" },
+                          { code: "FAT", label: "Always tired",     icon: "⚡", color: "#f59e0b" },
+                          { code: "RCV", label: "Workout recovery", icon: "💪", color: "#34d399" },
+                          { code: "COG", label: "Focus boost",      icon: "🧠", color: "#06b6d4" },
+                          { code: "SKN", label: "Skin glow",        icon: "🌿", color: "#a78bfa" },
+                        ]
                     ).map((hint) => (
-                      <button
-                        key={hint}
-                        onClick={() => { setAiIntent(hint.slice(2).trim()); setAiMatchError(null); }}
-                        className="px-2.5 py-1 rounded-full text-[10px] md:text-[11px] font-bold transition-all hover:scale-105 active:scale-95"
+                      <motion.button
+                        key={hint.code}
+                        onClick={() => { setAiIntent(hint.label); setAiMatchError(null); }}
+                        whileHover={{ y: -2, scale: 1.04 }}
+                        whileTap={{ scale: 0.96 }}
+                        className="group/chip relative flex items-center gap-2 px-3 py-1.5 overflow-hidden"
                         style={{
-                          background: "rgba(255,255,255,0.05)",
-                          border: "1px solid rgba(255,255,255,0.1)",
-                          color: "rgba(255,255,255,0.5)",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "rgba(16,185,129,0.1)";
-                          e.currentTarget.style.borderColor = "rgba(16,185,129,0.3)";
-                          e.currentTarget.style.color = "#6ee7b7";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                          e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-                          e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                          background: "rgba(10, 15, 30, 0.6)",
+                          border: `1px solid ${hint.color}30`,
+                          borderLeft: `2px solid ${hint.color}`,
+                          borderRadius: "6px",
+                          backdropFilter: "blur(8px)",
                         }}
                       >
-                        {hint}
-                      </button>
+                        {/* 호버 시 스캔 슬라이드 */}
+                        <span
+                          className="absolute inset-0 opacity-0 group-hover/chip:opacity-100 transition-opacity duration-300 pointer-events-none"
+                          style={{ background: `linear-gradient(90deg, ${hint.color}15, transparent)` }}
+                        />
+                        {/* 상태 코드 라벨 */}
+                        <span
+                          className="text-[8px] font-black tracking-widest shrink-0"
+                          style={{ color: hint.color, opacity: 0.7 }}
+                        >
+                          {hint.code}
+                        </span>
+                        {/* 구분선 */}
+                        <span className="w-px h-3 shrink-0" style={{ background: `${hint.color}30` }} />
+                        {/* 라벨 텍스트 */}
+                        <span
+                          className="text-[11px] font-bold text-white/60 group-hover/chip:text-white/90 transition-colors whitespace-nowrap relative z-10"
+                        >
+                          {hint.label}
+                        </span>
+                      </motion.button>
                     ))}
                   </div>
                 </motion.div>
@@ -832,26 +915,32 @@ export default function HomeClient() {
                     />
 
                     <div
-                      className="relative flex items-center rounded-[4rem] p-1 md:p-1.5 transition-all duration-700 overflow-hidden group/inner"
+                      className="relative flex items-center rounded-xl p-1 md:p-1.5 transition-all duration-700 overflow-hidden group/inner hud-card"
                       style={{
-                        background: "rgba(10, 15, 30, 0.45)",
+                        background: "rgba(2, 6, 23, 0.9)",
+                        border: "1px solid var(--color-hud-border)",
                         backdropFilter: "blur(24px)",
-                        boxShadow: "0 25px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
+                        boxShadow: "0 25px 50px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.03)",
                         transform: "translateZ(0)"
                       }}
                     >
+                      {/* HUD Corner Brackets & Scanline */}
+                      <div className="hud-corner-br opacity-60" />
+                      <div className="hud-corner-bl opacity-60" />
+                      <div className="hud-scanline opacity-10" />
+
                       {/* 프리즘 테두리 애니메이션 */}
-                      <div className="absolute inset-0 p-[2px] rounded-[4rem] pointer-events-none opacity-40 group-focus-within/bar:opacity-100 transition-opacity duration-1000">
+                      <div className="absolute inset-0 p-[2px] rounded-xl pointer-events-none opacity-40 group-focus-within/bar:opacity-100 transition-opacity duration-1000">
                         <div
                           className="absolute inset-[-100%] animate-spin-slow"
                           style={{
-                            background: "conic-gradient(from 0deg, transparent 0deg, #10b981 90deg, #06b6d4 180deg, #7c3aed 270deg, transparent 360deg)",
+                            background: "conic-gradient(from 0deg, transparent 0deg, var(--color-hud-cyan) 90deg, #06b6d4 180deg, #7c3aed 270deg, transparent 360deg)",
                             animationDuration: "4s"
                           }}
                         />
                         <div
-                          className="absolute inset-[1.5px] rounded-[4rem]"
-                          style={{ background: "#0a0f1e" }}
+                          className="absolute inset-[1.5px] rounded-xl"
+                          style={{ background: "#020617" }}
                         />
                       </div>
 
@@ -1152,13 +1241,16 @@ export default function HomeClient() {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="mt-8 flex flex-col items-center gap-4"
             >
-              <div className="flex items-center gap-2">
-                <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-emerald-500/30" />
-                <span className="text-[10px] md:text-[11px] font-black text-emerald-400/70 uppercase tracking-[0.25em] flex items-center gap-2">
-                  <Activity size={12} className="text-emerald-500" />
-                  {t.hero.quickStart}
-                </span>
-                <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-emerald-500/30" />
+              <div className="flex items-center gap-3">
+                <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-hud-cyan/40" />
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] md:text-[11px] font-black text-hud-cyan uppercase tracking-[0.3em] flex items-center gap-2">
+                    <Activity size={12} className="text-hud-cyan animate-pulse" />
+                    {t.hero.quickStart}
+                  </span>
+                  <span className="text-[7px] font-black text-hud-cyan/40 tracking-[0.4em] uppercase -mt-0.5">Lab protocols ready</span>
+                </div>
+                <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-hud-cyan/40" />
               </div>
               <div className="flex flex-wrap justify-center gap-2 px-4 min-h-[44px]">
                 <AnimatePresence mode="wait">
@@ -1196,31 +1288,29 @@ export default function HomeClient() {
                               }
                             });
                             if (toAdd.length > 0) {
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                              window.scrollTo({ top: 0, behavior: "smooth" });
                             }
                           }}
-                          className="px-2.5 py-3 md:px-4 md:py-3.5 rounded-xl transition-all active:scale-95 flex items-center justify-between gap-1 group/combo"
+                          className="relative group/combo flex flex-col items-start p-3 rounded-xl hud-card transition-all duration-300 hover:scale-[1.02] active:scale-95 border-hud-border/40"
                           style={{
-                            background: "rgba(10, 15, 30, 0.45)",
-                            border: "1px solid rgba(255, 255, 255, 0.08)",
-                            backdropFilter: "blur(16px)",
-                            boxShadow: "0 4px 14px rgba(0,0,0,0.3)"
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = "rgba(16, 185, 129, 0.4)";
-                            e.currentTarget.style.background = "rgba(16, 185, 129, 0.1)";
-                            e.currentTarget.style.boxShadow = "0 0 20px rgba(16, 185, 129, 0.2)";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
-                            e.currentTarget.style.background = "rgba(10, 15, 30, 0.45)";
-                            e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,0,0,0.3)";
+                            background: "rgba(10, 15, 30, 0.4)",
+                            backdropFilter: "blur(12px)",
                           }}
                         >
-                          <span className="text-[10px] md:text-xs font-black text-white/80 group-hover/combo:text-emerald-300 transition-colors tracking-tighter md:tracking-tight leading-tight text-left">
-                            {combo.label}
-                          </span>
-                          <ChevronRight size={10} className="text-white/20 group-hover/combo:text-emerald-400 group-hover/combo:translate-x-0.5 transition-all shrink-0 md:size-3" />
+                          {/* HUD Brackets for cards */}
+                          <div className="hud-corner-br opacity-40 scale-75 origin-bottom-right" />
+                          <div className="hud-corner-bl opacity-40 scale-75 origin-bottom-left" />
+                          
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-hud-cyan/60 animate-pulse" />
+                            <span className="text-[9px] font-black text-hud-cyan/60 uppercase tracking-widest">Protocol {combo.id.toUpperCase()}</span>
+                          </div>
+                          <span className="text-xs md:text-sm font-black text-white mb-1 group-hover/combo:text-hud-cyan transition-colors">{combo.label}</span>
+                          <div className="flex gap-1">
+                            {combo.tags.map(tag => (
+                              <span key={tag} className="text-[9px] font-bold text-white/40 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">{tag}</span>
+                            ))}
+                          </div>
                         </button>
                       ))}
                     </div>
@@ -1228,7 +1318,6 @@ export default function HomeClient() {
                 </AnimatePresence>
               </div>
             </motion.div>
-
             {/* 최근 분석 히스토리 [신규 ✨] */}
             {isMounted && analysisHistory.length > 0 && (
               <motion.div
@@ -1395,19 +1484,12 @@ export default function HomeClient() {
           </motion.div>
         </div>
 
-        {/* 하단 스크림 (가독성을 위해 높이 조절 및 위치 최적화) */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-32 md:h-40 pointer-events-none z-20"
-          style={{
-            background: "linear-gradient(to top, rgba(248,250,252,1) 0%, rgba(248,250,252,0.9) 30%, transparent 100%)"
-          }}
-        />
       </section>
 
 
 
-      <main className="mx-auto max-w-2xl px-4 py-8">
-        <div ref={ingredientsRef}> {/* 영양제 선택 영역만 ref로 감싸기 */}
+      <main className="mx-auto max-w-2xl px-4 py-10">
+        <div ref={ingredientsRef}>
 
           <div className="relative mb-10">
             {/* 섹션 라벨 */}
@@ -1434,16 +1516,14 @@ export default function HomeClient() {
                     onClick={() => setSelectedCategory(key)}
                     className="group relative flex items-center justify-center sm:justify-start gap-1.5 md:gap-2.5 px-2 md:px-5 py-2 md:py-3.5 rounded-xl md:rounded-[1.25rem] text-[10px] md:text-[13px] font-[900] transition-all duration-300"
                     style={isActive ? {
-                      background: "linear-gradient(135deg, #0a1a15 0%, #071210 100%)",
-                      border: "1.2px solid rgba(16,185,129,0.5)",
+                      background: "rgba(16,185,129,0.12)",
+                      border: "1px solid rgba(16,185,129,0.4)",
                       color: "#34d399",
-                      boxShadow: "0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.1)"
+                      boxShadow: "0 0 14px rgba(16,185,129,0.15)"
                     } : {
-                      background: "rgba(255,255,255,0.6)",
-                      border: "1px solid rgba(0,0,0,0.05)",
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.07)",
                       color: "#64748b",
-                      boxShadow: "0 4px 10px rgba(0,0,0,0.02)",
-                      backdropFilter: "blur(20px)"
                     }}
                   >
                     {/* 활성 배경 글로우 (Liquid Light 효과) */}
@@ -1491,11 +1571,10 @@ export default function HomeClient() {
 
           {searchQuery === "" && selectedCategory === "all" && (
             <div
-              className="mb-16 -mx-4 px-5 py-8 rounded-[2rem]"
+              className="mb-16 -mx-4 px-5 py-8 rounded-2xl"
               style={{
-                background: "linear-gradient(160deg, rgba(240,253,250,0.8) 0%, rgba(255,255,255,0.95) 40%, rgba(240,249,255,0.6) 100%)",
-                border: "1px solid rgba(16,185,129,0.1)",
-                boxShadow: "0 4px 30px rgba(16,185,129,0.06), inset 0 1px 0 rgba(255,255,255,0.8)"
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.07)",
               }}
             >
               {/* 섹션 헤더 */}
@@ -1516,8 +1595,8 @@ export default function HomeClient() {
                   </motion.div>
 
                   <div>
-                    <h2 className="text-base font-[900] tracking-tight" style={{ color: "#0f172a", lineHeight: "1.2" }}>
-                      {t.common.popular}
+                    <h2 className="text-base font-[900] tracking-tight" style={{ color: "#f1f5f9", lineHeight: "1.2" }}>
+                    {t.common.popular}
                     </h2>
                     <p className="text-[9px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.15em", lineHeight: "1" }}>
                       Curated trending picks
@@ -1536,9 +1615,11 @@ export default function HomeClient() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
-                      className="relative z-10 appearance-none bg-white/40 hover:bg-white/60 border border-slate-200/60 rounded-xl px-3 pr-8 py-1.5 text-[10px] md:text-[11px] font-[900] text-slate-600 cursor-pointer transition-all outline-none focus:ring-2 focus:ring-emerald-500/20"
+                      className="relative z-10 appearance-none border rounded-xl px-3 pr-8 py-1.5 text-[10px] md:text-[11px] font-[900] cursor-pointer transition-all outline-none"
                       style={{
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+                        background: "rgba(255,255,255,0.05)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "#94a3b8",
                       }}
                     >
                       <option value="default">{language === 'ko' ? '추천순' : 'Recommended'}</option>
@@ -1591,23 +1672,8 @@ export default function HomeClient() {
                   exit={{ opacity: 0, scale: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   style={{
-                    background: (() => {
-                      const theme = CATEGORY_THEMES[selectedCategory] || CATEGORY_THEMES.all;
-                      // 대표님 요청: HEX -> RGBA 변환으로 완벽한 화사함 구현 (0.8 / 0.95 / 0.6 룰 적용 ✨)
-                      const r1 = parseInt(theme.bg.slice(1, 3), 16);
-                      const g1 = parseInt(theme.bg.slice(3, 5), 16);
-                      const b1 = parseInt(theme.bg.slice(5, 7), 16);
-
-                      const r2 = parseInt(theme.border.slice(1, 3), 16);
-                      const g2 = parseInt(theme.border.slice(3, 5), 16);
-                      const b2 = parseInt(theme.border.slice(5, 7), 16);
-
-                      return `linear-gradient(160deg, rgba(${r1}, ${g1}, ${b1}, 0.8) 0%, rgba(255, 255, 255, 0.95) 40%, rgba(${r2}, ${g2}, ${b2}, 0.6) 100%)`;
-                    })(),
-                    border: `1px solid ${selectedCategory === 'all' ? 'rgba(16,185,129,0.1)' : (CATEGORY_THEMES[selectedCategory]?.border || '#eee') + 'cc'}`,
-                    boxShadow: selectedCategory === 'all'
-                      ? "0 4px 30px rgba(16,185,129,0.06), inset 0 1px 0 rgba(255,255,255,0.8)"
-                      : `0 4px 30px ${(CATEGORY_THEMES[selectedCategory]?.text || '#000')}06, inset 0 1px 0 rgba(255,255,255,0.8)`
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.07)",
                   }}
                 >
                   {/* ── 전체 목록 헤더 (인기 섹션과 100% 매칭 ✨) ── */}

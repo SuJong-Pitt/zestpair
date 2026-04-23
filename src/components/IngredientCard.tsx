@@ -73,13 +73,9 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
           border: `1.5px solid ${theme.color}`,
           boxShadow: `0 15px 40px ${theme.glow}, inset 0 0 12px ${theme.color}15`,
         } : {
-          background: isFeatured
-            ? "linear-gradient(145deg, #ffffff 0%, #f8fffe 100%)"
-            : "linear-gradient(145deg, #ffffff 0%, #f9fafb 100%)",
-          border: isFeatured ? "1.5px solid rgba(16,185,129,0.2)" : "1.5px solid rgba(0,0,0,0.06)",
-          boxShadow: isFeatured
-            ? "0 6px 20px rgba(16,185,129,0.06)" // 최적화: 40px 블러 -> 20px 블러, 투명도 0.06으로 대폭 하향
-            : "0 4px 16px rgba(0,0,0,0.03)",
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
         }}
       >
         {/* ── 배경 글로우 오브 (Selected) ── */}
@@ -116,9 +112,9 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
             border: `1px solid ${theme.color}40`,
             color: theme.color,
           } : {
-            background: "rgba(0,0,0,0.04)",
-            border: "1px solid rgba(0,0,0,0.06)",
-            color: "#94a3b8"
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            color: "#64748b"
           }}
         >
           <Icon size={11} />
@@ -130,9 +126,7 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
           style={selected ? {
             background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.15) 100%)",
           } : {
-            background: isFeatured
-              ? "linear-gradient(180deg, rgba(16,185,129,0.06) 0%, rgba(6,182,212,0.03) 100%)"
-              : "linear-gradient(180deg, rgba(0,0,0,0.025) 0%, rgba(0,0,0,0.01) 100%)"
+            background: "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)"
           }}
         >
           <span
@@ -153,7 +147,7 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
           <div className="flex items-start justify-between gap-1 mb-0.5">
             <h3
               className="font-black text-[11px] md:text-[14px] tracking-tight leading-tight line-clamp-1 transition-colors duration-300"
-              style={selected ? { color: theme.color } : { color: "#0f172a" }}
+              style={selected ? { color: theme.color } : { color: "#e2e8f0" }}
             >
               {name}
             </h3>
@@ -177,7 +171,7 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
           className="flex items-center justify-between px-4 py-2 mt-0.5 transition-colors duration-300"
           style={selected
             ? { borderTop: `1px solid ${theme.color}20` }
-            : { borderTop: "1px solid rgba(0,0,0,0.05)" }
+            : { borderTop: "1px solid rgba(255,255,255,0.06)" }
           }
         >
           {/* 복용 시간 태그 */}
@@ -188,9 +182,9 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
               border: `1px solid ${theme.color}30`,
               color: theme.color
             } : {
-              background: isFeatured ? "rgba(16,185,129,0.07)" : "rgba(0,0,0,0.04)",
-              border: isFeatured ? "1px solid rgba(16,185,129,0.12)" : "1px solid rgba(0,0,0,0.06)",
-              color: isFeatured ? "#10b981" : "#94a3b8"
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: isFeatured ? "#10b981" : "#475569"
             }}
           >
             <Clock size={8} strokeWidth={2.5} />
@@ -208,7 +202,7 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
               <div className="flex items-center gap-1">
                 {isFeatured
                   ? <Sparkles size={12} className="text-emerald-400 opacity-60" />
-                  : <div className="w-4 h-4 rounded-full border border-dashed border-slate-200 group-hover:border-emerald-300 transition-colors" />
+                  : <div className="w-4 h-4 rounded-full border border-dashed border-white/10 group-hover:border-emerald-400/40 transition-colors" />
                 }
               </div>
             )}
@@ -291,7 +285,7 @@ export default function IngredientCard(props: IngredientCardProps) {
   return (
     <div
       ref={ref}
-      className="w-full h-[180px] md:h-[220px] rounded-[1.75rem] border border-slate-100 bg-slate-50/50"
+      className="w-full h-[180px] md:h-[220px] rounded-[1.75rem] border border-white/5 bg-white/[0.02]"
       aria-hidden="true"
     />
   );
