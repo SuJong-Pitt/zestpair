@@ -2,7 +2,7 @@
 
 import { memo, useMemo, useEffect, useState } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { Sparkles, ArrowRight, ShoppingCart, FlaskConical, TrendingUp, AlertCircle, Activity, Zap } from "lucide-react";
+import { Sparkles, ArrowRight, ShoppingCart, FlaskConical, TrendingUp, AlertCircle, Activity, Zap, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import type { AnalysisResult, Ingredient } from "@/types/database";
@@ -293,149 +293,347 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
             viewport={{ once: true }}
             className="pt-10 pb-5 space-y-12"
         >
-            {/* AI Targeted Insight Header */}
-            <div className="pt-10 pb-6 md:pt-16 md:pb-12 flex flex-col items-center gap-6 md:gap-10 relative">
-                {/* Background Technical Grid (Subtle) */}
-                <div className="absolute inset-x-0 top-0 h-40 md:h-64 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.1),transparent_70%)] pointer-events-none opacity-50" />
-                
-                <motion.div 
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    className="flex flex-col items-center gap-3 md:gap-4 relative"
+            {/* Direction A: Vertical Story Flow */}
+            <div className="flex flex-col gap-5 px-2 md:px-4 pt-6 md:pt-10 pb-2">
+
+                {/* 1. AI Discovery Badge */}
+                <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="flex items-center gap-2"
                 >
-                    <div className="px-3 md:px-4 py-1 rounded bg-white/5 border border-white/10 backdrop-blur-md">
-                        <span className="text-[8px] md:text-[10px] font-black text-emerald-400 uppercase tracking-[0.4em] md:tracking-[0.5em]">AI Optimal Match Found</span>
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-emerald-500/30" />
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md">
+                        <motion.div
+                            animate={{ scale: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="w-1.5 h-1.5 rounded-full bg-emerald-400"
+                        />
+                        <span className="text-[9px] md:text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em]">
+                            {isKo ? "AI 최적 파트너 발견" : "AI Optimal Match Found"}
+                        </span>
+                    </div>
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-emerald-500/30" />
+                </motion.div>
+
+                {/* 2. Large Ingredient Card */}
+                <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 }}
+                    className="relative rounded-2xl md:rounded-3xl bg-white/[0.03] border border-emerald-500/20 p-5 md:p-7 flex items-center gap-5"
+                >
+                    {/* Left accent */}
+                    <div className="absolute left-0 top-5 bottom-5 w-[3px] rounded-full bg-emerald-400/60" />
+
+                    {/* Floating emoji */}
+                    <motion.div
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        className="text-5xl md:text-6xl shrink-0 drop-shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                    >
+                        {targetPartner.icon_emoji}
+                    </motion.div>
+
+                    <div className="flex flex-col gap-1.5 min-w-0">
+                        <span className="text-[9px] md:text-[10px] font-black text-emerald-400/70 uppercase tracking-[0.3em]">
+                            {isKo ? "AI 선정 최적 파트너" : "AI Selected Partner"}
+                        </span>
+                        <h2 className="text-2xl md:text-4xl font-[1000] text-white tracking-tighter leading-none truncate">
+                            {recName}
+                        </h2>
+                        <span className="text-[11px] md:text-[13px] font-bold text-slate-400">
+                            {isKo
+                                ? `현재 조합의 마지막 퍼즐 — 시너지의 완성`
+                                : `The final piece — completes your synergy stack`}
+                        </span>
                     </div>
 
-                    <div className="relative flex items-center justify-center py-4 md:py-6 px-10 md:px-20">
-                        {/* Dynamic Framing Corners */}
-                        <div className="absolute top-0 left-0 w-6 h-6 md:w-8 md:h-8 border-t-2 border-l-2 border-emerald-500/40 rounded-tl-xl md:rounded-2xl" />
-                        <div className="absolute top-0 right-0 w-6 h-6 md:w-8 md:h-8 border-t-2 border-r-2 border-emerald-500/40 rounded-tr-xl md:rounded-2xl" />
-                        <div className="absolute bottom-0 left-0 w-6 h-6 md:w-8 md:h-8 border-b-2 border-l-2 border-emerald-500/40 rounded-bl-xl md:rounded-2xl" />
-                        <div className="absolute bottom-0 right-0 w-6 h-6 md:w-8 md:h-8 border-b-2 border-r-2 border-emerald-500/40 rounded-br-xl md:rounded-2xl" />
+                    {/* Sparkle */}
+                    <motion.div
+                        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 3, repeat: Infinity }}
+                        className="absolute top-3 right-4"
+                    >
+                        <Sparkles className="text-emerald-400 w-4 h-4 fill-emerald-500/20" />
+                    </motion.div>
+                </motion.div>
 
-                        <h2 className="text-4xl md:text-8xl font-[1000] text-center tracking-tighter leading-none relative z-10">
-                            <span className="bg-gradient-to-b from-white via-white to-white/50 bg-clip-text text-transparent">
-                                {recName}
-                            </span>
-                        </h2>
-                        
-                        {/* Floating Interaction Sparkle */}
-                        <motion.div 
-                            animate={{ 
-                                scale: [1, 1.2, 1],
-                                opacity: [0.5, 1, 0.5]
-                            }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                            className="absolute -top-2 -right-2 md:-top-6 md:-right-6"
-                        >
-                            <Sparkles className="text-emerald-400 w-5 h-5 md:w-10 md:h-10 fill-emerald-500/20" />
-                        </motion.div>
+                {/* 3. Score Progress Bar */}
+                <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2 }}
+                    className="rounded-2xl bg-white/[0.02] border border-white/8 p-4 md:p-6 space-y-3"
+                >
+                    <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.25em]">
+                            {isKo ? "점수 업그레이드 경로" : "Score Upgrade Path"}
+                        </span>
+                        <span className="text-[10px] font-black text-emerald-400">
+                            +{displayProjectedScore - currentScore} {isKo ? "점 상승 가능" : "pts gain"}
+                        </span>
+                    </div>
+
+                    {/* Progress track */}
+                    <div className="relative h-3 md:h-4 rounded-full bg-white/5 overflow-hidden">
+                        <motion.div
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${currentScore}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+                            className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-slate-600 to-slate-400"
+                        />
+                        <motion.div
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${displayProjectedScore}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1.6, ease: "easeOut", delay: 0.6 }}
+                            className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 opacity-40"
+                        />
+                    </div>
+
+                    <div className="flex items-end justify-between">
+                        <div className="flex flex-col items-start">
+                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{isKo ? "현재" : "Current"}</span>
+                            <span className="text-2xl md:text-3xl font-[1000] text-white/70 tracking-tighter">{currentScore}</span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <motion.div
+                                animate={{ x: [0, 4, 0] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                            >
+                                <TrendingUp size={16} className="text-emerald-400" />
+                            </motion.div>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">{isKo ? "달성 가능" : "Reachable"}</span>
+                            <span className={cn(
+                                "text-2xl md:text-3xl font-[1000] tracking-tighter drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]",
+                                isPerfect ? "text-amber-400" : "text-emerald-400"
+                            )}>{displayProjectedScore}</span>
+                        </div>
                     </div>
                 </motion.div>
 
-                <div className="flex flex-col items-center text-center space-y-2 md:space-y-3 px-6 max-w-2xl mx-auto">
-                    <p className="text-lg md:text-3xl text-emerald-100 font-bold tracking-tight leading-tight break-keep">
-                        {isKo ? (
-                            <>현재의 조합을 <span className="text-emerald-400">완벽</span>하게 마무리지을<br />가장 강력한 시너지의 주인공입니다.</>
-                        ) : (
-                            <>The most powerful synergy partner<br />to <span className="text-emerald-400">perfectly</span> complete your stack.</>
-                        )}
-                    </p>
-                    <div className="h-[1px] md:h-[2px] w-12 md:w-16 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                </div>
+                {/* 4. Insight Bullets */}
+                <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 }}
+                    className="space-y-2.5"
+                >
+                    {[
+                        isKo
+                            ? `지금 ${recName}을(를) 추가하면 점수가 ${currentScore}점 → ${displayProjectedScore}점으로 상승합니다.`
+                            : `Adding ${recName} now will boost your score from ${currentScore} → ${displayProjectedScore} pts.`,
+                        isKo
+                            ? `현재 잠재력의 ${100 - currentScore}%가 아직 활성화되지 않은 상태입니다.`
+                            : `${100 - currentScore}% of your stack's potential is still untapped.`
+                    ].map((text, i) => (
+                        <div key={i} className="flex items-start gap-3 px-1">
+                            <div className="mt-1 shrink-0 w-4 h-4 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                            </div>
+                            <p className="text-[12px] md:text-[14px] text-slate-300 leading-relaxed font-medium">
+                                {text}
+                            </p>
+                        </div>
+                    ))}
+                </motion.div>
+
+                {/* Scroll hint → 아래 프리미엄 카드로 자연 연결 */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.5 }}
+                    className="flex flex-col items-center gap-1.5 pt-1 pb-2"
+                >
+                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.25em]">
+                        {isKo ? "구매 상세 정보 확인하기" : "See Purchase Details"}
+                    </span>
+                    <motion.div
+                        animate={{ y: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                        className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"
+                    >
+                        <TrendingUp size={10} className="text-emerald-400 rotate-90" />
+                    </motion.div>
+                </motion.div>
             </div>
 
-            {/* High-Resolution Score Comparison: Minimalist & Direct */}
-            <div className="relative py-4 md:py-12 px-2 md:px-6">
-                <div className="max-w-3xl mx-auto flex flex-col items-center gap-12 relative z-10 w-full">
-                    <div className="flex items-center justify-between w-full gap-4 md:gap-16 relative">
-                        {/* Current Score State */}
-                        <div className="flex flex-col items-center gap-4 flex-1">
-                            <span className="text-[10px] md:text-sm font-black text-slate-500 uppercase tracking-[0.3em] md:tracking-[0.5em] whitespace-nowrap">Current State</span>
-                            <div className="relative group/score">
-                                <span className="text-6xl md:text-9xl font-[1000] text-white/10 tracking-tighter tabular-nums leading-none">
-                                    {currentScore}
+
+
+            <div className="relative mt-6 overflow-hidden rounded-[2rem] md:rounded-[3rem] bg-slate-950/60 border border-white/10 backdrop-blur-3xl p-5 md:p-10 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]">
+                {/* Subtle glow */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-emerald-500/[0.06] blur-[80px] rounded-full pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col gap-6 md:gap-8">
+
+                    {/* Header */}
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                            <div className="h-px w-6 bg-emerald-500/40" />
+                            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">
+                                {isKo ? "AI 임상 결론" : "Clinical Conclusion"}
+                            </span>
+                        </div>
+                        <h4 className="text-[22px] md:text-4xl font-[1000] text-white tracking-tight leading-snug">
+                            {isKo ? (
+                                <>당신의 건강 자산,{" "}
+                                    <span className="text-emerald-400">마지막 연결</span>로 완성하세요.
+                                </>
+                            ) : (
+                                <>Complete your health investment with the{" "}
+                                    <span className="text-emerald-400">Final Link.</span>
+                                </>
+                            )}
+                        </h4>
+                    </div>
+
+                    {/* Minimal Product Card */}
+                    <motion.div
+                        whileHover={{ scale: 1.01 }}
+                        className="relative rounded-2xl md:rounded-3xl bg-white/[0.03] border border-emerald-500/20 p-4 md:p-7 flex items-center gap-4 md:gap-5 overflow-hidden"
+                    >
+                        {/* Subtle sweep shine */}
+                        <motion.div
+                            animate={{ x: ['-200%', '200%'] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent skew-x-12 pointer-events-none"
+                        />
+                        <div className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full bg-emerald-400/50" />
+
+                        {/* Emoji — 모바일에서 작게 */}
+                        <motion.div
+                            animate={{ y: [0, -6, 0] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            className="text-3xl md:text-6xl shrink-0 drop-shadow-[0_0_20px_rgba(16,185,129,0.4)] pl-2"
+                        >
+                            {targetPartner.icon_emoji}
+                        </motion.div>
+
+                        {/* Text block — flex-1 so it takes all remaining space */}
+                        <div className="flex flex-col gap-1 flex-1 min-w-0">
+                            <span className="text-[8px] md:text-[9px] font-black text-emerald-400/60 uppercase tracking-[0.2em] whitespace-nowrap">
+                                {isKo ? "AI 선정 파트너" : "AI Selected Partner"}
+                            </span>
+                            <h5 className="text-lg md:text-3xl font-[1000] text-white tracking-tighter leading-tight break-keep">
+                                {recName}
+                            </h5>
+                            <span className="text-[10px] md:text-[13px] text-slate-400 font-medium break-keep">
+                                {isKo ? "현재 조합의 마지막 퍼즐" : "The final piece of your stack"}
+                            </span>
+                        </div>
+
+                        {/* +점수 뱃지 — 모바일에서 숨김 (위 프로그레스 바에 이미 표시됨) */}
+                        <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            whileInView={{ scale: 1, opacity: 1 }}
+                            className="hidden md:flex ml-auto shrink-0 flex-col items-center px-2.5 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/25"
+                        >
+                            <span className="text-lg md:text-2xl font-[1000] text-emerald-400 leading-none">
+                                +{displayProjectedScore - currentScore}
+                            </span>
+                            <span className="text-[7px] font-black text-emerald-400/60 uppercase tracking-wider">
+                                {isKo ? "점" : "pts"}
+                            </span>
+                        </motion.div>
+                    </motion.div>
+
+
+                    {/* Insight Cards — outside, readable */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* Synergy insight */}
+                        <div className="flex items-start gap-3 p-4 md:p-5 rounded-2xl bg-emerald-500/[0.04] border border-emerald-500/15">
+                            <div className="mt-0.5 w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
+                                <FlaskConical size={15} className="text-emerald-400" />
+                            </div>
+                            <div className="space-y-1 min-w-0">
+                                <span className="block text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em]">
+                                    {isKo ? "시너지 분석" : "Synergy Analysis"}
                                 </span>
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-4xl md:text-7xl font-black text-white/90 tracking-tighter drop-shadow-2xl">
-                                        {currentScore}
-                                    </span>
-                                </div>
+                                <p className="text-[12px] md:text-[13px] text-slate-300 leading-relaxed font-medium break-keep">
+                                    {isKo
+                                        ? (optimizerData.potentialSynergy.interaction?.reason || `${recName}은(는) 현재 드시는 성분들과 뛰어난 시너지를 이루어 효능을 극대화합니다.`)
+                                        : (optimizerData.potentialSynergy.interaction?.reason_en || `${recName} creates excellent synergy with your current stack.`)}
+                                </p>
                             </div>
                         </div>
 
-                        {/* Energy Flow / Synergy Stream */}
-                        <div className="relative flex-1 flex flex-col items-center justify-center h-12">
-                            <div className="w-full h-[1px] bg-white/5 relative overflow-hidden">
-                                <motion.div
-                                    animate={{
-                                        left: ['-50%', '150%']
-                                    }}
-                                    transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                                    className="absolute top-0 w-1/2 h-full bg-gradient-to-r from-transparent via-emerald-500/60 to-transparent"
-                                />
+                        {/* Opportunity cost */}
+                        <div className="flex items-start gap-3 p-4 md:p-5 rounded-2xl bg-amber-500/[0.04] border border-amber-500/15">
+                            <div className="mt-0.5 w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
+                                <AlertCircle size={15} className="text-amber-400" />
                             </div>
-                            <motion.div
-                                animate={{ scale: [1, 1.1, 1], rotate: 360 }}
-                                transition={{ duration: 6, repeat: Infinity }}
-                                className="absolute bg-[#020617] border border-white/10 p-2.5 rounded-full z-20 shadow-[0_0_30px_rgba(0,0,0,0.8)]"
-                            >
-                                <TrendingUp size={22} className="text-emerald-400" />
-                            </motion.div>
-                            <span className="absolute -bottom-8 text-[9px] font-bold text-emerald-500/50 tracking-widest uppercase truncate w-full text-center">AI Optimization Bridge</span>
-                        </div>
-
-                        {/* Optimized Score State */}
-                        <div className="flex flex-col items-center gap-4 flex-1">
-                            <span className="text-[10px] md:text-sm font-black text-emerald-500 uppercase tracking-[0.3em] md:tracking-[0.5em] whitespace-nowrap">Optimal Peak</span>
-                            <div className="relative">
-                                <motion.span
-                                    animate={{
-                                        opacity: [0.1, 0.2, 0.1]
-                                    }}
-                                    transition={{ duration: 3, repeat: Infinity }}
-                                    className="text-6xl md:text-9xl font-[1000] text-emerald-500 tracking-tighter tabular-nums leading-none blur-sm"
-                                >
-                                    {displayProjectedScore}
-                                </motion.span>
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className={cn(
-                                        "text-4xl md:text-7xl font-black tracking-tighter drop-shadow-[0_0_30px_rgba(16,185,129,0.5)]",
-                                        isPerfect ? "text-amber-400" : "text-white"
-                                    )}>
-                                        {displayProjectedScore}
-                                    </span>
-                                </div>
-                                <motion.div
-                                    initial={{ scale: 0, opacity: 0 }}
-                                    whileInView={{ scale: 1, opacity: 1 }}
-                                    className="absolute -top-6 -right-4 md:-top-10 md:-right-8 px-2.5 py-1 rounded bg-emerald-500 text-[10px] md:text-sm font-black text-black shadow-3xl z-30"
-                                >
-                                    +{displayProjectedScore - currentScore} UP
-                                </motion.div>
+                            <div className="space-y-1 min-w-0">
+                                <span className="block text-[9px] font-black text-amber-400 uppercase tracking-[0.2em]">
+                                    {isKo ? "기회 비용 경고" : "Efficiency Recovery"}
+                                </span>
+                                <p className="text-[12px] md:text-[13px] text-slate-300 leading-relaxed font-medium break-keep">
+                                    {isKo
+                                        ? `현재 잠재 시너지의 약 ${efficiencyGain}%를 놓치고 있습니다. ${recName}을 추가하면 효능을 100% 활성화할 수 있습니다.`
+                                        : `You are missing ~${efficiencyGain}% of potential synergy. Add ${recName} to unlock your stack's full potential.`}
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Performance Insight Labels */}
-                    <div className="flex gap-4 md:gap-12 w-full pt-4">
-                        <div className="flex-1 text-center py-4 md:py-6 rounded-2xl md:rounded-[2rem] bg-white/[0.02] border border-white/5 space-y-1">
-                            <span className="block text-[8px] md:text-[10px] font-black text-slate-500 tracking-widest uppercase">Performance Gap</span>
-                            <span className="text-xs md:text-lg font-bold text-white/50">{100 - currentScore}% Potential Lost</span>
+                    {/* Full-width standalone CTA */}
+                    <motion.a
+                        href={buyUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={handleAffiliateClick}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                        className={cn(
+                            "relative w-full py-4 md:py-5 rounded-2xl flex items-center justify-between px-5 md:px-7 overflow-hidden group/cta transition-all",
+                            isKo
+                                ? "bg-gradient-to-r from-[#cb1400] to-[#015199] shadow-[0_12px_40px_-10px_rgba(203,20,0,0.4)]"
+                                : "bg-gradient-to-r from-[#232f3e] to-[#ff9900] shadow-[0_12px_40px_-10px_rgba(255,153,0,0.35)]"
+                        )}
+                    >
+                        {/* Sweep on hover */}
+                        <motion.div
+                            variants={{ initial: { x: '-100%', opacity: 0 }, hover: { x: '200%', opacity: 1, transition: { duration: 1.2, repeat: Infinity, ease: "linear" } } }}
+                            className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[30deg] z-10 pointer-events-none"
+                        />
+                        <div className="flex items-center gap-3 z-20">
+                            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                                <ShoppingCart size={17} fill="currentColor" className="text-white" />
+                            </div>
+                            <div className="flex flex-col items-start leading-tight">
+                                <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">
+                                    {isKo ? "쿠팡 로켓배송" : "Amazon"}
+                                </span>
+                                <span className="text-[14px] md:text-[16px] font-black text-white">
+                                    {isKo ? `${recName} 지금 바로 추가하기` : `Add ${recName} Now`}
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex-1 text-center py-4 md:py-6 rounded-2xl md:rounded-[2rem] bg-emerald-500/[0.03] border border-emerald-500/10 space-y-1">
-                            <span className="block text-[8px] md:text-[10px] font-black text-emerald-500 tracking-widest uppercase">Synergy Impact</span>
-                            <span className="text-xs md:text-lg font-bold text-emerald-400">Deep Integration Active</span>
-                        </div>
-                    </div>
+                        <ExternalLink size={16} className="text-white/50 group-hover/cta:text-white transition-colors z-20 shrink-0" />
+                    </motion.a>
+
+                    {/* Affiliate Disclosure */}
+                    {isKo && (
+                        <p className="text-center text-[9px] text-slate-600 leading-relaxed pt-1">
+                            이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+                        </p>
+                    )}
                 </div>
             </div>
 
 
-            {/* Popular Selection - Secondary Engagement Section */}
+
+            {/* Popular Selection - Secondary Engagement Section (MOVED DOWN HERE) */}
             {popularIngredients.length > 0 && (
-                <div className="pt-10 space-y-8">
+                <div className="pt-20 space-y-8">
                     <div className="flex flex-col items-center gap-2">
                         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-white/5">
                             <TrendingUp size={10} className="text-slate-400" />
@@ -486,217 +684,6 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                     </div>
                 </div>
             )}
-
-            <div className="relative mt-12 overflow-hidden rounded-[3rem] md:rounded-[5rem] bg-slate-950/40 border border-white/10 backdrop-blur-3xl p-6 md:p-16 lg:p-20 shadow-[0_60px_120px_-40px_rgba(0,0,0,0.9)] group/card">
-                {/* Intense Central Glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/[0.03] blur-[180px] rounded-full pointer-events-none" />
-
-                <div className="relative z-10 flex flex-col items-center gap-10 md:gap-24">
-                    {/* GROUP 1: Conclusions (Centered Hero) */}
-                    <div className="flex flex-col items-center text-center space-y-8 md:space-y-14 w-full max-w-5xl">
-                        <div className="space-y-4 md:space-y-6">
-                            <div className="flex items-center justify-center gap-3">
-                                <div className="w-8 md:w-12 h-px bg-gradient-to-r from-transparent to-emerald-500/50" />
-                                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.5em] text-emerald-400">Clinical Conclusion</span>
-                                <div className="w-8 md:w-12 h-px bg-gradient-to-l from-transparent to-emerald-500/50" />
-                            </div>
-                            <h4 className="text-2xl md:text-6xl lg:text-7xl font-[1000] text-white tracking-tighter leading-[1.2] md:leading-[1.05]">
-                                {isKo ? (
-                                    <>당신의 건강 자산,<br /><span className="text-emerald-400 drop-shadow-[0_0_30px_rgba(16,185,129,0.5)]">마지막 연결</span>로<br />완성하세요.</>
-                                ) : (
-                                    <>Complete your health<br />investment with the<br /><span className="text-emerald-400 drop-shadow-[0_0_30px_rgba(16,185,129,0.5)]">Final Link.</span></>
-                                )}
-                            </h4>
-                        </div>
-
-                        {/* Rainbow Prism Product Card Container */}
-                        <div className="w-full max-w-[340px] md:max-w-[500px] pt-4">
-                            <motion.div 
-                                whileHover={{ scale: 1.02 }}
-                                className="relative p-[2px] rounded-[3.5rem] overflow-hidden group/card shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7)]"
-                            >
-                                {/* Continuous Rainbow Spin Border */}
-                                <motion.div 
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                                    className="absolute inset-[-150%] bg-[conic-gradient(from_0deg,#ff0000,#ff8000,#ffff00,#00ff00,#00ffff,#0000ff,#8000ff,#ff0000)] opacity-40 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none"
-                                />
-
-                                <div className="relative p-10 md:p-14 rounded-[3.4rem] bg-[#020617] backdrop-blur-3xl flex flex-col items-center gap-10 overflow-hidden">
-                                    {/* Sweeping Rainbow Prism Shine Effect */}
-                                    <motion.div 
-                                        animate={{ x: ['-200%', '200%'] }}
-                                        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-                                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-25 pointer-events-none z-10"
-                                    />
-                                    
-                                    {/* Inner Spectrum Glow */}
-                                    <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(ellipse_at_50%_0%,rgba(16,185,129,0.3),transparent_70%)] pointer-events-none" />
-
-                                    <div className="flex flex-col items-center gap-6 relative z-10 text-center">
-                                        <motion.div
-                                            animate={{ y: [0, -10, 0] }}
-                                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                                            className="text-7xl md:text-9xl drop-shadow-[0_0_30px_rgba(16,185,129,0.4)]"
-                                        >
-                                            {targetPartner.icon_emoji}
-                                        </motion.div>
-                                        <div className="space-y-2">
-                                            <h5 className="text-3xl md:text-5xl font-[1000] text-white tracking-tighter leading-none">{recName}</h5>
-                                            <div className="flex flex-col items-center gap-1.5 opacity-60">
-                                                <div className="w-10 h-px bg-emerald-500" />
-                                                <span className="text-[10px] md:text-xs font-black text-emerald-400 uppercase tracking-[0.4em]">{isKo ? "AI 선정 파트너" : "AI SELECTED PARTNER"}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Market Connect / Affiliate Action Button (Fun & High CTR) ✨ */}
-                                    <div className="flex justify-center pt-8 w-full max-w-sm relative">
-                                        {/* Eternal Pulse Ripples (Base) */}
-                                        <motion.div 
-                                            animate={{ scale: [1, 1.4, 1.1], opacity: [0.5, 0, 0] }}
-                                            transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                                            className={cn(
-                                                "absolute inset-0 rounded-[2rem] border-2 -z-10",
-                                                isKo ? "border-red-500/50" : "border-orange-500/50"
-                                            )}
-                                        />
-                                        <motion.div 
-                                            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0] }}
-                                            transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
-                                            className={cn(
-                                                "absolute inset-0 rounded-[2rem] border-2 -z-10",
-                                                isKo ? "border-blue-500/30" : "border-orange-500/30"
-                                            )}
-                                        />
-
-                                        <motion.a
-                                            href={buyUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            onClick={handleAffiliateClick}
-                                            whileHover="hover"
-                                            whileTap={{ scale: 0.95 }}
-                                            initial="initial"
-                                            className={cn(
-                                                "relative w-full py-5 md:py-8 rounded-[1.5rem] md:rounded-[2rem] flex flex-col items-center justify-center gap-1 overflow-hidden group/magnetic transition-all duration-500",
-                                                isKo 
-                                                    ? "bg-gradient-to-r from-[#cb1400] to-[#015199] text-white shadow-[0_20px_50px_-10px_rgba(203,20,0,0.4)]" 
-                                                    : "bg-gradient-to-r from-[#232f3e] to-[#ff9900] text-white shadow-[0_20px_50px_-10px_rgba(255,153,0,0.4)]"
-                                            )}
-                                        >
-                                            {/* Scanning Radar Beam on Hover */}
-                                            <motion.div 
-                                                variants={{
-                                                    initial: { x: '-100%', opacity: 0 },
-                                                    hover: { x: '200%', opacity: 1, transition: { duration: 1.5, repeat: Infinity, ease: "linear" } }
-                                                }}
-                                                className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[30deg] z-20 pointer-events-none"
-                                            />
-                                            
-                                            {/* Background Matrix/Dots on Hover */}
-                                            <motion.div 
-                                                variants={{
-                                                    initial: { opacity: 0 },
-                                                    hover: { opacity: 1 }
-                                                }}
-                                                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2)_1px,transparent_1px)] bg-[size:10px_10px] pointer-events-none"
-                                            />
-
-                                            <div className="flex items-center gap-2 md:gap-3 relative z-10 px-4">
-                                                <motion.div
-                                                    variants={{
-                                                        initial: { rotate: 0 },
-                                                        hover: { rotate: [0, -10, 10, -10, 0], scale: 1.2 }
-                                                    }}
-                                                    transition={{ duration: 0.5 }}
-                                                >
-                                                    <ShoppingCart size={18} fill="currentColor" className="shrink-0 md:size-[26px]" />
-                                                </motion.div>
-                                                
-                                                {/* Text crossfade on hover */}
-                                                <div className="relative h-6 md:h-10 overflow-hidden flex items-center justify-center min-w-[200px]">
-                                                    <motion.span 
-                                                        variants={{ initial: { y: 0, opacity: 1 }, hover: { y: -40, opacity: 0 } }}
-                                                        className="absolute text-[13px] md:text-2xl font-[1000] tracking-tight md:tracking-tighter whitespace-nowrap"
-                                                    >
-                                                        {isKo ? "쿠팡에서 잠재력 깨우기" : "Awaken on Amazon"}
-                                                    </motion.span>
-                                                    <motion.span 
-                                                        variants={{ initial: { y: 40, opacity: 0 }, hover: { y: 0, opacity: 1 } }}
-                                                        className="absolute text-[13px] md:text-2xl font-[1000] tracking-tight md:tracking-tighter whitespace-nowrap text-yellow-300"
-                                                    >
-                                                        {isKo ? "⚡ 실시간 최저가 스캔 중..." : "⚡ Finding Best Price..."}
-                                                    </motion.span>
-                                                </div>
-                                            </div>
-
-                                            <span className="relative z-10 text-[8px] md:text-[10px] font-black tracking-[0.15em] md:tracking-[0.3em] uppercase text-white/80 group-hover/magnetic:text-white transition-colors">
-                                                {isKo ? "로켓배송으로 내일 당장 시작하기" : "Start Optimization Tomorrow"}
-                                            </span>
-                                            
-                                            {/* Glow Reveal */}
-                                            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/magnetic:opacity-100 transition-opacity duration-300 -z-10" />
-                                        </motion.a>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        </div>
-                    </div>
-
-                    {/* GROUP 2: Insights (Aligned Grid) */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 w-full max-w-5xl">
-                        <div className="flex items-start gap-4 md:gap-6 p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] bg-emerald-500/[0.03] border border-emerald-500/10 hover:bg-emerald-500/[0.05] transition-all group/item shadow-2xl">
-                            <div className="mt-0.5 w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-emerald-500/20 flex items-center justify-center shrink-0 group-hover/item:scale-110 transition-transform">
-                                <FlaskConical size={20} className="text-emerald-400 md:size-6" />
-                            </div>
-                            <div className="space-y-2 md:space-y-3 min-w-0">
-                                <span className="text-[9px] md:text-[11px] font-black text-emerald-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">{isKo ? "시너지 분석 데이터" : "Synergy Analysis"}</span>
-                                <p className="text-slate-300 text-sm md:text-lg leading-relaxed font-semibold break-keep">
-                                    {isKo
-                                        ? (optimizerData.potentialSynergy.interaction?.reason || `${recName}은(는) 현재 드시는 성분들과 뛰어난 시너지를 이루어 효능을 극대화합니다.`)
-                                        : (optimizerData.potentialSynergy.interaction?.reason_en || `${recName} creates excellent synergy with your current stack.`)}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-4 md:gap-6 p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] bg-amber-500/[0.03] border border-amber-500/10 hover:bg-amber-500/[0.05] transition-all group/item shadow-2xl">
-                            <div className="mt-0.5 w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-amber-500/20 flex items-center justify-center shrink-0 group-hover/item:scale-110 transition-transform">
-                                <AlertCircle size={20} className="text-amber-400 md:size-6" />
-                            </div>
-                            <div className="space-y-2 md:space-y-3 min-w-0">
-                                <span className="text-[9px] md:text-[11px] font-black text-amber-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">{isKo ? "기회 비용 경고" : "Efficiency Recovery"}</span>
-                                <p className="text-slate-400 text-xs md:text-base leading-relaxed font-medium italic break-keep">
-                                    {isKo
-                                        ? `현재 조합만으로는 성분의 잠재 시너지를 약 ${efficiencyGain}% 놓치고 있습니다. ${recName}을 통해 잠재된 효능을 100% 활성화하세요.`
-                                        : `You are missing out on up to ${efficiencyGain}% of potential synergy. Unlock your stack's full potential now.`}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Coupang Partners Disclosure - HUD Style Footnote */}
-                {isKo && (
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        className="flex flex-col items-center gap-3 pt-12 pb-4 opacity-20 hover:opacity-40 transition-opacity duration-700 select-none"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-[1px] bg-white/10" />
-                            <div className="flex items-center gap-2 grayscale opacity-50 px-2 py-0.5 rounded border border-white/10 bg-white/5">
-                                <ShoppingCart size={8} className="text-white" />
-                                <span className="text-[7px] font-black uppercase tracking-[0.25em] text-white">Affiliate Disclosure</span>
-                            </div>
-                            <div className="w-8 h-[1px] bg-white/10" />
-                        </div>
-                        <p className="text-[9px] md:text-[11px] font-medium text-slate-400 text-center leading-relaxed px-6 max-w-xl break-keep">
-                            이 게시물은 쿠팡 파트너스 활동의 일환으로,<br className="md:hidden" /> 이에 따른 일정액의 수수료를 제공받습니다.
-                        </p>
-                    </motion.div>
-                )}
-            </div>
         </motion.div>
     );
 });

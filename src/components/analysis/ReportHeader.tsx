@@ -52,38 +52,7 @@ export default function ReportHeader() {
         const { imageFileName, title, description } = getKakaoShareDetails(score, language);
         const targetImageUrl = `${window.location.origin}/images/share/${imageFileName}`;
 
-        // 카카오톡 공유 기능이 로드되었는지 확인
-        if (typeof window !== "undefined" && window.Kakao) {
-            if (!window.Kakao.isInitialized()) {
-                window.Kakao.init("27a049c799662857ed882c2639461392");
-            }
-            window.Kakao.Share.sendDefault({
-                objectType: 'feed',
-                content: {
-                    title: title,
-                    description: description,
-                    imageUrl: targetImageUrl,
-                    imageWidth: 800,
-                    imageHeight: 800,
-                    link: {
-                        mobileWebUrl: shareUrl,
-                        webUrl: shareUrl,
-                    },
-                },
-                buttons: [
-                    {
-                        title: language === 'ko' ? '내 영양제 궁합 점수' : 'My Supplement Score',
-                        link: {
-                            mobileWebUrl: shareUrl,
-                            webUrl: shareUrl,
-                        },
-                    },
-                ],
-            });
-            return; // 카카오 공유 성공 시 일반 시스템 루틴 종료
-        }
-
-        // 카카오 미지원 환경 (해외 등) 폴백: Web Share API 또는 클립보드 복사
+        // 일반 공유 (Native Share 또는 클립보드 복사)
         const shareData = {
             title: "ZestPair | 영양제 궁합 분석 결과",
             text: title,

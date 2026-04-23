@@ -179,8 +179,11 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                             handleNativeShare={handleNativeShare}
                         />
 
-                        {/* 2. Interaction Details */}
-                        <div className="space-y-6">
+                        {/* 2. Synergy Optimization (Moved UP for Monetization & UX Flow) */}
+                        <SynergyOptimizer result={result} language={language} />
+
+                        {/* 3. Interaction Details (Moved Down) */}
+                        <div className="space-y-6 pt-4">
                             <div className="flex items-center justify-between px-2">
                                 <h3 className="text-xl md:text-2xl font-black text-white tracking-tight">
                                     {t.results.matrixTitle}
@@ -201,13 +204,10 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                             )}
                         </div>
 
-                        {/* 3. Synergy Optimization (Extracted) */}
-                        <SynergyOptimizer result={result} language={language} />
-
                         {/* 3.1 AI Dosage Schedule */}
                         <DosageSchedule result={result} language={language} />
 
-                        {/* 4. Scientific Evidence (Extracted) */}
+                        {/* 4. Scientific Evidence */}
                         <ScientificEvidence result={result} language={language} />
                     </div>
 
