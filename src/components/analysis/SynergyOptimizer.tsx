@@ -7,6 +7,12 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import type { AnalysisResult, Ingredient } from "@/types/database";
 
+// --- Helpers ---
+const renderIcon = (icon: string) => {
+    if (icon === "sparkles") return "✨";
+    return icon;
+};
+
 // --- High-End HUD Component for Synergy Visualization ---
 const SynergyHUD = memo(function SynergyHUD({
     score,
@@ -334,7 +340,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         className="text-5xl md:text-6xl shrink-0 drop-shadow-[0_0_20px_rgba(16,185,129,0.4)]"
                     >
-                        {targetPartner.icon_emoji}
+                        {renderIcon(targetPartner.icon_emoji)}
                     </motion.div>
 
                     <div className="flex flex-col gap-1.5 min-w-0">
@@ -515,7 +521,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                             className="text-3xl md:text-6xl shrink-0 drop-shadow-[0_0_20px_rgba(16,185,129,0.4)] pl-2"
                         >
-                            {targetPartner.icon_emoji}
+                            {renderIcon(targetPartner.icon_emoji)}
                         </motion.div>
 
                         {/* Text block — flex-1 so it takes all remaining space */}
@@ -664,7 +670,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                                 
                                 <div className="relative p-5 md:p-8 rounded-[1.9rem] bg-slate-900/60 backdrop-blur-xl border border-white/5 flex flex-col items-center gap-4 text-center h-full">
                                     <span className="text-4xl md:text-6xl drop-shadow-xl group-hover/pop:scale-110 transition-transform duration-500">
-                                        {ing.icon_emoji}
+                                        {renderIcon(ing.icon_emoji)}
                                     </span>
                                     <div className="space-y-1">
                                         <h5 className="text-sm md:text-xl font-black text-white">{isKo ? ing.name : (ing.name_en || ing.name)}</h5>

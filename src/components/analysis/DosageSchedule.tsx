@@ -21,6 +21,20 @@ const TIME_CONFIG: Record<string, { icon: any, color: string, label: string, lab
     anytime: { icon: Clock, color: "from-emerald-400 to-teal-500", label: "편한 시간", label_en: "Anytime" }
 };
 
+const renderIngredientIcon = (icon: string) => {
+    const iconMap: Record<string, string> = {
+        "sparkles": "✨",
+        "droplet": "💧",
+        "shield": "🛡️",
+        "sun": "☀️",
+        "moon": "🌙",
+        "zap": "⚡",
+        "brain": "🧠",
+        "heart": "❤️"
+    };
+    return iconMap[icon] || icon;
+};
+
 const DosageSchedule = memo(function DosageSchedule({ result, language }: DosageScheduleProps) {
     const schedule = result.schedule || [];
     const isLoading = false; 
@@ -105,7 +119,7 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
                                                 key={item.ingredient_id}
                                                 className="flex items-center gap-3 pl-2 pr-4 py-2 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors"
                                             >
-                                                <span className="text-2xl">{item.icon}</span>
+                                                <span className="text-2xl">{renderIngredientIcon(item.icon)}</span>
                                                 <div className="flex flex-col">
                                                     <span className="text-sm font-black text-white">{item.name}</span>
                                                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{item.note}</span>
