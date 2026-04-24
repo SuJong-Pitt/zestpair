@@ -15,14 +15,18 @@ export const UI_TRANSLATIONS = {
                 "💊 '아연'도 인기가 많아요"
             ],
             combos: {
-                immunity: "🛡️ 면역력 부스터 (C+아연)",
-                bone: "🦴 뼈 건강 (칼슘+D)",
-                sleep: "🌙 꿀잠 듀오 (마그네슘+테아닌)",
-                vision: "👁️ 눈 피로 개선 (루테인+아스타잔틴)",
-                energy: "🔥 활력 충전 (B12+아르기닌)",
-                heart: "❤️ 심혈관 케어 (오메가3+CoQ10)",
-                beauty: "👸 피부 생기 (콜라겐+C)",
-                liver: "🍻 간 건강 (밀크씨슬+B)"
+                immunity: "🛡️ 면역력 부스터",
+                bone: "🦴 뼈 건강",
+                sleep: "🌙 꿀잠 듀오",
+                vision: "👁️ 눈 피로 개선",
+                energy: "🔥 활력 충전",
+                heart: "❤️ 심혈관 케어",
+                beauty: "👸 피부 생기",
+                liver: "🍻 간 건강",
+                brain: "🧠 두뇌 활력",
+                diet: "🏃 다이어트 시너지",
+                joint: "🦴 관절 케어",
+                bright: "✨ 피부 미백"
             }
         },
         howItWorks: {
@@ -163,14 +167,18 @@ export const UI_TRANSLATIONS = {
                 "💊 'Zinc' is also popular"
             ],
             combos: {
-                immunity: "🛡️ Immunity (C+Zinc)",
-                bone: "🦴 Bone Health (Ca+D)",
-                sleep: "🌙 Sleep Duo (Mg+Theanine)",
-                vision: "👁️ Eye Care (Lutein+Astaxanthin)",
-                energy: "🔥 Energy Boost (B12+Arginine)",
-                heart: "❤️ Heart Care (Omega3+CoQ10)",
-                beauty: "👸 Skin Beauty (Collagen+C)",
-                liver: "🍻 Liver (Milk Thistle+B)"
+                immunity: "🛡️ Immunity",
+                bone: "🦴 Bone Health",
+                sleep: "🌙 Sleep Duo",
+                vision: "👁️ Eye Care",
+                energy: "🔥 Energy Boost",
+                heart: "❤️ Heart Care",
+                beauty: "👸 Skin Beauty",
+                liver: "🍻 Liver",
+                brain: "🧠 Brain Power",
+                diet: "🏃 Diet Synergy",
+                joint: "🦴 Joint Care",
+                bright: "✨ Skin Brightening"
             }
         },
         howItWorks: {

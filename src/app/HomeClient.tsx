@@ -196,7 +196,7 @@ export default function HomeClient() {
 
     // 퀵스타트 콤보 로테이션 (5초)
     const cInterval = setInterval(() => {
-      setComboIndex((prev) => (prev + 1) % 3); // 3개 세트 로테이션
+      setComboIndex((prev) => (prev + 1) % 6); // 6개 세트 로테이션
     }, 5000);
 
     return () => {
@@ -1307,9 +1307,18 @@ export default function HomeClient() {
                       ] : comboIndex === 1 ? [
                         { id: 'vision', tags: ['루테인', '아스타잔틴'], label: t.hero.combos.vision },
                         { id: 'energy', tags: ['비타민B12', '아르기닌'], label: t.hero.combos.energy },
-                      ] : [
+                      ] : comboIndex === 2 ? [
                         { id: 'beauty', tags: ['콜라겐', '비타민C'], label: t.hero.combos.beauty },
                         { id: 'liver', tags: ['밀크씨슬 (실리마린)', '비타민B12'], label: t.hero.combos.liver }
+                      ] : comboIndex === 3 ? [
+                        { id: 'sleep', tags: ['마그네슘', 'L-테아닌'], label: t.hero.combos.sleep },
+                        { id: 'heart', tags: ['오메가-3', '코엔자임Q10'], label: t.hero.combos.heart }
+                      ] : comboIndex === 4 ? [
+                        { id: 'brain', tags: ['오메가-3', '은행잎 추출물 (징코)'], label: t.hero.combos.brain },
+                        { id: 'diet', tags: ['카테킨 (녹차추출물)', 'L-카르니틴'], label: t.hero.combos.diet }
+                      ] : [
+                        { id: 'joint', tags: ['칼슘', '콘드로이친'], label: t.hero.combos.joint },
+                        { id: 'bright', tags: ['콜라겐', '글루타치온'], label: t.hero.combos.bright }
                       ]).map((combo) => (
                         <button
                           key={combo.id}
