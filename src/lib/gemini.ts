@@ -169,7 +169,14 @@ export async function generateUnifiedAnalysis(
     interactions: { synergies: InteractionResult[], cautions: InteractionResult[], conflicts: InteractionResult[] },
     score: number,
     language: "ko" | "en" = "ko"
-): Promise<{ briefing: string[], schedule: ScheduleSlot[], isFallback: boolean }> {
+): Promise<{ 
+    briefing: string[], 
+    schedule: ScheduleSlot[], 
+    recommendation_targets: string[], 
+    lifestyle_guidelines: string[],
+    expected_timeline: { week1: string; week2: string; week4: string; },
+    isFallback: boolean 
+}> {
     const isKo = language === 'ko';
     
     const prompt = `
@@ -199,19 +206,32 @@ Your mission is to ANALYZE, VALIDATE, and OPTIMIZE this specific selection.
    - Point 1: Overall validation of the user's selected basket foundation.
    - Point 2: Specific synergy or caution highlights within THEIR selection.
    - Point 3: Future outlook or lifestyle advice based on this specific stack.
-2. Optimal Dosage Schedule: Group into morning_before, morning_after, lunch_after, evening_after, night_before, anytime.
+2. Recommended For (3 short phrases):
+    - Identify who would benefit most from this specific combination (e.g., "고강도 운동을 즐기는 분", "만성 피로에 시달리는 직장인").
+3. Lifestyle & Food Synergy (3 tips):
+   - Habits or foods that boost the effectiveness of this specific stack.
+4. 4-Week Expected Journey:
+   - Predict physical changes for Week 1, Week 2, and Week 4.
+5. Optimal Dosage Schedule: Group into morning_before, morning_after, lunch_after, evening_after, night_before, anytime.
 
 ## Return Format (Strict JSON only):
 {
-  "briefing": ["point1", "point2", "point3"],
-  "schedule": [
-    {
-      "time_id": "...",
-      "items": [{"ingredient_id": "...", "name": "...", "icon": "...", "note": "..."}],
-      "ai_insight": "..."
-    }
-  ]
-}
+    "briefing": ["point1", "point2", "point3"],
+    "recommendation_targets": ["target1", "target2", "target3"],
+    "lifestyle_guidelines": ["tip1", "tip2", "tip3"],
+    "expected_timeline": {
+      "week1": "Short prediction",
+      "week2": "Short prediction",
+      "week4": "Short prediction"
+    },
+    "schedule": [
+      {
+        "time_id": "...",
+        "items": [{"ingredient_id": "...", "name": "...", "icon": "...", "note": "..."}],
+        "ai_insight": "..."
+      }
+    ]
+  }
 
 Language: ${isKo ? 'Korean' : 'English'}.
 Only return the JSON. No markdown code blocks.
@@ -224,6 +244,9 @@ Only return the JSON. No markdown code blocks.
         
         return {
             briefing: (result.briefing && result.briefing.length > 0) ? result.briefing.slice(0, 3) : FALLBACK_BRIEFING,
+            recommendation_targets: (result.recommendation_targets && result.recommendation_targets.length > 0) ? result.recommendation_targets.slice(0, 3) : FALLBACK_TARGETS,
+            lifestyle_guidelines: (result.lifestyle_guidelines && result.lifestyle_guidelines.length > 0) ? result.lifestyle_guidelines.slice(0, 3) : FALLBACK_LIFESTYLE,
+            expected_timeline: result.expected_timeline || FALLBACK_TIMELINE,
             schedule: (result.schedule && result.schedule.length > 0) ? result.schedule : [],
             isFallback: false // 성공 시 false 명시 ✨
         };
@@ -234,6 +257,9 @@ Only return the JSON. No markdown code blocks.
         // 할당량 초과 시에도 럭셔리한 경험을 유지하기 위한 '품격 있는 대안' 데이터 ✨
         return {
             briefing: FALLBACK_BRIEFING,
+            recommendation_targets: FALLBACK_TARGETS,
+            lifestyle_guidelines: FALLBACK_LIFESTYLE,
+            expected_timeline: FALLBACK_TIMELINE,
             schedule: [],
             isFallback: true // 캐시 방지 등을 위한 플래그 추가
         };
@@ -245,3 +271,21 @@ const FALLBACK_BRIEFING = [
     "성분 간의 흡수율을 극대화하기 위해 식사 직후 복용을 권장하며, 수분 섭취를 충분히 늘려 대사 효율을 보조하시기 바랍니다.",
     "이 구성을 4주간 유지할 경우 활력 지수의 유의미한 수치 개선과 항산화 밸런스의 정교한 최적화가 기대됩니다."
 ];
+
+const FALLBACK_TARGETS = [
+    "일과 후 빠른 피로 회복이 필요한 분",
+    "고강도 운동이나 활동적인 라이프스타일을 즐기는 분",
+    "아침 기상이 무겁고 만성적인 활력 저하를 느끼는 분"
+];
+
+const FALLBACK_LIFESTYLE = [
+    "복용 전후 1시간은 카페인 섭취를 피해 흡수율을 높이세요.",
+    "충분한 수분 섭취는 미네랄 대사를 원활하게 돕습니다.",
+    "가벼운 스트레칭과 병행하면 근육 이완 효과가 배가됩니다."
+];
+
+const FALLBACK_TIMELINE = {
+    week1: "신체 긴장 완화와 수면 질 개선 단계",
+    week2: "세포 에너지 대사 활성화 및 활력 증가 단계",
+    week4: "신체 밸런스 최적화 및 항산화 체계 구축 단계"
+};

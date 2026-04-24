@@ -216,7 +216,14 @@ export async function performAnalysis(
 
 
     // AI 통합 요약(브리핑 & 시간표) 1회 호출로 해결 ✨ (할당량 최적화)
-    const { briefing: ai_briefing, schedule, isFallback } = await generateUnifiedAnalysis(
+    const { 
+        briefing: ai_briefing, 
+        schedule, 
+        recommendation_targets, 
+        lifestyle_guidelines,
+        expected_timeline,
+        isFallback 
+    } = await generateUnifiedAnalysis(
         selectedIngredients,
         { synergies, cautions, conflicts },
         score,
@@ -229,6 +236,9 @@ export async function performAnalysis(
         potentialSynergy,
         projectedScore,
         ai_briefing,
+        recommendation_targets,
+        lifestyle_guidelines,
+        expected_timeline,
         schedule,
         is_fallback: isFallback,
         analyzed_at: new Date().toISOString()

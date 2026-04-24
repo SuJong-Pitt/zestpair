@@ -111,6 +111,13 @@ export interface AnalysisResult {
   analyzed_at: string; // 분석 시각 ISO 8601
   schedule?: ScheduleSlot[]; // AI생성 복용 시간표
   ai_briefing?: string[]; // AI가 생성한 프리미엄 브리핑 포인트 (3가지)
+  recommendation_targets?: string[]; // AI가 분석한 '누구에게 좋은지' 대상 (신규) ✨
+  lifestyle_guidelines?: string[]; // 함께하면 좋은 생활 습관/음식 가이드 ✨
+  expected_timeline?: { // 4주 기대 효과 타임라인 ✨
+    week1: string;
+    week2: string;
+    week4: string;
+  };
   is_fallback?: boolean; // AI 호출 실패로 인한 임시 데이터 여부 ✨
 }
 
