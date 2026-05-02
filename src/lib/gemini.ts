@@ -16,20 +16,22 @@ export async function matchIngredientsByIntent(
     
     const prompt = `
 You are an expert nutritionist AI for "ZestPair".
-Analyze the user's intent and select the 2-3 most appropriate ingredient IDs from the list below.
+Your task is to analyze the user's input and select the most appropriate ingredient IDs from the provided list.
 
 [Available Ingredients]
 ${ingredientsContext}
 
-[User Intent]
+[User Input]
 "${intent}"
 
 [Rules]
-1. Select only the most relevant 2-3 ingredients.
-2. Return ONLY a JSON array of strings containing the ingredient IDs.
-3. No explanation, no other text.
+1. If the user mentions specific ingredients (e.g., "Vitamin C", "Zinc"), match them accurately to the IDs.
+2. If the user expresses a general need (e.g., "fatigue", "men in 50s"), select a balanced set of relevant ingredients.
+3. You can select up to 10 ingredients, but prioritize quality over quantity.
+4. Return ONLY a JSON array of strings containing the ingredient IDs.
+5. No explanation, no other text.
 
-Example: ["uuid-1", "uuid-2"]
+Example: ["uuid-1", "uuid-2", "uuid-3"]
 `;
 
     try {
@@ -202,14 +204,15 @@ Your mission is to ANALYZE, VALIDATE, and OPTIMIZE this specific selection.
 - Do not just list facts; provide a "Briefing" that feels like a personal consultation.
 
 ## Deliverables:
-1. Luxury Essential Briefing (3 premium points):
+1. Luxury Essential Briefing (3-5 premium points):
+   - Provide 3-5 high-quality briefing points. More points are encouraged if the user has many supplements or complex interactions.
    - Point 1: Overall validation of the user's selected basket foundation.
-   - Point 2: Specific synergy or caution highlights within THEIR selection.
-   - Point 3: Future outlook or lifestyle advice based on this specific stack.
-2. Recommended For (3 short phrases):
-    - Identify who would benefit most from this specific combination (e.g., "고강도 운동을 즐기는 분", "만성 피로에 시달리는 직장인").
-3. Lifestyle & Food Synergy (3 tips):
-   - Habits or foods that boost the effectiveness of this specific stack.
+   - Points 2-4: Specific synergy or caution highlights within THEIR selection.
+   - Final Point: Future outlook or lifestyle advice based on this specific stack.
+2. Recommended For (3-5 short phrases):
+    - Identify 3-5 types of people who would benefit most from this specific combination.
+3. Lifestyle & Food Synergy (3-5 tips):
+   - Provide 3-5 habits or foods that boost the effectiveness of this specific stack.
 4. 4-Week Expected Journey:
    - Predict physical changes for Week 1, Week 2, and Week 4.
 5. Optimal Dosage Schedule: Group into morning_before, morning_after, lunch_after, evening_after, night_before, anytime.
@@ -243,9 +246,9 @@ Only return the JSON. No markdown code blocks.
         const result = JSON.parse(text);
         
         return {
-            briefing: (result.briefing && result.briefing.length > 0) ? result.briefing.slice(0, 3) : FALLBACK_BRIEFING,
-            recommendation_targets: (result.recommendation_targets && result.recommendation_targets.length > 0) ? result.recommendation_targets.slice(0, 3) : FALLBACK_TARGETS,
-            lifestyle_guidelines: (result.lifestyle_guidelines && result.lifestyle_guidelines.length > 0) ? result.lifestyle_guidelines.slice(0, 3) : FALLBACK_LIFESTYLE,
+            briefing: (result.briefing && result.briefing.length > 0) ? result.briefing.slice(0, 5) : FALLBACK_BRIEFING,
+            recommendation_targets: (result.recommendation_targets && result.recommendation_targets.length > 0) ? result.recommendation_targets.slice(0, 5) : FALLBACK_TARGETS,
+            lifestyle_guidelines: (result.lifestyle_guidelines && result.lifestyle_guidelines.length > 0) ? result.lifestyle_guidelines.slice(0, 5) : FALLBACK_LIFESTYLE,
             expected_timeline: result.expected_timeline || FALLBACK_TIMELINE,
             schedule: (result.schedule && result.schedule.length > 0) ? result.schedule : [],
             isFallback: false // 성공 시 false 명시 ✨
