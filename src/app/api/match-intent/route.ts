@@ -19,7 +19,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Intent is too short" }, { status: 400 });
     }
 
-    const cacheKey = `intent:${intent.trim().toLowerCase()}`;
+    const originalIntent = intent.trim().toLowerCase();
+    
+    // 1. 모드 감지 (전부 추천 vs 필요한 것만 추천) ✨
+    const isAllMode = /전부|모두|다|all|everything|full/i.test(originalIntent);
+    const isMinimalMode = /필요한|딱|필수|minimal|necessary|best/i.test(originalIntent);
+    const modeSuffix = isAllMode ? ":all" : isMinimalMode ? ":minimal" : ":default";
+
+    // 2. 키워드 정규화 (조사 제거 등 단순화)
+    const keywordsForSearch = originalIntent
+        .split(/\s+/)
+        .filter((w: string) => w.length >= 2)
+        .map((w: string) => w.replace(/(에|의|를|을|은|는|도|가|이)$/, '')); // 기초적인 조사 제거
+    
+    const cacheKey = `intent:${keywordsForSearch.join('_')}${modeSuffix}`;
 
     // 1. [1차] 서버 메모리 캐시 확인
     if (intentCache.has(cacheKey)) {
@@ -28,14 +41,15 @@ export async function POST(request: Request) {
     }
 
     // 2. [2차] DB 캐시 확인 (키워드 기반 유연한 검색 ✨)
-    const keywordsForSearch = intent.split(/\s+/).filter((w: string) => w.length >= 2);
-    
     let query = supabase.from("ai_analysis_cache").select("cache_key, response");
     
-    // 모든 키워드가 포함된 캐시 키를 찾음 (예: "50대" AND "여자" AND "폐경")
-    keywordsForSearch.forEach((word: string) => {
-        query = query.like("cache_key", `%${word}%`);
-    });
+    // 핵심 키워드 2개 이상만 일치해도 캐시로 인정 (너무 엄격하면 히트율 저하)
+    if (keywordsForSearch.length > 0) {
+        keywordsForSearch.slice(0, 3).forEach((word: string) => {
+            query = query.like("cache_key", `%${word}%`);
+        });
+        query = query.like("cache_key", `%${modeSuffix}`);
+    }
 
     const { data: dbCache } = await (query as any)
         .limit(1)

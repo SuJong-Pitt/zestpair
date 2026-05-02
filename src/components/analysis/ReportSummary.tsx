@@ -182,7 +182,10 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
     const hasWarning = (conflicts?.length || 0) > 0 || (cautions?.length || 0) > 0;
 
     const handleShare = useCallback(async () => {
-        let text = isKo ? `[ZestPair] ${score}점 영양제 분석 리포트 ✨\n\n` : `[ZestPair] Supplement Analysis Report: ${score} pts ✨\n\n`;
+        const ingredientsList = ingredientNames.join(", ");
+        let text = isKo 
+            ? `💊 선택한 영양제: ${ingredientsList}\n\n[ZestPair] ${score}점 영양제 분석 리포트 ✨\n\n` 
+            : `💊 Selected: ${ingredientsList}\n\n[ZestPair] Supplement Analysis Report: ${score} pts ✨\n\n`;
         insights.forEach((insight, idx) => {
             const meta = idx === 0 && hasWarning ? WARN_META : CARD_META[idx] || CARD_META[2];
             text += `📍 ${isKo ? meta.labelKo : meta.labelEn}\n${insight}\n\n`;
