@@ -180,7 +180,11 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                             handleNativeShare={handleNativeShare}
                         />
 
-                        {/* 2. Synergy Optimization (Moved UP for Monetization & UX Flow) */}
+                        {/* 2. AI Dosage Schedule & Special Insights (Priority UX) ✨ */}
+                        <DosageSchedule result={result} language={language} />
+                        <SpecialInsights result={result} language={language} />
+
+                        {/* 3. Synergy Optimization (Discovery) */}
                         <SynergyOptimizer result={result} language={language} />
 
                         {/* 3. Interaction Details (Moved Down) */}
@@ -204,12 +208,6 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                 <InteractionCard language={language} t={t} />
                             )}
                         </div>
-
-                        {/* 3.1 AI Dosage Schedule */}
-                        <DosageSchedule result={result} language={language} />
-
-                        {/* 3.2 AI Special Insights (Meal & Safety) ✨ */}
-                        <SpecialInsights result={result} language={language} />
 
                         {/* 4. Scientific Evidence */}
                         <ScientificEvidence result={result} language={language} />
