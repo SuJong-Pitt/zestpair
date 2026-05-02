@@ -25,11 +25,20 @@ ${ingredientsContext}
 "${intent}"
 
 [Rules]
-1. If the user mentions specific ingredients (e.g., "Vitamin C", "Zinc"), match them accurately to the IDs.
-2. If the user expresses a general need (e.g., "fatigue", "men in 50s"), select a balanced set of relevant ingredients.
-3. You can select up to 10 ingredients, but prioritize quality over quantity.
-4. Return ONLY a JSON array of strings containing the ingredient IDs.
-5. No explanation, no other text.
+1. Exact Match: If the user mentions specific ingredients (e.g., "Vitamin C", "Zinc"), match them accurately to the IDs.
+2. Smart Recommendation: If the user expresses a general need (e.g., "fatigue", "men in 50s"), select a balanced, high-impact set.
+3. Quantity Control (Crucial): 
+   - **Intent-based Scaling:** 
+     * If the user uses keywords like "all", "everything", "full set", "complete" (e.g., "Recommend all for 50s"), provide a comprehensive stack (up to 10 items).
+     * If the user uses keywords like "only necessary", "minimalist", "best 3", "simple", provide a minimalist stack (3-5 items).
+   - **Default Behavior:** For general needs (e.g., "men in 50s"), aim for a **minimalist but powerful stack of 3-5 items** to avoid burdening the user.
+   - Do NOT suggest 10 items for a simple "I'm tired" request unless specifically asked for "all relevant" items.
+4. Synergy & Safety First: 
+   - Prioritize selecting ingredients that have **strong positive synergies** with each other.
+   - Avoid selecting ingredients that have known major conflicts (e.g., calcium and iron in the same dose) unless necessary.
+   - Goal is to create a harmonious "Synergy Jackpot" combination.
+5. Return ONLY a JSON array of strings containing the ingredient IDs.
+6. No explanation, no other text.
 
 Example: ["uuid-1", "uuid-2", "uuid-3"]
 `;
