@@ -113,8 +113,8 @@ export function getKakaoShareDetails(score: number, language: string, ingredient
 
   const comboPart = processedNames ? `${processedNames}: ` : "";
   const title = language === 'ko' 
-    ? `${scoreIcon} ${comboPart}${score}점!`
-    : `${scoreIcon} ${comboPart}${score}pts!`;
+    ? `${processedNames ? `${processedNames}의 ` : ""}궁합 점수 ${score}점! ${scoreIcon}`
+    : `${processedNames ? `${processedNames}: ` : ""}Synergy Score ${score}pts! ${scoreIcon}`;
 
   return { imageFileName, title, description };
 }

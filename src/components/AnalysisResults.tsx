@@ -91,8 +91,8 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
     const handleNativeShare = useCallback(async () => {
         if (!shareData) return;
-        const { shareUrl, score } = shareData;
-        const { title } = getKakaoShareDetails(score, language);
+        const { shareUrl, score, names } = shareData;
+        const { title } = getKakaoShareDetails(score, language, names);
 
         const data = { title: "ZestPair", text: title, url: shareUrl };
 
@@ -156,7 +156,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     <div className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-3 md:p-10 space-y-8 md:space-y-16">
 
                         {/* 0. Report Header */}
-                        <div id="analysis-report-top" className="flex flex-col items-center gap-2 pt-4 pb-0">
+                        <div id="analysis-report-top" className="flex flex-col items-center gap-6 pt-4 pb-0">
                             <motion.div
                                 initial={{ y: -10, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -167,7 +167,28 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     {language === 'ko' ? 'Analysis Protocol' : 'Analysis Report'}
                                 </h2>
                             </motion.div>
-                            <div className="w-px h-2 bg-gradient-to-b from-emerald-500/30 to-transparent" />
+
+                            {/* Selected Ingredients Quick View ✨ */}
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.2 }}
+                                className="flex flex-wrap justify-center gap-3 md:gap-4 px-4"
+                            >
+                                {result.ingredients.map((ing, i) => (
+                                    <div 
+                                        key={ing.id}
+                                        className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md"
+                                    >
+                                        <span className="text-lg md:text-xl">{ing.icon_emoji}</span>
+                                        <span className="text-[11px] md:text-xs font-black text-slate-300">
+                                            {language === 'ko' ? ing.name : (ing.name_en || ing.name)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </motion.div>
+
+                            <div className="w-px h-6 bg-gradient-to-b from-emerald-500/30 to-transparent" />
                         </div>
 
                         {/* 1. Score Summary (Optimized & Memoized) */}
