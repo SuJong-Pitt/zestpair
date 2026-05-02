@@ -177,6 +177,10 @@ export async function generateUnifiedAnalysis(
     recommendation_targets: string[], 
     lifestyle_guidelines: string[],
     expected_timeline: { week1: string; week2: string; week4: string; },
+    synergy_jackpot: { pair_names: string; reason: string; } | null,
+    conflict_solution: string | null,
+    meal_pairing: string[],
+    medication_safety: string | null,
     isFallback: boolean 
 }> {
     const isKo = language === 'ko';
@@ -215,7 +219,19 @@ Your mission is to ANALYZE, VALIDATE, and OPTIMIZE this specific selection.
    - Provide 3-5 habits or foods that boost the effectiveness of this specific stack.
 4. 4-Week Expected Journey:
    - Predict physical changes for Week 1, Week 2, and Week 4.
-5. Optimal Dosage Schedule: Group into morning_before, morning_after, lunch_after, evening_after, night_before, anytime.
+5. Synergy Jackpot (The BEST pair):
+   - Identify the single most powerful synergy pair (e.g., "Vitamin C + Collagen").
+   - Provide a 1-sentence reason why this is a "Jackpot" combination.
+   - If no synergies, identify a "Solid Foundation" pair.
+6. Conflict Solution (How you solved it):
+   - If there are CAUTIONS or CONFLICTS, explain in 1-2 sentences how the provided schedule resolves them (e.g., "I separated A and B to different times to maximize safety").
+   - If no conflicts, provide a "Perfect Harmony" confirmation.
+7. AI Meal Pairing (Nutrient-Food Synergy):
+   - Provide 2-3 specific foods or dietary habits that boost the effectiveness of this specific stack (e.g., "Eat with healthy fats like nuts").
+8. Medication Safety Check:
+   - If any ingredients are recognized as medications (drugs), provide a professional, cautionary advisory.
+   - If no drugs, provide a reassurance about the overall safety profile.
+9. Optimal Dosage Schedule: Group into morning_before, morning_after, lunch_after, evening_after, night_before, anytime.
 
 ## Return Format (Strict JSON only):
 {
@@ -227,6 +243,13 @@ Your mission is to ANALYZE, VALIDATE, and OPTIMIZE this specific selection.
       "week2": "Short prediction",
       "week4": "Short prediction"
     },
+    "synergy_jackpot": {
+      "pair_names": "A + B",
+      "reason": "..."
+    },
+    "conflict_solution": "...",
+    "meal_pairing": ["food1", "food2"],
+    "medication_safety": "...",
     "schedule": [
       {
         "time_id": "...",
@@ -250,6 +273,10 @@ Only return the JSON. No markdown code blocks.
             recommendation_targets: (result.recommendation_targets && result.recommendation_targets.length > 0) ? result.recommendation_targets.slice(0, 5) : FALLBACK_TARGETS,
             lifestyle_guidelines: (result.lifestyle_guidelines && result.lifestyle_guidelines.length > 0) ? result.lifestyle_guidelines.slice(0, 5) : FALLBACK_LIFESTYLE,
             expected_timeline: result.expected_timeline || FALLBACK_TIMELINE,
+            synergy_jackpot: result.synergy_jackpot || null,
+            conflict_solution: result.conflict_solution || null,
+            meal_pairing: result.meal_pairing || [],
+            medication_safety: result.medication_safety || null,
             schedule: (result.schedule && result.schedule.length > 0) ? result.schedule : [],
             isFallback: false // 성공 시 false 명시 ✨
         };
@@ -263,6 +290,10 @@ Only return the JSON. No markdown code blocks.
             recommendation_targets: FALLBACK_TARGETS,
             lifestyle_guidelines: FALLBACK_LIFESTYLE,
             expected_timeline: FALLBACK_TIMELINE,
+            synergy_jackpot: null,
+            conflict_solution: null,
+            meal_pairing: [],
+            medication_safety: null,
             schedule: [],
             isFallback: true // 캐시 방지 등을 위한 플래그 추가
         };

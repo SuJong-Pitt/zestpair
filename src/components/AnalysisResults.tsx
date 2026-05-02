@@ -19,6 +19,7 @@ import OptimizedScoreSection from "./analysis/OptimizedScoreSection";
 import SynergyOptimizer from "./analysis/SynergyOptimizer";
 import ScientificEvidence from "./analysis/ScientificEvidence";
 import DosageSchedule from "./analysis/DosageSchedule";
+import SpecialInsights from "./analysis/SpecialInsights";
 
 interface AnalysisResultsProps {
     result: AnalysisResult;
@@ -206,6 +207,9 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
                         {/* 3.1 AI Dosage Schedule */}
                         <DosageSchedule result={result} language={language} />
+
+                        {/* 3.2 AI Special Insights (Meal & Safety) ✨ */}
+                        <SpecialInsights result={result} language={language} />
 
                         {/* 4. Scientific Evidence */}
                         <ScientificEvidence result={result} language={language} />

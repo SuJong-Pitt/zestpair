@@ -170,6 +170,44 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                         </motion.p>
                     </div>
 
+                    {/* Synergy Jackpot (Premium Highlight) ✨ */}
+                    {result.synergy_jackpot && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.6 }}
+                            className="w-full max-w-2xl mb-8 p-0.5 rounded-[2rem] bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 shadow-[0_10px_30px_-10px_rgba(245,158,11,0.3)] group/jackpot"
+                        >
+                            <div className="bg-slate-900/90 backdrop-blur-xl rounded-[1.95rem] p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover/jackpot:opacity-20 transition-opacity">
+                                    <Sparkles size={80} className="text-yellow-500" />
+                                </div>
+                                
+                                <div className="shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-[2.5rem] bg-yellow-500/10 border border-yellow-500/20 flex flex-col items-center justify-center relative">
+                                    <span className="text-3xl md:text-4xl mb-1">🎰</span>
+                                    <span className="text-[10px] font-black text-yellow-500 uppercase tracking-tighter">Jackpot</span>
+                                    <motion.div 
+                                        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                                        transition={{ duration: 2, repeat: Infinity }}
+                                        className="absolute -inset-2 rounded-[3rem] border border-yellow-500/30 blur-[2px]"
+                                    />
+                                </div>
+
+                                <div className="flex-1 text-center md:text-left space-y-2">
+                                    <div className="flex flex-col md:flex-row md:items-center gap-2">
+                                        <span className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.3em]">Today's Best Pair</span>
+                                        <h4 className="text-xl md:text-2xl font-[1000] text-white tracking-tight">
+                                            {result.synergy_jackpot.pair_names}
+                                        </h4>
+                                    </div>
+                                    <p className="text-sm md:text-base font-bold text-slate-300 leading-relaxed break-keep">
+                                        {result.synergy_jackpot.reason}
+                                    </p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+
                     {/* Summary Box */}
                     <ReportSummary result={result} className="w-full max-w-2xl mb-4" />
 

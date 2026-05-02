@@ -70,6 +70,36 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
                 </p>
             </div>
 
+            {/* AI Conflict Solution Advisory (Reassurance) ✨ */}
+            {result.conflict_solution && (
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="max-w-4xl mx-auto px-4 mb-4"
+                >
+                    <div className="relative p-6 rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-xl overflow-hidden group">
+                        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-500" />
+                        <div className="flex items-start gap-4 relative z-10">
+                            <div className="p-2.5 rounded-2xl bg-indigo-500/20">
+                                <AlertCircle size={20} className="text-indigo-400" />
+                            </div>
+                            <div className="space-y-1.5">
+                                <h4 className="text-[11px] font-black text-indigo-400 uppercase tracking-[0.2em]">
+                                    {language === 'ko' ? "AI 충돌 해결 리포트" : "AI Conflict Resolution"}
+                                </h4>
+                                <p className="text-[14px] md:text-[16px] font-bold text-indigo-100 leading-relaxed break-keep">
+                                    {result.conflict_solution}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="absolute -right-8 -bottom-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <Sparkles size={120} className="text-indigo-400" />
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+
             <div className="grid gap-6 md:gap-8 max-w-4xl mx-auto px-2">
                 <AnimatePresence mode="popLayout">
                     {schedule.map((slot, idx) => {

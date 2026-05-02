@@ -118,6 +118,13 @@ export interface AnalysisResult {
     week2: string;
     week4: string;
   };
+  synergy_jackpot?: { // 가장 강력한 시너지 커플 하이라이트 ✨
+    pair_names: string;
+    reason: string;
+  } | null;
+  conflict_solution?: string | null; // 주의/충돌 조합에 대한 AI의 해결책 설명 ✨
+  meal_pairing?: string[]; // 영양제와 궁합이 좋은 음식 추천 ✨
+  medication_safety?: string | null; // 의약품 포함 시 전용 안전 가이드 ✨
   is_fallback?: boolean; // AI 호출 실패로 인한 임시 데이터 여부 ✨
 }
 
