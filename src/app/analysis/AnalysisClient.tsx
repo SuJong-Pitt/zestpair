@@ -34,31 +34,37 @@ function AnalysisContent() {
 
     useEffect(() => {
         const handleSharedLink = async () => {
-            // 1. 이미 결과가 있거나 요청 중이면 중복 실행 방지
-            if (analysisResult || isFetchingRef.current) {
-                setAnalyzing(false);
-                setHasResult(true);
-                setIsLoading(false);
-                return;
-            }
+            if (isFetchingRef.current) return;
 
-            // 2. 공유 링크를 통해 들어온 경우 (?v=... 또는 ?ids=...)
             const vParam = searchParams.get("v");
             const idsParam = searchParams.get("ids");
-            
-            if (vParam || idsParam) {
-                setIsLoading(true);
-                let selectedSlugs: string[] = [];
-                let selectedIds: string[] = [];
+            const hasParams = !!(vParam || idsParam);
 
-                if (vParam) {
-                    selectedSlugs = decodeShareParams(vParam);
-                } else if (idsParam) {
-                    selectedIds = idsParam.split(",");
+            // 1. 파라미터가 있는 경우: 현재 결과와 비교하여 다르면 새로 불러오기 ✨
+            if (hasParams) {
+                let targetSlugs: string[] = vParam ? decodeShareParams(vParam) : [];
+                let targetIds: string[] = idsParam ? idsParam.split(",") : [];
+
+                if (analysisResult) {
+                    const currentSlugs = [...analysisResult.ingredients.map(i => i.slug)].sort();
+                    const currentIds = [...analysisResult.ingredients.map(i => i.id)].sort();
+                    
+                    const isMatch = vParam 
+                        ? JSON.stringify(currentSlugs) === JSON.stringify([...targetSlugs].sort())
+                        : JSON.stringify(currentIds) === JSON.stringify([...targetIds].sort());
+
+                    if (isMatch) {
+                        setAnalyzing(false);
+                        setHasResult(true);
+                        setIsLoading(false);
+                        return;
+                    }
                 }
-
+                
+                // 매치되지 않으면 로딩 시작
+                setIsLoading(true);
                 try {
-                    // 모든 성분 데이터 가져오기 (추천 로직용)
+                    // 모든 성분 데이터 가져오기
                     const { data: allIngs } = await supabase
                         .from("ingredients")
                         .select("*")
@@ -66,23 +72,19 @@ function AnalysisContent() {
 
                     if (!allIngs) throw new Error("Failed to fetch ingredients");
 
-                    // 링크에 포함된 성분들 필터링 (슬러그 또는 ID 기준)
                     const selectedIngs = (allIngs as Ingredient[]).filter(ing => {
-                        if (selectedSlugs.length > 0) return selectedSlugs.includes(ing.slug);
-                        if (selectedIds.length > 0) return selectedIds.includes(ing.id);
+                        if (targetSlugs.length > 0) return targetSlugs.includes(ing.slug);
+                        if (targetIds.length > 0) return targetIds.includes(ing.id);
                         return false;
                     });
                     
                     if (selectedIngs.length >= 2) {
-                        // 로딩 시작 및 락 걸기
                         isFetchingRef.current = true;
                         setAnalyzing(true);
 
-                        // 바구니 업데이트 (공유받은 리스트로 교체)
                         clearBasket();
                         selectedIngs.forEach(ing => addIngredient(ing));
 
-                        // 분석 실행 (서버 사이드 API 호출)
                         const response = await fetch("/api/analyze", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -101,7 +103,6 @@ function AnalysisContent() {
                         isFetchingRef.current = false;
                         setAnalyzing(false);
                     } else {
-                        // 성분이 부족하면 홈으로
                         setIsRedirecting(true);
                     }
                 } catch (error) {
@@ -113,7 +114,15 @@ function AnalysisContent() {
                 return;
             }
 
-            // 3. 결과도 없고 공유 링크도 아니면 홈으로 리다이렉트
+            // 2. 파라미터가 없는데 이미 결과가 있는 경우: 그대로 사용
+            if (analysisResult) {
+                setAnalyzing(false);
+                setHasResult(true);
+                setIsLoading(false);
+                return;
+            }
+
+            // 3. 결과도 없고 파라미터도 없으면 홈으로
             setIsRedirecting(true);
         };
 
