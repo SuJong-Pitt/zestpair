@@ -213,13 +213,24 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                         <Sparkles size={18} className={isHighEnd ? "text-yellow-400" : "text-emerald-400"} />
                     </div>
                     <div className="flex flex-col">
-                        <h4 className={cn(
-                            "text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em]",
-                            isHighEnd ? "text-yellow-400" : "text-emerald-400"
-                        )}>
+                        <motion.h4 
+                            animate={{ opacity: [1, 0.8, 1, 0.9, 1] }}
+                            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 5 }}
+                            className={cn(
+                                "text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em]",
+                                isHighEnd ? "text-yellow-400" : "text-emerald-400"
+                            )}
+                        >
                             {isKo ? "AI 프로토콜 리포트" : "AI PROTOCOL REPORT"}
-                        </h4>
-                        <span className="text-[9px] text-slate-500 font-bold tracking-tight opacity-70">HYPER-PERSONALIZED ANALYSIS</span>
+                        </motion.h4>
+                        <motion.span 
+                            initial={{ opacity: 0, x: -5 }}
+                            animate={{ opacity: 0.7, x: 0 }}
+                            transition={{ delay: 0.5 }}
+                            className="text-[9px] text-slate-500 font-bold tracking-tight"
+                        >
+                            HYPER-PERSONALIZED ANALYSIS
+                        </motion.span>
                     </div>
                 </div>
 
@@ -237,15 +248,33 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                     const isWarnCard = idx === 0 && hasWarning;
                     const meta = isWarnCard ? WARN_META : CARD_META[idx] || CARD_META[2];
                     const Icon = meta.icon;
-                    const { headline, body } = extractHeadline(insight);
+                    
+                    let headline = "";
+                    let body = "";
+                    if (typeof insight === 'string') {
+                        const extracted = extractHeadline(insight);
+                        headline = extracted.headline;
+                        body = extracted.body;
+                    } else {
+                        headline = insight.headline;
+                        body = insight.details;
+                    }
 
                     return (
                         <motion.div
                             key={idx}
-                            initial={{ opacity: 0, y: 15 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.1 }}
+                            initial={{ opacity: 0, x: -20, filter: "blur(10px)" }}
+                            whileInView={{ 
+                                opacity: 1, 
+                                x: 0, 
+                                filter: "blur(0px)",
+                                transition: {
+                                    duration: 0.8,
+                                    ease: [0.22, 1, 0.36, 1],
+                                    delay: idx * 0.15
+                                }
+                            }}
+                            viewport={{ once: true, margin: "-50px" }}
                             className={cn(
                                 "group relative rounded-[2rem] border p-6 md:p-7 overflow-hidden transition-all duration-500",
                                 "backdrop-blur-xl bg-opacity-40",
@@ -255,6 +284,21 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                 "hover:scale-[1.01] hover:brightness-110 active:scale-[0.99]"
                             )}
                         >
+                            {/* Scanning Beam Effect ✨ */}
+                            <motion.div 
+                                initial={{ top: "-100%" }}
+                                whileInView={{ top: "200%" }}
+                                transition={{ 
+                                    duration: 1.5, 
+                                    delay: idx * 0.15 + 0.3,
+                                    ease: "easeInOut"
+                                }}
+                                className={cn(
+                                    "absolute left-0 right-0 h-20 opacity-20 blur-xl pointer-events-none z-0",
+                                    meta.badgeBg
+                                )}
+                            />
+
                             <div className={cn(
                                 "absolute left-0 top-6 bottom-6 w-1 rounded-full opacity-60 group-hover:opacity-100 transition-opacity",
                                 meta.barColor
@@ -279,12 +323,17 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                 </div>
 
                                 <div className="space-y-3 text-left">
-                                    <h5 className={cn(
-                                        "text-[16px] md:text-[18px] font-black leading-[1.4] tracking-tight",
-                                        isWarnCard ? "text-amber-100" : "text-white/95"
-                                    )}>
+                                    <motion.h5 
+                                        initial={{ opacity: 0 }}
+                                        whileInView={{ opacity: 1 }}
+                                        transition={{ duration: 0.5, delay: idx * 0.15 + 0.2 }}
+                                        className={cn(
+                                            "text-[16px] md:text-[18px] font-black leading-[1.4] tracking-tight",
+                                            isWarnCard ? "text-amber-100" : "text-white/95"
+                                        )}
+                                    >
                                         {highlightIngredients(headline, ingredientNames, meta.colorClass)}
-                                    </h5>
+                                    </motion.h5>
                                     {body && body.length > 5 && body !== headline && (
                                         <p className="text-[14px] md:text-[15px] font-medium leading-[1.6] text-slate-400/90 tracking-tight">
                                             {highlightIngredients(body, ingredientNames, meta.colorClass)}
@@ -314,9 +363,9 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                 </div>
                                 <div className="grid gap-2.5">
                                     {result.recommendation_targets.map((target, i) => (
-                                        <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.03] border border-white/5 transition-colors hover:bg-white/[0.05]">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-400/50" />
-                                            <span className="text-[13px] md:text-[14px] font-bold text-slate-200 leading-tight">
+                                        <div key={i} className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-white/[0.03] border border-white/5 transition-colors hover:bg-white/[0.05] text-left">
+                                            <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-400/50 flex-shrink-0" />
+                                            <span className="text-[13px] md:text-[14px] font-bold text-slate-200 leading-[1.5]">
                                                 {target}
                                             </span>
                                         </div>

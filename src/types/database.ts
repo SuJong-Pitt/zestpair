@@ -110,7 +110,7 @@ export interface AnalysisResult {
   projectedScore?: number; // 추천 성분 추가 시의 예상 점수
   analyzed_at: string; // 분석 시각 ISO 8601
   schedule?: ScheduleSlot[]; // AI생성 복용 시간표
-  ai_briefing?: string[]; // AI가 생성한 프리미엄 브리핑 포인트 (3가지)
+  ai_briefing?: Array<{ headline: string; details: string } | string>; // AI가 생성한 프리미엄 브리핑 포인트 (새 구조와 구 구조 호환)
   recommendation_targets?: string[]; // AI가 분석한 '누구에게 좋은지' 대상 (신규) ✨
   lifestyle_guidelines?: string[]; // 함께하면 좋은 생활 습관/음식 가이드 ✨
   expected_timeline?: { // 4주 기대 효과 타임라인 ✨

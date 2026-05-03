@@ -162,6 +162,39 @@ function AnalysisContent() {
                                 : (language === 'ko' ? 'Pori AI가 조합을 정밀 분석하고 있어요. 잠시만 기다려주세요!' : 'Pori AI is precisely analyzing your combination. Just a moment!')
                             }
                         </p>
+                        
+                        {/* Dynamic AI Protocol Logs ✨ */}
+                        {!isRedirecting && (
+                            <div className="flex flex-col items-center gap-1.5 pt-2">
+                                <motion.div 
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: [0, 1, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity, times: [0, 0.5, 1] }}
+                                    className="flex items-center gap-2"
+                                >
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="text-[10px] font-black text-emerald-500/80 uppercase tracking-[0.2em] font-mono">
+                                        Establishing Protocol...
+                                    </span>
+                                </motion.div>
+                                <div className="flex flex-col items-start gap-1 font-mono text-[9px] text-slate-500/60 font-bold">
+                                    {[
+                                        "MATCHING SYNERGY VECTORS...",
+                                        "CALCULATING BIO-AVAILABILITY...",
+                                        "DECODING CHEMICAL INTERACTIONS..."
+                                    ].map((log, i) => (
+                                        <motion.div
+                                            key={i}
+                                            initial={{ opacity: 0, x: -5 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: i * 0.8, repeat: Infinity, repeatDelay: 3 }}
+                                        >
+                                            {">"} {log}
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </motion.div>
             </div>

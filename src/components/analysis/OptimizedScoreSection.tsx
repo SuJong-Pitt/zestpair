@@ -255,11 +255,9 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
 
                             // AI 브리핑에서 해당 성분 언급 문장 추출 (1문장)
                             const ingName = isKo ? ing.name : (ing.name_en || ing.name);
-                            const briefingHint = result.ai_briefing?.find(b =>
-                                b.includes(isKo ? ing.name : (ing.name_en || ing.name))
-                            );
-                            const hintSentence = briefingHint
-                                ? briefingHint.split(/[.。]/).find(s => s.includes(ingName))?.trim()
+                            const briefingHintStr = result.ai_briefing?.map(b => typeof b === 'string' ? b : `${b.headline} ${b.details}`).find(b => b.includes(ingName));
+                            const hintSentence = briefingHintStr
+                                ? briefingHintStr.split(/[.。]/).find((s: string) => s.includes(ingName))?.trim()
                                 : null;
 
                             const purchaseUrl = isKo

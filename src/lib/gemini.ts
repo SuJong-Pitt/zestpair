@@ -107,8 +107,8 @@ ${ingredients.map(ing => `- ${ing.name} (${ing.name_en}): Recommended time is ${
 1. Group ingredients into: morning_before (empty stomach), morning_after, lunch_after, evening_after, night_before, anytime.
 2. IMPORTANT: If there is a CAUTION or CONFLICT between two ingredients, separate them into different time slots (e.g., one in morning, one in evening).
 3. Synergies should be taken together if their recommended dosage times allow.
-4. For each time slot, provide a short "ai_insight" explaining WHY this grouping is good (in ${language === 'ko' ? 'Korean' : 'English'}).
-5. Keep it professional, scientific, but encouraging.
+4. For each time slot, provide a short "ai_insight" explaining WHY this grouping is good (in ${language === 'ko' ? 'Korean' : 'English'}). Explain it using a **fun, easy-to-understand analogy** rather than complex medical terms.
+5. Keep it friendly, witty, and highly engaging. Use emojis appropriately.
 
 ## Return Format (JSON only):
 [
@@ -212,18 +212,23 @@ Your mission is to ANALYZE, VALIDATE, and OPTIMIZE this specific selection.
 - Detected Conflicts: ${interactions.conflicts.length}
 
 ## Style Guidelines:
-- Tone: Luxury, Empowering, Clinical, Personalized.
-- Reference the user's basket explicitly (e.g., "당신이 선택한 이 조합은...", "Your selected stack...").
-- Do not just list facts; provide a "Briefing" that feels like a personal consultation.
+- Tone: Friendly, Highly Expert, Luxurious, and Vivid. Act like a top-tier private health consultant who is warm yet deeply knowledgeable.
+- NEVER use the word "대표님". Address the user politely and elegantly (e.g., "회원님", "고객님", or simply omit the title and speak directly).
+- EXTREMELY IMPORTANT: Use vivid, premium analogies and metaphors to explain complex mechanisms. 
+  - The explanation must feel like a "luxury service" (e.g., "마치 무너진 기초 공사를 다시 세우는 초호화 리모델링 프로젝트와 같습니다", "24시간 상시 보습 조명 시스템을 가동합니다").
+- Provide DETAILED mechanisms of action. Combine scientific terms with easy-to-understand, luxurious imagery (e.g., "A opens the cellular door, while B rushes in to repair...").
+- Make the user feel cared for and thrilled about their premium selection, maintaining a flawless balance of friendliness and professional authority.
 
 ## Deliverables:
-1. Luxury Essential Briefing (3-5 premium points):
-   - Provide 3-5 high-quality briefing points. More points are encouraged if the user has many supplements or complex interactions.
-   - Point 1: Overall validation of the user's selected basket foundation.
-   - Points 2-4: Specific synergy or caution highlights within THEIR selection.
-   - Final Point: Future outlook or lifestyle advice based on this specific stack.
-2. Recommended For (3-5 short phrases):
-    - Identify 3-5 types of people who would benefit most from this specific combination.
+1. Premium Essential Briefing (3-5 highly detailed points):
+   - Provide 3-5 vivid, detailed briefing paragraphs. Each point MUST be composed of a short, impactful headline followed by a detailed explanatory sentence.
+   - Point 1 (Performance & Strategy): Start with a mind-blowing summary of their entire stack. Give the stack a cool metaphorical name (e.g., "The Ultimate Anti-Aging Masterpiece").
+   - Points 2-4 (Synergy Mechanism): Dive DEEP into specific ingredient combinations. Explain EXACTLY how they work together using vivid analogies. Highlight specific ingredient names.
+   - Final Point (Long-term Strategy): Predict the long-term compounding effects in an inspiring, visionary way.
+2. Recommended For (3-5 highly professional and detailed phrases):
+    - Identify 3-5 specific demographic or lifestyle profiles that would benefit most from this combination.
+    - Write these in a detailed, clinical, and highly professional manner (e.g., "만성적인 수면 부족과 고강도 스트레스에 노출된 40대 전문직 종사자", "운동 후 빠른 근육 회복 및 젖산 분해 케어가 필요한 분"). 
+    - Avoid playful, joking, or overly casual tone here. Be an expert.
 3. Lifestyle & Food Synergy (3-5 tips):
    - Provide 3-5 habits or foods that boost the effectiveness of this specific stack.
 4. 4-Week Expected Journey:
@@ -244,7 +249,11 @@ Your mission is to ANALYZE, VALIDATE, and OPTIMIZE this specific selection.
 
 ## Return Format (Strict JSON only):
 {
-    "briefing": ["point1", "point2", "point3"],
+    "briefing": [
+      { "headline": "...", "details": "..." },
+      { "headline": "...", "details": "..." },
+      { "headline": "...", "details": "..." }
+    ],
     "recommendation_targets": ["target1", "target2", "target3"],
     "lifestyle_guidelines": ["tip1", "tip2", "tip3"],
     "expected_timeline": {
