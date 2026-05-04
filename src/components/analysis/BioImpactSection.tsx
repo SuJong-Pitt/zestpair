@@ -57,9 +57,9 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
     );
 
     // Label box dimensions in SVG coordinate space
-    const BOX_W = 80;
-    const BOX_H = 52;
-    const LABEL_DIST = radius + 58; // distance from center to label center
+    const BOX_W = 96;
+    const BOX_H = 60;
+    const LABEL_DIST = radius + 66; // distance from center to label center
 
     return (
         <div className="space-y-3">
@@ -80,22 +80,25 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
 
                 <div className="relative z-10 p-6 md:p-8">
                     {/* Section Header */}
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                            <div className="relative w-9 h-9 rounded-2xl flex items-center justify-center"
+                    <div className="flex items-center justify-between mb-4 gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="relative w-8 h-8 md:w-9 md:h-9 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0"
                                 style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(52,211,153,0.2))', border: '1px solid rgba(129,140,248,0.3)' }}>
-                                <Zap size={16} className="text-indigo-400" />
+                                <Zap size={14} className="text-indigo-400" />
                             </div>
-                            <div>
-                                <p className="text-[11px] font-black uppercase tracking-[0.25em] text-indigo-400/90">
-                                    {isKo ? '6대 바이오 임팩트 분석' : '6D BIO-IMPACT METRICS'}
+                            <div className="min-w-0">
+                                <p className="text-[12px] md:text-[13px] font-black uppercase tracking-[0.06em] md:tracking-[0.2em] text-indigo-400/90 whitespace-nowrap">
+                                    {isKo ? '6대 바이오 임팩트 분석' : '6D BIO-IMPACT'}
                                 </p>
-                                <p className="text-[9px] text-slate-600 font-bold tracking-wide mt-0.5">HYPER-PERSONALIZED · AI COMPUTED</p>
+                                <p className="text-[9px] md:text-[10px] text-slate-500 font-bold tracking-wide mt-0.5 whitespace-nowrap">
+                                    HYPER-PERSONALIZED · AI COMPUTED
+                                </p>
                             </div>
                         </div>
-                        <div className="px-3 py-1.5 rounded-full border"
+                        {/* 모바일에서는 배지 숨김 — 공간 확보 */}
+                        <div className="hidden md:flex flex-shrink-0 px-2.5 py-1.5 rounded-full border"
                             style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}>
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide whitespace-nowrap">
                                 {isKo ? 'AI 정밀 데이터' : 'AI PRECISION DATA'}
                             </span>
                         </div>
@@ -248,11 +251,11 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
                                                 backdropFilter: 'blur(14px)',
                                                 whiteSpace: 'nowrap',
                                             }}>
-                                                <span style={{ fontSize: 8, fontWeight: 900, color: '#94a3b8', letterSpacing: '0.04em' }}>
+                                                <span style={{ fontSize: 11, fontWeight: 900, color: '#94a3b8', letterSpacing: '0.04em' }}>
                                                     {cat.label}
                                                 </span>
                                                 <span style={{
-                                                    fontSize: 16,
+                                                    fontSize: 22,
                                                     fontWeight: 900,
                                                     lineHeight: 1,
                                                     color: cat.color,
@@ -284,13 +287,13 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
                                 className="flex flex-col items-center p-3 rounded-2xl"
                                 style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
                             >
-                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">
+                                <span className="text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
                                     {stat.label}
                                 </span>
-                                <span className={cn("text-sm font-black leading-none", stat.colorClass)}>
+                                <span className={cn("text-base md:text-lg font-black leading-none", stat.colorClass)}>
                                     {stat.value}
                                 </span>
-                                <span className="text-[7px] font-bold text-slate-700 mt-1 tracking-widest">
+                                <span className="text-[9px] md:text-[10px] font-bold text-slate-600 mt-1 tracking-widest">
                                     {stat.sub}
                                 </span>
                             </motion.div>
