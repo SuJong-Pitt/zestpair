@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useBasketStore } from "@/store/basketStore";
 import { AnalysisResult } from "@/types/database";
+import BioImpactSection from "./BioImpactSection";
 
 interface ReportSummaryProps {
     result: AnalysisResult;
@@ -233,7 +234,6 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                         </motion.span>
                     </div>
                 </div>
-
                 <button
                     onClick={handleShare}
                     className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-95 group"
@@ -242,6 +242,22 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                     <span className="text-[11px] font-black uppercase tracking-wider">{isKo ? '공유' : 'SHARE'}</span>
                 </button>
             </div>
+
+            {/* 🧬 [NEW] 6D Bio-Impact Analysis ✨ */}
+            {result.bio_metrics && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.1 }}
+                    viewport={{ once: true }}
+                >
+                    <BioImpactSection 
+                        metrics={result.bio_metrics} 
+                        mechanism={result.scientific_mechanism}
+                        language={language}
+                    />
+                </motion.div>
+            )}
 
             <div className="grid gap-3.5">
                 {insights.map((insight, idx) => {

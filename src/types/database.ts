@@ -126,6 +126,19 @@ export interface AnalysisResult {
   meal_pairing?: string[]; // 영양제와 궁합이 좋은 음식 추천 ✨
   medication_safety?: string | null; // 의약품 포함 시 전용 안전 가이드 ✨
   is_fallback?: boolean; // AI 호출 실패로 인한 임시 데이터 여부 ✨
+  impact_ratio?: { // (Legacy) 정신적 vs 신체적 영향력 비율
+    mental: number;
+    physical: number;
+  };
+  bio_metrics?: { // 6대 바이오 지표 (각 0~100) ✨
+    focus: number;      // 정신/집중
+    vitality: number;   // 신체/활력
+    shield: number;     // 면역/보호
+    beauty: number;     // 항노화/미용
+    calm: number;       // 스트레스/수면
+    metabolism: number; // 대사/소화
+  };
+  scientific_mechanism?: string | null; // 과학적 기전 상세 설명 (아코디언용) ✨
 }
 
 /**

@@ -226,6 +226,8 @@ export async function performAnalysis(
         conflict_solution,
         meal_pairing,
         medication_safety,
+        bio_metrics,
+        scientific_mechanism,
         isFallback 
     } = await generateUnifiedAnalysis(
         selectedIngredients,
@@ -247,6 +249,8 @@ export async function performAnalysis(
         conflict_solution,
         meal_pairing,
         medication_safety,
+        bio_metrics,
+        scientific_mechanism,
         schedule,
         is_fallback: isFallback,
         analyzed_at: new Date().toISOString()

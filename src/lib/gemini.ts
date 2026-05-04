@@ -181,7 +181,7 @@ export async function generateUnifiedAnalysis(
     score: number,
     language: "ko" | "en" = "ko"
 ): Promise<{ 
-    briefing: string[], 
+    briefing: any[], 
     schedule: ScheduleSlot[], 
     recommendation_targets: string[], 
     lifestyle_guidelines: string[],
@@ -190,6 +190,8 @@ export async function generateUnifiedAnalysis(
     conflict_solution: string | null,
     meal_pairing: string[],
     medication_safety: string | null,
+    bio_metrics: { focus: number, vitality: number, shield: number, beauty: number, calm: number, metabolism: number },
+    scientific_mechanism: string | null,
     isFallback: boolean 
 }> {
     const isKo = language === 'ko';
@@ -245,7 +247,19 @@ Your mission is to ANALYZE, VALIDATE, and OPTIMIZE this specific selection.
 8. Medication Safety Check:
    - If any ingredients are recognized as medications (drugs), provide a professional, cautionary advisory.
    - If no drugs, provide a reassurance about the overall safety profile.
-9. Optimal Dosage Schedule: Group into morning_before, morning_after, lunch_after, evening_after, night_before, anytime.
+9. Bio-Metrics Analysis (6 Dimensions):
+   - Analyze the stack's impact on 6 dimensions (0-100 points each):
+     - focus: Mental clarity, memory, and focus.
+     - vitality: Physical energy, stamina, and recovery.
+     - shield: Immune system support and protection.
+     - beauty: Anti-aging, skin, hair, and cell regeneration.
+     - calm: Stress reduction, sleep quality, and relaxation.
+     - metabolism: Digestion, nutrient absorption, and metabolic health.
+   - Return as: {"focus": 80, "vitality": 60, "shield": 50, "beauty": 40, "calm": 30, "metabolism": 70}
+10. Scientific Mechanism Deep-Dive:
+    - Provide a detailed, 2-3 sentence technical explanation of the primary chemical/biological mechanism of this specific stack.
+    - Focus on how the main ingredients interact at a cellular or molecular level.
+11. Optimal Dosage Schedule: Group into morning_before, morning_after, lunch_after, evening_after, night_before, anytime.
 
 ## Return Format (Strict JSON only):
 {
@@ -268,6 +282,11 @@ Your mission is to ANALYZE, VALIDATE, and OPTIMIZE this specific selection.
     "conflict_solution": "...",
     "meal_pairing": ["food1", "food2"],
     "medication_safety": "...",
+    "bio_metrics": { 
+        "focus": 80, "vitality": 60, "shield": 50, 
+        "beauty": 40, "calm": 30, "metabolism": 70 
+    },
+    "scientific_mechanism": "...",
     "schedule": [
       {
         "time_id": "...",
@@ -295,6 +314,8 @@ Only return the JSON. No markdown code blocks.
             conflict_solution: result.conflict_solution || null,
             meal_pairing: result.meal_pairing || [],
             medication_safety: result.medication_safety || null,
+            bio_metrics: result.bio_metrics || { focus: 50, vitality: 50, shield: 50, beauty: 50, calm: 50, metabolism: 50 },
+            scientific_mechanism: result.scientific_mechanism || null,
             schedule: (result.schedule && result.schedule.length > 0) ? result.schedule : [],
             isFallback: false // 성공 시 false 명시 ✨
         };
@@ -312,6 +333,8 @@ Only return the JSON. No markdown code blocks.
             conflict_solution: null,
             meal_pairing: [],
             medication_safety: null,
+            bio_metrics: { focus: 50, vitality: 50, shield: 50, beauty: 50, calm: 50, metabolism: 50 },
+            scientific_mechanism: null,
             schedule: [],
             isFallback: true // 캐시 방지 등을 위한 플래그 추가
         };
