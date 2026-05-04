@@ -270,63 +270,86 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             return (
                                 <motion.div
                                     key={ing.id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.1 + i * 0.08 }}
-                                    className="relative bg-white/[0.02] border border-white/10 rounded-2xl p-4 md:p-5 group/card hover:border-emerald-500/30 hover:bg-white/[0.04] transition-all duration-300"
+                                    initial={{ opacity: 0, y: 12, filter: 'blur(8px)' }}
+                                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                    transition={{ delay: 0.1 + i * 0.1, duration: 0.6, ease: [0.22,1,0.36,1] }}
+                                    className="group/card relative overflow-hidden rounded-[1.8rem] transition-all duration-400"
+                                    style={{
+                                        background: 'linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02), rgba(15,23,42,0.8))',
+                                        border: '1px solid rgba(52,211,153,0.18)',
+                                        boxShadow: '0 15px 40px -15px rgba(0,0,0,0.5)'
+                                    }}
+                                    whileHover={{ scale: 1.01, boxShadow: '0 20px 60px -15px rgba(52,211,153,0.2)' }}
                                 >
-                                    {/* Left accent */}
-                                    <div className="absolute left-0 top-4 bottom-4 w-[3px] rounded-full bg-emerald-400/40 group-hover/card:bg-emerald-400/80 transition-colors" />
+                                    {/* Sweep shine on hover */}
+                                    <motion.div
+                                        animate={{ x: ['-200%', '200%'] }}
+                                        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: i * 0.8 }}
+                                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent skew-x-12 pointer-events-none"
+                                    />
+                                    {/* Left accent bar */}
+                                    <div className="absolute left-0 top-4 bottom-4 w-[3px] rounded-full transition-all duration-300"
+                                        style={{ background: 'linear-gradient(180deg, #34d399, rgba(52,211,153,0.2))' }} />
+                                    {/* Top gradient line */}
+                                    <div className="absolute top-0 left-0 right-0 h-px"
+                                        style={{ background: 'linear-gradient(90deg, transparent, rgba(52,211,153,0.3), transparent)' }} />
 
-                                    <div className="pl-3 flex flex-col gap-3">
-                                        {/* Top row: emoji + name + score contribution */}
+                                    <div className="pl-5 pr-4 py-4 md:py-5 flex flex-col gap-3">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="relative">
-                                                    <span className="text-2xl md:text-3xl">{ing.icon_emoji}</span>
+                                                <div className="relative w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                                                    style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}>
+                                                    <span className="text-2xl">{ing.icon_emoji}</span>
                                                     <motion.div
-                                                        animate={{ opacity: [0, 1, 0] }}
-                                                        transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.6 }}
-                                                        className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400/60 blur-[2px]"
+                                                        animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.7, 0.3] }}
+                                                        transition={{ duration: 3, repeat: Infinity, delay: i * 0.7 }}
+                                                        className="absolute inset-0 rounded-2xl"
+                                                        style={{ background: 'radial-gradient(circle, rgba(52,211,153,0.3), transparent)' }}
                                                     />
                                                 </div>
                                                 <div className="flex flex-col items-start leading-tight">
-                                                    <span className="text-[15px] md:text-[17px] font-black text-white">
+                                                    <span className="text-[15px] md:text-[17px] font-black text-white tracking-tight">
                                                         {ingName}
                                                     </span>
-                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                    <div className="flex items-center gap-2 mt-1">
                                                         <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
                                                             {ing.category}
                                                         </span>
-                                                        <span className="text-[8px] text-slate-600">·</span>
-                                                        <span className="text-[8px] font-black text-emerald-400/80 uppercase tracking-wide">
+                                                        <span className="text-[8px] text-slate-700">·</span>
+                                                        <span className="text-[8px] font-black uppercase tracking-wide"
+                                                            style={{ color: synergyCount >= 2 ? '#34d399' : synergyCount === 1 ? '#60a5fa' : '#64748b' }}>
                                                             {roleLabel}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {/* Score contribution badge */}
-                                            <div className="shrink-0 flex flex-col items-center px-2.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                                                <span className="text-[18px] md:text-[22px] font-[1000] text-emerald-400 leading-none">+{scoreContrib}</span>
-                                                <span className="text-[7px] font-black text-emerald-400/60 uppercase tracking-wider">{isKo ? "점 기여" : "pts"}</span>
+                                            {/* Score badge - premium */}
+                                            <div className="shrink-0 flex flex-col items-center px-3 py-2 rounded-2xl"
+                                                style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.25)', boxShadow: '0 4px 20px -4px rgba(52,211,153,0.2)' }}>
+                                                <span className="text-[20px] md:text-[24px] font-[1000] leading-none"
+                                                    style={{ color: '#34d399', textShadow: '0 0 12px rgba(52,211,153,0.5)' }}>+{scoreContrib}</span>
+                                                <span className="text-[7px] font-black text-emerald-400/60 uppercase tracking-wider mt-0.5">{isKo ? "점 기여" : "pts"}</span>
                                             </div>
                                         </div>
 
-                                        {/* AI insight hint */}
                                         {hintSentence && hintSentence.length > 5 && (
-                                            <p className="text-[11px] md:text-[12px] text-slate-400 leading-relaxed border-l-2 border-emerald-500/20 pl-3 italic">
-                                                "{hintSentence}"
+                                            <p className="text-[11px] md:text-[12px] text-slate-400 leading-relaxed pl-3 italic"
+                                                style={{ borderLeft: '2px solid rgba(52,211,153,0.25)' }}>
+                                                &ldquo;{hintSentence}&rdquo;
                                             </p>
                                         )}
 
-                                        {/* CTA Button */}
+                                        {/* CTA */}
                                         <a
                                             href={purchaseUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             onClick={e => e.stopPropagation()}
-                                            className="flex items-center justify-between gap-2 w-full px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 hover:border-emerald-400/50 transition-all group/btn active:scale-95"
+                                            className="flex items-center justify-between gap-2 w-full px-4 py-3 rounded-xl transition-all group/btn active:scale-95"
+                                            style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.18)' }}
+                                            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(52,211,153,0.18)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(52,211,153,0.4)'; }}
+                                            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(52,211,153,0.08)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(52,211,153,0.18)'; }}
                                         >
                                             <div className="flex items-center gap-2">
                                                 <ShoppingCart size={13} className="text-emerald-400" />
@@ -334,7 +357,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                                     {storeIcon} {storeLabel}{isKo ? "으로 구매" : " — Best Price"}
                                                 </span>
                                             </div>
-                                            <ExternalLink size={11} className="text-emerald-400/50 group-hover/btn:text-emerald-300 transition-colors" />
+                                            <ExternalLink size={11} className="text-emerald-400/50" />
                                         </a>
                                     </div>
                                 </motion.div>
@@ -342,39 +365,44 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                         })}
                     </div>
 
-                    {/* Score Rationale Breakdown */}
-                    <div className={cn(
-                        "w-full max-w-2xl mb-10 p-4 sm:p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] backdrop-blur-md transition-all duration-700",
-                        scoreRationale.isHighEnd 
-                            ? "bg-yellow-500/[0.03] border border-yellow-500/20 shadow-[0_20px_50px_-20px_rgba(251,191,36,0.15)]" 
-                            : "bg-white/[0.03] border border-white/10 shadow-xl md:shadow-2xl"
-                    )}>
-                        <div className="flex items-center justify-between mb-4 md:mb-6 px-1">
-                            <div className="flex items-center gap-2">
-                                <Info size={12} className={scoreRationale.isHighEnd ? "text-yellow-500/50" : "text-slate-500"} />
-                                <h5 className={cn(
-                                    "text-[9px] md:text-[10px] font-black uppercase tracking-wider md:tracking-[0.2em]",
-                                    scoreRationale.isHighEnd ? "text-yellow-500/70" : "text-slate-500"
-                                )}>
+                    {/* Score Rationale Breakdown - Luxury */}
+                    <div className="w-full max-w-2xl mb-10 overflow-hidden rounded-[2rem] md:rounded-[2.5rem] relative"
+                        style={{
+                            background: scoreRationale.isHighEnd
+                                ? 'linear-gradient(135deg, rgba(251,191,36,0.06), rgba(251,191,36,0.02))'
+                                : 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
+                            border: scoreRationale.isHighEnd ? '1px solid rgba(251,191,36,0.2)' : '1px solid rgba(255,255,255,0.08)',
+                            boxShadow: scoreRationale.isHighEnd ? '0 20px 60px -20px rgba(251,191,36,0.15)' : '0 20px 60px -20px rgba(0,0,0,0.4)'
+                        }}>
+                        {/* Top glow line */}
+                        <div className="absolute top-0 left-0 right-0 h-px"
+                            style={{ background: scoreRationale.isHighEnd ? 'linear-gradient(90deg, transparent, rgba(251,191,36,0.4), transparent)' : 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)' }} />
+                        <div className="p-4 sm:p-6 md:p-8">
+                            <div className="flex items-center gap-2 mb-5 md:mb-6">
+                                <Info size={11} style={{ color: scoreRationale.isHighEnd ? 'rgba(251,191,36,0.5)' : '#475569' }} />
+                                <h5 className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]"
+                                    style={{ color: scoreRationale.isHighEnd ? 'rgba(251,191,36,0.7)' : '#475569' }}>
                                     {isKo ? "과학적 정밀 분석 지표" : "Precision Analysis Metrics"}
                                 </h5>
+                                <div className="h-px flex-1 ml-2"
+                                    style={{ background: scoreRationale.isHighEnd ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.05)' }} />
                             </div>
-                            <div className={cn("h-px flex-1 ml-4", scoreRationale.isHighEnd ? "bg-yellow-500/10" : "bg-white/5")} />
-                        </div>
-                        <div className="grid grid-cols-3 gap-1 sm:gap-4">
-                            <div className="flex flex-col items-center gap-1 md:gap-1.5">
-                                <span className="text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-tight sm:tracking-[0.2em] text-center leading-tight">Synergy</span>
-                                <span className="text-xl sm:text-2xl md:text-3xl font-[1000] text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">+{scoreRationale.synergyScore}</span>
-                            </div>
-                            <div className={cn("flex flex-col items-center gap-1 md:gap-1.5 border-x", scoreRationale.isHighEnd ? "border-yellow-500/10" : "border-white/5")}>
-                                <span className="text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-tight sm:tracking-[0.2em] text-center leading-tight">Foundation</span>
-                                <span className="text-xl sm:text-2xl md:text-3xl font-[1000] text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.3)]">+{scoreRationale.basisScore}</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1 md:gap-1.5">
-                                <span className="text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-tight sm:tracking-[0.2em] text-center leading-tight">Risk Factor</span>
-                                <span className={cn("text-xl sm:text-2xl md:text-3xl font-[1000]", scoreRationale.penalties < 0 ? "text-rose-400 drop-shadow-[0_0_15px_rgba(251,113,133,0.3)]" : "text-slate-600")}>
-                                    {scoreRationale.penalties < 0 ? scoreRationale.penalties : 0}
-                                </span>
+                            <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                                {[
+                                    { label: 'Synergy', value: `+${scoreRationale.synergyScore}`, color: '#34d399', glow: 'rgba(52,211,153,0.3)' },
+                                    { label: 'Foundation', value: `+${scoreRationale.basisScore}`, color: '#60a5fa', glow: 'rgba(96,165,250,0.3)', bordered: true },
+                                    { label: 'Risk Factor', value: scoreRationale.penalties < 0 ? String(scoreRationale.penalties) : '0', color: scoreRationale.penalties < 0 ? '#fb7185' : '#334155', glow: scoreRationale.penalties < 0 ? 'rgba(251,113,133,0.3)' : 'transparent' },
+                                ].map((item, i) => (
+                                    <div key={i} className="flex flex-col items-center gap-1 md:gap-2 py-2 relative"
+                                        style={{ borderRight: item.bordered ? (scoreRationale.isHighEnd ? '1px solid rgba(251,191,36,0.1)' : '1px solid rgba(255,255,255,0.05)') : 'none',
+                                                 borderLeft: item.bordered ? (scoreRationale.isHighEnd ? '1px solid rgba(251,191,36,0.1)' : '1px solid rgba(255,255,255,0.05)') : 'none' }}>
+                                        <span className="text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-[0.15em] text-center leading-tight">{item.label}</span>
+                                        <span className="text-xl sm:text-2xl md:text-3xl font-[1000]"
+                                            style={{ color: item.color, filter: `drop-shadow(0 0 12px ${item.glow})` }}>
+                                            {item.value}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
