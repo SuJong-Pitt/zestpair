@@ -171,7 +171,8 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
             : `💊 Selected: ${ingredientsList}\n\n[ZestPair] Supplement Analysis Report: ${score} pts ✨\n\n`;
         insights.forEach((insight, idx) => {
             const meta = idx === 0 && hasWarning ? WARN_META : CARD_META[idx] || CARD_META[2];
-            text += `📍 ${isKo ? meta.labelKo : meta.labelEn}\n${insight}\n\n`;
+            const insightText = typeof insight === 'string' ? insight : `${insight.headline} ${insight.details}`;
+            text += `📍 ${isKo ? meta.labelKo : meta.labelEn}\n${insightText}\n\n`;
         });
         text += `${isKo ? '상세 결과 보기' : 'View Full Analysis'}: ${window.location.href}`;
         if (typeof navigator !== 'undefined' && navigator.share) {
