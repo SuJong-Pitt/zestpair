@@ -14,7 +14,7 @@ export default function LanguageDetector() {
     // 언어 변경 시 문서 타이틀 동기화
     useEffect(() => {
         if (typeof document !== "undefined") {
-            document.title = UI_TRANSLATIONS[language].metadata.title;
+            document.title = (UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko']).metadata.title;
         }
     }, [language]);
 

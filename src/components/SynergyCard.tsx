@@ -58,7 +58,7 @@ const SynergyCard = memo(function SynergyCard({
     index: number;
 }) {
     const { language } = useBasketStore();
-    const t = UI_TRANSLATIONS[language];
+    const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
 
     if (!result.interaction) return null;
 

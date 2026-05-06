@@ -9,7 +9,7 @@ import Image from "next/image";
 
 export default function HowItWorks({ onStart }: { onStart?: () => void }) {
   const { language } = useBasketStore();
-  const t = UI_TRANSLATIONS[language];
+  const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
   const containerRef = useRef<HTMLDivElement>(null);
 
   // --- 3D Tilt & Mouse Shine Logic ---

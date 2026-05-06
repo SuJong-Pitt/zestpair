@@ -38,7 +38,7 @@ export default function FloatingBasketBar({
   const [showAlert, setShowAlert] = useState(false);
 
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const t = UI_TRANSLATIONS[language];
+  const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
   const count = selectedIngredients.length;
   const canAnalyze = count >= 2;
 

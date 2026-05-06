@@ -22,7 +22,7 @@ interface ProductCardProps {
  */
 const ProductCard = memo(function ProductCard({ product, index, sourceIngredient }: ProductCardProps) {
     const { language } = useBasketStore();
-    const t = UI_TRANSLATIONS[language];
+    const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
 
     const configs = [
         { label: t.products.bestAi, color: "text-blue-600", bg: "bg-blue-500/5", border: "border-blue-100/50", gradient: "from-blue-600 to-indigo-600", glow: "shadow-blue-500/20", icon: <Sparkles size={10} className="text-blue-400" /> },

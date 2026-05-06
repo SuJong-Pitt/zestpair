@@ -9,7 +9,7 @@ import Link from "next/link";
 
 export default function GlobalFooter() {
   const { language } = useBasketStore();
-  const t = UI_TRANSLATIONS[language];
+  const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
 
   return (
     <footer className="relative pt-28 pb-14 overflow-hidden bg-[#030712]">

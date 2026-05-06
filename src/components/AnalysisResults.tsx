@@ -29,7 +29,7 @@ interface AnalysisResultsProps {
 export default function AnalysisResults({ result }: AnalysisResultsProps) {
     const router = useRouter();
     const { language, clearBasket } = useBasketStore();
-    const t = UI_TRANSLATIONS[language];
+    const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
     const isMobile = useMediaQuery("(max-width: 768px)");
     
     const [toast, setToast] = useState({ show: false, message: "" });

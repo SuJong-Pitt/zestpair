@@ -37,7 +37,7 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
   const selected = isSelected(ingredient.id);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const t = UI_TRANSLATIONS[language];
+  const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
   const name     = language === "ko" ? ingredient.name     : ingredient.name_en;
   const shortDesc= language === "ko" ? ingredient.short_description : (ingredient.short_description_en || ingredient.short_description);
   const desc     = language === "ko" ? ingredient.description       : (ingredient.description_en       || ingredient.description);

@@ -186,7 +186,7 @@ export default function HomeClient() {
     return () => clearInterval(interval);
   }, [isAiMatching, language, aiLoadingMessages]);
 
-  const t = UI_TRANSLATIONS[language];
+  const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
 
   useEffect(() => {
     // 플레이스홀더 로테이션 (3초)

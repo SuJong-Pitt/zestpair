@@ -38,7 +38,7 @@ const renderIngredientIcon = (icon: string) => {
 const DosageSchedule = memo(function DosageSchedule({ result, language }: DosageScheduleProps) {
     const schedule = result.schedule || [];
     const isLoading = false; 
-    const t = UI_TRANSLATIONS[language];
+    const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
 
     if (isLoading) {
         return (
