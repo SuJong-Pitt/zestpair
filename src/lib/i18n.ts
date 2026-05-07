@@ -220,7 +220,16 @@ export const UI_TRANSLATIONS = {
                 "생체 이용률 계산 중...",
                 "화학적 상호작용 해독 중..."
             ]
-        }
+        },
+        sharing: {
+            editSelection: "선택 수정하기",
+            kakaoShare: "카카오톡 공유",
+            lineShare: "라인 공유",
+            copyLink: "링크 복사",
+            copied: "링크가 복사되었습니다!",
+            checkScore: "내 점수 확인하기",
+            shareTitle: "ZestPair | 영양제 궁합 분석 결과"
+        },
     },
     en: {
         hero: {
@@ -443,7 +452,16 @@ export const UI_TRANSLATIONS = {
                 "CALCULATING BIO-AVAILABILITY...",
                 "DECODING CHEMICAL INTERACTIONS..."
             ]
-        }
+        },
+        sharing: {
+            editSelection: "Edit Selection",
+            kakaoShare: "Kakao Share",
+            lineShare: "LINE Share",
+            copyLink: "Copy Link",
+            copied: "Link copied to clipboard!",
+            checkScore: "Check my score",
+            shareTitle: "ZestPair | Analysis Result"
+        },
     },
     ja: {
         hero: {
@@ -666,7 +684,16 @@ export const UI_TRANSLATIONS = {
                 "バイオアベイラビリティを計算中...",
                 "化学的相互作用を解読中..."
             ]
-        }
+        },
+        sharing: {
+            editSelection: "選択を修正する",
+            kakaoShare: "カカオトークで共有",
+            lineShare: "LINEで共有",
+            copyLink: "リンクをコピー",
+            copied: "リンクがコピーされました！",
+            checkScore: "自分のスコアを確認する",
+            shareTitle: "ZestPair | サプリメント飲み合わせ分析結果"
+        },
     },
     zh: {
         hero: {
@@ -889,6 +916,15 @@ export const UI_TRANSLATIONS = {
                 "正在计算生物利用度...",
                 "正在解码化学相互作用..."
             ]
+        },
+        sharing: {
+            editSelection: "修改选择",
+            kakaoShare: "微信/QQ 分享",
+            lineShare: "LINE 分享",
+            copyLink: "复制链接",
+            copied: "链接已复制到剪贴板！",
+            checkScore: "查看我的分数",
+            shareTitle: "ZestPair | 补充剂协同分析结果"
         }
     }
 } as const;

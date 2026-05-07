@@ -11,26 +11,22 @@ import { useState, useEffect } from "react";
 import Toast from "@/components/ui/Toast";
 import { encodeShareParams, getKakaoShareDetails } from "@/lib/utils";
 
+import { UI_TRANSLATIONS } from "@/lib/i18n";
+
 declare global {
     interface Window {
         Kakao: any;
     }
 }
 
-
-
-/**
- * 분석 리포트 전용 헤더 (AI 디자인실장 영자 스타일 🎨)
- * 
- * - 로고 클릭 시 홈으로 이동 (데이터 유지 / 수정 모드)
- * - 수정하기 버튼 클릭 시 홈으로 이동 (데이터 유지)
- * - 글래스모피즘 & 플로팅 내비게이션
- */
 export default function ReportHeader() {
     const router = useRouter();
     const { language, selectedIngredients, analysisResult } = useBasketStore();
     const isMobile = useMediaQuery("(max-width: 768px)");
     const [toast, setToast] = useState({ show: false, message: "" });
+    
+    // Safety check for translations
+    const t = UI_TRANSLATIONS[language as keyof typeof UI_TRANSLATIONS] || UI_TRANSLATIONS.en;
 
     // 카카오 SDK 초기화
     useEffect(() => {
@@ -49,12 +45,11 @@ export default function ReportHeader() {
         const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
         const score = analysisResult?.score ?? 0;
 
-        const { imageFileName, title, description } = getKakaoShareDetails(score, language);
-        const targetImageUrl = `${window.location.origin}/images/share/${imageFileName}`;
+        const { title } = getKakaoShareDetails(score, language);
 
         // 일반 공유 (Native Share 또는 클립보드 복사)
         const shareData = {
-            title: "ZestPair | 영양제 궁합 분석 결과",
+            title: t.sharing.shareTitle,
             text: title,
             url: shareUrl
         };
@@ -66,7 +61,7 @@ export default function ReportHeader() {
                 await navigator.clipboard.writeText(shareUrl);
                 setToast({
                     show: true,
-                    message: language === 'ko' ? "링크가 복사되었습니다!" : "Link copied to clipboard!"
+                    message: t.sharing.copied
                 });
                 setTimeout(() => setToast({ show: false, message: "" }), 3000);
             } catch (err) { }
@@ -104,7 +99,7 @@ export default function ReportHeader() {
                     >
                         <ArrowLeft size={16} className="text-slate-400 group-hover:text-emerald-400 transition-all" />
                         <span className="hidden md:inline-block text-[11px] md:text-xs font-black text-slate-300 group-hover:text-white uppercase tracking-widest ml-2 whitespace-nowrap">
-                            {language === 'ko' ? '선택 수정하기' : 'Edit Selection'}
+                            {t.sharing.editSelection}
                         </span>
                     </motion.button>
 
@@ -116,11 +111,8 @@ export default function ReportHeader() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.15 }}
                             className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 transition-all active:scale-95 group"
-                            title={language === 'ko' ? '카카오톡 공유' : 'Kakao Share'}
+                            title={t.sharing.kakaoShare}
                             onClick={() => {
-                                // AnalysisResults와 동일한 로직을 수행하기 위해 
-                                // window.handleKakaoShare가 전역에 있으면 좋겠지만, 
-                                // 일단 여기서 직접 태웁니다.
                                 if (typeof window !== "undefined" && (window as any).Kakao) {
                                     const Kakao = (window as any).Kakao;
                                     try {
@@ -134,7 +126,14 @@ export default function ReportHeader() {
                                         const canonicalBase = isLocal ? window.location.origin : "https://zestpair.com";
                                         const shareUrl = `${canonicalBase}/analysis?v=${encoded}`;
                                         const score = analysisResult?.score ?? 0;
-                                        const ingredientNames = selectedIngredients.map(ing => ing.name).join(" + ");
+                                        
+                                        // Use localized names if available
+                                        const ingredientNames = selectedIngredients.map(ing => {
+                                            if (language === 'ja') return ing.name_ja || ing.name_en || ing.name;
+                                            if (language === 'zh') return ing.name_zh || ing.name_en || ing.name;
+                                            return ing.name;
+                                        }).join(" + ");
+
                                         const { imageFileName, title, description } = getKakaoShareDetails(score, language, ingredientNames);
                                         const imageBase = "https://zestpair.com";
                                         const targetImageUrl = `${imageBase}/images/share/${imageFileName}`;
@@ -150,16 +149,13 @@ export default function ReportHeader() {
                                                 link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                                             },
                                             buttons: [{
-                                                title: language === 'ko' ? '내 점수 확인하기' : 'Check my score',
+                                                title: t.sharing.checkScore,
                                                 link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                                             }],
                                         });
                                     } catch (err) {
                                         console.error("Kakao Share Error:", err);
-                                        alert("카카오톡 실행 오류: " + (err as Error).message);
                                     }
-                                } else {
-                                    alert("카카오톡 모듈이 로드되지 않았습니다. 잠시 후 상단 아이콘이나 다시 시도해 주세요!");
                                 }
                             }}
                         >
@@ -172,7 +168,7 @@ export default function ReportHeader() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.18 }}
                             className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 transition-all active:scale-95 group"
-                            title={language === 'ko' ? '라인 공유' : 'LINE Share'}
+                            title={t.sharing.lineShare}
                             onClick={() => {
                                 const slugs = selectedIngredients.map(ing => ing.slug);
                                 const encoded = encodeShareParams(slugs);
@@ -196,7 +192,7 @@ export default function ReportHeader() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
                             className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 backdrop-blur-2xl hover:bg-white/10 transition-all active:scale-95 group"
-                            title={language === 'ko' ? '링크 복사' : 'Copy Link'}
+                            title={t.sharing.copyLink}
                             onClick={handleShare}
                         >
                             <Share2 size={22} className="text-white/70 group-hover:text-white transition-colors" />
