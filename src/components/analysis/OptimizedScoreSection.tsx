@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import ScoreRing from "./ScoreRing";
 import ReportSummary from "./ReportSummary";
+import { CATEGORIES_TRANSLATIONS } from "@/lib/i18n";
 import type { AnalysisResult } from "@/types/database";
 
 interface OptimizedScoreSectionProps {
@@ -52,12 +53,12 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
         const targetPartner = result.potentialSynergy.pair[1];
         const currentScore = result.score;
         const nextScore = Math.max(currentScore, result.projectedScore || currentScore);
-        
+
         const isAlreadyPerfect = currentScore >= 100;
         const isNextPerfect = nextScore >= 100;
 
         let bridgeText = language === 'ko' ? `${nextScore}점 달성하기` : language === 'ja' ? `${nextScore}点を目指す` : language === 'zh' ? `达到${nextScore}分` : `Reach ${nextScore} pts`;
-        
+
         if (isAlreadyPerfect) {
             bridgeText = language === 'ko' ? "완벽 그 이상의 시너지" : language === 'ja' ? "完璧以上のシナジー" : language === 'zh' ? "超越完美的协同效应" : "Beyond Perfection";
         } else if (isNextPerfect) {
@@ -78,7 +79,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
 
             <div className="relative rounded-[2.5rem] bg-slate-900/80 border border-white/10 backdrop-blur-2xl text-white overflow-hidden">
                 <CardContent className="px-3 py-6 sm:p-5 md:p-10 relative z-10 flex flex-col items-center text-center">
-                    
+
                     {/* Potential Synergy Bridge (Hot Funnel 🔥) */}
                     {synergyBridge && (
                         <motion.button
@@ -91,7 +92,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                         >
                             <div className="relative">
                                 <span className="text-lg md:text-xl">{synergyBridge.emoji}</span>
-                                <motion.div 
+                                <motion.div
                                     animate={{ scale: [1, 1.2, 1] }}
                                     transition={{ duration: 2, repeat: Infinity }}
                                     className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400"
@@ -117,7 +118,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                         >
                             <ScoreRing score={result.score} language={language} size={isMobile ? 180 : 260} />
                         </motion.div>
-                        
+
                         {/* Interactive Hint for Bridge */}
                         {synergyBridge && (
                             <motion.div
@@ -128,7 +129,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             >
                                 <div className="flex flex-col items-center gap-1">
                                     <p className="text-[10px] font-black text-emerald-400/70 uppercase tracking-widest">{language === 'ko' ? "시너지 해결책 발견" : language === 'ja' ? "シナジー解決策を発見" : language === 'zh' ? "发现协同方案" : "Synergy Solution Found"}</p>
-                                    <motion.div 
+                                    <motion.div
                                         animate={{ y: [0, 5, 0] }}
                                         transition={{ duration: 1.5, repeat: Infinity }}
                                     >
@@ -184,13 +185,13 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover/jackpot:opacity-20 transition-opacity">
                                     <Sparkles size={80} className="text-yellow-500" />
                                 </div>
-                                
+
                                 <div className="shrink-0 w-16 h-16 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2.5rem] bg-yellow-500/10 border border-yellow-500/20 flex flex-col items-center justify-center relative">
                                     <span className="text-2xl md:text-4xl mb-0.5">🎰</span>
                                     <span className="text-[8px] md:text-[10px] font-black text-yellow-500 uppercase tracking-tighter">
                                         {language === 'ko' ? "대박 조합" : language === 'ja' ? "大当たりの組み合わせ" : language === 'zh' ? "极佳组合" : "Jackpot"}
                                     </span>
-                                    <motion.div 
+                                    <motion.div
                                         animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
                                         transition={{ duration: 2, repeat: Infinity }}
                                         className="absolute -inset-2 rounded-[3rem] border border-yellow-500/30 blur-[2px]"
@@ -255,7 +256,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             const synergyBonus = synergyCount * 10;
                             // 3. 페널티/보정치 배분
                             const penaltyAdj = scoreRationale.penalties / result.ingredients.length;
-                            
+
                             const scoreContrib = Math.round(baseContrib + synergyBonus + penaltyAdj);
 
                             // 역할 라벨
@@ -266,10 +267,10 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             })();
 
                             // AI 브리핑에서 해당 성분 언급 문장 추출 (1문장)
-                            const ingName = language === 'ko' ? ing.name : 
-                                            language === 'ja' ? (ing.name_ja || ing.name_en || ing.name) : 
-                                            language === 'zh' ? (ing.name_zh || ing.name_en || ing.name) : 
-                                            (ing.name_en || ing.name);
+                            const ingName = language === 'ko' ? ing.name :
+                                language === 'ja' ? (ing.name_ja || ing.name_en || ing.name) :
+                                    language === 'zh' ? (ing.name_zh || ing.name_en || ing.name) :
+                                        (ing.name_en || ing.name);
                             const briefingHintStr = result.ai_briefing?.map(b => typeof b === 'string' ? b : `${b.headline} ${b.details}`).find(b => b.includes(ingName));
                             const hintSentence = briefingHintStr
                                 ? briefingHintStr.split(/[.。]/).find((s: string) => s.includes(ingName))?.trim()
@@ -278,10 +279,10 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             const purchaseUrl = language === 'ko'
                                 ? (ing.coupang_url || `https://www.coupang.com/np/search?q=${encodeURIComponent(ing.name)}`)
                                 : language === 'ja'
-                                ? (ing.rakuten_url || `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(ing.rakuten_search_keyword || ing.name_ja || ing.name)}`)
-                                : language === 'zh'
-                                ? (ing.tmall_url || `https://s.taobao.com/search?q=${encodeURIComponent(ing.tmall_search_keyword || ing.name_zh || ing.name)}`)
-                                : (ing.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(ing.amazon_search_keyword || ing.name_en || ing.name)}`);
+                                    ? (ing.rakuten_url || `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(ing.rakuten_search_keyword || ing.name_ja || ing.name)}`)
+                                    : language === 'zh'
+                                        ? (ing.tmall_url || `https://s.taobao.com/search?q=${encodeURIComponent(ing.tmall_search_keyword || ing.name_zh || ing.name)}`)
+                                        : (ing.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(ing.amazon_search_keyword || ing.name_en || ing.name)}`);
 
                             const storeLabel = language === 'ko' ? "쿠팡 로켓배송" : language === 'ja' ? "Rakuten" : language === 'zh' ? "Tmall" : "Amazon";
                             const storeIcon = language === 'ko' ? "🚀" : language === 'ja' ? "🛒" : language === 'zh' ? "🛍️" : "📦";
@@ -291,7 +292,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                     key={ing.id}
                                     initial={{ opacity: 0, y: 12, filter: 'blur(8px)' }}
                                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                                    transition={{ delay: 0.1 + i * 0.1, duration: 0.6, ease: [0.22,1,0.36,1] }}
+                                    transition={{ delay: 0.1 + i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                                     className="group/card relative overflow-hidden rounded-[1.8rem] transition-all duration-400"
                                     style={{
                                         background: 'linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02), rgba(15,23,42,0.8))',
@@ -332,10 +333,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                                     </span>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
-                                                            {language === 'ko' ? ing.category : 
-                                                             language === 'ja' ? (ing.category_ja || ing.category) : 
-                                                             language === 'zh' ? (ing.category_zh || ing.category) : 
-                                                             ing.category}
+                                                            {CATEGORIES_TRANSLATIONS[ing.category as keyof typeof CATEGORIES_TRANSLATIONS]?.[language as 'ko' | 'en' | 'ja' | 'zh'] || ing.category}
                                                         </span>
                                                         <span className="text-[8px] text-slate-700">·</span>
                                                         <span className="text-[8px] font-black uppercase tracking-wide"
@@ -416,8 +414,10 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                     { label: 'Risk Factor', value: scoreRationale.penalties < 0 ? String(scoreRationale.penalties) : '0', color: scoreRationale.penalties < 0 ? '#fb7185' : '#334155', glow: scoreRationale.penalties < 0 ? 'rgba(251,113,133,0.3)' : 'transparent' },
                                 ].map((item, i) => (
                                     <div key={i} className="flex flex-col items-center gap-1 md:gap-2 py-2 relative"
-                                        style={{ borderRight: item.bordered ? (scoreRationale.isHighEnd ? '1px solid rgba(251,191,36,0.1)' : '1px solid rgba(255,255,255,0.05)') : 'none',
-                                                 borderLeft: item.bordered ? (scoreRationale.isHighEnd ? '1px solid rgba(251,191,36,0.1)' : '1px solid rgba(255,255,255,0.05)') : 'none' }}>
+                                        style={{
+                                            borderRight: item.bordered ? (scoreRationale.isHighEnd ? '1px solid rgba(251,191,36,0.1)' : '1px solid rgba(255,255,255,0.05)') : 'none',
+                                            borderLeft: item.bordered ? (scoreRationale.isHighEnd ? '1px solid rgba(251,191,36,0.1)' : '1px solid rgba(255,255,255,0.05)') : 'none'
+                                        }}>
                                         <span className="text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-[0.15em] text-center leading-tight">{item.label}</span>
                                         <span className="text-xl sm:text-2xl md:text-3xl font-[1000]"
                                             style={{ color: item.color, filter: `drop-shadow(0 0 12px ${item.glow})` }}>
