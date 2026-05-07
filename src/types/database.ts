@@ -40,24 +40,40 @@ export interface Ingredient {
   id: string; // UUID
   name: string; // 한국어 이름 (e.g. '비타민C')
   name_en: string; // 영문 이름 (e.g. 'Vitamin C')
+  name_ja?: string; // 일문 이름 (e.g. 'ビタミンC')
+  name_zh?: string; // 중문 이름 (e.g. '维生素C')
   slug: string; // URL-friendly 식별자 (e.g. 'vitamin-c')
   category: IngredientCategory;
   description: string; // 성분 상세 설명
   description_en?: string; // 영문 상세 설명
+  description_ja?: string; // 일문 상세 설명
+  description_zh?: string; // 중문 상세 설명
   short_description: string; // 카드에 표시할 한 줄 설명
   short_description_en?: string; // 영문 한 줄 설명
+  short_description_ja?: string; // 일문 한 줄 설명
+  short_description_zh?: string; // 중문 한 줄 설명
   dosage_time: DosageTime; // 권장 복용 시간
   dosage_note: string | null; // 복용량/방법 메모
   dosage_note_en?: string | null; // 영문 복용 방법 메모
+  dosage_note_ja?: string | null; // 일문 복용 방법 메모
+  dosage_note_zh?: string | null; // 중문 복용 방법 메모
   icon_emoji: string; // 대표 이모지 (e.g. '🍊')
   benefits: string[]; // 주요 효능 목록
   benefits_en?: string[]; // 영문 주요 효능 목록
+  benefits_ja?: string[]; // 일문 주요 효능 목록
+  benefits_zh?: string[]; // 중문 주요 효능 목록
   warnings: string[] | null; // 주의사항 목록
   warnings_en?: string[] | null; // 영문 주의사항 목록
+  warnings_ja?: string[] | null; // 일문 주의사항 목록
+  warnings_zh?: string[] | null; // 중문 주의사항 목록
   coupang_search_keyword: string; // 쿠팡 파트너스 검색 키워드
   amazon_search_keyword?: string; // 글로벌(영문) 사이트용 아마존 파트너스 키워드
+  rakuten_search_keyword?: string; // 일본 사이트용 라쿠텐 검색 키워드
+  tmall_search_keyword?: string; // 중국 사이트용 티몰 검색 키워드
   coupang_url?: string; // 직접 지정된 쿠팡 파트너스 링크
   amazon_url?: string; // 직접 지정된 아마존 파트너스 링크
+  rakuten_url?: string; // 직접 지정된 라쿠텐 파트너스 링크
+  tmall_url?: string; // 직접 지정된 티몰 파트너스 링크
   is_popular: boolean; // 인기 성분 여부 (홈 화면 우선 노출)
   sort_order: number; // 정렬 순서
   created_at: string; // ISO 8601
@@ -76,10 +92,16 @@ export interface Interaction {
   type: InteractionType; // 궁합 유형
   title: string; // 궁합 요약 제목 (e.g. '흡수율 2배 상승!')
   title_en?: string; // 영문 궁합 요약 제목
+  title_ja?: string; // 일문 궁합 요약 제목
+  title_zh?: string; // 중문 궁합 요약 제목
   reason: string; // 전문적인 궁합 이유 설명
   reason_en?: string; // 영문 궁합 이유 설명
+  reason_ja?: string; // 일문 궁합 이유 설명
+  reason_zh?: string; // 중문 궁합 이유 설명
   recommendation: string | null; // 구체적인 복용 권장 방법
   recommendation_en?: string | null; // 영문 복용 권장 방법
+  recommendation_ja?: string | null; // 일문 복용 권장 방법
+  recommendation_zh?: string | null; // 중문 복용 권장 방법
   scientific_reference: string | null; // 근거 논문/출처 (선택)
   created_at: string;
   updated_at: string;
