@@ -9,16 +9,70 @@ import { cn } from "@/lib/utils";
 
 interface DosageScheduleProps {
     result: AnalysisResult;
-    language: "ko" | "en";
+    language: "ko" | "en" | "ja" | "zh";
 }
 
-const TIME_CONFIG: Record<string, { icon: any, color: string, label: string, label_en: string }> = {
-    morning_before: { icon: Sunrise, color: "from-amber-400 to-orange-500", label: "아침 식전", label_en: "Morning (Empty)" },
-    morning_after: { icon: Sun, color: "from-orange-400 to-yellow-500", label: "아침 식후", label_en: "Morning (After Meal)" },
-    lunch_after: { icon: SunMedium, color: "from-yellow-400 to-emerald-500", label: "점심 식후", label_en: "Lunch (After Meal)" },
-    evening_after: { icon: Moon, color: "from-indigo-400 to-purple-600", label: "저녁 식후", label_en: "Evening (After Meal)" },
-    night_before: { icon: Coffee, color: "from-slate-700 to-slate-900", label: "취침 전", label_en: "Before Sleep" },
-    anytime: { icon: Clock, color: "from-emerald-400 to-teal-500", label: "편한 시간", label_en: "Anytime" }
+const TIME_CONFIG: Record<string, { icon: any, color: string, labels: Record<string, string> }> = {
+    morning_before: { 
+        icon: Sunrise, 
+        color: "from-amber-400 to-orange-500", 
+        labels: {
+            ko: "아침 식전",
+            en: "Morning (Empty)",
+            ja: "朝食前",
+            zh: "早餐前"
+        }
+    },
+    morning_after: { 
+        icon: Sun, 
+        color: "from-orange-400 to-yellow-500", 
+        labels: {
+            ko: "아침 식후",
+            en: "Morning (After Meal)",
+            ja: "朝食後",
+            zh: "早餐后"
+        }
+    },
+    lunch_after: { 
+        icon: SunMedium, 
+        color: "from-yellow-400 to-emerald-500", 
+        labels: {
+            ko: "점심 식후",
+            en: "Lunch (After Meal)",
+            ja: "昼食後",
+            zh: "午餐后"
+        }
+    },
+    evening_after: { 
+        icon: Moon, 
+        color: "from-indigo-400 to-purple-600", 
+        labels: {
+            ko: "저녁 식후",
+            en: "Evening (After Meal)",
+            ja: "夕食後",
+            zh: "晚餐后"
+        }
+    },
+    night_before: { 
+        icon: Coffee, 
+        color: "from-slate-700 to-slate-900", 
+        labels: {
+            ko: "취침 전",
+            en: "Before Sleep",
+            ja: "就寝前",
+            zh: "睡觉前"
+        }
+    },
+    anytime: { 
+        icon: Clock, 
+        color: "from-emerald-400 to-teal-500", 
+        labels: {
+            ko: "편한 시간",
+            en: "Anytime",
+            ja: "いつでも",
+            zh: "随时"
+        }
+    }
 };
 
 const renderIngredientIcon = (icon: string) => {
@@ -86,9 +140,12 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
                             </div>
                             <div className="space-y-1.5">
                                 <h4 className="text-[11px] font-black text-indigo-400 uppercase tracking-[0.2em]">
-                                    {language === 'ko' ? "AI 충돌 해결 리포트" : "AI Conflict Resolution"}
+                                    {language === 'ko' ? "AI 충돌 해결 리포트" : language === 'ja' ? "AI衝突解決レポート" : language === 'zh' ? "AI 冲突解决报告" : "AI Conflict Resolution"}
                                 </h4>
-                                <p className="text-[14px] md:text-[16px] font-bold text-indigo-100 leading-relaxed break-keep">
+                                <p className={cn(
+                                    "text-[14px] md:text-[16px] font-bold text-indigo-100 leading-relaxed",
+                                    (language === 'ja' || language === 'zh') ? "break-all" : "break-keep"
+                                )}>
                                     {result.conflict_solution}
                                 </p>
                             </div>
@@ -126,7 +183,7 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
                                         <Icon size={24} className="text-white drop-shadow-lg" />
                                     </div>
                                     <span className="text-lg md:text-xl font-black text-white whitespace-nowrap">
-                                        {language === 'ko' ? config.label : config.label_en}
+                                        {config.labels[language] || config.labels['en']}
                                     </span>
                                 </div>
 
@@ -137,7 +194,10 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
                                         <div className="mt-1 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
                                             <Sparkles size={10} className="text-emerald-400" />
                                         </div>
-                                        <p className="text-emerald-100/90 text-sm md:text-base font-bold leading-relaxed break-keep">
+                                        <p className={cn(
+                                            "text-emerald-100/90 text-sm md:text-base font-bold leading-relaxed",
+                                            (language === 'ja' || language === 'zh') ? "break-all" : "break-keep"
+                                        )}>
                                             {slot.ai_insight}
                                         </p>
                                     </div>

@@ -12,7 +12,7 @@ interface BasketState {
     isAnalyzing: boolean;
     hasResult: boolean;
 
-    language: "ko" | "en";
+    language: "ko" | "en" | "ja" | "zh";
     isBasketExpanded: boolean;
     analysisResult: AnalysisResult | null;
     analysisHistory: AnalysisResult[];
@@ -25,7 +25,7 @@ interface BasketState {
     setAnalyzing: (value: boolean) => void;
     setHasResult: (value: boolean) => void;
     isSelected: (id: string) => boolean;
-    setLanguage: (lang: "ko" | "en") => void;
+    setLanguage: (lang: "ko" | "en" | "ja" | "zh") => void;
     setBasketExpanded: (value: boolean) => void;
     setAnalysisResult: (result: AnalysisResult | null) => void;
     addToHistory: (result: AnalysisResult) => void;

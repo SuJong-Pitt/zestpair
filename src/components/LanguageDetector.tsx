@@ -31,15 +31,26 @@ export default function LanguageDetector() {
                     setLanguage("ko");
                     localStorage.setItem("zestpair-language-detected", "true");
                     return;
+                } else if (timeZone === "Asia/Tokyo") {
+                    setLanguage("ja");
+                    localStorage.setItem("zestpair-language-detected", "true");
+                    return;
+                } else if (timeZone === "Asia/Shanghai" || timeZone === "Asia/Taipei") {
+                    setLanguage("zh");
+                    localStorage.setItem("zestpair-language-detected", "true");
+                    return;
                 }
 
-                // 2. IP 위치 정보 API를 통한 정밀 분석 (한국인 경우 ko, 그 외 en)
-                // ipapi.co는 무료 계층에서 일정 횟수 호출이 가능합니다.
+                // 2. IP 위치 정보 API를 통한 정밀 분석
                 const res = await fetch("https://ipapi.co/json/");
                 if (res.ok) {
                     const data = await res.json();
                     if (data.country_code === "KR") {
                         setLanguage("ko");
+                    } else if (data.country_code === "JP") {
+                        setLanguage("ja");
+                    } else if (data.country_code === "CN" || data.country_code === "TW" || data.country_code === "HK") {
+                        setLanguage("zh");
                     } else {
                         setLanguage("en");
                     }
@@ -51,6 +62,10 @@ export default function LanguageDetector() {
                 const userLang = navigator.language.toLowerCase();
                 if (userLang.startsWith("ko")) {
                     setLanguage("ko");
+                } else if (userLang.startsWith("ja")) {
+                    setLanguage("ja");
+                } else if (userLang.startsWith("zh")) {
+                    setLanguage("zh");
                 } else {
                     setLanguage("en");
                 }
@@ -62,6 +77,10 @@ export default function LanguageDetector() {
                 const userLang = navigator.language.toLowerCase();
                 if (userLang.startsWith("ko")) {
                     setLanguage("ko");
+                } else if (userLang.startsWith("ja")) {
+                    setLanguage("ja");
+                } else if (userLang.startsWith("zh")) {
+                    setLanguage("zh");
                 } else {
                     setLanguage("en");
                 }

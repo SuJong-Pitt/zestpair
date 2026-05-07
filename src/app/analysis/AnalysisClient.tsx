@@ -10,7 +10,8 @@ import { Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { performAnalysis } from "@/lib/analysis";
 import type { Ingredient } from "@/types/database";
-import { decodeShareParams } from "@/lib/utils";
+import { cn, decodeShareParams } from "@/lib/utils";
+import { UI_TRANSLATIONS } from "@/lib/i18n";
 
 /**
  * 분석 결과 페이지 본체 (Suspense 대응을 위해 분리)
@@ -140,6 +141,8 @@ function AnalysisContent() {
 
     // 로딩 중이거나 리다이렉트 중일 때 보여줄 화면
     if (isLoading || isRedirecting) {
+        const t = UI_TRANSLATIONS[language as keyof typeof UI_TRANSLATIONS] || UI_TRANSLATIONS.ko;
+        
         return (
             <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
                 <motion.div
@@ -159,17 +162,17 @@ function AnalysisContent() {
                         </div>
                     </div>
                     <div className="space-y-3">
-                        <h2 className="text-xl md:text-2xl font-[1000] text-white tracking-tight leading-tight">
-                            {isRedirecting 
-                                ? (language === 'ko' ? '데이터를 찾을 수 없어요!' : 'Data not found!')
-                                : (language === 'ko' ? '분석 결과를 불러오는 중...' : 'Loading analysis results...')
-                            }
+                        <h2 className={cn(
+                            "text-xl md:text-2xl font-[1000] text-white tracking-tight leading-tight",
+                            (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                        )}>
+                            {isRedirecting ? t.loading.redirectTitle : t.loading.title}
                         </h2>
-                        <p className="text-slate-400 text-sm md:text-base font-bold bg-white/5 py-2 px-4 rounded-xl border border-white/5">
-                            {isRedirecting 
-                                ? (language === 'ko' ? '대표님, 홈 스크린에서 다시 시작해 볼까요? ✨' : 'Shall we start again from the home screen? ✨')
-                                : (language === 'ko' ? 'Pori AI가 조합을 정밀 분석하고 있어요. 잠시만 기다려주세요!' : 'Pori AI is precisely analyzing your combination. Just a moment!')
-                            }
+                        <p className={cn(
+                            "text-slate-400 text-sm md:text-base font-bold bg-white/5 py-2 px-4 rounded-xl border border-white/5",
+                            (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                        )}>
+                            {isRedirecting ? t.loading.redirectSubtitle : t.loading.subtitle}
                         </p>
                         
                         {/* Dynamic AI Protocol Logs ✨ */}
@@ -183,15 +186,11 @@ function AnalysisContent() {
                                 >
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                     <span className="text-[10px] font-black text-emerald-500/80 uppercase tracking-[0.2em] font-mono">
-                                        Establishing Protocol...
+                                        {t.loading.protocol}
                                     </span>
                                 </motion.div>
                                 <div className="flex flex-col items-start gap-1 font-mono text-[9px] text-slate-500/60 font-bold">
-                                    {[
-                                        "MATCHING SYNERGY VECTORS...",
-                                        "CALCULATING BIO-AVAILABILITY...",
-                                        "DECODING CHEMICAL INTERACTIONS..."
-                                    ].map((log, i) => (
+                                    {t.loading.logs.map((log, i) => (
                                         <motion.div
                                             key={i}
                                             initial={{ opacity: 0, x: -5 }}

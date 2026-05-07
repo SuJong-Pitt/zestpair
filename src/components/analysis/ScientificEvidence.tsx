@@ -47,17 +47,17 @@ const ScientificEvidence = memo(function ScientificEvidence({
                         </div>
                         <div>
                             <h4 className="text-base md:text-xl font-black text-white tracking-tight">
-                                {isKo ? "학술적 근거 및 데이터 투명성" : "Evidence & Transparency"}
+                                {language === 'ko' ? "학술적 근거 및 데이터 투명성" : language === 'ja' ? "学術的根拠およびデータの透明性" : language === 'zh' ? "学术依据与数据透明度" : "Evidence & Transparency"}
                             </h4>
                             <p className="text-[9px] md:text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
-                                Verified Medical Scholarly Sources
+                                {language === 'ko' ? "검증된 의료 학술 자료" : language === 'ja' ? "検証済みの医療学術資料" : language === 'zh' ? "经验证的医疗学术资料" : "Verified Medical Scholarly Sources"}
                             </p>
                         </div>
                     </div>
                     <div className="px-4 md:px-5 py-1.5 md:py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2 self-start md:self-center">
                         <ShieldCheck size={12} className="text-emerald-400 md:size-3.5" />
                         <span className="text-[9px] md:text-[11px] font-black text-emerald-400 tracking-tighter uppercase pt-0.5">
-                            Medical Grade v2.4 Certified
+                            {language === 'ko' ? "의료 등급 v2.4 인증됨" : language === 'ja' ? "医療グレードv2.4認証済み" : language === 'zh' ? "医疗级v2.4已认证" : "Medical Grade v2.4 Certified"}
                         </span>
                     </div>
                 </div>
@@ -84,7 +84,7 @@ const ScientificEvidence = memo(function ScientificEvidence({
                                             <Globe size={10} className="text-slate-600 opacity-0 group-hover/ref:opacity-100 transition-opacity" />
                                         </div>
                                         <p className="text-[8px] md:text-[9px] font-black text-slate-600 uppercase tracking-widest">
-                                            P-R Scholarly Resource
+                                            {language === 'ko' ? "검증된 학술 자료" : language === 'ja' ? "検証済み学術リソース" : language === 'zh' ? "经验证的学术资源" : "P-R Scholarly Resource"}
                                         </p>
                                     </div>
                                 </motion.div>
@@ -97,9 +97,9 @@ const ScientificEvidence = memo(function ScientificEvidence({
                                         className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-400 text-[11px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all active:scale-95"
                                     >
                                         {isExpanded ? (
-                                            <>접기 <Globe size={12} className="rotate-180" /></>
+                                            <>{language === 'ko' ? '접기' : language === 'ja' ? '閉じる' : language === 'zh' ? '收起' : 'Close'} <Globe size={12} className="rotate-180" /></>
                                         ) : (
-                                            <>더 보기 (+{allReferences.length - 2})</>
+                                            <>{language === 'ko' ? '더 보기' : language === 'ja' ? 'もっと見る' : language === 'zh' ? '查看更多' : 'See More'} (+{allReferences.length - 2})</>
                                         )}
                                     </button>
                                 </div>
@@ -108,8 +108,12 @@ const ScientificEvidence = memo(function ScientificEvidence({
                     ) : (
                         <div className="col-span-full p-8 md:p-10 text-center rounded-2xl md:rounded-[2rem] border border-dashed border-white/5 bg-white/[0.01]">
                             <span className="text-xs md:text-[14px] font-bold text-slate-500 italic leading-relaxed">
-                                {isKo 
+                                {language === 'ko' 
                                     ? "본 리포트의 모든 데이터는 ZestPair AI 임상 가이드라인을 기반으로 생성되었습니다." 
+                                    : language === 'ja'
+                                    ? "本レポートのすべてのデータは、ZestPair AI臨床ガイドラインに基づいて生成されました。"
+                                    : language === 'zh'
+                                    ? "本报告的所有数据均基于 ZestPair AI 临床指南生成。"
                                     : "All data was generated based on ZestPair AI clinical guidelines."}
                             </span>
                         </div>
@@ -118,8 +122,12 @@ const ScientificEvidence = memo(function ScientificEvidence({
 
                 <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 opacity-60">
                     <p className="text-[9px] md:text-[11px] font-bold text-slate-400 leading-relaxed max-w-xl text-center md:text-left pt-1">
-                        {isKo 
+                        {language === 'ko' 
                             ? "* 본 서비스는 참고용 정보만을 제공하며 의료 진단을 대신할 수 없습니다."
+                            : language === 'ja'
+                            ? "* 本サービスは参考用情報のみを提供しており、医療診断に代わるものではありません。"
+                            : language === 'zh'
+                            ? "* 本服务仅提供参考信息，不能替代医疗诊断。"
                             : "* This service is for reference only and is not a medical diagnosis."}
                     </p>
                     <div className="flex items-center gap-6 shrink-0 pt-1">

@@ -65,10 +65,62 @@ export default function PrivacyPage() {
           body: "Users can change or delete their information (cookies, etc.) settings at any time. For inquiries, please contact our support team for prompt action."
         }
       ]
+    },
+    ja: {
+      title: "個人情報処理方針",
+      lastUpdated: "最終更新日: 2026年4月21日",
+      sections: [
+        {
+          title: "1. 収集する個人情報の項目",
+          body: "ZestPairは利用者から別途の会員登録手続きなしにサービスを提供し、原則として個人を識別できる情報を収集しません。ただし、サービス利用の過程で以下のような情報が自動的に生成され、収集される場合があります。\n- サービス利用記録、接続ログ、クッキー、接続IP情報"
+        },
+        {
+          title: "2. 個人情報の収集および利用目的",
+          body: "- AIサプリメント組み合わせ分析サービスの提供および結果の最適化\n- サービス利用統計分析および品質改善\n- 不正利用防止およびセキュリティ強化"
+        },
+        {
+          title: "3. 個人情報の保有および利用期間",
+          body: "ZestPairは原則として個人情報の収集および利用目的が達成された後は、該当情報を遅滞なく破棄します。ただし、関係法令の規定により保存する必要がある場合は、該当法令で定めた期間保管します。"
+        },
+        {
+          title: "4. 個人情報の第三者提供",
+          body: "ZestPairは利用者の個人情報を原則として外部に提供しません。ただし、利用者が事前に同意した場合や、法令の規定に基づいた場合は例外とします。"
+        },
+        {
+          title: "5. 利用者の権利およびその行使方法",
+          body: "利用者はいつでも自身の個人情報（クッキーなど）の設定を変更したり削除したりできます。お問い合わせはカスタマーセンターまでご連絡いただければ、遅滞なく対応いたします。"
+        }
+      ]
+    },
+    zh: {
+      title: "个人信息处理方针",
+      lastUpdated: "最后修订日期：2026年4月21日",
+      sections: [
+        {
+          title: "1. 收集的个人信息项目",
+          body: "ZestPair 在不要求用户单独注册的情况下提供服务，原则上不收集可识别个人的信息。但是，在服务利用过程中可能会自动生成并收集以下信息：\n- 服务利用记录、访问日志、Cookie、访问 IP 信息"
+        },
+        {
+          title: "2. 个人信息的收集及利用目的",
+          body: "- 提供 AI 营养补充品分析服务及结果优化\n- 服务利用统计分析及品质改善\n- 防止不正当利用及加强安全性"
+        },
+        {
+          title: "3. 个人信息的持有及利用期间",
+          body: "原则上，ZestPair 在达到个人信息收集及利用目的后，将立即销毁相关信息。但根据相关法令规定有必要保存的情况，将在相关法令规定的期间内保存。"
+        },
+        {
+          title: "4. 个人信息的第三方提供",
+          body: "原则上，ZestPair 不会向外部提供用户的个人信息。但经过用户事先同意或根据法令规定的情况除外。"
+        },
+        {
+          title: "5. 用户的权利及其行使方法",
+          body: "用户可以随时更改或删除自己的个人信息（Cookie 等）设置。如有疑问，请通过客服中心联系我们，我们将立即采取措施。"
+        }
+      ]
     }
   };
 
-  const t = content[language];
+  const t = content[language as keyof typeof content] || content.en;
 
   return (
     <div className="min-h-screen bg-[#030712] text-white selection:bg-emerald-500/30">
@@ -86,7 +138,7 @@ export default function PrivacyPage() {
             className="group flex items-center gap-2 mb-10 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-xs font-bold text-slate-400 hover:text-white"
           >
             <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-            <span>{language === 'ko' ? '홈으로 돌아가기' : 'Back to Home'}</span>
+            <span>{language === 'ko' ? '홈으로 돌아가기' : language === 'ja' ? 'ホームに戻る' : language === 'zh' ? '回到首页' : 'Back to Home'}</span>
           </Link>
 
           <div className="flex items-center gap-3 mb-6">
@@ -131,11 +183,15 @@ export default function PrivacyPage() {
           <section className="pt-8 border-t border-white/10">
             <div className="p-8 rounded-3xl bg-gradient-to-br from-emerald-500/15 to-transparent border border-emerald-500/20 text-center">
               <h3 className="text-lg font-black mb-3">
-                {language === 'ko' ? '문의 사항이 있으신가요?' : 'Have any questions?'}
+                {language === 'ko' ? '문의 사항이 있으신가요?' : language === 'ja' ? 'ご不明な点はありますか？' : language === 'zh' ? '有什么疑问吗？' : 'Have any questions?'}
               </h3>
               <p className="text-slate-400 text-sm mb-6 max-w-sm mx-auto">
                 {language === 'ko' 
                   ? '제스트페어의 개인정보 처리와 관련하여 궁금한 점이 있다면 언제든 문의해 주세요.'
+                  : language === 'ja'
+                  ? 'ZestPairの個人情報処理に関してご不明な点がありましたら、いつでもお問い合わせください。'
+                  : language === 'zh'
+                  ? '如果您对 ZestPair 的个人信息处理有任何疑问，请随时与我们联系。'
                   : 'If you have any questions regarding the processing of personal information, please feel free to contact us.'}
               </p>
               <a 

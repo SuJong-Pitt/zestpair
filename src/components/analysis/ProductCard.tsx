@@ -135,7 +135,10 @@ const ProductCard = memo(function ProductCard({ product, index, sourceIngredient
                             <div className="absolute inset-0 -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
                             <ShoppingCart size={10} className="text-white/90" />
                             <span className="text-[9px] font-black tracking-tight text-white whitespace-nowrap">
-                                {language === 'ko' ? t.common.shoppingCoupang : t.common.shoppingAmazon}
+                                {language === 'ko' ? t.common.shoppingCoupang : 
+                                 language === 'ja' ? t.common.shoppingRakuten : 
+                                 language === 'zh' ? t.common.shoppingTmall : 
+                                 t.common.shoppingAmazon}
                             </span>
                         </a>
                     </Button>

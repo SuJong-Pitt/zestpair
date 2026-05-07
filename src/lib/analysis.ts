@@ -7,7 +7,7 @@ import { generateUnifiedAnalysis } from "./gemini";
  */
 export async function performAnalysis(
     selectedIngredients: Ingredient[],
-    language: "ko" | "en",
+    language: "ko" | "en" | "ja" | "zh",
     allIngredients: Ingredient[]
 ): Promise<AnalysisResult | null> {
     if (selectedIngredients.length < 2) return null;
@@ -207,6 +207,16 @@ export async function performAnalysis(
         else if (synergies.length > 0) summary = `✅ ${synergies.length}가지 시너지 조합이 발견되었습니다!`;
         else if (cautions.length > 0) summary = `🔶 ${cautions.length}가지 주의 조합이 발견되었습니다...`;
         else summary = "중립적인 조합입니다.";
+    } else if (language === "ja") {
+        if (conflicts.length > 0) summary = `⚠️ ${conflicts.length}件の衝突が見つかりました...`;
+        else if (synergies.length > 0) summary = `✅ ${synergies.length}件のシナジーが見つかりました！`;
+        else if (cautions.length > 0) summary = `🔶 ${cautions.length}件の注意が見つかりました...`;
+        else summary = "中立的な組み合わせです。";
+    } else if (language === "zh") {
+        if (conflicts.length > 0) summary = `⚠️ 发现了 ${conflicts.length} 种冲突组合...`;
+        else if (synergies.length > 0) summary = `✅ 发现了 ${synergies.length} 种协同组合！`;
+        else if (cautions.length > 0) summary = `🔶 发现了 ${cautions.length} 种注意组合...`;
+        else summary = "中性组合。";
     } else {
         if (conflicts.length > 0) summary = `⚠️ ${conflicts.length} conflicts detected...`;
         else if (synergies.length > 0) summary = `✅ ${synergies.length} synergies detected!`;

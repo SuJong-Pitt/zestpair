@@ -70,11 +70,11 @@ const SynergyCard = memo(function SynergyCard({
     const config = cardTypeConfig[result.interaction.type];
     const Icon = config.icon;
 
-    const displayTitle = language === "ko" ? result.interaction.title : (result.interaction.title_en || result.interaction.title);
-    const displayReason = language === "ko" ? result.interaction.reason : (result.interaction.reason_en || result.interaction.reason);
-    const displayRec = language === "ko" ? result.interaction.recommendation : (result.interaction.recommendation_en || result.interaction.recommendation);
-    const nameA = language === "ko" ? result.pair[0].name : result.pair[0].name_en;
-    const nameB = language === "ko" ? result.pair[1].name : result.pair[1].name_en;
+    const displayTitle = language === "ko" ? result.interaction.title : language === "ja" && result.interaction.title_ja ? result.interaction.title_ja : language === "zh" && result.interaction.title_zh ? result.interaction.title_zh : result.interaction.title_en || result.interaction.title;
+    const displayReason = language === "ko" ? result.interaction.reason : language === "ja" && result.interaction.reason_ja ? result.interaction.reason_ja : language === "zh" && result.interaction.reason_zh ? result.interaction.reason_zh : result.interaction.reason_en || result.interaction.reason;
+    const displayRec = language === "ko" ? result.interaction.recommendation : language === "ja" && result.interaction.recommendation_ja ? result.interaction.recommendation_ja : language === "zh" && result.interaction.recommendation_zh ? result.interaction.recommendation_zh : result.interaction.recommendation_en || result.interaction.recommendation;
+    const nameA = language === "ko" ? result.pair[0].name : language === "ja" && result.pair[0].name_ja ? result.pair[0].name_ja : language === "zh" && result.pair[0].name_zh ? result.pair[0].name_zh : result.pair[0].name_en || result.pair[0].name;
+    const nameB = language === "ko" ? result.pair[1].name : language === "ja" && result.pair[1].name_ja ? result.pair[1].name_ja : language === "zh" && result.pair[1].name_zh ? result.pair[1].name_zh : result.pair[1].name_en || result.pair[1].name;
 
     const typeString = result.interaction.type === 'SYNERGY' ? t.results.typeSynergy : result.interaction.type === 'CAUTION' ? t.results.typeCaution : t.results.typeConflict;
 
@@ -83,7 +83,7 @@ const SynergyCard = memo(function SynergyCard({
         setIsSharing(true);
         const shareData = {
             title: `ZestPair - ${displayTitle}`,
-            text: `${nameA} & ${nameB} ${language === 'ko' ? '궁합 분석 결과' : 'Interaction Analysis'}: ${displayTitle}\n${displayReason}`,
+            text: `${nameA} & ${nameB} ${language === 'ko' ? '궁합 분석 결과' : language === 'ja' ? '相性分析結果' : language === 'zh' ? '契合度分析结果' : 'Interaction Analysis'}: ${displayTitle}\n${displayReason}`,
             url: window.location.href,
         };
 
@@ -91,7 +91,8 @@ const SynergyCard = memo(function SynergyCard({
             if (navigator.share) {
                 await navigator.share(shareData);
             } else {
-                await navigator.clipboard.writeText(`${shareData.text}\n\n결과 보기: ${shareData.url}`);
+                const viewResultText = language === 'ko' ? '결과 보기' : language === 'ja' ? '結果を見る' : language === 'zh' ? '查看结果' : 'View Results';
+                await navigator.clipboard.writeText(`${shareData.text}\n\n${viewResultText}: ${shareData.url}`);
                 alert(t.common.shareText);
             }
         } catch (err) {
@@ -231,7 +232,7 @@ const SynergyCard = memo(function SynergyCard({
                                         <div className="space-y-2 md:space-y-3">
                                             <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-white/[0.03] border border-white/5 rounded-md">
                                                 <div className="w-1 h-1 rounded-full bg-slate-500" />
-                                                <span className="text-slate-500 font-black text-[8px] md:text-[9px] uppercase tracking-widest">{language === 'ko' ? '전문가 분석' : 'Analysis'}</span>
+                                                <span className="text-slate-500 font-black text-[8px] md:text-[9px] uppercase tracking-widest">{language === 'ko' ? '전문가 분석' : language === 'ja' ? '専門家分析' : language === 'zh' ? '专家分析' : 'Analysis'}</span>
                                             </div>
                                             <p className="text-[13px] md:text-[15px] text-slate-300 font-bold leading-relaxed tracking-tight break-words pr-8 sm:pr-16">
                                                 {displayReason}
@@ -263,7 +264,7 @@ const SynergyCard = memo(function SynergyCard({
                                                             "font-black text-[8px] md:text-[10px] uppercase tracking-widest",
                                                             (result.interaction.type === "CAUTION" || result.interaction.type === "CONFLICT") ? "text-amber-300" : "text-emerald-300"
                                                         )}>
-                                                            {language === 'ko' ? 'Pori의 해결책' : "Pori's Solution"}
+                                                            {language === 'ko' ? 'Pori의 해결책' : language === 'ja' ? 'Poriの解決策' : language === 'zh' ? 'Pori的解决方案' : "Pori's Solution"}
                                                         </span>
                                                     </div>
                                                     <div className="space-y-2 md:space-y-3">
@@ -295,7 +296,7 @@ const SynergyCard = memo(function SynergyCard({
                                             className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl flex items-center gap-2 border border-white/10 transition-colors active:scale-95"
                                         >
                                             {isSharing ? <Loader2 size={12} className="animate-spin" /> : <Share2 size={12} />}
-                                            <span className="text-[9px] font-black tracking-widest uppercase">{language === 'ko' ? '공유' : 'Share'}</span>
+                                            <span className="text-[9px] font-black tracking-widest uppercase">{language === 'ko' ? '공유' : language === 'ja' ? '共有' : language === 'zh' ? '分享' : 'Share'}</span>
                                         </button>
                                         <button
                                             onClick={handleDownload}
@@ -308,7 +309,7 @@ const SynergyCard = memo(function SynergyCard({
                                             style={{ backgroundColor: result.interaction.type === 'SYNERGY' ? '#34d399' : result.interaction.type === 'CAUTION' ? '#fbbf24' : '#fb7185' }}
                                         >
                                             {isDownloading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-                                            <span className="text-[9px] font-black tracking-widest uppercase">{language === 'ko' ? '저장' : 'Save'}</span>
+                                            <span className="text-[9px] font-black tracking-widest uppercase">{language === 'ko' ? '저장' : language === 'ja' ? '保存' : language === 'zh' ? '保存' : 'Save'}</span>
                                         </button>
                                     </div>
                                 </div>

@@ -42,9 +42,13 @@ export default function GlobalFooter() {
               <BrandLogo size={34} />
               <BrandName size="text-3xl" />
             </div>
-            <p className="text-slate-500 text-sm font-medium leading-[1.8] max-w-[260px]">
+            <p className="text-slate-500 text-sm font-medium leading-[1.8] max-w-[260px] whitespace-pre-line">
               {language === "ko"
                 ? "AI 기술을 통해 당신의 건강한\n영양제 생활을 돕는 고감도\n시너지 가이드."
+                : language === "ja"
+                ? "AI技術を通じてあなたの健康的な\nサプリメント生活をサポートする\n高感度シナジーガイド。"
+                : language === "zh"
+                ? "通过 AI 技术帮助您实现健康的\n营养补充生活的敏锐\n协同指南。"
                 : "A high-sensitivity synergy guide helping your healthy supplement life through AI technology."}
             </p>
 
@@ -52,7 +56,7 @@ export default function GlobalFooter() {
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/8 border border-emerald-500/15">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[10px] font-bold text-emerald-400/80 uppercase tracking-widest">
-                {language === "ko" ? "서비스 운영 중" : "Service Active"}
+                {language === "ko" ? "서비스 운영 중" : language === "ja" ? "サービス運営中" : language === "zh" ? "服务运行中" : "Service Active"}
               </span>
             </div>
           </motion.div>
@@ -69,7 +73,7 @@ export default function GlobalFooter() {
             <div className="flex items-center gap-2.5">
               <div className="w-4 h-[1.5px] bg-emerald-500/60 rounded-full" />
               <span className="text-[10px] font-black text-emerald-400/70 uppercase tracking-[0.35em]">
-                {language === "ko" ? "문의 사항" : "Inquiry"}
+                {language === "ko" ? "문의 사항" : language === "ja" ? "お問い合わせ" : language === "zh" ? "联系方式" : "Inquiry"}
               </span>
             </div>
 
@@ -174,7 +178,7 @@ export default function GlobalFooter() {
             <div className="flex items-center gap-2.5">
               <div className="w-4 h-[1.5px] bg-amber-500/60 rounded-full" />
               <span className="text-[10px] font-black text-amber-400/70 uppercase tracking-[0.35em]">
-                {language === "ko" ? "안내 사항" : "Notice"}
+                {language === "ko" ? "안내 사항" : language === "ja" ? "注意事項" : language === "zh" ? "注意事项" : "Notice"}
               </span>
             </div>
 

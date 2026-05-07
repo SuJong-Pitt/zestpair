@@ -23,6 +23,24 @@ const ANALYZING_MESSAGES_EN = [
   "Complete! Packaging results...",
 ];
 
+const ANALYZING_MESSAGES_JA = [
+  "バスケット成分抽出中...",
+  "分子構造マッピング中...",
+  "衝突テストプロトコル稼働...",
+  "成分シナジー計算中...",
+  "栄養バランス最適化...",
+  "分析完了！結果パッケージング中...",
+];
+
+const ANALYZING_MESSAGES_ZH = [
+  "正在提取篮子成分...",
+  "正在映射分子结构...",
+  "启动冲突测试协议...",
+  "正在计算成分协同作用...",
+  "正在优化营养平衡...",
+  "分析完成！正在打包结果...",
+];
+
 // 알약 이모지 세트
 const PILL_EMOJIS = ["💊", "🧬", "🔬", "⚗️", "🧪", "💉", "🫧", "🌿"];
 
@@ -34,7 +52,7 @@ export default function AnalyzingAnimation({ onComplete }: Props) {
   const [progress, setProgress] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
-  const messages = language === "ko" ? ANALYZING_MESSAGES_KO : ANALYZING_MESSAGES_EN;
+  const messages = language === "ko" ? ANALYZING_MESSAGES_KO : language === "ja" ? ANALYZING_MESSAGES_JA : language === "zh" ? ANALYZING_MESSAGES_ZH : ANALYZING_MESSAGES_EN;
 
   // 선택된 영양제의 이모지 (없으면 기본값)
   const ingredientEmojis = useMemo(() =>

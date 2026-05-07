@@ -35,6 +35,8 @@ interface SearchCategory {
   id: string;
   name: string;
   name_en: string;
+  name_ja: string;
+  name_zh: string;
   emoji: string;
   isCategory: true;
 }
@@ -127,12 +129,32 @@ export default function HomeClient() {
 
   const [isMounted, setIsMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // 언어 선택 드롭다운 상태 ✨
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(event.target as Node)) {
+        setIsLangOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const LANGUAGES = [
+    { code: 'ko', label: '한국어', short: 'KO' },
+    { code: 'en', label: 'English', short: 'EN' },
+    { code: 'ja', label: '日本語', short: 'JA' },
+    { code: 'zh', label: '中文', short: 'ZH' },
+  ] as const;
   const [inputValue, setInputValue] = useState("");
   const [isPending, startTransition] = useTransition();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchMode, setSearchMode] = useState<"ai" | "manual">("ai");
   const [sortBy, setSortBy] = useState<'default' | 'name' | 'popular'>('default');
-  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [isMainSortDropdownOpen, setIsMainSortDropdownOpen] = useState(false);
   // 카테고리 전환 감지: 1=초기 로드(stagger 적용), >0=탭 전환(딜레이 없이 즉각 표시)
@@ -152,41 +174,20 @@ export default function HomeClient() {
   const [aiMatchError, setAiMatchError] = useState<string | null>(null);
 
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
-
-  // AI 매칭 로딩 메시지 설정
-  const aiLoadingMessages = useMemo(() => ({
-    ko: [
-      "신경망 코어 초기화 중...",
-      "증상 벡터 분석 중...",
-      "성분 데이터베이스 스캔 중...",
-      "최적의 시너지 계산 중...",
-      "맞춤형 프로토콜 생성 중...",
-      "데이터 동기화 완료 중..."
-    ],
-    en: [
-      "INITIALIZING NEURAL CORE...",
-      "ANALYZING SYMPTOM VECTORS...",
-      "SCANNING DATABASE...",
-      "CALCULATING SYNERGY...",
-      "GENERATING PROTOCOL...",
-      "FINALIZING DATA SYNC..."
-    ]
-  }), []);
+  const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
 
   // 로딩 메시지 순환 효과
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isAiMatching) {
       interval = setInterval(() => {
-        setLoadingMessageIndex((prev) => (prev + 1) % aiLoadingMessages[language].length);
+        setLoadingMessageIndex((prev) => (prev + 1) % t.hero.aiLoadingMessages.length);
       }, 1200);
     } else {
       setLoadingMessageIndex(0);
     }
     return () => clearInterval(interval);
-  }, [isAiMatching, language, aiLoadingMessages]);
-
-  const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
+  }, [isAiMatching, language, t.hero.aiLoadingMessages]);
 
   useEffect(() => {
     // 플레이스홀더 로테이션 (3초)
@@ -319,21 +320,23 @@ export default function HomeClient() {
     const matchedCategories = Object.entries(CATEGORIES_TRANSLATIONS)
       .filter(([key, data]) => {
         if (key === 'all') return false;
-        const catName = language === 'ko' ? data.ko : data.en;
+        const catName = language === 'ko' ? data.ko : language === 'ja' ? data.ja : language === 'zh' ? data.zh : data.en;
         return catName.toLowerCase().includes(searchQuery.toLowerCase());
       })
       .map(([key, data]) => ({
         id: key,
         name: data.ko,
         name_en: data.en,
+        name_ja: data.ja,
+        name_zh: data.zh,
         emoji: data.emoji,
         isCategory: true
       }));
 
     // 2. 성분 매칭 (이름, 설명, 또는 매칭된 카테고리 소속)
     const matchedIngredients = dbIngredients.filter((ing) => {
-      const name = (language === "ko" ? ing.name : ing.name_en).toLowerCase();
-      const desc = (language === "ko" ? ing.short_description : (ing.short_description_en || ing.short_description)).toLowerCase();
+      const name = (language === "ko" ? ing.name : language === "ja" ? (ing.name_ja || ing.name_en) : language === "zh" ? (ing.name_zh || ing.name_en) : ing.name_en).toLowerCase();
+      const desc = (language === "ko" ? ing.short_description : language === "ja" ? (ing.short_description_ja || ing.short_description_en || ing.short_description) : language === "zh" ? (ing.short_description_zh || ing.short_description_en || ing.short_description) : (ing.short_description_en || ing.short_description)).toLowerCase();
       const query = searchQuery.toLowerCase();
 
       const isTextMatch = name.includes(query) || desc.includes(query);
@@ -420,13 +423,13 @@ export default function HomeClient() {
             setAnalyzing(true);
           }
         } else {
-          setAiMatchError(language === 'ko' ? "적절한 성분을 찾지 못했습니다." : "No matching ingredients found.");
+          setAiMatchError(t.hero.aiNoMatch);
         }
       } else {
-        setAiMatchError(language === 'ko' ? "AI 매칭 및 분석에 실패했습니다." : "AI matching & analysis failed.");
+        setAiMatchError(t.hero.aiFail);
       }
     } catch (error) {
-      setAiMatchError(language === 'ko' ? "네트워크 오류가 발생했습니다." : "Network error occurred.");
+      setAiMatchError(t.hero.networkError);
     } finally {
       setIsAiMatching(false);
     }
@@ -458,28 +461,67 @@ export default function HomeClient() {
         {/* ── 상단 네비게이션 ── */}
         <div className="absolute top-0 left-0 right-0 z-50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-            {/* 언어 토글 */}
-            <button
-              onClick={() => setLanguage(language === "ko" ? "en" : "ko")}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 font-bold text-[10px] tracking-widest uppercase transition-all active:scale-95 pointer-events-auto"
-            >
-              <Languages size={11} className="shrink-0" />
-              <span>{language === "ko" ? "EN" : "KO"}</span>
-            </button>
+            <div className="relative" ref={langRef}>
+              <button
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                className="group flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-[#0d1a15]/40 border border-white/10 text-white hover:border-emerald-500/40 hover:bg-[#0d1a15]/60 transition-all active:scale-95 pointer-events-auto shadow-lg backdrop-blur-md"
+              >
+                <div className="flex items-center justify-center w-5 h-5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                  <Languages size={12} className="text-emerald-400" />
+                </div>
+                <span className="text-[11px] font-black tracking-[0.1em] uppercase">{language}</span>
+                <ChevronDown size={11} className={cn("transition-transform duration-500 text-slate-500", isLangOpen && "rotate-180 text-emerald-400")} />
+              </button>
+
+              <AnimatePresence>
+                {isLangOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                    className="absolute top-full left-0 mt-3 w-40 p-2 rounded-2xl bg-[#0a0f0d]/95 border border-white/10 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[60]"
+                  >
+                    <div className="absolute inset-0 bg-emerald-500/5 rounded-2xl pointer-events-none" />
+                    <div className="relative space-y-1">
+                      {LANGUAGES.map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => {
+                            setLanguage(lang.code);
+                            setIsLangOpen(false);
+                          }}
+                          className={cn(
+                            "w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] font-bold tracking-wide transition-all group/item",
+                            language === lang.code 
+                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
+                              : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
+                          )}
+                        >
+                          <span>{lang.label}</span>
+                          {language === lang.code ? (
+                            <motion.div 
+                              layoutId="activeLang"
+                              className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#10b981]" 
+                            />
+                          ) : (
+                            <div className="w-1 h-1 rounded-full bg-slate-700 opacity-0 group-hover/item:opacity-100 transition-opacity" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* 우측 네비 */}
             <div className="flex items-center gap-2 pointer-events-auto">
-              <button
-                onClick={() => setIsGuideOpen(true)}
-                className="px-3 py-1.5 rounded-lg text-white/60 hover:text-white font-bold text-[10px] tracking-wide transition-all hover:bg-white/5"
-              >
-                {language === 'ko' ? '가이드' : 'Guide'}
-              </button>
               <Link
                 href="/about"
                 className="px-3 py-1.5 rounded-lg text-white/60 hover:text-white font-bold text-[10px] tracking-wide transition-all hover:bg-white/5"
               >
-                {language === 'ko' ? '소개' : 'About'}
+                {t.hero.about}
               </Link>
             </div>
           </div>
@@ -531,7 +573,7 @@ export default function HomeClient() {
               transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tighter text-white"
             >
-              {language === 'ko' ? (
+              {t.hero.titleOrder === 'gradient-first' ? (
                 <>
                   <span
                     className="inline"
@@ -540,19 +582,19 @@ export default function HomeClient() {
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                     }}
-                  >영양제 상호작용</span>
-                  <span className="text-white"> 무료 분석</span>
+                  >{t.hero.titleGradient}</span>
+                  <span className="text-white">{t.hero.titleNormal}</span>
                 </>
               ) : (
                 <>
-                  <span className="text-white">Free Supplement</span>{" "}
+                  <span className="text-white">{t.hero.titleNormal}</span>{" "}
                   <span
                     style={{
                       background: "linear-gradient(135deg, #34d399 0%, #22d3ee 50%, #818cf8 100%)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                     }}
-                  >Analysis</span>
+                  >{t.hero.titleGradient}</span>
                 </>
               )}
             </motion.div>
@@ -634,7 +676,7 @@ export default function HomeClient() {
                     className="text-[11px] md:text-xs font-bold tracking-wide whitespace-nowrap transition-colors duration-200"
                     style={{ color: searchMode === "ai" ? "#ffffff" : "rgba(255,255,255,0.35)" }}
                   >
-                    {language === "ko" ? "AI 매칭" : "AI Match"}
+                    {t.hero.aiMatch}
                   </span>
                 </button>
 
@@ -652,7 +694,7 @@ export default function HomeClient() {
                     className="text-[11px] md:text-xs font-bold tracking-wide whitespace-nowrap transition-colors duration-200"
                     style={{ color: searchMode === "manual" ? "#ffffff" : "rgba(255,255,255,0.35)" }}
                   >
-                    {language === "ko" ? "직접 검색" : "Search"}
+                    {t.hero.manualSearch}
                   </span>
                 </button>
               </div>
@@ -709,7 +751,7 @@ export default function HomeClient() {
                         <div className="flex items-center gap-2">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse shadow-[0_0_6px_#10b981]" />
                           <span className="text-[8px] font-black tracking-[0.2em] uppercase text-emerald-400/60">
-                            AI NEURAL MATCH · ONLINE
+                            {t.hero.aiStatus}
                           </span>
                         </div>
                         <AnimatePresence mode="wait">
@@ -725,7 +767,7 @@ export default function HomeClient() {
                               textShadow: isAiMatching ? "0 0 8px rgba(52,211,153,0.5)" : "none"
                             }}
                           >
-                            {isAiMatching ? aiLoadingMessages[language][loadingMessageIndex] : "READY"}
+                            {isAiMatching ? t.hero.aiLoadingMessages[loadingMessageIndex] : t.hero.aiReady}
                           </motion.span>
                         </AnimatePresence>
                       </div>
@@ -766,11 +808,7 @@ export default function HomeClient() {
                             value={aiIntent}
                             onChange={(e) => { setAiIntent(e.target.value); setAiMatchError(null); }}
                             onKeyDown={(e) => e.key === "Enter" && handleAiMatch()}
-                            placeholder={
-                              language === "ko"
-                                ? isMobile ? "증상이나 목표를 입력하세요" : "증상이나 목표를 말씀해주세요 (예: 요즘 너무 피곤해)"
-                                : isMobile ? "Describe your symptoms" : "Tell me your symptoms (e.g., I'm so tired lately)"
-                            }
+                            placeholder={t.hero.aiPlaceholder}
                             className="flex-1 bg-transparent border-none text-white placeholder:text-white/20 focus:ring-0 text-[13px] md:text-[14px] font-medium py-3 md:py-3.5 min-w-0"
                           />
                         </div>
@@ -808,9 +846,7 @@ export default function HomeClient() {
                             )}
                             <Zap size={10} className="relative z-10 shrink-0" />
                             <span className="relative z-10">
-                              {isAiMatching
-                                ? (isMobile ? "···" : "SCAN")
-                                : "MATCH"}
+                              {isAiMatching ? t.hero.aiScanButton : t.hero.aiMatchButton}
                             </span>
                           </motion.button>
                         </div>
@@ -870,22 +906,7 @@ export default function HomeClient() {
 
                   {/* 하단 힌트 태그 — HUD Query Chips */}
                   <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-                    {(language === "ko"
-                      ? [
-                          { code: "SLP", label: "잠이 안 와",    icon: "💤", color: "#818cf8" },
-                          { code: "FAT", label: "너무 피곤해",   icon: "⚡", color: "#f59e0b" },
-                          { code: "RCV", label: "운동 회복",     icon: "💪", color: "#34d399" },
-                          { code: "COG", label: "집중력 향상",   icon: "🧠", color: "#06b6d4" },
-                          { code: "SKN", label: "피부 개선",     icon: "🌿", color: "#a78bfa" },
-                        ]
-                      : [
-                          { code: "SLP", label: "Can't sleep",      icon: "💤", color: "#818cf8" },
-                          { code: "FAT", label: "Always tired",     icon: "⚡", color: "#f59e0b" },
-                          { code: "RCV", label: "Workout recovery", icon: "💪", color: "#34d399" },
-                          { code: "COG", label: "Focus boost",      icon: "🧠", color: "#06b6d4" },
-                          { code: "SKN", label: "Skin glow",        icon: "🌿", color: "#a78bfa" },
-                        ]
-                    ).map((hint) => (
+                    {t.hero.hintTags.map((hint) => (
                       <motion.button
                         key={hint.code}
                         onClick={() => { setAiIntent(hint.label); setAiMatchError(null); }}
@@ -1047,7 +1068,7 @@ export default function HomeClient() {
                       style={{ color: "#6ee7b7" }}
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_#10b981] dot-pulse" />
-                      {language === 'ko' ? `선택됨 ${selectedIngredients.length}` : `${selectedIngredients.length} Items`}
+                      {t.hero.itemsSelected.replace("{count}", selectedIngredients.length.toString())}
                     </span>
                     <div className="h-px flex-1" style={{ background: "linear-gradient(to left, transparent, rgba(52,211,153,0.3))" }} />
                   </div>
@@ -1080,7 +1101,7 @@ export default function HomeClient() {
                         <span className="text-sm md:text-base leading-none">{ingredient.icon_emoji}</span>
                         {/* 이름 */}
                         <span className="text-[10px] md:text-xs font-[900] text-white tracking-tight max-w-[90px] md:max-w-[150px] truncate">
-                          {language === 'ko' ? ingredient.name : ingredient.name_en}
+                          {language === 'ko' ? ingredient.name : language === 'ja' ? (ingredient.name_ja || ingredient.name_en) : language === 'zh' ? (ingredient.name_zh || ingredient.name_en) : ingredient.name_en}
                         </span>
                         {/* 삭제 버튼 */}
                         <button
@@ -1136,7 +1157,7 @@ export default function HomeClient() {
                     }}
                   >
                     <RotateCcw size={12} className="group-hover/reset:rotate-[-180deg] transition-transform duration-500 shrink-0" />
-                    <span className="whitespace-nowrap">{language === 'ko' ? '초기화' : 'Clear'}</span>
+                    <span className="whitespace-nowrap">{t.hero.reset}</span>
                   </button>
 
                   {/* 구분선 */}
@@ -1154,7 +1175,7 @@ export default function HomeClient() {
                       }}
                     >
                       <span className="text-sm leading-none shrink-0">+</span>
-                      <span className="whitespace-nowrap">{language === 'ko' ? '1개를 더 선택해주세요' : 'Select 1 more item'}</span>
+                      <span className="whitespace-nowrap">{t.hero.selectMore}</span>
                     </div>
                   ) : (
                     /* 활성화 — 2개 이상: 프리즘 고광량 버튼 */
@@ -1183,9 +1204,7 @@ export default function HomeClient() {
                       />
                       <Zap size={13} className="relative z-10 fill-current shrink-0" />
                       <span className="relative z-10 tracking-tight whitespace-nowrap">
-                        {language === 'ko'
-                          ? `${selectedIngredients.length}개 조합 분석!!`
-                          : `Analyze ${selectedIngredients.length}!`}
+                        {t.hero.analyzeCount.replace("{count}", selectedIngredients.length.toString())}
                       </span>
                     </motion.button>
                   )}
@@ -1250,7 +1269,7 @@ export default function HomeClient() {
                               {isCategory ? (item as SearchCategory).emoji : (item as Ingredient).icon_emoji}
                             </span>
                             <span className="tracking-tighter">
-                              {language === 'ko' ? item.name : item.name_en}
+                              {language === 'ko' ? item.name : language === 'ja' ? (item.name_ja || item.name_en) : language === 'zh' ? (item.name_zh || item.name_en) : item.name_en}
                             </span>
                             {isCategory ? (
                               <span className="text-[7px] text-amber-400/80 font-black uppercase tracking-widest pl-1 border-l border-amber-400/20 ml-1">Cat</span>
@@ -1263,8 +1282,8 @@ export default function HomeClient() {
                     </div>
                     {/* 드롭다운 푸터 */}
                     <div className="px-6 py-3 bg-white/[0.02] border-t border-white/[0.05] flex justify-between items-center">
-                      <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Select to add</span>
-                      <span className="text-[9px] font-bold text-emerald-400/50 italic">Pori AI Search</span>
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">{t.hero.selectToAdd}</span>
+                      <span className="text-[9px] font-bold text-emerald-400/50 italic">{t.common.poriAiSearch}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -1302,60 +1321,60 @@ export default function HomeClient() {
                   >
                     <div className="grid grid-cols-2 gap-2 w-full max-w-lg mx-auto">
                       {(comboIndex === 0 ? [
-                        { id: 'immunity', tags: ['비타민C', '아연'], label: t.hero.combos.immunity },
-                        { id: 'bone', tags: ['칼슘', '비타민D'], label: t.hero.combos.bone },
+                        { id: 'immunity', slugs: ['vitamin-c', 'zinc'] },
+                        { id: 'bone', slugs: ['calcium', 'vitamin-d'] },
                       ] : comboIndex === 1 ? [
-                        { id: 'vision', tags: ['루테인', '아스타잔틴'], label: t.hero.combos.vision },
-                        { id: 'energy', tags: ['비타민B12', '아르기닌'], label: t.hero.combos.energy },
+                        { id: 'vision', slugs: ['lutein', 'astaxanthin'] },
+                        { id: 'energy', slugs: ['vitamin-b12', 'arginine'] },
                       ] : comboIndex === 2 ? [
-                        { id: 'beauty', tags: ['콜라겐', '비타민C'], label: t.hero.combos.beauty },
-                        { id: 'liver', tags: ['밀크씨슬 (실리마린)', '비타민B12'], label: t.hero.combos.liver }
+                        { id: 'beauty', slugs: ['collagen', 'vitamin-c'] },
+                        { id: 'liver', slugs: ['milk-thistle', 'vitamin-b12'] }
                       ] : comboIndex === 3 ? [
-                        { id: 'sleep', tags: ['마그네슘', 'L-테아닌'], label: t.hero.combos.sleep },
-                        { id: 'heart', tags: ['오메가-3', '코엔자임Q10'], label: t.hero.combos.heart }
+                        { id: 'sleep', slugs: ['magnesium', 'l-theanine'] },
+                        { id: 'heart', slugs: ['omega-3', 'coq10'] }
                       ] : comboIndex === 4 ? [
-                        { id: 'brain', tags: ['오메가-3', '은행잎 추출물 (징코)'], label: t.hero.combos.brain },
-                        { id: 'diet', tags: ['카테킨 (녹차추출물)', 'L-카르니틴'], label: t.hero.combos.diet }
+                        { id: 'brain', slugs: ['omega-3', 'ginkgo'] },
+                        { id: 'diet', slugs: ['catechin', 'l-carnitine'] }
                       ] : [
-                        { id: 'joint', tags: ['칼슘', '콘드로이친'], label: t.hero.combos.joint },
-                        { id: 'bright', tags: ['콜라겐', '글루타치온'], label: t.hero.combos.bright }
-                      ]).map((combo) => (
-                        <button
-                          key={combo.id}
-                          onClick={() => {
-                            const toAdd = dbIngredients.filter(ing =>
-                              combo.tags.some(tag =>
-                                ing.name === tag ||
-                                ing.slug === tag
-                              )
-                            );
-                            toAdd.forEach(ing => {
-                              if (!selectedIngredients.some(s => s.id === ing.id)) {
-                                addIngredient(ing);
+                        { id: 'joint', slugs: ['calcium', 'chondroitin'] },
+                        { id: 'bright', slugs: ['collagen', 'glutathione'] }
+                      ]).map((conf) => {
+                        const combo = t.hero.combos[conf.id as keyof typeof t.hero.combos];
+                        return (
+                          <button
+                            key={conf.id}
+                            onClick={() => {
+                              const toAdd = dbIngredients.filter(ing =>
+                                conf.slugs.includes(ing.slug)
+                              );
+                              toAdd.forEach(ing => {
+                                if (!selectedIngredients.some(s => s.id === ing.id)) {
+                                  addIngredient(ing);
+                                }
+                              });
+                              if (toAdd.length > 0) {
+                                window.scrollTo({ top: 0, behavior: "smooth" });
                               }
-                            });
-                            if (toAdd.length > 0) {
-                              window.scrollTo({ top: 0, behavior: "smooth" });
-                            }
-                          }}
-                          className="relative group/combo flex flex-col items-start p-4 rounded-2xl transition-all duration-300 hover:bg-white/[0.06] active:scale-95 border border-white/10"
-                          style={{
-                            background: "rgba(255, 255, 255, 0.03)",
-                            backdropFilter: "blur(20px)",
-                          }}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
-                            <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">{combo.id} Protocol</span>
-                          </div>
-                          <span className="text-xs md:text-sm font-black text-white mb-2 group-hover/combo:text-emerald-400 transition-colors leading-tight">{combo.label}</span>
-                          <div className="flex flex-wrap gap-1">
-                            {combo.tags.map(tag => (
-                              <span key={tag} className="text-[8px] font-bold text-emerald-400/70 bg-emerald-500/5 px-2 py-0.5 rounded-md border border-emerald-500/10">{tag}</span>
-                            ))}
-                          </div>
-                        </button>
-                      ))}
+                            }}
+                            className="relative group/combo flex flex-col items-start p-4 rounded-2xl transition-all duration-300 hover:bg-white/[0.06] active:scale-95 border border-white/10"
+                            style={{
+                              background: "rgba(255, 255, 255, 0.03)",
+                              backdropFilter: "blur(20px)",
+                            }}
+                          >
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                              <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">{combo.label.replace(/[^\w\s]/g, '').trim() || conf.id} {t.hero.protocol}</span>
+                            </div>
+                            <span className="text-xs md:text-sm font-black text-white mb-2 group-hover/combo:text-emerald-400 transition-colors leading-tight">{combo.label}</span>
+                            <div className="flex flex-wrap gap-1">
+                              {combo.tags.map(tag => (
+                                <span key={tag} className="text-[8px] font-bold text-emerald-400/70 bg-emerald-500/5 px-2 py-0.5 rounded-md border border-emerald-500/10">{tag}</span>
+                              ))}
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -1375,13 +1394,13 @@ export default function HomeClient() {
                 <div className="flex items-center justify-between gap-4 mb-3 px-2">
                   <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.25em] flex items-center gap-2 italic">
                     <RotateCcw size={10} />
-                    {language === 'ko' ? '최근 분석 기록' : 'Recent Scans'}
+                    {t.hero.recentScans}
                   </span>
                   <button 
                     onClick={clearHistory}
                     className="text-[9px] font-bold text-white/20 hover:text-red-400 transition-colors uppercase tracking-wider"
                   >
-                    {language === 'ko' ? '기록 삭제' : 'Clear All'}
+                    {t.hero.clearHistory}
                   </button>
                 </div>
                 
@@ -1411,11 +1430,14 @@ export default function HomeClient() {
                       </div>
                       <div className="flex flex-col items-start min-w-0">
                         <span className="text-[10px] font-black text-white/80 line-clamp-1 max-w-[120px]">
-                          {history.ingredients.map(ing => language === 'ko' ? ing.name : ing.name_en).join(', ')}
+                          {history.ingredients.map(ing => {
+                            const currentIng = dbIngredients.find(dbIng => dbIng.id === ing.id) || ing;
+                            return language === 'ko' ? currentIng.name : language === 'ja' ? (currentIng.name_ja || currentIng.name_en) : language === 'zh' ? (currentIng.name_zh || currentIng.name_en) : currentIng.name_en;
+                          }).join(', ')}
                         </span>
                         <div className="flex items-center gap-1.5">
                            <span className="text-[8px] font-bold" style={{ color: history.score >= 80 ? '#10b981' : history.score >= 60 ? '#f59e0b' : '#f87171' }}>
-                            SCORE: {history.score}
+                            {t.hero.score}: {history.score}
                            </span>
                            <span className="w-1 h-1 rounded-full bg-white/10" />
                            <span className="text-[8px] font-medium text-white/20">
@@ -1441,7 +1463,7 @@ export default function HomeClient() {
               <div className="flex items-center gap-3">
                  <div className="w-8 h-[1px] bg-gradient-to-r from-transparent to-white/10" />
                  <span className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em] whitespace-nowrap">
-                   {language === 'ko' ? '인기 키워드' : 'Trending Tags'}
+                   {t.hero.trendingTags}
                  </span>
                  <div className="w-8 h-[1px] bg-gradient-to-l from-transparent to-white/10" />
               </div>
@@ -1487,16 +1509,11 @@ export default function HomeClient() {
             className="flex flex-wrap items-center justify-center gap-2 mt-12 mb-6 max-w-3xl mx-auto"
           >
             {[
-              { icon: "⚡", text: language === 'ko' ? '0.5초 분석' : '0.5s Analysis', color: "#fbbf24" },
-              { icon: "🔬", text: language === 'ko' ? 'AI 성분 매칭' : 'AI Matching', color: "#34d399" },
-              { icon: "🛡️", text: language === 'ko' ? '충돌 감지' : 'Conflict Alert', color: "#f87171" },
-              { icon: "✨", text: language === 'ko' ? '시너지 발견' : 'Synergy Finder', color: "#a78bfa" },
-              { 
-                icon: "📱", 
-                text: language === 'ko' ? 'App 출시 예정' : 'App Coming Soon', 
-                color: "#60a5fa",
-              },
-              { icon: "💚", text: language === 'ko' ? '무료 서비스' : 'Free Forever', color: "#34d399" },
+              { icon: "🔬", text: t.hero.badges.matching, color: "#34d399" },
+              { icon: "🛡️", text: t.hero.badges.conflict, color: "#f87171" },
+              { icon: "✨", text: t.hero.badges.synergy, color: "#a78bfa" },
+              { icon: "📱", text: t.hero.badges.app, color: "#60a5fa" },
+              { icon: "💚", text: t.hero.badges.free, color: "#34d399" },
             ].map((badge: any, i) => (
               <div
                 key={i}
@@ -1613,7 +1630,7 @@ export default function HomeClient() {
                     {t.common.popular}
                     </h2>
                     <p className="text-[8px] md:text-[9px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.2em", lineHeight: "1" }}>
-                      Curated trending picks
+                      {t.hero.trendingSubtitle}
                     </p>
                   </div>
                 </div>
@@ -1633,9 +1650,9 @@ export default function HomeClient() {
                       }}
                     >
                       <span className="whitespace-nowrap">
-                        {sortBy === 'default' ? (language === 'ko' ? '추천순' : 'Recommended') :
-                         sortBy === 'name' ? (language === 'ko' ? '이름순' : 'A-Z') :
-                         (language === 'ko' ? '인기순' : 'Popularity')}
+                        {sortBy === 'default' ? t.common.recommended :
+                         sortBy === 'name' ? t.common.az :
+                         t.common.popularity}
                       </span>
                       <ChevronDown
                         size={12}
@@ -1664,9 +1681,9 @@ export default function HomeClient() {
                             }}
                           >
                             {[
-                              { value: 'default', label: language === 'ko' ? '추천순' : 'Recommended' },
-                              { value: 'name', label: language === 'ko' ? '이름순' : 'A-Z' },
-                              { value: 'popular', label: language === 'ko' ? '인기순' : 'Popularity' },
+                              { value: 'default', label: t.common.recommended },
+                              { value: 'name', label: t.common.az },
+                              { value: 'popular', label: t.common.popularity },
                             ].map((opt) => (
                               <button
                                 key={opt.value}
@@ -1777,8 +1794,8 @@ export default function HomeClient() {
                               </div>
                               <p className="text-[8px] md:text-[9px] font-black uppercase mt-0.5" style={{ color: "#10b981", letterSpacing: "0.2em", lineHeight: "1" }}>
                                 {selectedCategory === 'all'
-                                  ? 'Curated trending picks'
-                                  : `Discover ${selectedCategory.split('_')[0]} collection`}
+                                  ? t.hero.trendingSubtitle
+                                  : t.common.exploreCategory}
                               </p>
                             </div>
                           </div>
@@ -1801,9 +1818,9 @@ export default function HomeClient() {
                           }}
                         >
                           <span className="whitespace-nowrap">
-                            {sortBy === 'default' ? (language === 'ko' ? '추천순' : 'Recommended') :
-                             sortBy === 'name' ? (language === 'ko' ? '이름순' : 'A-Z') :
-                             (language === 'ko' ? '인기순' : 'Popularity')}
+                            {sortBy === 'default' ? t.common.recommended :
+                             sortBy === 'name' ? t.common.az :
+                             t.common.popularity}
                           </span>
                           <ChevronDown
                             size={12}
@@ -1831,9 +1848,9 @@ export default function HomeClient() {
                                 }}
                               >
                                 {[
-                                  { value: 'default', label: language === 'ko' ? '추천순' : 'Recommended' },
-                                  { value: 'name', label: language === 'ko' ? '이름순' : 'A-Z' },
-                                  { value: 'popular', label: language === 'ko' ? '인기순' : 'Popularity' },
+                                  { value: 'default', label: t.common.recommended },
+                                  { value: 'name', label: t.common.az },
+                                  { value: 'popular', label: t.common.popularity },
                                 ].map((opt) => (
                                   <button
                                     key={opt.value}
@@ -1912,22 +1929,25 @@ export default function HomeClient() {
                       <div className="w-full max-w-md mx-auto mb-10">
                         <div className="flex items-center gap-2 mb-4 justify-center">
                           <span className="h-px w-8 bg-slate-200" />
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Maybe Try These?</span>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.hero.maybeTry}</span>
                           <span className="h-px w-8 bg-slate-200" />
                         </div>
                         <div className="flex flex-wrap justify-center gap-2">
-                          {popularIngredients.slice(0, 4).map((ing) => (
-                            <button
-                              key={ing.id}
-                              onClick={() => {
-                                setInputValue(language === 'ko' ? ing.name : ing.name_en);
-                                startTransition(() => setSearchQuery(language === 'ko' ? ing.name : ing.name_en));
-                              }}
-                              className="px-3 py-1.5 rounded-xl bg-white border border-slate-100 text-slate-600 text-[10px] font-bold hover:border-emerald-300 hover:text-emerald-500 transition-all shadow-sm active:scale-95"
-                            >
-                              {ing.icon_emoji} {language === 'ko' ? ing.name : ing.name_en}
-                            </button>
-                          ))}
+                            {popularIngredients.slice(0, 4).map((ing) => {
+                              const name = language === 'ko' ? ing.name : language === 'ja' ? (ing.name_ja || ing.name_en) : language === 'zh' ? (ing.name_zh || ing.name_en) : ing.name_en;
+                              return (
+                                <button
+                                  key={ing.id}
+                                  onClick={() => {
+                                    setInputValue(name);
+                                    startTransition(() => setSearchQuery(name));
+                                  }}
+                                  className="px-3 py-1.5 rounded-xl bg-white border border-slate-100 text-slate-600 text-[10px] font-bold hover:border-emerald-300 hover:text-emerald-500 transition-all shadow-sm active:scale-95"
+                                >
+                                  {ing.icon_emoji} {name}
+                                </button>
+                              );
+                            })}
                         </div>
                       </div>
 
@@ -1976,48 +1996,7 @@ export default function HomeClient() {
       )}
 
 
-      {/* 가이드 팝업 */}
-      <AnimatePresence>
-        {isGuideOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6"
-          >
-            {/* 어두운 배경 (클릭 시 닫힘) */}
-            <div
-              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md cursor-pointer"
-              onClick={() => setIsGuideOpen(false)}
-            />
 
-            <motion.div
-              initial={{ scale: 0.95, y: 20, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.95, y: 10, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative w-auto h-auto max-w-5xl max-h-[90vh] bg-transparent rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl flex flex-col pointer-events-auto"
-            >
-              {/* 닫기 버튼 */}
-              <button
-                onClick={() => setIsGuideOpen(false)}
-                className="absolute top-4 right-4 md:top-6 md:right-6 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white/70 hover:text-white hover:bg-black/60 backdrop-blur-sm border border-white/10 transition-all hover:scale-110 active:scale-95 shadow-xl"
-              >
-                <X size={20} />
-              </button>
-
-              {/* 이미지 영역 (스크롤 가능) */}
-              <div className="overflow-y-auto scrollbar-hide flex-1">
-                <img
-                  src={language === 'ko' ? '/hero-illustration-guide.webp' : '/hero-illustration-guide-en.webp'}
-                  alt="ZestPair Using Guide"
-                  className="w-auto h-auto max-w-full max-h-[90vh] object-contain block leading-none"
-                />
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
 
     </div>

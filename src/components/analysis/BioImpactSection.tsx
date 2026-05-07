@@ -15,7 +15,7 @@ interface BioImpactSectionProps {
         metabolism: number;
     };
     mechanism?: string | null;
-    language: "ko" | "en";
+    language: "ko" | "en" | "ja" | "zh";
 }
 
 export default function BioImpactSection({ metrics, mechanism, language }: BioImpactSectionProps) {
@@ -29,12 +29,12 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
     const radius = VB * 0.27; // ~108 — radar polygon radius
 
     const categories = [
-        { key: 'focus',      label: isKo ? '정신/집중'     : 'FOCUS',     icon: Brain,        color: '#818cf8', bg: 'rgba(129,140,248,0.18)', colorClass: 'text-indigo-400' },
-        { key: 'vitality',   label: isKo ? '신체/활력'     : 'VITALITY',  icon: Zap,          color: '#fb923c', bg: 'rgba(251,146,60,0.18)',  colorClass: 'text-orange-400' },
-        { key: 'shield',     label: isKo ? '면역/보호'     : 'SHIELD',    icon: Shield,       color: '#34d399', bg: 'rgba(52,211,153,0.18)',  colorClass: 'text-emerald-400' },
-        { key: 'beauty',     label: isKo ? '항노화/미용'   : 'BEAUTY',    icon: Sparkles,     color: '#f472b6', bg: 'rgba(244,114,182,0.18)', colorClass: 'text-pink-400' },
-        { key: 'calm',       label: isKo ? '스트레스/수면' : 'CALM',      icon: Moon,         color: '#c084fc', bg: 'rgba(192,132,252,0.18)', colorClass: 'text-violet-400' },
-        { key: 'metabolism', label: isKo ? '대사/소화'     : 'METABOLIC', icon: Accessibility, color: '#60a5fa', bg: 'rgba(96,165,250,0.18)',  colorClass: 'text-blue-400' },
+        { key: 'focus',      label: language === 'ko' ? '정신/집중'     : language === 'ja' ? '精神/集中' : language === 'zh' ? '精神/集中' : 'FOCUS',     icon: Brain,        color: '#818cf8', bg: 'rgba(129,140,248,0.18)', colorClass: 'text-indigo-400' },
+        { key: 'vitality',   label: language === 'ko' ? '신체/활력'     : language === 'ja' ? '身体/活力' : language === 'zh' ? '身体/活力' : 'VITALITY',  icon: Zap,          color: '#fb923c', bg: 'rgba(251,146,60,0.18)',  colorClass: 'text-orange-400' },
+        { key: 'shield',     label: language === 'ko' ? '면역/보호'     : language === 'ja' ? '免疫/保護' : language === 'zh' ? '免疫/保护' : 'SHIELD',    icon: Shield,       color: '#34d399', bg: 'rgba(52,211,153,0.18)',  colorClass: 'text-emerald-400' },
+        { key: 'beauty',     label: language === 'ko' ? '항노화/미용'   : language === 'ja' ? '美容/抗加齢' : language === 'zh' ? '美容/抗衰老' : 'BEAUTY',    icon: Sparkles,     color: '#f472b6', bg: 'rgba(244,114,182,0.18)', colorClass: 'text-pink-400' },
+        { key: 'calm',       label: language === 'ko' ? '스트레스/수면' : language === 'ja' ? '睡眠/ストレス' : language === 'zh' ? '睡眠/压力' : 'CALM',      icon: Moon,         color: '#c084fc', bg: 'rgba(192,132,252,0.18)', colorClass: 'text-violet-400' },
+        { key: 'metabolism', label: language === 'ko' ? '대사/소화'     : language === 'ja' ? '代謝/消化' : language === 'zh' ? '代谢/消化' : 'METABOLIC', icon: Accessibility, color: '#60a5fa', bg: 'rgba(96,165,250,0.18)',  colorClass: 'text-blue-400' },
     ];
 
     const getPoint = (index: number, value: number, max = 100) => {
@@ -88,10 +88,10 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
                             </div>
                             <div className="min-w-0">
                                 <p className="text-[12px] md:text-[13px] font-black uppercase tracking-[0.06em] md:tracking-[0.2em] text-indigo-400/90 whitespace-nowrap">
-                                    {isKo ? '6대 바이오 임팩트 분석' : '6D BIO-IMPACT'}
+                                    {language === 'ko' ? '6대 바이오 임팩트 분석' : language === 'ja' ? '6大バイオインパクト分析' : language === 'zh' ? '6大生物影响分析' : '6D BIO-IMPACT'}
                                 </p>
                                 <p className="text-[9px] md:text-[10px] text-slate-500 font-bold tracking-wide mt-0.5 whitespace-nowrap">
-                                    HYPER-PERSONALIZED · AI COMPUTED
+                                    {language === 'ko' ? "개인 맞춤형 · AI 연산" : language === 'ja' ? "パーソナライズ · AI演算" : language === 'zh' ? "个性化 · AI计算" : "HYPER-PERSONALIZED · AI COMPUTED"}
                                 </p>
                             </div>
                         </div>
@@ -99,7 +99,7 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
                         <div className="hidden md:flex flex-shrink-0 px-2.5 py-1.5 rounded-full border"
                             style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}>
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide whitespace-nowrap">
-                                {isKo ? 'AI 정밀 데이터' : 'AI PRECISION DATA'}
+                                {language === 'ko' ? 'AI 정밀 데이터' : language === 'ja' ? 'AI精密データ' : language === 'zh' ? 'AI精密数据' : 'AI PRECISION DATA'}
                             </span>
                         </div>
                     </div>
@@ -240,8 +240,8 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
                                                 flexDirection: 'column',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
-                                                gap: '2px',
-                                                padding: '5px 8px',
+                                                gap: '1px',
+                                                padding: '4px 6px',
                                                 borderRadius: '10px',
                                                 background: `linear-gradient(135deg, ${cat.bg}, rgba(2,6,18,0.88))`,
                                                 border: `1px solid ${cat.color}38`,
@@ -249,9 +249,11 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
                                                     ? `0 4px 18px -4px ${cat.color}60, inset 0 1px 0 ${cat.color}20`
                                                     : '0 2px 10px rgba(0,0,0,0.5)',
                                                 backdropFilter: 'blur(14px)',
-                                                whiteSpace: 'nowrap',
+                                                width: '100%',
+                                                height: '100%',
+                                                boxSizing: 'border-box'
                                             }}>
-                                                <span style={{ fontSize: 11, fontWeight: 900, color: '#94a3b8', letterSpacing: '0.04em' }}>
+                                                <span style={{ fontSize: 9, fontWeight: 900, color: '#94a3b8', letterSpacing: '0.04em', wordBreak: 'break-all', textAlign: 'center', lineHeight: 1.1 }}>
                                                     {cat.label}
                                                 </span>
                                                 <span style={{
@@ -275,9 +277,9 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
                     <div className="grid grid-cols-3 gap-2 mt-2 pt-4"
                         style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                         {[
-                            { label: isKo ? '평균 지수' : 'AVG INDEX', value: String(avgScore), colorClass: 'text-white', sub: 'OVERALL' },
-                            { label: isKo ? '최고 강점' : 'PEAK', value: peakCategory.label, colorClass: peakCategory.colorClass, sub: 'STRENGTH' },
-                            { label: isKo ? '분석 신뢰도' : 'CONFIDENCE', value: '98%', colorClass: 'text-indigo-400', sub: 'AI SCORE' },
+                            { label: language === 'ko' ? '평균 지수' : language === 'ja' ? '平均指数' : language === 'zh' ? '平均指数' : 'AVG INDEX', value: String(avgScore), colorClass: 'text-white', sub: 'OVERALL' },
+                            { label: language === 'ko' ? '최고 강점' : language === 'ja' ? '最高強み' : language === 'zh' ? '最高强项' : 'PEAK', value: peakCategory.label, colorClass: peakCategory.colorClass, sub: 'STRENGTH' },
+                            { label: language === 'ko' ? '분석 신뢰도' : language === 'ja' ? '分析信頼度' : language === 'zh' ? '分析信誉' : 'CONFIDENCE', value: '98%', colorClass: 'text-indigo-400', sub: 'AI SCORE' },
                         ].map((stat, i) => (
                             <motion.div
                                 key={i}
@@ -326,7 +328,7 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
                                 <Info size={13} className="text-violet-400" />
                             </div>
                             <span className="text-[11px] font-black uppercase tracking-[0.2em] text-violet-400/80">
-                                {isKo ? '과학적 기전 심층 분석' : 'SCIENTIFIC MECHANISM'}
+                                {language === 'ko' ? '과학적 기전 심층 분석' : language === 'ja' ? '科学的メカニズムの深層分析' : language === 'zh' ? '科学机制深层分析' : 'SCIENTIFIC MECHANISM'}
                             </span>
                         </div>
                         <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} className="text-violet-500/50">
@@ -342,7 +344,10 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
                         <div className="px-6 pb-6 pt-2">
                             <div className="p-4 rounded-2xl"
                                 style={{ background: 'rgba(192,132,252,0.05)', border: '1px solid rgba(192,132,252,0.1)' }}>
-                                <p className="text-[13px] md:text-[14px] font-medium leading-relaxed text-slate-300 text-left">
+                                <p className={cn(
+                                    "text-[13px] md:text-[14px] font-medium leading-relaxed text-slate-300 text-left",
+                                    (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                                )}>
                                     {mechanism}
                                 </p>
                                 <div className="mt-3 flex items-center gap-2">
@@ -352,7 +357,7 @@ export default function BioImpactSection({ metrics, mechanism, language }: BioIm
                                         className="w-1.5 h-1.5 rounded-full bg-violet-400"
                                     />
                                     <span className="text-[9px] font-black text-violet-400/40 uppercase tracking-widest font-mono">
-                                        CELLULAR PROTOCOL ACTIVE
+                                        {language === 'ko' ? "세포 프로토콜 활성화" : language === 'ja' ? "細胞プロトコル活性化" : language === 'zh' ? "细胞协议已激活" : "CELLULAR PROTOCOL ACTIVE"}
                                     </span>
                                 </div>
                             </div>

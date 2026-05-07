@@ -89,7 +89,7 @@ async function callGeminiWithRetry(prompt: string, retries = 2, delay = 2000): P
 export async function generateDosageSchedule(
     ingredients: Ingredient[],
     interactions: { synergies: InteractionResult[], cautions: InteractionResult[], conflicts: InteractionResult[] },
-    language: "ko" | "en"
+    language: "ko" | "en" | "ja" | "zh"
 ): Promise<ScheduleSlot[]> {
     const prompt = `
 You are an expert nutritionist and pharmacist AI for ZestPair.
@@ -107,7 +107,7 @@ ${ingredients.map(ing => `- ${ing.name} (${ing.name_en}): Recommended time is ${
 1. Group ingredients into: morning_before (empty stomach), morning_after, lunch_after, evening_after, night_before, anytime.
 2. IMPORTANT: If there is a CAUTION or CONFLICT between two ingredients, separate them into different time slots (e.g., one in morning, one in evening).
 3. Synergies should be taken together if their recommended dosage times allow.
-4. For each time slot, provide a short "ai_insight" explaining WHY this grouping is good (in ${language === 'ko' ? 'Korean' : 'English'}). Explain it using a **fun, easy-to-understand analogy** rather than complex medical terms.
+4. For each time slot, provide a short "ai_insight" explaining WHY this grouping is good (in ${language === 'ko' ? 'Korean' : language === 'ja' ? 'Japanese' : language === 'zh' ? 'Chinese' : 'English'}). Explain it using a **fun, easy-to-understand analogy** rather than complex medical terms.
 5. Keep it friendly, witty, and highly engaging. Use emojis appropriately.
 
 ## Return Format (JSON only):
@@ -150,19 +150,19 @@ Only return the JSON array. Do not include markdown code blocks.
     }
 }
 
-function fallbackSchedule(ingredients: Ingredient[], language: "ko" | "en"): ScheduleSlot[] {
+function fallbackSchedule(ingredients: Ingredient[], language: "ko" | "en" | "ja" | "zh"): ScheduleSlot[] {
     // Simple heuristic-based fallback
     const slots: Record<string, ScheduleSlot> = {
-        morning_after: { time_id: "morning_after", items: [], ai_insight: language === 'ko' ? "아침 식사 후 활력을 위해 배정되었습니다." : "Scheduled after breakfast for daily energy." },
-        anytime: { time_id: "anytime", items: [], ai_insight: language === 'ko' ? "편하신 시간에 편하게 드세요." : "Take anytime at your convenience." }
+        morning_after: { time_id: "morning_after", items: [], ai_insight: language === 'ko' ? "아침 식사 후 활력을 위해 배정되었습니다." : language === 'ja' ? "朝食後の活力のために割り当てられました。" : language === 'zh' ? "为了早餐后的活力而安排。" : "Scheduled after breakfast for daily energy." },
+        anytime: { time_id: "anytime", items: [], ai_insight: language === 'ko' ? "편하신 시간에 편하게 드세요." : language === 'ja' ? "お好きな時間にリラックスしてお召し上がりください。" : language === 'zh' ? "请在您方便的时间服用。" : "Take anytime at your convenience." }
     };
 
     ingredients.forEach(ing => {
         const item = {
             ingredient_id: ing.id,
-            name: language === 'ko' ? ing.name : ing.name_en,
+            name: language === 'ko' ? ing.name : language === 'ja' && ing.name_ja ? ing.name_ja : language === 'zh' && ing.name_zh ? ing.name_zh : ing.name_en || ing.name,
             icon: ing.icon_emoji,
-            note: language === 'ko' ? (ing.dosage_note || "물과 함께 섭취") : (ing.dosage_note_en || "Take with water")
+            note: language === 'ko' ? (ing.dosage_note || "물과 함께 섭취") : language === 'ja' ? (ing.dosage_note_ja || "水と一緒に摂取") : language === 'zh' ? (ing.dosage_note_zh || "随水服用") : (ing.dosage_note_en || "Take with water")
         };
         if (ing.dosage_time === "morning") slots.morning_after.items.push(item);
         else slots.anytime.items.push(item);
@@ -179,7 +179,7 @@ export async function generateUnifiedAnalysis(
     ingredients: Ingredient[],
     interactions: { synergies: InteractionResult[], cautions: InteractionResult[], conflicts: InteractionResult[] },
     score: number,
-    language: "ko" | "en" = "ko"
+    language: "ko" | "en" | "ja" | "zh" = "ko"
 ): Promise<{ 
     briefing: any[], 
     schedule: ScheduleSlot[], 
@@ -195,6 +195,7 @@ export async function generateUnifiedAnalysis(
     isFallback: boolean 
 }> {
     const isKo = language === 'ko';
+    const fallback = FALLBACK_DATA[language] || FALLBACK_DATA['ko'];
     
     const prompt = `
 You are the "Chief AI Design Director" for ZestPair, a premium supplement analysis service.
@@ -207,7 +208,7 @@ Your mission is to ANALYZE, VALIDATE, and OPTIMIZE this specific selection.
 - Provide a clear, actionable intake schedule.
 
 ## Input Data:
-- User's Selected Ingredients: ${ingredients.map(i => isKo ? i.name : i.name_en).join(", ")}
+- User's Selected Ingredients: ${ingredients.map(i => language === 'ko' ? i.name : language === 'ja' && i.name_ja ? i.name_ja : language === 'zh' && i.name_zh ? i.name_zh : i.name_en || i.name).join(", ")}
 - Synergy Score: ${score}/100
 - Detected Synergies: ${interactions.synergies.length}
 - Detected Cautions: ${interactions.cautions.length}
@@ -296,7 +297,7 @@ Your mission is to ANALYZE, VALIDATE, and OPTIMIZE this specific selection.
     ]
   }
 
-Language: ${isKo ? 'Korean' : 'English'}.
+Language: ${language === 'ko' ? 'Korean' : language === 'ja' ? 'Japanese' : language === 'zh' ? 'Chinese' : 'English'}.
 Only return the JSON. No markdown code blocks.
 `;
 
@@ -306,10 +307,10 @@ Only return the JSON. No markdown code blocks.
         const result = JSON.parse(text);
         
         return {
-            briefing: (result.briefing && result.briefing.length > 0) ? result.briefing.slice(0, 5) : FALLBACK_BRIEFING,
-            recommendation_targets: (result.recommendation_targets && result.recommendation_targets.length > 0) ? result.recommendation_targets.slice(0, 5) : FALLBACK_TARGETS,
-            lifestyle_guidelines: (result.lifestyle_guidelines && result.lifestyle_guidelines.length > 0) ? result.lifestyle_guidelines.slice(0, 5) : FALLBACK_LIFESTYLE,
-            expected_timeline: result.expected_timeline || FALLBACK_TIMELINE,
+            briefing: (result.briefing && result.briefing.length > 0) ? result.briefing.slice(0, 5) : fallback.briefing,
+            recommendation_targets: (result.recommendation_targets && result.recommendation_targets.length > 0) ? result.recommendation_targets.slice(0, 5) : fallback.targets,
+            lifestyle_guidelines: (result.lifestyle_guidelines && result.lifestyle_guidelines.length > 0) ? result.lifestyle_guidelines.slice(0, 5) : fallback.lifestyle,
+            expected_timeline: result.expected_timeline || fallback.timeline,
             synergy_jackpot: result.synergy_jackpot || null,
             conflict_solution: result.conflict_solution || null,
             meal_pairing: result.meal_pairing || [],
@@ -322,13 +323,13 @@ Only return the JSON. No markdown code blocks.
     } catch (error) {
         console.warn("⚠️ [Gemini API] Unified Analysis Failed. Using Luxury Fallback Text.");
         console.error("Error Detail:", error);
-        
+
         // 할당량 초과 시에도 럭셔리한 경험을 유지하기 위한 '품격 있는 대안' 데이터 ✨
         return {
-            briefing: FALLBACK_BRIEFING,
-            recommendation_targets: FALLBACK_TARGETS,
-            lifestyle_guidelines: FALLBACK_LIFESTYLE,
-            expected_timeline: FALLBACK_TIMELINE,
+            briefing: fallback.briefing,
+            recommendation_targets: fallback.targets,
+            lifestyle_guidelines: fallback.lifestyle,
+            expected_timeline: fallback.timeline,
             synergy_jackpot: null,
             conflict_solution: null,
             meal_pairing: [],
@@ -341,26 +342,93 @@ Only return the JSON. No markdown code blocks.
     }
 }
 
-const FALLBACK_BRIEFING = [
-    "현재 조합은 기초 대사량 증진과 세포 보호를 위한 핵심 성분들이 조화롭게 구성된 프리미엄 베이스를 갖추고 있습니다.",
-    "성분 간의 흡수율을 극대화하기 위해 식사 직후 복용을 권장하며, 수분 섭취를 충분히 늘려 대사 효율을 보조하시기 바랍니다.",
-    "이 구성을 4주간 유지할 경우 활력 지수의 유의미한 수치 개선과 항산화 밸런스의 정교한 최적화가 기대됩니다."
-];
-
-const FALLBACK_TARGETS = [
-    "일과 후 빠른 피로 회복이 필요한 분",
-    "고강도 운동이나 활동적인 라이프스타일을 즐기는 분",
-    "아침 기상이 무겁고 만성적인 활력 저하를 느끼는 분"
-];
-
-const FALLBACK_LIFESTYLE = [
-    "복용 전후 1시간은 카페인 섭취를 피해 흡수율을 높이세요.",
-    "충분한 수분 섭취는 미네랄 대사를 원활하게 돕습니다.",
-    "가벼운 스트레칭과 병행하면 근육 이완 효과가 배가됩니다."
-];
-
-const FALLBACK_TIMELINE = {
-    week1: "신체 긴장 완화와 수면 질 개선 단계",
-    week2: "세포 에너지 대사 활성화 및 활력 증가 단계",
-    week4: "신체 밸런스 최적화 및 항산화 체계 구축 단계"
+const FALLBACK_DATA: Record<string, any> = {
+    ko: {
+        briefing: [
+            "현재 조합은 기초 대사량 증진과 세포 보호를 위한 핵심 성분들이 조화롭게 구성된 프리미엄 베이스를 갖추고 있습니다.",
+            "성분 간의 흡수율을 극대화하기 위해 식사 직후 복용을 권장하며, 수분 섭취를 충분히 늘려 대사 효율을 보조하시기 바랍니다.",
+            "이 구성을 4주간 유지할 경우 활력 지수의 유의미한 수치 개선과 항산화 밸런스의 정교한 최적화가 기대됩니다."
+        ],
+        targets: [
+            "일과 후 빠른 피로 회복이 필요한 분",
+            "고강도 운동이나 활동적인 라이프스타일을 즐기는 분",
+            "아침 기상이 무겁고 만성적인 활력 저하를 느끼는 분"
+        ],
+        lifestyle: [
+            "복용 전후 1시간은 카페인 섭취를 피해 흡수율을 높이세요.",
+            "충분한 수분 섭취는 미네랄 대사를 원활하게 돕습니다.",
+            "가벼운 스트레칭과 병행하면 근육 이완 효과가 배가됩니다."
+        ],
+        timeline: {
+            week1: "신체 긴장 완화와 수면 질 개선 단계",
+            week2: "세포 에너지 대사 활성화 및 활력 증가 단계",
+            week4: "신체 밸런스 최적화 및 항산화 체계 구축 단계"
+        }
+    },
+    en: {
+        briefing: [
+            "The current combination features a premium base of core ingredients harmoniously formulated for metabolic enhancement and cellular protection.",
+            "To maximize absorption, it is recommended to take after meals and increase water intake to support metabolic efficiency.",
+            "Maintaining this regimen for 4 weeks is expected to result in significant improvements in vitality indices and refined optimization of antioxidant balance."
+        ],
+        targets: [
+            "Those needing rapid recovery after a long day",
+            "Those with high-intensity workouts or active lifestyles",
+            "Those experiencing heavy mornings and chronic lack of energy"
+        ],
+        lifestyle: [
+            "Avoid caffeine 1 hour before and after intake to improve absorption.",
+            "Sufficient hydration helps smooth mineral metabolism.",
+            "Combining with light stretching doubles the muscle relaxation effect."
+        ],
+        timeline: {
+            week1: "Relaxation of body tension and sleep quality improvement phase",
+            week2: "Cellular energy activation and vitality increase phase",
+            week4: "Body balance optimization and antioxidant system building phase"
+        }
+    },
+    ja: {
+        briefing: [
+            "現在の組み合わせは、基礎代謝の向上と細胞保護のための核となる成分が調和して構成されたプレミアムベースを備えています。",
+            "成分間の吸収率を最大化するために食直後の服用を推奨し、水分摂取を十分に増やして代謝効率を補助してください。",
+            "この構成を4週間維持した場合、活力指数の有意な改善と抗酸化バランスの精巧な最適化が期待されます。"
+        ],
+        targets: [
+            "仕事の後の素早い疲労回復が必要な方",
+            "高強度の運動やアクティブなライフスタイルを楽しむ方",
+            "朝の目覚めが重く、慢性的な活力低下を感じる方"
+        ],
+        lifestyle: [
+            "服用の前後1時間はカフェインの摂取を避け、吸収率を高めてください。",
+            "十分な水分摂取はミネラル代謝を円滑に助けます。",
+            "軽いストレッチを並行すると、筋肉の弛緩効果が倍増します。"
+        ],
+        timeline: {
+            week1: "身体の緊張緩和と睡眠の質の改善段階",
+            week2: "細胞エネルギー代謝の活性化と活力増大段階",
+            week4: "身体バランスの最適化と抗酸化体系の構築段階"
+        }
+    },
+    zh: {
+        briefing: [
+            "目前的组合具有协调构成的优质基础，包含促进基础代谢和细胞保护的核心成分。",
+            "为使成分吸收率最大化，建议饭后立即服用，并请充分增加水分摄入以辅助代谢效率。",
+            "维持此方案4周后，预计活力指数将有显著改善，抗氧化平衡也将得到精确优化。"
+        ],
+        targets: [
+            "工作后需要快速恢复疲劳的人",
+            "享受高强度运动或活跃生活方式的人",
+            "早晨起床感觉沉重并感到慢性活力低下的人"
+        ],
+        lifestyle: [
+            "服用前后1小时请避免摄入咖啡因，以提高吸收率。",
+            "充足的水分摄入有助于矿物质代谢顺畅。",
+            "结合轻微的拉伸运动，肌肉放松效果会加倍。"
+        ],
+        timeline: {
+            week1: "缓解身体紧张和改善睡眠质量阶段",
+            week2: "细胞能量代谢激活和活力增加阶段",
+            week4: "身体平衡优化和抗氧化体系建立阶段"
+        }
+    }
 };

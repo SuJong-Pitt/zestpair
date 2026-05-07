@@ -5,6 +5,7 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 
 interface ScoreRingProps {
     score: number;
+    language: string;
     size?: number;
 }
 
@@ -12,7 +13,7 @@ interface ScoreRingProps {
  * 점수 링 컴포넌트 - 풀 컬러 네온 HUD 버전
  * React.memo를 통해 부모 리렌더링 시에도 불필요한 계산을 방지합니다.
  */
-const ScoreRing = memo(function ScoreRing({ score, size }: ScoreRingProps) {
+const ScoreRing = memo(function ScoreRing({ score, language, size }: ScoreRingProps) {
     const radius = 72;
     const strokeWidth = 8;
     const circumference = 2 * Math.PI * radius;
@@ -46,31 +47,36 @@ const ScoreRing = memo(function ScoreRing({ score, size }: ScoreRingProps) {
             gradA: "#e879f9",   // fuchsia
             gradB: "#818cf8",   // indigo  
             gradC: "#34d399",   // emerald
-            label: "✦  P E R F E C T  ✦", labelColor: "#f0abfc"
+            label: language === 'ko' ? "✦  완 벽  ✦" : language === 'ja' ? "✦ 完 璧 ✦" : language === 'zh' ? "✦ 完 美 ✦" : "✦  P E R F E C T  ✦", 
+            labelColor: "#f0abfc"
         };
         if (s >= 80) return {
             main: "#34d399", light: "#6ee7b7", accent: "#a7f3d0",
             shadow: "rgba(52,211,153,0.9)",
             gradA: "#34d399", gradB: "#06b6d4", gradC: "#6366f1",
-            label: "HIGH_SYNERGY", labelColor: "#34d399"
+            label: language === 'ko' ? "높은 시너지" : language === 'ja' ? "高い相乗効果" : language === 'zh' ? "高协同效应" : "HIGH_SYNERGY", 
+            labelColor: "#34d399"
         };
         if (s >= 60) return {
             main: "#22d3ee", light: "#67e8f9", accent: "#a5f3fc",
             shadow: "rgba(34,211,238,0.9)",
             gradA: "#22d3ee", gradB: "#818cf8", gradC: "#c084fc",
-            label: "SYNC_STABLE", labelColor: "#22d3ee"
+            label: language === 'ko' ? "안정적 결합" : language === 'ja' ? "安定した結合" : language === 'zh' ? "稳定结合" : "SYNC_STABLE", 
+            labelColor: "#22d3ee"
         };
         if (s >= 40) return {
             main: "#fbbf24", light: "#fcd34d", accent: "#fde68a",
             shadow: "rgba(251,191,36,0.9)",
             gradA: "#fbbf24", gradB: "#f97316", gradC: "#fb7185",
-            label: "CAUTION_REQ", labelColor: "#fbbf24"
+            label: language === 'ko' ? "주의 필요" : language === 'ja' ? "注意が必要" : language === 'zh' ? "需要注意" : "CAUTION_REQ", 
+            labelColor: "#fbbf24"
         };
         return {
             main: "#f87171", light: "#fca5a5", accent: "#fecaca",
             shadow: "rgba(248,113,113,0.9)",
             gradA: "#f87171", gradB: "#e879f9", gradC: "#fb923c",
-            label: "CRIT_WARN", labelColor: "#f87171"
+            label: language === 'ko' ? "치명적 경고" : language === 'ja' ? "致命的な警告" : language === 'zh' ? "严重警告" : "CRIT_WARN", 
+            labelColor: "#f87171"
         };
     };
 

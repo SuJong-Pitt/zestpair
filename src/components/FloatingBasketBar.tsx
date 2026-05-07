@@ -58,7 +58,7 @@ export default function FloatingBasketBar({
 
   const filteredSearch = allIngredients.filter((ing) => {
     if (!searchQuery) return false;
-    const name = language === "ko" ? ing.name : ing.name_en;
+    const name = language === "ko" ? ing.name : language === "ja" && ing.name_ja ? ing.name_ja : language === "zh" && ing.name_zh ? ing.name_zh : ing.name_en || ing.name;
     return name.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
@@ -186,7 +186,7 @@ export default function FloatingBasketBar({
                         {isSearchActive && searchQuery ? (
                           filteredSearch.length > 0 ? (
                             filteredSearch.map((ing, i) => {
-                              const ingName = language === "ko" ? ing.name : ing.name_en;
+                              const ingName = language === "ko" ? ing.name : language === "ja" && ing.name_ja ? ing.name_ja : language === "zh" && ing.name_zh ? ing.name_zh : ing.name_en || ing.name;
                               const sel = isSelected(ing.id);
                               return (
                                 <motion.button
@@ -210,12 +210,12 @@ export default function FloatingBasketBar({
                             })
                           ) : (
                             <div className="w-full py-6 text-center text-white/30 text-xs font-bold">
-                              {language === "ko" ? "검색 결과가 없습니다." : "No results found."}
+                              {language === "ko" ? "검색 결과가 없습니다." : language === "ja" ? "検索結果がありません。" : language === "zh" ? "没有找到结果。" : "No results found."}
                             </div>
                           )
                         ) : (
                           selectedIngredients.map((ing, i) => {
-                            const ingName = language === "ko" ? ing.name : ing.name_en;
+                            const ingName = language === "ko" ? ing.name : language === "ja" && ing.name_ja ? ing.name_ja : language === "zh" && ing.name_zh ? ing.name_zh : ing.name_en || ing.name;
                             return (
                               <motion.div
                                 key={ing.id}
@@ -300,7 +300,7 @@ export default function FloatingBasketBar({
                           type="text"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          placeholder={language === "ko" ? "성분 검색..." : "Search..."}
+                          placeholder={language === "ko" ? "성분 검색..." : language === "ja" ? "成分検索..." : language === "zh" ? "搜索成分..." : "Search..."}
                           className="w-full bg-transparent border-none focus:ring-0 text-[13px] md:text-sm text-white font-bold p-0 placeholder:text-white/25"
                         />
                       </motion.div>
@@ -331,7 +331,7 @@ export default function FloatingBasketBar({
                         {/* 텍스트 */}
                         <div className="flex flex-col">
                           <span className="text-xs font-[800] leading-tight text-white/90 whitespace-nowrap">
-                            {language === "ko" ? `${count}개 선택됨` : `${count} selected`}
+                            {language === "ko" ? `${count}개 선택됨` : language === "ja" ? `${count}個選択中` : language === "zh" ? `已选 ${count} 个` : `${count} selected`}
                           </span>
                           <motion.span
                             initial={{ x: 0 }}
@@ -349,11 +349,11 @@ export default function FloatingBasketBar({
                               showAlert ? (
                                 <span>{t.common.notEnoughIngredients}</span>
                               ) : (
-                                language === "ko" ? "1개 더 추가하세요" : "Add 1 more"
+                                language === "ko" ? "1개 더 추가하세요" : language === "ja" ? "もう1つ追加" : language === "zh" ? "再加1个" : "Add 1 more"
                               )
                             ) : (
                               <>
-                                {language === "ko" ? "분석 준비 완료!" : "Ready to analyze!"}
+                                {language === "ko" ? "분석 준비 완료!" : language === "ja" ? "分析準備完了！" : language === "zh" ? "准备好分析了！" : "Ready to analyze!"}
                                 <motion.span
                                   animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.3, 1] }}
                                   transition={{ duration: 3, repeat: Infinity }}
@@ -440,7 +440,7 @@ export default function FloatingBasketBar({
                         ) : (
                           <>
                             <Zap size={12} className={canAnalyze ? "text-yellow-200" : ""} />
-                            <span className="uppercase">{language === "ko" ? "분석" : "SCAN"}</span>
+                            <span className="uppercase">{language === "ko" ? "분석" : language === "ja" ? "分析" : language === "zh" ? "分析" : "SCAN"}</span>
                           </>
                         )}
                       </span>

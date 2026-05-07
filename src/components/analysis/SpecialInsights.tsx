@@ -15,7 +15,7 @@ import type { AnalysisResult } from "@/types/database";
 
 interface SpecialInsightsProps {
     result: AnalysisResult;
-    language: "ko" | "en";
+    language: "ko" | "en" | "ja" | "zh";
 }
 
 const SpecialInsights = memo(function SpecialInsights({ result, language }: SpecialInsightsProps) {
@@ -34,11 +34,11 @@ const SpecialInsights = memo(function SpecialInsights({ result, language }: Spec
                 >
                     <Sparkles size={14} className="text-indigo-400" />
                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400">
-                        {isKo ? "AI 스페셜 가이드" : "AI SPECIAL GUIDE"}
+                        {language === 'ko' ? "AI 스페셜 가이드" : language === 'ja' ? "AIスペシャルガイド" : language === 'zh' ? "AI特别指南" : "AI SPECIAL GUIDE"}
                     </span>
                 </motion.div>
                 <h3 className="text-2xl md:text-5xl font-[1000] text-white tracking-tighter">
-                    {isKo ? "더 완벽한 섭취를 위한 팁" : "Tips for Perfect Intake"}
+                    {language === 'ko' ? "더 완벽한 섭취를 위한 팁" : language === 'ja' ? "より完璧な摂取のためのヒント" : language === 'zh' ? "更完美摄入的提示" : "Tips for Perfect Intake"}
                 </h3>
             </div>
 
@@ -57,9 +57,11 @@ const SpecialInsights = memo(function SpecialInsights({ result, language }: Spec
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">
-                                    {isKo ? "추천 식단 궁합" : "Meal Pairing"}
+                                    {language === 'ko' ? "추천 식단 궁합" : language === 'ja' ? "おすすめの食事との相性" : language === 'zh' ? "推荐饮食搭配" : "Meal Pairing"}
                                 </span>
-                                <h4 className="text-lg md:text-xl font-black text-white">AI Meal Guide</h4>
+                                <h4 className="text-lg md:text-xl font-black text-white">
+                                    {language === 'ko' ? "AI 식단 매칭" : language === 'ja' ? "AI食事マッチング" : language === 'zh' ? "AI饮食搭配" : "AI Meal Guide"}
+                                </h4>
                             </div>
                         </div>
 
@@ -73,7 +75,10 @@ const SpecialInsights = memo(function SpecialInsights({ result, language }: Spec
                                     className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 group-hover:bg-white/[0.05] transition-colors"
                                 >
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                                    <p className="text-[14px] md:text-[15px] font-bold text-slate-200 leading-tight">
+                                    <p className={cn(
+                                        "text-[14px] md:text-[15px] font-bold text-slate-200 leading-tight",
+                                        (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                                    )}>
                                         {meal}
                                     </p>
                                 </motion.div>
@@ -112,15 +117,18 @@ const SpecialInsights = memo(function SpecialInsights({ result, language }: Spec
                                     "text-[11px] font-black uppercase tracking-widest",
                                     result.ingredients.some(i => i.category === 'drugs') ? "text-rose-400" : "text-indigo-400"
                                 )}>
-                                    {isKo ? "약물 안전 가이드" : "Safety Check"}
+                                    {language === 'ko' ? "약물 안전 가이드" : language === 'ja' ? "薬物安全ガイド" : language === 'zh' ? "药物安全指南" : "Safety Check"}
                                 </span>
-                                <h4 className="text-lg md:text-xl font-black text-white">Medication Safety</h4>
+                                <h4 className="text-lg md:text-xl font-black text-white">
+                                    {language === 'ko' ? "의약품 안전성" : language === 'ja' ? "医薬品の安全性" : language === 'zh' ? "药品安全性" : "Medication Safety"}
+                                </h4>
                             </div>
                         </div>
 
                         <div className="relative z-10">
                             <div className={cn(
-                                "p-5 rounded-2xl border leading-relaxed break-keep",
+                                "p-5 rounded-2xl border leading-relaxed",
+                                (language === 'ja' || language === 'zh') ? "break-all" : "break-keep",
                                 result.ingredients.some(i => i.category === 'drugs')
                                     ? "bg-rose-500/5 border-rose-500/10 text-rose-100/90"
                                     : "bg-indigo-500/5 border-indigo-500/10 text-indigo-100/90"

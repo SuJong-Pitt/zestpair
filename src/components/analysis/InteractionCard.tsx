@@ -39,10 +39,10 @@ const NoInteractionCard = memo(function NoInteractionCard({ language, t }: NoInt
                 />
             </div>
 
-            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 p-8 md:p-12">
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 p-6 sm:p-8 md:p-12">
                 {/* Holographic Shield Icon */}
                 <div className="shrink-0 flex items-center justify-center">
-                    <div className="relative w-40 h-40 md:w-44 md:h-44 flex items-center justify-center">
+                    <div className="relative w-32 h-32 md:w-44 md:h-44 flex items-center justify-center">
                         <div className="absolute inset-0 rounded-full border-2 border-dashed border-emerald-400/20" />
                         <motion.div
                             animate={{ rotate: -360 }}
@@ -50,22 +50,25 @@ const NoInteractionCard = memo(function NoInteractionCard({ language, t }: NoInt
                             className="absolute inset-0 rounded-full"
                             style={{ background: "conic-gradient(from 0deg, transparent 0deg, rgba(52,211,153,0.35) 25deg, transparent 50deg)" }}
                         />
-                        <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-[1.6rem] flex items-center justify-center bg-slate-900 border border-emerald-400/40 shadow-xl">
-                            <ShieldCheck size={42} className="text-emerald-400" />
+                        <div className="relative w-12 h-12 md:w-20 md:h-20 rounded-[1.2rem] md:rounded-[1.6rem] flex items-center justify-center bg-slate-900 border border-emerald-400/40 shadow-xl">
+                            <ShieldCheck size={32} className="text-emerald-400" />
                         </div>
                     </div>
                 </div>
 
                 {/* Content */}
-                <div className="flex flex-col gap-4 text-center md:text-left flex-1 min-w-0">
+                <div className="flex flex-col gap-3 md:gap-4 text-center md:text-left flex-1 min-w-0">
                     <div className="inline-flex items-center gap-2 self-center md:self-start">
                         <div className="w-2 h-2 rounded-full bg-emerald-400" style={{ boxShadow: "0 0 8px #34d399" }} />
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">
-                            Security Status — Verified
+                            {language === 'ko' ? "보안 상태 — 검증됨" : language === 'ja' ? "セキュリティステータス — 検証済み" : language === 'zh' ? "安全状态 — 已验证" : "Security Status — Verified"}
                         </span>
                     </div>
 
-                    <h4 className="text-2xl md:text-3xl font-[1000] tracking-tighter leading-[1.1] text-white">
+                    <h4 className={cn(
+                        "text-xl md:text-3xl font-[1000] tracking-tighter leading-[1.1] text-white",
+                        (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                    )}>
                         {t.results.noInteraction}
                     </h4>
 
@@ -75,9 +78,9 @@ const NoInteractionCard = memo(function NoInteractionCard({ language, t }: NoInt
 
                     <div className="flex flex-row flex-wrap gap-2.5 justify-center md:justify-start pt-1">
                         {[
-                            { label: "Zero Risk", icon: "🛡️", color: "#34d399" },
-                            { label: "Bio-Safe", icon: "🧬", color: "#818cf8" },
-                            { label: "100% Synergy", icon: "⚡", color: "#fbbf24" },
+                            { label: language === 'ko' ? "위험 제로" : language === 'ja' ? "リスクゼロ" : language === 'zh' ? "零风险" : "Zero Risk", icon: "🛡️", color: "#34d399" },
+                            { label: language === 'ko' ? "생체 안전" : language === 'ja' ? "バイオセーフ" : language === 'zh' ? "生物安全" : "Bio-Safe", icon: "🧬", color: "#818cf8" },
+                            { label: language === 'ko' ? "100% 시너지" : language === 'ja' ? "100%シナジー" : language === 'zh' ? "100%协同" : "100% Synergy", icon: "⚡", color: "#fbbf24" },
                         ].map((badge, i) => (
                             <div
                                 key={i}

@@ -38,9 +38,9 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
   const [showTooltip, setShowTooltip] = useState(false);
 
   const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko'];
-  const name     = language === "ko" ? ingredient.name     : ingredient.name_en;
-  const shortDesc= language === "ko" ? ingredient.short_description : (ingredient.short_description_en || ingredient.short_description);
-  const desc     = language === "ko" ? ingredient.description       : (ingredient.description_en       || ingredient.description);
+  const name = language === "ko" ? ingredient.name : language === "ja" && ingredient.name_ja ? ingredient.name_ja : language === "zh" && ingredient.name_zh ? ingredient.name_zh : ingredient.name_en || ingredient.name;
+  const shortDesc = language === "ko" ? ingredient.short_description : language === "ja" && ingredient.short_description_ja ? ingredient.short_description_ja : language === "zh" && ingredient.short_description_zh ? ingredient.short_description_zh : ingredient.short_description_en || ingredient.short_description;
+  const desc = language === "ko" ? ingredient.description : language === "ja" && ingredient.description_ja ? ingredient.description_ja : language === "zh" && ingredient.description_zh ? ingredient.description_zh : ingredient.description_en || ingredient.description;
   const theme    = getCategoryTheme(ingredient.name);
   const { Icon } = theme;
 
@@ -99,7 +99,7 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
                 boxShadow: "0 4px 12px rgba(239,68,68,0.4)"
               }}
             >
-              {isFeatured ? "TRENDING" : "LIMITED"}
+              {isFeatured ? t.hero.trending : t.hero.limited}
             </div>
           </div>
         )}
@@ -221,10 +221,13 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
             className="absolute -top-3 left-1/2 z-[40] pointer-events-none"
           >
             <div
-              className="relative rounded-[1.25rem] p-2 bg-slate-950/98 border backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] w-[140px] md:w-[240px]"
+              className={cn(
+                "relative rounded-[1.25rem] px-4 py-3 bg-slate-950/98 border backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)]",
+                language === 'ja' || language === 'zh' ? "w-[200px] md:w-[320px]" : "w-[160px] md:w-[260px]"
+              )}
               style={{ borderColor: `${theme.color}50`, borderTop: `2px solid ${theme.color}a0` }}
             >
-              <div className="flex items-center gap-1.5 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${theme.color}25` }}>
+              <div className="flex items-center gap-1.5 mb-2 pb-2" style={{ borderBottom: `1px solid ${theme.color}25` }}>
                 <span className="text-xs md:text-sm">{ingredient.icon_emoji}</span>
                 <span className="text-[7.5px] md:text-[8.5px] font-[1000] uppercase tracking-widest" style={{ color: theme.color }}>
                   {t.common.analysisProtocol}
@@ -236,7 +239,10 @@ const IngredientCardContent = memo(function IngredientCardContent({ ingredient, 
                   style={{ background: theme.color, boxShadow: `0 0 5px ${theme.color}` }}
                 />
               </div>
-              <p className="text-[9.5px] md:text-[10.5px] leading-snug text-slate-200 font-bold tracking-tight">
+              <p className={cn(
+                "text-[10px] md:text-[11.5px] leading-relaxed text-slate-200 font-bold break-words",
+                language === 'ko' ? "break-keep" : ""
+              )}>
                 {desc}
               </p>
 

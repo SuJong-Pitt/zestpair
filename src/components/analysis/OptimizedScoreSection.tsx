@@ -56,16 +56,16 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
         const isAlreadyPerfect = currentScore >= 100;
         const isNextPerfect = nextScore >= 100;
 
-        let bridgeText = isKo ? `${nextScore}점 달성하기` : `Reach ${nextScore} pts`;
+        let bridgeText = language === 'ko' ? `${nextScore}점 달성하기` : language === 'ja' ? `${nextScore}点を目指す` : language === 'zh' ? `达到${nextScore}分` : `Reach ${nextScore} pts`;
         
         if (isAlreadyPerfect) {
-            bridgeText = isKo ? "완벽 그 이상의 시너지" : "Beyond Perfection";
+            bridgeText = language === 'ko' ? "완벽 그 이상의 시너지" : language === 'ja' ? "完璧以上のシナジー" : language === 'zh' ? "超越完美的协同效应" : "Beyond Perfection";
         } else if (isNextPerfect) {
-            bridgeText = isKo ? "100점 만점 도전" : "Ultimate 100 Pts";
+            bridgeText = language === 'ko' ? "100점 만점 도전" : language === 'ja' ? "100点満点への挑戦" : language === 'zh' ? "挑战100分满分" : "Ultimate 100 Pts";
         }
 
         return {
-            name: isKo ? targetPartner.name : targetPartner.name_en,
+            name: language === 'ko' ? targetPartner.name : language === 'ja' ? (targetPartner.name_ja || targetPartner.name_en) : language === 'zh' ? (targetPartner.name_zh || targetPartner.name_en) : targetPartner.name_en,
             score: nextScore,
             emoji: targetPartner.icon_emoji,
             bridgeText
@@ -115,7 +115,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                         >
-                            <ScoreRing score={result.score} size={isMobile ? 180 : 260} />
+                            <ScoreRing score={result.score} language={language} size={isMobile ? 180 : 260} />
                         </motion.div>
                         
                         {/* Interactive Hint for Bridge */}
@@ -127,7 +127,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                 className="absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap"
                             >
                                 <div className="flex flex-col items-center gap-1">
-                                    <p className="text-[10px] font-black text-emerald-400/70 uppercase tracking-widest">{isKo ? "시너지 해결책 발견" : "Synergy Solution Found"}</p>
+                                    <p className="text-[10px] font-black text-emerald-400/70 uppercase tracking-widest">{language === 'ko' ? "시너지 해결책 발견" : language === 'ja' ? "シナジー解決策を発見" : language === 'zh' ? "发现协同方案" : "Synergy Solution Found"}</p>
                                     <motion.div 
                                         animate={{ y: [0, 5, 0] }}
                                         transition={{ duration: 1.5, repeat: Infinity }}
@@ -147,7 +147,9 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                         className="flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md mb-4 mt-6"
                     >
                         <Sparkles size={10} className="text-indigo-300" />
-                        <span className="text-[8px] md:text-[9px] font-black text-indigo-100 uppercase tracking-[0.2em]">AI Precision Analysis</span>
+                        <span className="text-[8px] md:text-[9px] font-black text-indigo-100 uppercase tracking-[0.2em]">
+                            {language === 'ko' ? "AI 정밀 분석 시스템" : language === 'ja' ? "AI精密分析システム" : language === 'zh' ? "AI精密分析系统" : "AI Precision Analysis"}
+                        </span>
                     </motion.div>
 
                     {/* Title & Motivation */}
@@ -158,7 +160,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
                             className="text-2xl md:text-4xl font-[1000] tracking-tighter leading-none text-white"
                         >
-                            {result.score >= 90 ? t.results.synergy : result.score >= 70 ? (isKo ? "좋은 조합입니다!" : "Great Match!") : result.score >= 40 ? t.results.caution : t.results.conflict}
+                            {result.score >= 90 ? t.results.synergy : result.score >= 70 ? (language === 'ko' ? "좋은 조합입니다!" : language === 'ja' ? "良い組み合わせです！" : language === 'zh' ? "很好的组合！" : "Great Match!") : result.score >= 40 ? t.results.caution : t.results.conflict}
                         </motion.h2>
                         <motion.p
                             initial={{ opacity: 0 }}
@@ -166,7 +168,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             transition={{ delay: 0.5 }}
                             className="text-sm md:text-base font-black text-emerald-400/90 tracking-tight"
                         >
-                            {result.score >= 90 ? t.results.bestMix : result.score >= 70 ? (isKo ? "서로의 효능을 보완하는 구성" : "Ingredients complement each other") : result.score >= 40 ? t.results.potentialConflict : t.results.dangerous}
+                            {result.score >= 90 ? t.results.bestMix : result.score >= 70 ? (language === 'ko' ? "서로의 효능을 보완하는 구성" : language === 'ja' ? "お互いの効能を補完する構成" : language === 'zh' ? "互补功效的构成" : "Ingredients complement each other") : result.score >= 40 ? t.results.potentialConflict : t.results.dangerous}
                         </motion.p>
                     </div>
 
@@ -178,14 +180,16 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             transition={{ delay: 0.6 }}
                             className="w-full max-w-2xl mb-8 p-0.5 rounded-[2rem] bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 shadow-[0_10px_30px_-10px_rgba(245,158,11,0.3)] group/jackpot"
                         >
-                            <div className="bg-slate-900/90 backdrop-blur-xl rounded-[1.95rem] p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                            <div className="bg-slate-900/90 backdrop-blur-xl rounded-[1.95rem] px-4 py-6 sm:p-6 md:p-8 flex flex-col md:flex-row items-center gap-4 md:gap-6 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover/jackpot:opacity-20 transition-opacity">
                                     <Sparkles size={80} className="text-yellow-500" />
                                 </div>
                                 
-                                <div className="shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-[2.5rem] bg-yellow-500/10 border border-yellow-500/20 flex flex-col items-center justify-center relative">
-                                    <span className="text-3xl md:text-4xl mb-1">🎰</span>
-                                    <span className="text-[10px] font-black text-yellow-500 uppercase tracking-tighter">Jackpot</span>
+                                <div className="shrink-0 w-16 h-16 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2.5rem] bg-yellow-500/10 border border-yellow-500/20 flex flex-col items-center justify-center relative">
+                                    <span className="text-2xl md:text-4xl mb-0.5">🎰</span>
+                                    <span className="text-[8px] md:text-[10px] font-black text-yellow-500 uppercase tracking-tighter">
+                                        {language === 'ko' ? "대박 조합" : language === 'ja' ? "大当たりの組み合わせ" : language === 'zh' ? "极佳组合" : "Jackpot"}
+                                    </span>
                                     <motion.div 
                                         animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
                                         transition={{ duration: 2, repeat: Infinity }}
@@ -195,12 +199,20 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
 
                                 <div className="flex-1 text-center md:text-left space-y-2">
                                     <div className="flex flex-col md:flex-row md:items-center gap-2">
-                                        <span className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.3em]">Today's Best Pair</span>
-                                        <h4 className="text-xl md:text-2xl font-[1000] text-white tracking-tight">
+                                        <span className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.3em]">
+                                            {language === 'ko' ? "오늘의 베스트 페어" : language === 'ja' ? "本日のベストペア" : language === 'zh' ? "今日最佳搭档" : "Today's Best Pair"}
+                                        </span>
+                                        <h4 className={cn(
+                                            "text-xl md:text-2xl font-[1000] text-white tracking-tight",
+                                            (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                                        )}>
                                             {result.synergy_jackpot.pair_names}
                                         </h4>
                                     </div>
-                                    <p className="text-sm md:text-base font-bold text-slate-300 leading-relaxed break-keep">
+                                    <p className={cn(
+                                        "text-sm md:text-base font-bold text-slate-300 leading-relaxed",
+                                        (language === 'ja' || language === 'zh') ? "break-all" : "break-keep"
+                                    )}>
                                         {result.synergy_jackpot.reason}
                                     </p>
                                 </div>
@@ -220,13 +232,13 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                     <TrendingUp size={13} className="text-emerald-400" />
                                 </div>
                                 <h5 className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                    {isKo ? "내 성분 스택 — 구매 가이드" : "My Stack — Purchase Guide"}
+                                    {language === 'ko' ? "내 성분 스택 — 구매 가이드" : language === 'ja' ? "マイスタック — 購入ガイド" : language === 'zh' ? "我的成分堆栈 — 购买指南" : "My Stack — Purchase Guide"}
                                 </h5>
                             </div>
                             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                                 <Sparkles size={9} className="text-emerald-400" />
                                 <span className="text-[9px] font-black text-emerald-400 uppercase tracking-tighter">
-                                    {result.ingredients.length} {isKo ? "개 AI 검증" : "AI Verified"}
+                                    {result.ingredients.length} {language === 'ko' ? "개 성분 AI 검증" : language === 'ja' ? "個の成分AI検証済み" : language === 'zh' ? "个成分AI已验证" : "Ingredients AI Verified"}
                                 </span>
                             </div>
                         </div>
@@ -248,24 +260,31 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
 
                             // 역할 라벨
                             const roleLabel = (() => {
-                                if (synergyCount >= 2) return isKo ? "핵심 시너지 성분" : "Core Synergy";
-                                if (synergyCount === 1) return isKo ? "보완 역할" : "Complement";
-                                return isKo ? "기초 지원 성분" : "Foundation";
+                                if (synergyCount >= 2) return language === 'ko' ? "핵심 시너지 성분" : language === 'ja' ? "核心シナジー成分" : language === 'zh' ? "核心协同成分" : "Core Synergy";
+                                if (synergyCount === 1) return language === 'ko' ? "보완 역할" : language === 'ja' ? "補完的役割" : language === 'zh' ? "补充角色" : "Complement";
+                                return language === 'ko' ? "기초 지원 성분" : language === 'ja' ? "基礎サポート成分" : language === 'zh' ? "基础支持成分" : "Foundation";
                             })();
 
                             // AI 브리핑에서 해당 성분 언급 문장 추출 (1문장)
-                            const ingName = isKo ? ing.name : (ing.name_en || ing.name);
+                            const ingName = language === 'ko' ? ing.name : 
+                                            language === 'ja' ? (ing.name_ja || ing.name_en || ing.name) : 
+                                            language === 'zh' ? (ing.name_zh || ing.name_en || ing.name) : 
+                                            (ing.name_en || ing.name);
                             const briefingHintStr = result.ai_briefing?.map(b => typeof b === 'string' ? b : `${b.headline} ${b.details}`).find(b => b.includes(ingName));
                             const hintSentence = briefingHintStr
                                 ? briefingHintStr.split(/[.。]/).find((s: string) => s.includes(ingName))?.trim()
                                 : null;
 
-                            const purchaseUrl = isKo
+                            const purchaseUrl = language === 'ko'
                                 ? (ing.coupang_url || `https://www.coupang.com/np/search?q=${encodeURIComponent(ing.name)}`)
-                                : (ing.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(ing.name_en || ing.name)}`);
+                                : language === 'ja'
+                                ? (ing.rakuten_url || `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(ing.rakuten_search_keyword || ing.name_ja || ing.name)}`)
+                                : language === 'zh'
+                                ? (ing.tmall_url || `https://s.taobao.com/search?q=${encodeURIComponent(ing.tmall_search_keyword || ing.name_zh || ing.name)}`)
+                                : (ing.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(ing.amazon_search_keyword || ing.name_en || ing.name)}`);
 
-                            const storeLabel = isKo ? "쿠팡 로켓배송" : "Amazon";
-                            const storeIcon = isKo ? "🚀" : "📦";
+                            const storeLabel = language === 'ko' ? "쿠팡 로켓배송" : language === 'ja' ? "Rakuten" : language === 'zh' ? "Tmall" : "Amazon";
+                            const storeIcon = language === 'ko' ? "🚀" : language === 'ja' ? "🛒" : language === 'zh' ? "🛍️" : "📦";
 
                             return (
                                 <motion.div
@@ -294,7 +313,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                     <div className="absolute top-0 left-0 right-0 h-px"
                                         style={{ background: 'linear-gradient(90deg, transparent, rgba(52,211,153,0.3), transparent)' }} />
 
-                                    <div className="pl-5 pr-4 py-4 md:py-5 flex flex-col gap-3">
+                                    <div className="pl-4 pr-3 py-4 md:pl-5 md:pr-4 md:py-5 flex flex-col gap-3">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex items-center gap-3">
                                                 <div className="relative w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
@@ -313,7 +332,10 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                                     </span>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
-                                                            {ing.category}
+                                                            {language === 'ko' ? ing.category : 
+                                                             language === 'ja' ? (ing.category_ja || ing.category) : 
+                                                             language === 'zh' ? (ing.category_zh || ing.category) : 
+                                                             ing.category}
                                                         </span>
                                                         <span className="text-[8px] text-slate-700">·</span>
                                                         <span className="text-[8px] font-black uppercase tracking-wide"
@@ -329,7 +351,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                                 style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.25)', boxShadow: '0 4px 20px -4px rgba(52,211,153,0.2)' }}>
                                                 <span className="text-[20px] md:text-[24px] font-[1000] leading-none"
                                                     style={{ color: '#34d399', textShadow: '0 0 12px rgba(52,211,153,0.5)' }}>+{scoreContrib}</span>
-                                                <span className="text-[7px] font-black text-emerald-400/60 uppercase tracking-wider mt-0.5">{isKo ? "점 기여" : "pts"}</span>
+                                                <span className="text-[7px] font-black text-emerald-400/60 uppercase tracking-wider mt-0.5">{language === 'ko' ? "점 기여" : language === 'ja' ? "点寄与" : language === 'zh' ? "分贡献" : "pts"}</span>
                                             </div>
                                         </div>
 
@@ -354,7 +376,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                             <div className="flex items-center gap-2">
                                                 <ShoppingCart size={13} className="text-emerald-400" />
                                                 <span className="text-[11px] md:text-[12px] font-black text-emerald-300">
-                                                    {storeIcon} {storeLabel}{isKo ? "으로 구매" : " — Best Price"}
+                                                    {storeIcon} {storeLabel}{language === 'ko' ? "으로 구매" : language === 'ja' ? "で詳細を見る" : language === 'zh' ? "查看详情" : " — Buy Now"}
                                                 </span>
                                             </div>
                                             <ExternalLink size={11} className="text-emerald-400/50" />
@@ -382,7 +404,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                 <Info size={11} style={{ color: scoreRationale.isHighEnd ? 'rgba(251,191,36,0.5)' : '#475569' }} />
                                 <h5 className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]"
                                     style={{ color: scoreRationale.isHighEnd ? 'rgba(251,191,36,0.7)' : '#475569' }}>
-                                    {isKo ? "과학적 정밀 분석 지표" : "Precision Analysis Metrics"}
+                                    {language === 'ko' ? "과학적 정밀 분석 지표" : language === 'ja' ? "科学的精密分析指標" : language === 'zh' ? "科学精密分析指标" : "Precision Analysis Metrics"}
                                 </h5>
                                 <div className="h-px flex-1 ml-2"
                                     style={{ background: scoreRationale.isHighEnd ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.05)' }} />
@@ -424,7 +446,7 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             className="h-12 md:h-14 rounded-2xl bg-white/5 border-white/10 hover:bg-white/10 text-white font-[1000] px-8 active:scale-95 text-[13px] md:text-sm tracking-widest uppercase"
                         >
                             <Share2 size={16} className="mr-2.5 opacity-60" />
-                            COPY LINK
+                            {language === 'ko' ? "링크 복사" : language === 'ja' ? "リンクをコピー" : language === 'zh' ? "复制链接" : "COPY LINK"}
                         </Button>
                     </div>
 

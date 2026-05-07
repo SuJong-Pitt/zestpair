@@ -186,7 +186,7 @@ const SynergyHUD = memo(function SynergyHUD({
                 </div>
                 <div className="flex flex-col items-center gap-1">
                     <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest">Status</span>
-                    <span className="text-[10px] font-bold text-white tracking-widest leading-none">{score >= 100 ? "OPTIMAL" : "SYNCING"}</span>
+                    <span className="text-[10px] font-bold text-white tracking-widest leading-none">{score >= 100 ? (language === 'ko' ? "최적" : language === 'ja' ? "最適" : language === 'zh' ? "最佳" : "OPTIMAL") : "SYNCING"}</span>
                 </div>
             </div>
 
@@ -246,11 +246,18 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
         const displayProjectedScore = Math.max(currentScore, rawProjectedScore);
 
         const targetPartner = potentialSynergy.pair[1];
-        const recName = isKo ? targetPartner.name : targetPartner.name_en;
+        const recName = language === 'ko' ? targetPartner.name : 
+                        language === 'ja' ? (targetPartner.name_ja || targetPartner.name_en || targetPartner.name) : 
+                        language === 'zh' ? (targetPartner.name_zh || targetPartner.name_en || targetPartner.name) : 
+                        (targetPartner.name_en || targetPartner.name);
 
-        const buyUrl = isKo
+        const buyUrl = language === 'ko'
             ? (targetPartner.coupang_url || `https://www.coupang.com/np/search?q=${encodeURIComponent(targetPartner.name)}`)
-            : (targetPartner.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(targetPartner.name_en || targetPartner.name)}`);
+            : language === 'ja'
+            ? (targetPartner.rakuten_url || `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(targetPartner.rakuten_search_keyword || targetPartner.name_ja || targetPartner.name)}`)
+            : language === 'zh'
+            ? (targetPartner.tmall_url || `https://s.taobao.com/search?q=${encodeURIComponent(targetPartner.tmall_search_keyword || targetPartner.name_zh || targetPartner.name)}`)
+            : (targetPartner.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(targetPartner.amazon_search_keyword || targetPartner.name_en || targetPartner.name)}`);
 
         const isPerfect = currentScore >= 100;
         const efficiencyGain = 45 + Math.floor(Math.random() * 20);
@@ -286,10 +293,19 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                 'event_category': 'outbound',
                 'event_label': recName,
                 'ingredient_id': targetPartner.id,
-                'platform': isKo ? 'coupang' : 'amazon'
+                'platform': language === 'ko' ? 'coupang' : language === 'ja' ? 'rakuten' : language === 'zh' ? 'tmall' : 'amazon'
             });
         }
     };
+
+    const platformConfig = useMemo(() => {
+        switch(language) {
+            case 'ko': return { label: "쿠팡 로켓배송", bg: "from-[#cb1400] to-[#015199]", shadow: "rgba(203,20,0,0.4)" };
+            case 'ja': return { label: "Rakuten GO", bg: "from-[#bf0000] to-[#df0000]", shadow: "rgba(191,0,0,0.4)" };
+            case 'zh': return { label: "Tmall GO", bg: "from-[#ff0036] to-[#000000]", shadow: "rgba(255,0,54,0.4)" };
+            default: return { label: "Amazon GO", bg: "from-[#232f3e] to-[#ff9900]", shadow: "rgba(255,153,0,0.35)" };
+        }
+    }, [language]);
 
     return (
         <motion.div
@@ -317,7 +333,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                             className="w-1.5 h-1.5 rounded-full bg-emerald-400"
                         />
                         <span className="text-[9px] md:text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em]">
-                            {isKo ? "AI 최적 파트너 발견" : "AI Optimal Match Found"}
+                            {language === 'ko' ? "AI 최적 파트너 발견" : language === 'ja' ? "AI最適パートナー発見" : language === 'zh' ? "发现AI最佳拍档" : "AI Optimal Match Found"}
                         </span>
                     </div>
                     <div className="h-px flex-1 bg-gradient-to-l from-transparent to-emerald-500/30" />
@@ -345,14 +361,18 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
 
                     <div className="flex flex-col gap-1.5 min-w-0">
                         <span className="text-[9px] md:text-[10px] font-black text-emerald-400/70 uppercase tracking-[0.3em]">
-                            {isKo ? "AI 선정 최적 파트너" : "AI Selected Partner"}
+                            {language === 'ko' ? "AI 선정 최적 파트너" : language === 'ja' ? "AI選定最適パートナー" : language === 'zh' ? "AI评选最佳拍档" : "AI Selected Partner"}
                         </span>
                         <h2 className="text-2xl md:text-4xl font-[1000] text-white tracking-tighter leading-none truncate">
                             {recName}
                         </h2>
                         <span className="text-[11px] md:text-[13px] font-bold text-slate-400">
-                            {isKo
+                            {language === 'ko'
                                 ? `현재 조합의 마지막 퍼즐 — 시너지의 완성`
+                                : language === 'ja'
+                                ? `現在の組み合わせの最後のパズル — シナジーの完成`
+                                : language === 'zh'
+                                ? `当前组合的最后一块拼图 — 协同效应的完成`
                                 : `The final piece — completes your synergy stack`}
                         </span>
                     </div>
@@ -377,10 +397,10 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                 >
                     <div className="flex items-center justify-between">
                         <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.25em]">
-                            {isKo ? "점수 업그레이드 경로" : "Score Upgrade Path"}
+                            {language === 'ko' ? "점수 업그레이드 경로" : language === 'ja' ? "スコアアップグレード経路" : language === 'zh' ? "分数升级路径" : "Score Upgrade Path"}
                         </span>
                         <span className="text-[10px] font-black text-emerald-400">
-                            +{displayProjectedScore - currentScore} {isKo ? "점 상승 가능" : "pts gain"}
+                            +{displayProjectedScore - currentScore} {language === 'ko' ? "점 상승 가능" : language === 'ja' ? "点アップ可能" : language === 'zh' ? "分提升可能" : "pts gain"}
                         </span>
                     </div>
 
@@ -404,7 +424,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
 
                     <div className="flex items-end justify-between">
                         <div className="flex flex-col items-start">
-                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{isKo ? "현재" : "Current"}</span>
+                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{language === 'ko' ? "현재" : language === 'ja' ? "現在" : language === 'zh' ? "当前" : "Current"}</span>
                             <span className="text-2xl md:text-3xl font-[1000] text-white/70 tracking-tighter">{currentScore}</span>
                         </div>
                         <div className="flex flex-col items-center">
@@ -416,7 +436,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                             </motion.div>
                         </div>
                         <div className="flex flex-col items-end">
-                            <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">{isKo ? "달성 가능" : "Reachable"}</span>
+                            <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">{language === 'ko' ? "달성 가능" : language === 'ja' ? "達成可能" : language === 'zh' ? "可达成" : "Reachable"}</span>
                             <span className={cn(
                                 "text-2xl md:text-3xl font-[1000] tracking-tighter drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]",
                                 isPerfect ? "text-amber-400" : "text-emerald-400"
@@ -434,11 +454,19 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                     className="space-y-2.5"
                 >
                     {[
-                        isKo
+                        language === 'ko'
                             ? `지금 ${recName}을(를) 추가하면 점수가 ${currentScore}점 → ${displayProjectedScore}점으로 상승합니다.`
+                            : language === 'ja'
+                            ? `今 ${recName} を追加すると、スコアが ${currentScore}点 → ${displayProjectedScore}点 に上昇します。`
+                            : language === 'zh'
+                            ? `现在添加 ${recName}，分数将从 ${currentScore}分 提升至 ${displayProjectedScore}分。`
                             : `Adding ${recName} now will boost your score from ${currentScore} → ${displayProjectedScore} pts.`,
-                        isKo
+                        language === 'ko'
                             ? `현재 잠재력의 ${100 - currentScore}%가 아직 활성화되지 않은 상태입니다.`
+                            : language === 'ja'
+                            ? `現在のポテンシャルの ${100 - currentScore}% がまだ活性化されていない状態です。`
+                            : language === 'zh'
+                            ? `当前潜力的 ${100 - currentScore}% 尚未被激活。`
                             : `${100 - currentScore}% of your stack's potential is still untapped.`
                     ].map((text, i) => (
                         <div key={i} className="flex items-start gap-3 px-1">
@@ -461,7 +489,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                     className="flex flex-col items-center gap-1.5 pt-1 pb-2"
                 >
                     <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.25em]">
-                        {isKo ? "구매 상세 정보 확인하기" : "See Purchase Details"}
+                        {language === 'ko' ? "구매 상세 정보 확인하기" : language === 'ja' ? "購入詳細情報を確認する" : language === 'zh' ? "查看购买详细信息" : "See Purchase Details"}
                     </span>
                     <motion.div
                         animate={{ y: [0, 5, 0] }}
@@ -486,13 +514,24 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                         <div className="flex items-center gap-2">
                             <div className="h-px w-6 bg-emerald-500/40" />
                             <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">
-                                {isKo ? "AI 임상 결론" : "Clinical Conclusion"}
+                                {language === 'ko' ? "AI 임상 결론" : language === 'ja' ? "AI臨床結論" : language === 'zh' ? "AI临床结论" : "Clinical Conclusion"}
                             </span>
                         </div>
-                        <h4 className="text-[22px] md:text-4xl font-[1000] text-white tracking-tight leading-snug">
-                            {isKo ? (
+                        <h4 className={cn(
+                            "text-[22px] md:text-4xl font-[1000] text-white tracking-tight leading-snug",
+                            (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                        )}>
+                            {language === 'ko' ? (
                                 <>당신의 건강 자산,{" "}
                                     <span className="text-emerald-400">마지막 연결</span>로 완성하세요.
+                                </>
+                            ) : language === 'ja' ? (
+                                <>あなたの健康資産、{" "}
+                                    <span className="text-emerald-400">最後のピース</span>で完成させてください。
+                                </>
+                            ) : language === 'zh' ? (
+                                <>您的健康资产，{" "}
+                                    通过<span className="text-emerald-400">最后的链接</span>来完成。
                                 </>
                             ) : (
                                 <>Complete your health investment with the{" "}
@@ -527,13 +566,19 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                         {/* Text block — flex-1 so it takes all remaining space */}
                         <div className="flex flex-col gap-1 flex-1 min-w-0">
                             <span className="text-[8px] md:text-[9px] font-black text-emerald-400/60 uppercase tracking-[0.2em] whitespace-nowrap">
-                                {isKo ? "AI 선정 파트너" : "AI Selected Partner"}
+                                {language === 'ko' ? "AI 선정 파트너" : language === 'ja' ? "AI選定パートナー" : language === 'zh' ? "AI评选拍档" : "AI Selected Partner"}
                             </span>
-                            <h5 className="text-lg md:text-3xl font-[1000] text-white tracking-tighter leading-tight break-keep">
+                            <h5 className={cn(
+                                "text-lg md:text-3xl font-[1000] text-white tracking-tighter leading-tight",
+                                (language === 'ja' || language === 'zh') ? "break-all" : "break-keep"
+                            )}>
                                 {recName}
                             </h5>
-                            <span className="text-[10px] md:text-[13px] text-slate-400 font-medium break-keep">
-                                {isKo ? "현재 조합의 마지막 퍼즐" : "The final piece of your stack"}
+                            <span className={cn(
+                                "text-[10px] md:text-[13px] text-slate-400 font-medium",
+                                (language === 'ja' || language === 'zh') ? "break-all" : "break-keep"
+                            )}>
+                                {language === 'ko' ? "현재 조합의 마지막 퍼즐" : language === 'ja' ? "現在の組み合わせの最後のパズル" : language === 'zh' ? "当前组合的最后一块拼图" : "The final piece of your stack"}
                             </span>
                         </div>
 
@@ -547,7 +592,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                                 +{displayProjectedScore - currentScore}
                             </span>
                             <span className="text-[7px] font-black text-emerald-400/60 uppercase tracking-wider">
-                                {isKo ? "점" : "pts"}
+                                {language === 'ko' ? "점" : language === 'ja' ? "点" : language === 'zh' ? "分" : "pts"}
                             </span>
                         </motion.div>
                     </motion.div>
@@ -562,11 +607,18 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                             </div>
                             <div className="space-y-1 min-w-0">
                                 <span className="block text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em]">
-                                    {isKo ? "시너지 분석" : "Synergy Analysis"}
+                                    {language === 'ko' ? "시너지 분석" : language === 'ja' ? "シナジー分析" : language === 'zh' ? "协同分析" : "Synergy Analysis"}
                                 </span>
-                                <p className="text-[12px] md:text-[13px] text-slate-300 leading-relaxed font-medium break-keep">
-                                    {isKo
+                                <p className={cn(
+                                    "text-[12px] md:text-[13px] text-slate-300 leading-relaxed font-medium",
+                                    (language === 'ja' || language === 'zh') ? "break-all" : "break-keep"
+                                )}>
+                                    {language === 'ko'
                                         ? (optimizerData.potentialSynergy.interaction?.reason || `${recName}은(는) 현재 드시는 성분들과 뛰어난 시너지를 이루어 효능을 극대화합니다.`)
+                                        : language === 'ja'
+                                        ? (optimizerData.potentialSynergy.interaction?.reason_ja || `${recName} は、現在服用中の成分と優れた相乗効果を発揮し、効能を最大限に高めます。`)
+                                        : language === 'zh'
+                                        ? (optimizerData.potentialSynergy.interaction?.reason_zh || `${recName} 与您当前服用的成分具有出色的协同作用，可最大限度地提高功效。`)
                                         : (optimizerData.potentialSynergy.interaction?.reason_en || `${recName} creates excellent synergy with your current stack.`)}
                                 </p>
                             </div>
@@ -579,11 +631,18 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                             </div>
                             <div className="space-y-1 min-w-0">
                                 <span className="block text-[9px] font-black text-amber-400 uppercase tracking-[0.2em]">
-                                    {isKo ? "기회 비용 경고" : "Efficiency Recovery"}
+                                    {language === 'ko' ? "기회 비용 경고" : language === 'ja' ? "機会費用の警告" : language === 'zh' ? "机会成本警告" : "Efficiency Recovery"}
                                 </span>
-                                <p className="text-[12px] md:text-[13px] text-slate-300 leading-relaxed font-medium break-keep">
-                                    {isKo
+                                <p className={cn(
+                                    "text-[12px] md:text-[13px] text-slate-300 leading-relaxed font-medium",
+                                    (language === 'ja' || language === 'zh') ? "break-all" : "break-keep"
+                                )}>
+                                    {language === 'ko'
                                         ? `현재 잠재 시너지의 약 ${efficiencyGain}%를 놓치고 있습니다. ${recName}을 추가하면 효능을 100% 활성화할 수 있습니다.`
+                                        : language === 'ja'
+                                        ? `現在の潜在的なシナジーの約 ${efficiencyGain}% を逃しています。 ${recName} を追加すると、効能を 100% 活性化できます。`
+                                        : language === 'zh'
+                                        ? `您目前错失了约 ${efficiencyGain}% 的潜在协同效应。添加 ${recName} 可以 100% 激活功效。`
                                         : `You are missing ~${efficiencyGain}% of potential synergy. Add ${recName} to unlock your stack's full potential.`}
                                 </p>
                             </div>
@@ -600,10 +659,10 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                         whileTap={{ scale: 0.97 }}
                         className={cn(
                             "relative w-full py-4 md:py-5 rounded-2xl flex items-center justify-between px-5 md:px-7 overflow-hidden group/cta transition-all",
-                            isKo
-                                ? "bg-gradient-to-r from-[#cb1400] to-[#015199] shadow-[0_12px_40px_-10px_rgba(203,20,0,0.4)]"
-                                : "bg-gradient-to-r from-[#232f3e] to-[#ff9900] shadow-[0_12px_40px_-10px_rgba(255,153,0,0.35)]"
+                            "bg-gradient-to-r shadow-xl",
+                            platformConfig.bg
                         )}
+                        style={{ boxShadow: `0 12px 40px -10px ${platformConfig.shadow}` }}
                     >
                         {/* Sweep on hover */}
                         <motion.div
@@ -616,10 +675,10 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                             </div>
                             <div className="flex flex-col items-start leading-tight">
                                 <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">
-                                    {isKo ? "쿠팡 로켓배송" : "Amazon"}
+                                    {platformConfig.label}
                                 </span>
                                 <span className="text-[14px] md:text-[16px] font-black text-white">
-                                    {isKo ? `${recName} 지금 바로 추가하기` : `Add ${recName} Now`}
+                                    {language === 'ko' ? `${recName} 지금 바로 추가하기` : language === 'ja' ? `${recName}を今すぐ追加する` : language === 'zh' ? `立即添加${recName}` : `Add ${recName} Now`}
                                 </span>
                             </div>
                         </div>
@@ -627,9 +686,19 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                     </motion.a>
 
                     {/* Affiliate Disclosure */}
-                    {isKo && (
+                    {language === 'ko' && (
                         <p className="text-center text-[9px] text-slate-600 leading-relaxed pt-1">
                             이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+                        </p>
+                    )}
+                    {language === 'ja' && (
+                        <p className="text-center text-[9px] text-slate-600 leading-relaxed pt-1">
+                            このページは楽天アフィリエイト・プログラムに参加しており、商品の購入により紹介料を受領する場合があります。
+                        </p>
+                    )}
+                    {language === 'zh' && (
+                        <p className="text-center text-[9px] text-slate-600 leading-relaxed pt-1">
+                            本页面包含推广链接，如果您通过链接购买，我们可能会获得一定比例的佣金。
                         </p>
                     )}
                 </div>
@@ -644,11 +713,11 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-white/5">
                             <TrendingUp size={10} className="text-slate-400" />
                             <span className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-400">
-                                {isKo ? "사용자들이 가장 많이 찾는 영양제" : "Global Popular Selections"}
+                                {language === 'ko' ? "사용자들이 가장 많이 찾는 영양제" : language === 'ja' ? "ユーザーが最も多く探しているサプリメント" : language === 'zh' ? "用户最常搜索的补充剂" : "Global Popular Selections"}
                             </span>
                         </div>
                         <h4 className="text-xl md:text-3xl font-black text-white tracking-tight">
-                            {isKo ? "놓치면 아쉬운 대중적인 인기템" : "Don't Miss These Trending Items"}
+                            {language === 'ko' ? "놓치면 아쉬운 대중적인 인기템" : language === 'ja' ? "見逃せない人気のアイテム" : language === 'zh' ? "不容错过的热门单品" : "Don't Miss These Trending Items"}
                         </h4>
                     </div>
 
@@ -656,9 +725,13 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                         {popularIngredients.map((ing) => (
                             <motion.a
                                 key={ing.id}
-                                href={isKo 
+                                href={language === 'ko' 
                                     ? (ing.coupang_url || `https://www.coupang.com/np/search?q=${encodeURIComponent(ing.name)}`)
-                                    : (ing.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(ing.name_en || ing.name)}`)
+                                    : language === 'ja'
+                                    ? (ing.rakuten_url || `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(ing.rakuten_search_keyword || ing.name_ja || ing.name)}`)
+                                    : language === 'zh'
+                                    ? (ing.tmall_url || `https://s.taobao.com/search?q=${encodeURIComponent(ing.tmall_search_keyword || ing.name_zh || ing.name)}`)
+                                    : (ing.amazon_url || `https://www.amazon.com/s?k=${encodeURIComponent(ing.amazon_search_keyword || ing.name_en || ing.name)}`)
                                 }
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -673,14 +746,22 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                                         {renderIcon(ing.icon_emoji)}
                                     </span>
                                     <div className="space-y-1">
-                                        <h5 className="text-sm md:text-xl font-black text-white">{isKo ? ing.name : (ing.name_en || ing.name)}</h5>
+                                        <h5 className="text-sm md:text-xl font-black text-white">
+                                            {language === 'ko' ? ing.name : 
+                                             language === 'ja' ? (ing.name_ja || ing.name_en || ing.name) : 
+                                             language === 'zh' ? (ing.name_zh || ing.name_en || ing.name) : 
+                                             (ing.name_en || ing.name)}
+                                        </h5>
                                         <p className="text-[9px] md:text-xs text-slate-500 font-bold tracking-tight line-clamp-1">
-                                            {isKo ? ing.short_description : (ing.short_description_en || ing.short_description)}
+                                            {language === 'ko' ? ing.short_description : 
+                                             language === 'ja' ? (ing.short_description_ja || ing.short_description_en || ing.short_description) : 
+                                             language === 'zh' ? (ing.short_description_zh || ing.short_description_en || ing.short_description) : 
+                                             (ing.short_description_en || ing.short_description)}
                                         </p>
                                     </div>
                                     <div className="mt-auto pt-4 w-full">
                                          <div className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[10px] md:text-xs font-black text-slate-300 group-hover/pop:bg-emerald-500 group-hover/pop:text-black group-hover/pop:border-emerald-500 transition-all duration-300">
-                                             <span>{isKo ? "최저가 확인하기" : "Check Best Price"}</span>
+                                             <span>{language === 'ko' ? "최저가 확인하기" : language === 'ja' ? "最安値を確認する" : language === 'zh' ? "查看最低价" : "Check Best Price"}</span>
                                              <ArrowRight size={12} />
                                          </div>
                                      </div>

@@ -72,7 +72,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
                     buttons: [{
-                        title: language === 'ko' ? '내 영양제 궁합 점수' : 'My Supplement Score',
+                        title: language === 'ko' ? '내 영양제 궁합 점수' : language === 'ja' ? '私のサプリメント相性スコア' : language === 'zh' ? '我的营养补充品契合度分数' : 'My Supplement Score',
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     }],
                 });
@@ -100,7 +100,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
             try { await navigator.share(data); } catch (err) {}
         } else {
             try {
-                setToast({ show: true, message: language === 'ko' ? "링크가 복사되었습니다!" : "Link copied!" });
+                setToast({ show: true, message: language === 'ko' ? "링크가 복사되었습니다!" : language === 'ja' ? "リンクがコピーされました！" : language === 'zh' ? "链接已复制！" : "Link copied!" });
                 setTimeout(() => setToast({ show: false, message: "" }), 3000);
 
                 // GA4 Share Tracking (Link Copy)
@@ -164,7 +164,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                             >
                                 <Sparkles size={12} className="text-emerald-400" />
                                 <h2 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.4em] text-emerald-400 pt-0.5 whitespace-nowrap">
-                                    {language === 'ko' ? 'Analysis Protocol' : 'Analysis Report'}
+                                    {language === 'ko' ? 'Analysis Protocol' : language === 'ja' ? '分析レポート' : language === 'zh' ? '分析报告' : 'Analysis Report'}
                                 </h2>
                             </motion.div>
 
@@ -182,7 +182,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     >
                                         <span className="text-lg md:text-xl">{ing.icon_emoji}</span>
                                         <span className="text-[11px] md:text-xs font-black text-slate-300">
-                                            {language === 'ko' ? ing.name : (ing.name_en || ing.name)}
+                                            {language === 'ko' ? ing.name : language === 'ja' && ing.name_ja ? ing.name_ja : language === 'zh' && ing.name_zh ? ing.name_zh : ing.name_en || ing.name}
                                         </span>
                                     </div>
                                 ))}
@@ -215,7 +215,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                                     {t.results.matrixTitle}
                                 </h3>
                                 <Badge variant="outline" className="rounded-lg px-3 py-1.5 border-white/10 text-slate-300 font-bold bg-white/5">
-                                    {allInteractions.length}{language === "ko" ? "건의 분석결과" : " Results"}
+                                    {allInteractions.length}{language === "ko" ? "건의 분석결과" : language === "ja" ? "件の分析結果" : language === "zh" ? "项分析结果" : " Results"}
                                 </Badge>
                             </div>
 
@@ -242,7 +242,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                         className="pt-20 pb-12 flex flex-col items-center gap-6 relative z-10"
                     >
                         <p className="text-[10px] md:text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">
-                            {language === 'ko' ? '다른 영양제도 궁금하신가요?' : 'Curious about other combinations?'}
+                            {language === 'ko' ? '다른 영양제도 궁금하신가요?' : language === 'ja' ? '他のサプリメントも気になりますか？' : language === 'zh' ? '对其他营养补充品也感到好奇吗？' : 'Curious about other supplements?'}
                         </p>
                         <button
                             onClick={handleReset}
@@ -250,7 +250,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                         >
                             <RefreshCcw size={18} className="text-emerald-400 group-hover:rotate-180 transition-transform duration-700" />
                             <span className="text-xs md:text-sm font-black text-white/90 uppercase tracking-widest">
-                                {language === 'ko' ? '새로운 조합 분석하기' : 'Analyze New Combination'}
+                                {language === 'ko' ? '새로운 조합 분석하기' : language === 'ja' ? '新しい組み合わせを分析する' : language === 'zh' ? '分析新的组合' : 'Analyze New Combination'}
                             </span>
                         </button>
                     </motion.div>

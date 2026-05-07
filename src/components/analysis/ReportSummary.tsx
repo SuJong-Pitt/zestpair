@@ -27,8 +27,7 @@ interface ReportSummaryProps {
 
 const CARD_META = [
     {
-        labelKo: "퍼포먼스 & 전략",
-        labelEn: "Performance Strategy",
+        label: { ko: "퍼포먼스 & 전략", en: "Performance Strategy", ja: "パフォーマンス＆戦略", zh: "表现与策略" },
         icon: Zap,
         color: '#22d3ee',
         borderColor: 'rgba(34,211,238,0.2)',
@@ -39,8 +38,7 @@ const CARD_META = [
         badgeText: "text-cyan-400",
     },
     {
-        labelKo: "시너지 메커니즘",
-        labelEn: "Synergy Mechanism",
+        label: { ko: "시너지 메커니즘", en: "Synergy Mechanism", ja: "相乗効果メカニズム", zh: "协同机制" },
         icon: Layers,
         color: '#34d399',
         borderColor: 'rgba(52,211,153,0.2)',
@@ -51,8 +49,7 @@ const CARD_META = [
         badgeText: "text-emerald-400",
     },
     {
-        labelKo: "장기 전략 & 기대 효과",
-        labelEn: "Long-Term Strategy",
+        label: { ko: "장기 전략 & 기대 효과", en: "Long-Term Strategy", ja: "長期戦略と期待効果", zh: "长期策略与预期效果" },
         icon: TrendingUp,
         color: '#a78bfa',
         borderColor: 'rgba(167,139,250,0.2)',
@@ -63,8 +60,7 @@ const CARD_META = [
         badgeText: "text-violet-400",
     },
     {
-        labelKo: "추천 복용 대상",
-        labelEn: "Recommended For",
+        label: { ko: "추천 복용 대상", en: "Recommended For", ja: "おすすめの服用対象", zh: "推荐服用对象" },
         icon: Users,
         color: '#fbbf24',
         borderColor: 'rgba(251,191,36,0.2)',
@@ -75,8 +71,7 @@ const CARD_META = [
         badgeText: "text-amber-400",
     },
     {
-        labelKo: "생활 습관 시너지",
-        labelEn: "Lifestyle Synergy",
+        label: { ko: "생활 습관 시너지", en: "Lifestyle Synergy", ja: "生活習慣シナジー", zh: "生活方式协同" },
         icon: Coffee,
         color: '#fb923c',
         borderColor: 'rgba(251,146,60,0.2)',
@@ -87,8 +82,7 @@ const CARD_META = [
         badgeText: "text-orange-400",
     },
     {
-        labelKo: "4주 기대 효과 타임라인",
-        labelEn: "4-Week Journey",
+        label: { ko: "4주 기대 효과 타임라인", en: "4-Week Journey", ja: "4週間の期待効果タイムライン", zh: "4周预期效果时间线" },
         icon: Calendar,
         color: '#f472b6',
         borderColor: 'rgba(244,114,182,0.2)',
@@ -101,8 +95,7 @@ const CARD_META = [
 ];
 
 const WARN_META = {
-    labelKo: "주의 사항",
-    labelEn: "Caution",
+    label: { ko: "주의 사항", en: "Caution", ja: "注意事項", zh: "注意事项" },
     icon: AlertTriangle,
     color: '#fbbf24',
     borderColor: 'rgba(251,191,36,0.25)',
@@ -146,8 +139,8 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
     const isKo = language === 'ko';
 
     const ingredientNames = useMemo(() =>
-        ingredients.map(i => isKo ? i.name : (i.name_en || i.name)),
-        [ingredients, isKo]
+        ingredients.map(i => language === 'ko' ? i.name : language === 'ja' ? (i.name_ja || i.name_en) : language === 'zh' ? (i.name_zh || i.name_en) : (i.name_en || i.name)),
+        [ingredients, language]
     );
 
     const insights = useMemo(() => {
@@ -155,33 +148,37 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
             return result.ai_briefing.slice(0, 3);
         }
         return [
-            isKo ? "성분 간 흡수율을 극대화하는 최적의 배합으로 설계되었습니다." : "Optimized formulation for maximum absorption.",
-            isKo ? "에너지 대사 활성화에 유리한 시너지가 확인되었습니다." : "Confirmed synergy for metabolic activation.",
-            isKo ? "체내 안전성을 최우선으로 고려한 AI 검증 조합입니다." : "AI verified combination for safety."
+            language === 'ko' ? "성분 간 흡수율을 극대화하는 최적의 배합으로 설계되었습니다." : language === 'ja' ? "成分間の吸収率を最大化する最適な配合で設計されています。" : language === 'zh' ? "旨在最大限度提高成分吸收率的最佳配方。" : "Optimized formulation for maximum absorption.",
+            language === 'ko' ? "에너지 대사 활성화에 유리한 시너지가 확인되었습니다." : language === 'ja' ? "エネルギー代謝の活性化に有利な相乗効果が確認されました。" : language === 'zh' ? "确认了有利于能量代谢激活的协同效应。" : "Confirmed synergy for metabolic activation.",
+            language === 'ko' ? "체내 안전성을 최우선으로 고려한 AI 검증 조합입니다." : language === 'ja' ? "体内の安全性を最優先に考慮したAI検証済みの組み合わせです。" : language === 'zh' ? "最优先考虑体内安全性的AI验证组合。" : "AI verified combination for safety."
         ];
-    }, [result.ai_briefing, isKo]);
+    }, [result.ai_briefing, language]);
 
     const isHighEnd = score >= 85;
     const hasWarning = (conflicts?.length || 0) > 0 || (cautions?.length || 0) > 0;
 
     const handleShare = useCallback(async () => {
         const ingredientsList = ingredientNames.join(", ");
-        let text = isKo
+        let text = language === 'ko'
             ? `💊 선택한 영양제: ${ingredientsList}\n\n[ZestPair] ${score}점 영양제 분석 리포트 ✨\n\n`
+            : language === 'ja'
+            ? `💊 選択したサプリメント: ${ingredientsList}\n\n[ZestPair] ${score}点 サプリメント分析レポート ✨\n\n`
+            : language === 'zh'
+            ? `💊 选择的补充剂: ${ingredientsList}\n\n[ZestPair] ${score}分 补充剂分析报告 ✨\n\n`
             : `💊 Selected: ${ingredientsList}\n\n[ZestPair] Supplement Analysis Report: ${score} pts ✨\n\n`;
         insights.forEach((insight, idx) => {
             const meta = idx === 0 && hasWarning ? WARN_META : CARD_META[idx] || CARD_META[2];
             const insightText = typeof insight === 'string' ? insight : `${insight.headline} ${insight.details}`;
-            text += `📍 ${isKo ? meta.labelKo : meta.labelEn}\n${insightText}\n\n`;
+            text += `📍 ${meta.label[language] || meta.label.en}\n${insightText}\n\n`;
         });
-        text += `${isKo ? '상세 결과 보기' : 'View Full Analysis'}: ${window.location.href}`;
+        text += `${language === 'ko' ? '상세 결과 보기' : language === 'ja' ? '詳細結果を見る' : language === 'zh' ? '查看详细结果' : 'View Full Analysis'}: ${window.location.href}`;
         if (typeof navigator !== 'undefined' && navigator.share) {
             try { await navigator.share({ title: 'ZestPair', text }); } catch (err) { console.log(err); }
         } else if (typeof navigator !== 'undefined') {
             await navigator.clipboard.writeText(text);
-            alert(isKo ? "클립보드에 복사되었습니다!" : "Copied to clipboard!");
+            alert(language === 'ko' ? "클립보드에 복사되었습니다!" : language === 'ja' ? "クリップボードにコピーされました！" : language === 'zh' ? "已复制到剪贴板！" : "Copied to clipboard!");
         }
-    }, [isKo, score, insights, hasWarning, ingredientNames]);
+    }, [language, score, insights, hasWarning, ingredientNames]);
 
     return (
         <div className={cn("relative space-y-5", className)}>
@@ -203,10 +200,10 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                             className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.22em]"
                             style={{ color: isHighEnd ? '#fbbf24' : '#34d399' }}
                         >
-                            {isKo ? "AI 프로토콜 리포트" : "AI PROTOCOL REPORT"}
+                            {language === 'ko' ? "AI 프로토콜 리포트" : language === 'ja' ? "AIプロトコルレポート" : language === 'zh' ? "AI协议报告" : "AI PROTOCOL REPORT"}
                         </motion.h4>
                         <span className="text-[9px] text-slate-600 font-bold tracking-tight mt-0.5">
-                            HYPER-PERSONALIZED ANALYSIS
+                            {language === 'ko' ? "개인 맞춤형 정밀 분석" : language === 'ja' ? "パーソナライズ精密分析" : language === 'zh' ? "个性化精密分析" : "HYPER-PERSONALIZED ANALYSIS"}
                         </span>
                     </div>
                 </div>
@@ -221,7 +218,7 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                 >
                     <Share2 size={13} className="text-slate-400 group-hover:text-white transition-colors group-hover:rotate-12 transition-transform" />
                     <span className="text-[11px] font-black uppercase tracking-wider text-slate-300 group-hover:text-white transition-colors">
-                        {isKo ? '공유' : 'SHARE'}
+                        {language === 'ko' ? '공유' : language === 'ja' ? '共有' : language === 'zh' ? '分享' : 'SHARE'}
                     </span>
                 </button>
             </div>
@@ -309,7 +306,7 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                     </div>
                                     <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.28em]"
                                         style={{ color: meta.color }}>
-                                        {isKo ? meta.labelKo : meta.labelEn}
+                                        {meta.label[language] || meta.label.en}
                                     </span>
                                 </div>
 
@@ -319,13 +316,19 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                         initial={{ opacity: 0 }}
                                         whileInView={{ opacity: 1 }}
                                         transition={{ duration: 0.5, delay: idx * 0.12 + 0.2 }}
-                                        className="text-[16px] md:text-[18px] font-black leading-[1.4] tracking-tight"
+                                        className={cn(
+                                            "text-[16px] md:text-[18px] font-black leading-[1.4] tracking-tight",
+                                            (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                                        )}
                                         style={{ color: isWarnCard ? '#fef3c7' : 'rgba(255,255,255,0.95)' }}
                                     >
                                         {highlightIngredients(headline, ingredientNames, meta.color)}
                                     </motion.h5>
                                     {body && body.length > 5 && body !== headline && (
-                                        <p className="text-[14px] md:text-[15px] font-medium leading-[1.65] text-slate-400/90 tracking-tight">
+                                        <p className={cn(
+                                            "text-[14px] md:text-[15px] font-medium leading-[1.65] text-slate-400/90 tracking-tight",
+                                            (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                                        )}>
                                             {highlightIngredients(body, ingredientNames, meta.color)}
                                         </p>
                                     )}
@@ -352,7 +355,7 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                         <Users size={14} className="text-amber-400" />
                                     </div>
                                     <span className="text-[11px] font-black uppercase tracking-[0.22em] text-amber-400/80">
-                                        {isKo ? '추천 복용 대상' : 'TARGETS'}
+                                        {language === 'ko' ? '추천 복용 대상' : language === 'ja' ? 'おすすめの服用対象' : language === 'zh' ? '推荐服用对象' : 'TARGETS'}
                                     </span>
                                 </div>
                                 <div className="grid gap-2">
@@ -361,7 +364,10 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
                                             <div className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
                                                 style={{ background: 'rgba(251,191,36,0.5)' }} />
-                                            <span className="text-[13px] md:text-[14px] font-bold text-slate-200 leading-[1.5]">
+                                            <span className={cn(
+                                                "text-[13px] md:text-[14px] font-bold text-slate-200 leading-[1.5]",
+                                                (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                                            )}>
                                                 {target}
                                             </span>
                                         </div>
@@ -386,7 +392,7 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                         <Coffee size={14} className="text-orange-400" />
                                     </div>
                                     <span className="text-[11px] font-black uppercase tracking-[0.22em] text-orange-400/80">
-                                        {isKo ? '라이프스타일 시너지' : 'LIFESTYLE'}
+                                        {language === 'ko' ? '라이프스타일 시너지' : language === 'ja' ? 'ライフスタイルシナジー' : language === 'zh' ? '生活方式协同' : 'LIFESTYLE'}
                                     </span>
                                 </div>
                                 <div className="space-y-3">
@@ -394,7 +400,10 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                         <div key={i} className="flex items-start gap-3 text-left">
                                             <div className="mt-2 w-1 h-1 rounded-full flex-shrink-0"
                                                 style={{ background: '#fb923c' }} />
-                                            <p className="text-[13px] md:text-[14px] font-medium text-slate-300 leading-relaxed">
+                                            <p className={cn(
+                                                "text-[13px] md:text-[14px] font-medium text-slate-300 leading-relaxed",
+                                                (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                                            )}>
                                                 {tip}
                                             </p>
                                         </div>
@@ -426,15 +435,15 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                     <Calendar size={14} className="text-pink-400" />
                                 </div>
                                 <span className="text-[11px] font-black uppercase tracking-[0.22em] text-pink-400/80">
-                                    {isKo ? '4주간의 변화 과정' : '4-WEEK JOURNEY'}
+                                    {language === 'ko' ? '4주간의 변화 과정' : language === 'ja' ? '4週間の変化過程' : language === 'zh' ? '4周变化过程' : '4-WEEK JOURNEY'}
                                 </span>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                                 {[
-                                    { w: 'Week 1', t: result.expected_timeline.week1, s: isKo ? '초기 적응기' : 'Adaptation' },
-                                    { w: 'Week 2', t: result.expected_timeline.week2, s: isKo ? '활성 가속기' : 'Acceleration' },
-                                    { w: 'Week 4', t: result.expected_timeline.week4, s: isKo ? '체감 안정기' : 'Stabilization' },
+                                    { w: 'Week 1', t: result.expected_timeline.week1, s: language === 'ko' ? '초기 적응기' : language === 'ja' ? '初期適応期' : language === 'zh' ? '初期适应期' : 'Adaptation' },
+                                    { w: 'Week 2', t: result.expected_timeline.week2, s: language === 'ko' ? '활성 가속기' : language === 'ja' ? '活性加速期' : language === 'zh' ? '活性加速期' : 'Acceleration' },
+                                    { w: 'Week 4', t: result.expected_timeline.week4, s: language === 'ko' ? '체감 안정기' : language === 'ja' ? '体感安定期' : language === 'zh' ? '体感稳定期' : 'Stabilization' },
                                 ].map((step, i) => (
                                     <motion.div
                                         key={i}
@@ -463,7 +472,10 @@ export default function ReportSummary({ result, className }: ReportSummaryProps)
                                                 </span>
                                             </div>
                                         </div>
-                                        <p className="text-[14px] md:text-[15px] font-bold text-slate-200 leading-[1.6] tracking-tight pl-11">
+                                        <p className={cn(
+                                            "text-[14px] md:text-[15px] font-bold text-slate-200 leading-[1.6] tracking-tight pl-11",
+                                            (language === 'ja' || language === 'zh') ? "break-all" : "break-words"
+                                        )}>
                                             {step.t}
                                         </p>
                                     </motion.div>
