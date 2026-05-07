@@ -19,13 +19,15 @@ const SynergyHUD = memo(function SynergyHUD({
     initialScore,
     isTarget = false,
     isPerfect = false,
-    label
+    label,
+    language
 }: {
     score: number;
     initialScore?: number;
     isTarget?: boolean;
     isPerfect?: boolean;
     label: string;
+    language: string;
 }) {
     const radius = 42;
     const circumference = 2 * Math.PI * radius;
