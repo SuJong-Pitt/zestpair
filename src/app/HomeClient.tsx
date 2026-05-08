@@ -145,10 +145,10 @@ export default function HomeClient() {
   }, []);
 
   const LANGUAGES = [
-    { code: 'ko', label: '한국어', short: 'KO' },
-    { code: 'en', label: 'English', short: 'EN' },
-    { code: 'ja', label: '日本語', short: 'JA' },
-    { code: 'zh', label: '中文', short: 'ZH' },
+    { code: 'ko', label: '한국어', short: 'KO', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
+    { code: 'en', label: 'English', short: 'EN', color: '#60a5fa', bg: 'rgba(96,165,250,0.15)' },
+    { code: 'ja', label: '日本語', short: 'JA', color: '#f87171', bg: 'rgba(248,113,113,0.15)' },
+    { code: 'zh', label: '中文',   short: 'ZH', color: '#fbbf24', bg: 'rgba(251,191,36,0.15)'  },
   ] as const;
   const [inputValue, setInputValue] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -462,53 +462,103 @@ export default function HomeClient() {
         <div className="absolute top-0 left-0 right-0 z-50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
             <div className="relative" ref={langRef}>
-              <button
-                onClick={() => setIsLangOpen(!isLangOpen)}
-                className="group flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-[#0d1a15]/40 border border-white/10 text-white hover:border-emerald-500/40 hover:bg-[#0d1a15]/60 transition-all active:scale-95 pointer-events-auto shadow-lg backdrop-blur-md"
-              >
-                <div className="flex items-center justify-center w-5 h-5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
-                  <Languages size={12} className="text-emerald-400" />
-                </div>
-                <span className="text-[11px] font-black tracking-[0.1em] uppercase">{language}</span>
-                <ChevronDown size={11} className={cn("transition-transform duration-500 text-slate-500", isLangOpen && "rotate-180 text-emerald-400")} />
-              </button>
+              {/* ── 트리거 버튼 ── */}
+              {(() => {
+                const activeLang = LANGUAGES.find(l => l.code === language);
+                return (
+                  <button
+                    onClick={() => setIsLangOpen(!isLangOpen)}
+                    className="group relative flex items-center gap-2.5 pl-3 pr-3 py-2 rounded-xl transition-all duration-300 active:scale-95 pointer-events-auto"
+                    style={{
+                      background: isLangOpen ? activeLang?.bg ?? 'rgba(16,185,129,0.12)' : 'rgba(10,18,14,0.6)',
+                      border: `1px solid ${isLangOpen ? (activeLang?.color ?? '#10b981') + '60' : 'rgba(255,255,255,0.1)'}`,
+                      boxShadow: isLangOpen ? `0 0 16px ${activeLang?.color ?? '#10b981'}30` : '0 2px 8px rgba(0,0,0,0.4)',
+                      backdropFilter: 'blur(16px)',
+                    }}
+                  >
+                    {/* 컬러 배지 */}
+                    <div
+                      className="flex items-center justify-center w-6 h-6 rounded-lg text-[10px] font-black tracking-tight shrink-0"
+                      style={{
+                        background: activeLang?.bg ?? 'rgba(16,185,129,0.15)',
+                        color: activeLang?.color ?? '#10b981',
+                        border: `1px solid ${activeLang?.color ?? '#10b981'}40`,
+                      }}
+                    >
+                      {activeLang?.short ?? 'KO'}
+                    </div>
+                    <ChevronDown
+                      size={11}
+                      className={cn('transition-transform duration-300', isLangOpen && 'rotate-180')}
+                      style={{ color: isLangOpen ? (activeLang?.color ?? '#10b981') : 'rgba(255,255,255,0.3)' }}
+                    />
+                  </button>
+                );
+              })()}
 
               <AnimatePresence>
                 {isLangOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    initial={{ opacity: 0, y: 6, scale: 0.94 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                    className="absolute top-full left-0 mt-3 w-40 p-2 rounded-2xl bg-[#0a0f0d]/95 border border-white/10 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[60]"
+                    exit={{ opacity: 0, y: 4, scale: 0.96 }}
+                    transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
+                    className="absolute top-full left-0 mt-2 w-44 rounded-2xl z-[1000] overflow-hidden"
+                    style={{
+                      background: 'rgba(6, 11, 9, 0.99)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      boxShadow: '0 20px 50px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.06)',
+                      backdropFilter: 'blur(32px)',
+                    }}
                   >
-                    <div className="absolute inset-0 bg-emerald-500/5 rounded-2xl pointer-events-none" />
-                    <div className="relative space-y-1">
-                      {LANGUAGES.map((lang) => (
-                        <button
-                          key={lang.code}
-                          onClick={() => {
-                            setLanguage(lang.code);
-                            setIsLangOpen(false);
-                          }}
-                          className={cn(
-                            "w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] font-bold tracking-wide transition-all group/item",
-                            language === lang.code 
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-                              : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
-                          )}
-                        >
-                          <span>{lang.label}</span>
-                          {language === lang.code ? (
-                            <motion.div 
-                              layoutId="activeLang"
-                              className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#10b981]" 
-                            />
-                          ) : (
-                            <div className="w-1 h-1 rounded-full bg-slate-700 opacity-0 group-hover/item:opacity-100 transition-opacity" />
-                          )}
-                        </button>
-                      ))}
+                    {/* 언어 목록 */}
+                    <div className="p-1.5">
+                      {LANGUAGES.map((lang, idx) => {
+                        const isActive = language === lang.code;
+                        return (
+                          <motion.button
+                            key={lang.code}
+                            initial={{ opacity: 0, y: 3 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.04, duration: 0.15 }}
+                            onClick={() => { setLanguage(lang.code); setIsLangOpen(false); }}
+                            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all duration-150"
+                            style={{
+                              background: isActive ? lang.bg : 'transparent',
+                              border: isActive ? `1px solid ${lang.color}30` : '1px solid transparent',
+                            }}
+                            onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; }}
+                            onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                          >
+                            {/* 컬러 배지 */}
+                            <div
+                              className="flex items-center justify-center w-7 h-7 rounded-lg shrink-0"
+                              style={{
+                                background: isActive ? lang.bg : 'rgba(255,255,255,0.04)',
+                                border: `1px solid ${isActive ? lang.color + '45' : 'rgba(255,255,255,0.07)'}`,
+                              }}
+                            >
+                              <span style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.04em', color: isActive ? lang.color : 'rgba(255,255,255,0.35)' }}>
+                                {lang.short}
+                              </span>
+                            </div>
+
+                            {/* 언어 이름 */}
+                            <span style={{ fontSize: '13px', fontWeight: 600, color: isActive ? '#fff' : 'rgba(255,255,255,0.55)', flex: 1, textAlign: 'left' }}>
+                              {lang.label}
+                            </span>
+
+                            {/* 활성 닷 */}
+                            {isActive && (
+                              <motion.div
+                                layoutId="activeLang"
+                                className="w-1.5 h-1.5 rounded-full shrink-0"
+                                style={{ background: lang.color, boxShadow: `0 0 6px ${lang.color}` }}
+                              />
+                            )}
+                          </motion.button>
+                        );
+                      })}
                     </div>
                   </motion.div>
                 )}
@@ -519,9 +569,38 @@ export default function HomeClient() {
             <div className="flex items-center gap-2 pointer-events-auto">
               <Link
                 href="/about"
-                className="px-3 py-1.5 rounded-lg text-white/60 hover:text-white font-bold text-[10px] tracking-wide transition-all hover:bg-white/5"
+                className="group relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-xl transition-all duration-300 active:scale-95"
+                style={{
+                  background: "rgba(10,18,14,0.5)",
+                  border: "1px solid rgba(255,255,255,0.09)",
+                  backdropFilter: "blur(16px)",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.border = "1px solid rgba(255,255,255,0.18)";
+                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.06)";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.border = "1px solid rgba(255,255,255,0.09)";
+                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(10,18,14,0.5)";
+                }}
               >
-                {t.hero.about}
+                {/* 아이콘 */}
+                <div
+                  className="flex items-center justify-center w-5 h-5 rounded-md shrink-0 transition-all duration-300"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
+                  <Info size={10} style={{ color: "rgba(255,255,255,0.45)" }} />
+                </div>
+                <span
+                  className="text-[11px] font-bold tracking-wide transition-colors duration-300"
+                  style={{ color: "rgba(255,255,255,0.55)" }}
+                >
+                  {t.hero.about}
+                </span>
               </Link>
             </div>
           </div>
