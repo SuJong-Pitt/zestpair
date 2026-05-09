@@ -607,4 +607,43 @@
     background-size: 200% auto;
     animation: prism-text-move 6s linear infinite;
   }
+
+  /* ============================================================
+   * Mobile Optimization: CSS replacements for framer-motion
+   * heavy infinite animations
+   * ============================================================ */
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Used by SynergyHUD ticks - applied via inline style */
+  .animate-spin-slow {
+    animation: spin 40s linear infinite;
+    transform-origin: center;
+  }
+
+  @keyframes slide-x {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+  }
+
+  /* Float variation - small bob for product cards */
+  @keyframes float-sm {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .animate-float-sm {
+    animation: float-sm 4s ease-in-out infinite;
+  }
+
+  /* Performance: disable heavy animations on low-power mobile */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }

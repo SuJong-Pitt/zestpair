@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Sparkles, RefreshCcw } from "lucide-react";
@@ -34,11 +34,6 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     
     const [toast, setToast] = useState({ show: false, message: "" });
     const [isExiting, setIsExiting] = useState(false);
-    const [isMounted, setIsMounted] = useState(false);
-
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
 
     // 인게이지먼트 공유 데이터 메모이제이션
     const shareData = useMemo(() => {
@@ -132,28 +127,24 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
         }, 400);
     }, [router, clearBasket]);
 
-    if (!result || !result.ingredients || !isMounted) {
+    if (!result || !result.ingredients) {
         return <div className="p-20 text-center text-slate-400">{t.common.loading}...</div>;
     }
 
     return (
         <div className="relative min-h-screen bg-slate-950 w-full font-sans text-slate-200 selection:bg-emerald-500/30">
-            {/* Background Blobs (Static decoration) */}
-            <div className="fixed top-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-            <div className="fixed bottom-[-20%] right-[-10%] w-[70vw] h-[70vw] rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
+            {/* Background Blobs — hidden on mobile to prevent fixed-pos repaint on scroll */}
+            <div className="hidden md:block fixed top-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+            <div className="hidden md:block fixed bottom-[-20%] right-[-10%] w-[70vw] h-[70vw] rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
 
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{
-                    opacity: isExiting ? 0 : 1,
-                    y: isExiting ? 40 : 0,
-                    scale: isExiting ? 0.98 : 1
-                }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            {/* CSS-only exit animation — avoids framer-motion recalc on every scroll frame */}
+            <div
+                className="transition-[opacity,transform] duration-500 ease-out"
+                style={isExiting ? { opacity: 0, transform: 'translateY(40px) scale(0.98)' } : {}}
             >
                 {/* Content Container */}
                 <main className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-24">
-                    <div className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-3 md:p-10 space-y-8 md:space-y-16">
+                    <div className="w-full rounded-3xl border border-white/10 bg-white/5 sm:backdrop-blur-xl shadow-2xl p-3 md:p-10 space-y-8 md:space-y-16">
 
                         {/* 0. Report Header */}
                         <div id="analysis-report-top" className="flex flex-col items-center gap-6 pt-4 pb-0">
@@ -255,7 +246,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                         </button>
                     </motion.div>
                 </main>
-            </motion.div>
+            </div>
 
             <Toast show={toast.show} message={toast.message} onClose={() => setToast({ ...toast, show: false })} />
         </div>

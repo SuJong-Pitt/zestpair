@@ -127,14 +127,16 @@ const SynergyCard = memo(function SynergyCard({
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.05 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.2) }}
             className={cn(
-                "w-full rounded-2xl border backdrop-blur-md overflow-hidden transition-all duration-300",
+                "w-full rounded-2xl border overflow-hidden transition-colors duration-300",
                 config.bg,
                 config.border,
                 isExpanded ? "shadow-lg" : "shadow-sm"
             )}
+            style={{ willChange: 'transform, opacity' }}
         >
             <div
                 ref={reportRef}
@@ -204,13 +206,9 @@ const SynergyCard = memo(function SynergyCard({
                         </div>
                         <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shadow-inner relative group-hover/header:border-emerald-500/30 transition-colors">
                             <ChevronDown size={14} className={cn("text-slate-400 transition-transform duration-300", isExpanded && "rotate-180")} />
-                            {/* Visual Hint Pulse */}
+                            {/* Visual Hint Pulse — CSS only, no framer-motion */}
                             {!isExpanded && (
-                                <motion.div 
-                                    animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                    className="absolute inset-0 rounded-full border border-emerald-500/40 pointer-events-none"
-                                />
+                                <span className="absolute inset-0 rounded-full border border-emerald-500/40 animate-ping pointer-events-none" style={{ animationDuration: '2s' }} />
                             )}
                         </div>
                     </div>

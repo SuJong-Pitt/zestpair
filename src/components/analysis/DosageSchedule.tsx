@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, memo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Clock, Sun, Sunrise, SunMedium, Moon, Coffee, Sparkles, AlertCircle, CheckCircle2, ChevronRight } from "lucide-react";
 import type { AnalysisResult, ScheduleSlot, ScheduleItem } from "@/types/database";
 import { UI_TRANSLATIONS } from "@/lib/i18n";
@@ -158,7 +158,6 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
             )}
 
             <div className="grid gap-6 md:gap-8 max-w-4xl mx-auto px-2">
-                <AnimatePresence mode="popLayout">
                     {schedule.map((slot, idx) => {
                         const config = TIME_CONFIG[slot.time_id] || TIME_CONFIG.anytime;
                         const Icon = config.icon;
@@ -168,7 +167,8 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
                                 key={slot.time_id}
                                 initial={{ opacity: 0, x: -20 }}
                                 whileInView={{ opacity: 1, x: 0 }}
-                                transition={{ delay: idx * 0.1 }}
+                                viewport={{ once: true, amount: 0.2 }}
+                                transition={{ delay: idx * 0.08 }}
                                 className="group relative flex flex-col md:flex-row gap-4 md:gap-8"
                             >
                                 {/* Left: Time Marker */}
@@ -225,8 +225,7 @@ const DosageSchedule = memo(function DosageSchedule({ result, language }: Dosage
                             </motion.div>
                         );
                     })}
-                </AnimatePresence>
-            </div>
+                </div>
         </section>
     );
 });

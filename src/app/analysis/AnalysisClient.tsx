@@ -216,9 +216,9 @@ function AnalysisContent() {
             <ReportHeader />
             <motion.div
                 className="pt-12 md:pt-16"
-                initial={{ opacity: 0, y: 15, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
                 <AnalysisResults result={analysisResult} />
             </motion.div>

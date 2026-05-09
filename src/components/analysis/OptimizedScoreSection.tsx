@@ -86,17 +86,11 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             onClick={scrollTarget}
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="absolute top-6 md:top-10 right-6 md:right-10 flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl z-20 group/bridge"
+                            className="absolute top-6 md:top-10 right-6 md:right-10 flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl z-20 group/bridge active:scale-95 transition-transform"
                         >
                             <div className="relative">
                                 <span className="text-lg md:text-xl">{synergyBridge.emoji}</span>
-                                <motion.div
-                                    animate={{ scale: [1, 1.2, 1] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                    className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400"
-                                />
+                                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                             </div>
                             <div className="flex flex-col items-start leading-none gap-1">
                                 <div className="flex items-center gap-1">
@@ -290,23 +284,17 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                             return (
                                 <motion.div
                                     key={ing.id}
-                                    initial={{ opacity: 0, y: 12, filter: 'blur(8px)' }}
-                                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                                    transition={{ delay: 0.1 + i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                                    initial={{ opacity: 0, y: 12 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true, amount: 0.2 }}
+                                    transition={{ delay: 0.05 + i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                                     className="group/card relative overflow-hidden rounded-[1.8rem] transition-all duration-400"
                                     style={{
                                         background: 'linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02), rgba(15,23,42,0.8))',
                                         border: '1px solid rgba(52,211,153,0.18)',
                                         boxShadow: '0 15px 40px -15px rgba(0,0,0,0.5)'
                                     }}
-                                    whileHover={{ scale: 1.01, boxShadow: '0 20px 60px -15px rgba(52,211,153,0.2)' }}
                                 >
-                                    {/* Sweep shine on hover */}
-                                    <motion.div
-                                        animate={{ x: ['-200%', '200%'] }}
-                                        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: i * 0.8 }}
-                                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent skew-x-12 pointer-events-none"
-                                    />
                                     {/* Left accent bar */}
                                     <div className="absolute left-0 top-4 bottom-4 w-[3px] rounded-full transition-all duration-300"
                                         style={{ background: 'linear-gradient(180deg, #34d399, rgba(52,211,153,0.2))' }} />
@@ -320,12 +308,6 @@ const OptimizedScoreSection = memo(function OptimizedScoreSection({
                                                 <div className="relative w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
                                                     style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}>
                                                     <span className="text-2xl">{ing.icon_emoji}</span>
-                                                    <motion.div
-                                                        animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.7, 0.3] }}
-                                                        transition={{ duration: 3, repeat: Infinity, delay: i * 0.7 }}
-                                                        className="absolute inset-0 rounded-2xl"
-                                                        style={{ background: 'radial-gradient(circle, rgba(52,211,153,0.3), transparent)' }}
-                                                    />
                                                 </div>
                                                 <div className="flex flex-col items-start leading-tight">
                                                     <span className="text-[15px] md:text-[17px] font-black text-white tracking-tight">

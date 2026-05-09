@@ -83,12 +83,8 @@ const SynergyHUD = memo(function SynergyHUD({
                         </filter>
                     </defs>
 
-                    {/* Outer Rotating Ticks */}
-                    <motion.g
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-                        className="origin-center"
-                    >
+                    {/* Outer Rotating Ticks - desktop only */}
+                    <g className="hidden md:block origin-center" style={{ animation: 'spin 40s linear infinite' }}>
                         {Array.from({ length: 36 }).map((_, i) => (
                             <line
                                 key={i}
@@ -99,16 +95,15 @@ const SynergyHUD = memo(function SynergyHUD({
                                 transform={`rotate(${i * 10} 50 50)`}
                             />
                         ))}
-                    </motion.g>
+                    </g>
 
-                    {/* Outer Scanning Beam */}
-                    <motion.circle
+                    {/* Outer Scanning Beam - desktop only */}
+                    <circle
                         cx="50" cy="50" r="48"
                         stroke={colors.main} strokeWidth="0.2" fill="none"
                         strokeDasharray="10 300"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                        className="origin-center opacity-30"
+                        className="hidden md:block origin-center opacity-30"
+                        style={{ animation: 'spin 3s linear infinite' }}
                     />
 
                     {/* Base Track */}
@@ -131,18 +126,15 @@ const SynergyHUD = memo(function SynergyHUD({
                         strokeDasharray={circumference}
                         initial={{ strokeDashoffset: circumference }}
                         whileInView={{ strokeDashoffset: circumference - (circumference * score) / 100 }}
+                        viewport={{ once: true }}
                         transition={{ duration: 2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
                         style={{ filter: `url(#glow-${label})` }}
                     />
 
-                    {/* Scanning Point */}
-                    <motion.g
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                        style={{ transformOrigin: "50px 50px" }}
-                    >
+                    {/* Scanning Point - desktop only */}
+                    <g className="hidden md:block" style={{ transformOrigin: '50px 50px', animation: 'spin 4s linear infinite' }}>
                         <circle cx="50" cy={50 - radius} r="2" fill="white" filter={`url(#glow-${label})`} />
-                    </motion.g>
+                    </g>
 
                     {/* Inner HUD UI Elements */}
                     <circle cx="50" cy="50" r={radius - 8} stroke="white" strokeWidth="0.5" strokeDasharray="2 6" fill="transparent" opacity="0.05" />
@@ -352,14 +344,13 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                     {/* Left accent */}
                     <div className="absolute left-0 top-5 bottom-5 w-[3px] rounded-full bg-emerald-400/60" />
 
-                    {/* Floating emoji */}
-                    <motion.div
-                        animate={{ y: [0, -6, 0] }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    {/* Floating emoji - CSS bounce animation */}
+                    <div
                         className="text-5xl md:text-6xl shrink-0 drop-shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                        style={{ animation: 'float 4s ease-in-out infinite' }}
                     >
                         {renderIcon(targetPartner.icon_emoji)}
-                    </motion.div>
+                    </div>
 
                     <div className="flex flex-col gap-1.5 min-w-0">
                         <span className="text-[9px] md:text-[10px] font-black text-emerald-400/70 uppercase tracking-[0.3em]">
@@ -430,12 +421,7 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                             <span className="text-2xl md:text-3xl font-[1000] text-white/70 tracking-tighter">{currentScore}</span>
                         </div>
                         <div className="flex flex-col items-center">
-                            <motion.div
-                                animate={{ x: [0, 4, 0] }}
-                                transition={{ duration: 1.5, repeat: Infinity }}
-                            >
-                                <TrendingUp size={16} className="text-emerald-400" />
-                            </motion.div>
+                            <TrendingUp size={16} className="text-emerald-400" style={{ animation: 'slide-x 1.5s ease-in-out infinite' }} />
                         </div>
                         <div className="flex flex-col items-end">
                             <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">{language === 'ko' ? "달성 가능" : language === 'ja' ? "達成可能" : language === 'zh' ? "可达成" : "Reachable"}</span>
@@ -548,22 +534,17 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                         whileHover={{ scale: 1.01 }}
                         className="relative rounded-2xl md:rounded-3xl bg-white/[0.03] border border-emerald-500/20 p-4 md:p-7 flex items-center gap-4 md:gap-5 overflow-hidden"
                     >
-                        {/* Subtle sweep shine */}
-                        <motion.div
-                            animate={{ x: ['-200%', '200%'] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent skew-x-12 pointer-events-none"
-                        />
+                        {/* Subtle sweep shine - CSS hover only, not JS loop */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent skew-x-12 pointer-events-none opacity-0 group-hover/prod:opacity-100 transition-opacity" />
                         <div className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full bg-emerald-400/50" />
 
-                        {/* Emoji — 모바일에서 작게 */}
-                        <motion.div
-                            animate={{ y: [0, -6, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        {/* Emoji — CSS float */}
+                        <div
                             className="text-3xl md:text-6xl shrink-0 drop-shadow-[0_0_20px_rgba(16,185,129,0.4)] pl-2"
+                            style={{ animation: 'float 4s ease-in-out infinite' }}
                         >
                             {renderIcon(targetPartner.icon_emoji)}
-                        </motion.div>
+                        </div>
 
                         {/* Text block — flex-1 so it takes all remaining space */}
                         <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -737,7 +718,9 @@ const SynergyOptimizer = memo(function SynergyOptimizer({
                                 }
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                whileHover={{ y: -5, scale: 1.02 }}
+                                initial={{ opacity: 0, y: 10 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
                                 className="relative group/pop p-[1px] rounded-[2rem] overflow-hidden"
                             >
                                 {/* Subtle Hover Border Glow */}
