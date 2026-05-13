@@ -16,6 +16,16 @@ export default function LanguageDetector() {
         if (typeof document !== "undefined") {
             document.title = (UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko']).metadata.title;
             document.documentElement.lang = language;
+            
+            // GA4 언어 정보 갱신
+            if (typeof window !== "undefined" && (window as any).gtag) {
+                (window as any).gtag('config', 'G-ZKMGFGYT2E', {
+                    'language': language
+                });
+                (window as any).gtag('event', 'change_language', {
+                    'language_type': language
+                });
+            }
         }
     }, [language]);
 

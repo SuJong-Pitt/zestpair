@@ -198,7 +198,10 @@ export default function RootLayout({
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
 
-            gtag('config', 'G-ZKMGFGYT2E');
+            gtag('config', 'G-ZKMGFGYT2E', {
+              'language': new URLSearchParams(window.location.search).get('lang') || 'ko',
+              'page_title': document.title
+            });
           `}
         </Script>
 
