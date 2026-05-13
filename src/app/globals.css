@@ -184,7 +184,7 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: "Pretendard Variable", Pretendard, "Noto Sans JP", "Noto Sans SC", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -214,7 +214,7 @@
   h4,
   h5,
   h6 {
-    font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    font-family: "Pretendard Variable", Pretendard, "Noto Sans JP", "Noto Sans SC", -apple-system, sans-serif;
     letter-spacing: -0.04em;
     font-weight: 700;
   }

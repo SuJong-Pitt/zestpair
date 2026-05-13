@@ -11,10 +11,11 @@ import { UI_TRANSLATIONS } from "@/lib/i18n";
 export default function LanguageDetector() {
     const { language, setLanguage } = useBasketStore();
 
-    // 언어 변경 시 문서 타이틀 동기화
+    // 언어 변경 시 문서 타이틀 및 HTML lang 속성 동기화
     useEffect(() => {
         if (typeof document !== "undefined") {
             document.title = (UI_TRANSLATIONS[language] || UI_TRANSLATIONS['ko']).metadata.title;
+            document.documentElement.lang = language;
         }
     }, [language]);
 
