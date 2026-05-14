@@ -205,11 +205,21 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* Kakao SDK (afterInteractive: 인터랙션 후 로드) */}
-        <Script 
-          src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" 
-          strategy="afterInteractive"
-        />
+        {/* Kakao SDK (Conditional Load: Only for Korean users to optimize performance) */}
+        <Script id="kakao-sdk-loader" strategy="afterInteractive">
+          {`
+            (function() {
+              const urlParams = new URLSearchParams(window.location.search);
+              const lang = urlParams.get('lang') || 'ko';
+              if (lang === 'ko') {
+                const script = document.createElement('script');
+                script.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js';
+                script.async = true;
+                document.body.appendChild(script);
+              }
+            })();
+          `}
+        </Script>
       </body>
     </html>
   );
